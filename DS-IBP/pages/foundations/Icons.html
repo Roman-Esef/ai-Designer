@@ -1,0 +1,300 @@
+<!-- @dsCard group="Foundations" name="Icons" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Icons — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/ds-toc.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* ---------- toolbar (interactive — first) ---------- */
+  .toolbar {
+    position: sticky; top: 0; z-index: 20;
+    margin-top: 30px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    padding: 16px clamp(16px,3vw,22px);
+    background: color-mix(in srgb, var(--bg-page) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border:1px solid var(--border-light); border-radius:16px;
+  }
+  .search { position:relative; flex:1 1 280px; min-width:220px; }
+  .search i, .clear i { display:contents; }
+  .search svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; color: var(--text-inactive); pointer-events:none; }
+  .search input {
+    width:100%; height:44px; padding:0 40px 0 42px;
+    border:1px solid var(--border-primary); border-radius:10px;
+    background: var(--bg-tile); color: var(--text-primary);
+    font: var(--type-body-m); outline:none;
+  }
+  .search input::placeholder { color: var(--text-inactive); }
+  .search input:focus-visible { outline:2px solid var(--primary); outline-offset:1px; }
+  .search .clear { position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:transparent; cursor:pointer; color:var(--text-inactive); width:24px; height:24px; display:none; align-items:center; justify-content:center; border-radius:6px; }
+  .search .clear:hover { color: var(--text-secondary); background: var(--bgtable-row-hover); }
+  .search.has-val .clear { display:flex; }
+
+  .seg { display:inline-flex; background: var(--tertiary); border-radius:10px; padding:3px; gap:3px; }
+  .seg button { border:none; background:transparent; padding:8px 13px; border-radius:7px; font: var(--type-button-s); color: var(--text-secondary); cursor:pointer; transition:.12s; font-variant-numeric:tabular-nums; }
+
+  .count { font: var(--type-body-s); color: var(--text-inactive); margin-left:auto; white-space:nowrap; }
+  .count b { color: var(--text-secondary); font-weight:600; }
+
+  /* ---------- category ---------- */
+  .cat { margin-top: 64px; }
+  .cat-head { display:flex; align-items:baseline; gap:14px; margin:0 0 6px; }
+  .cat-head h2 { font: var(--type-h3-strong); margin:0; color: var(--text-primary); }
+  .cat-head .c-count { font: var(--type-body-s); color: var(--text-inactive); font-variant-numeric:tabular-nums; }
+  .cat > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 24px; max-width:72ch; text-wrap:pretty; }
+
+  .panel { background: var(--bg-tile); border:1px solid var(--border-light); border-radius:16px; padding:14px; }
+
+  .thead { display:grid; grid-template-columns: 64px 1fr; align-items:center;
+    background: var(--tertiary); border-radius:10px; padding:13px 18px; margin-bottom:6px; }
+  .thead span { font: var(--type-body-s-strong); color: var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; font-size:12px; }
+
+  /* icon grid (for icon-only categories) */
+  .igrid { display:grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap:2px; }
+
+  .icell {
+    --ic: color-mix(in srgb, var(--primary) 36%, var(--text-inactive));
+    display:grid; grid-template-columns: 50px 1fr; align-items:center; gap:6px;
+    padding:11px 14px; border:none; border-radius:10px; background:transparent;
+    text-align:left; cursor:pointer; width:100%; font:inherit; color:inherit;
+    transition: background .12s ease;
+  }
+  .icell:hover { background: var(--bgtable-row-hover); }
+  .icell:active { background: var(--bgtable-row-focus); }
+  .icell .iwrap { display:flex; align-items:center; justify-content:center; width:34px; height:34px; color: var(--ic); transition: color .12s ease; }
+  .icell:hover .iwrap { color: var(--primary); }
+  .icell .iwrap svg { width: var(--isz, 24px); height: var(--isz, 24px); display:block; }
+  .icell .iname { font: var(--type-body-m); color: var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .icell:hover .iname { color: var(--text-primary); }
+
+  /* menu list (with descriptions) — single column */
+  .mlist { display:grid; grid-template-columns: 1fr; gap:2px; }
+  @media (min-width:900px){ .mlist { grid-template-columns: 1fr 1fr; } }
+  .mcell {
+    --ic: color-mix(in srgb, var(--primary) 36%, var(--text-inactive));
+    display:grid; grid-template-columns: 50px 1fr; align-items:center; gap:8px;
+    padding:12px 14px; border:none; border-radius:10px; background:transparent;
+    text-align:left; cursor:pointer; width:100%; font:inherit; color:inherit; transition: background .12s ease;
+  }
+  .mcell:hover { background: var(--bgtable-row-hover); }
+  .mcell .iwrap { display:flex; align-items:center; justify-content:center; width:34px; height:34px; color: var(--ic); transition: color .12s ease; }
+  .mcell:hover .iwrap { color: var(--primary); }
+  .mcell .iwrap svg { width: var(--isz, 24px); height: var(--isz, 24px); display:block; }
+  .mcell .m-name { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .mcell .m-desc { font: var(--type-body-s); color: var(--text-inactive); margin-top:1px; }
+
+  .empty { display:none; padding:60px 0; text-align:center; font: var(--type-body-l); color: var(--text-inactive); }
+  .empty.show { display:block; }
+
+  /* toast */
+  .toast {
+    position: fixed; left:50%; bottom:34px; transform: translate(-50%, 20px);
+    background: var(--text-primary); color:#fff; font: var(--type-body-s-strong);
+    padding:11px 18px; border-radius:10px; box-shadow:0 10px 30px rgba(40,50,55,.24);
+    opacity:0; pointer-events:none; transition: opacity .18s ease, transform .18s ease; z-index:50;
+    display:flex; align-items:center; gap:9px;
+  }
+  .toast.show { opacity:1; transform: translate(-50%, 0); }
+  .toast code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color: var(--primary-light, #58DCCC); }
+
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+</head>
+<body>
+<main class="page" data-screen-label="Icons">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.000</b></span><span>Обновлено: <b>07.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Основы</p>
+    <h1>Icons</h1>
+    <p class="lead">Набор иконок для компонентов и интерфейсов. По умолчанию используем <b>Outline</b> стиль; в исключительных случаях для отображения состояния можно использовать <b>Filled</b>. Иконки рисуются в сетке 24×24. Клик по иконке копирует её имя.</p>
+  </header>
+
+  <!-- TOOLBAR (interactive — first) -->
+  <div class="toolbar" data-screen-label="Toolbar">
+    <label class="search" id="search-wrap">
+      <i data-icon="search"></i>
+      <input id="search" type="text" placeholder="Поиск по имени иконки…" autocomplete="off" spellcheck="false">
+      <button class="clear" id="clear" aria-label="Очистить">
+        <i data-icon="close"></i>
+      </button>
+    </label>
+    <div class="seg" id="size-seg" role="tablist" aria-label="Размер иконок">
+      <button data-sz="16" role="tab">16</button>
+      <button data-sz="20" role="tab">20</button>
+      <button data-sz="24" role="tab" aria-selected="true">24</button>
+    </div>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div id="cats"></div>
+  <p class="empty" id="empty">Ничего не найдено</p>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Icons</span>
+    <span id="foot-total"></span>
+  </footer>
+</main>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+  <span>Скопировано: <code id="toast-name"></code></span>
+</div>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script>
+const I = window.DS_ICONS || {};
+
+/* ---- category config (order + membership from spec) ---- */
+const CATS = [
+  { id:'interface', title:'Interface', desc:'Базовые интерфейсные иконки: действия, статусы, навигация по контенту.',
+    icons:['add','minus','add-circle','edit','trash','minus-circle','close-circle','close','link-external','filter','filter-reset','attach','link','search','send','star-filled','star','mail','alert-circle','alert-circle-filled','alert-triangle-filled','alert-triangle','info-circle','Info-circle-filled','check-circle','check-circle-filled','check','blocked','help-circle','help-circle-filled','connection-lost','check-verified','check-shield','history','lock','a-risk','global','user-circle','calc','pie-chart','bar-chart-square','pmc-dashboard','percent-circle','message-text','message-star','pin','pin-filled','modify','circle','thumbs-up','thumb-up-filled','thumb-down','thumb-down-filled','copy','building-01','clock-timer','admin-panel-settings','visibility-on','visibility-off','link-broken','circle-filled','clock-fast-forward','x-circle','factory-01','bookmark-add','bookmark-check','bookmark-check-filled','bookmark-minus','bar-line-chart','circle-filled-small','presentation-chart','circle-filled-partly','user','phone','passport','target','bank','marker-pin','layer-01','layer-02','layer-03','building-02','building-03','check-circle-warning','swap-currency','layout-rows-01','layout-rows-02','layout-grid-01','layout-grid-02','tree-view','list-view-01','list-view-02','resident-rf','factory-check','save','bar-chart-square-plus'] },
+  { id:'arrows', title:'Arrows', desc:'Стрелки, шевроны и иконки направления / трансформации вида.',
+    icons:['arrow-right','arrow-left','arrow-up','arrow-down','arrow-up-right','arrow-down-left','arrow-up-left','arrow-down-right','flip-backward','flip-forward','arrow-narrow-down','arrow-narrow-down-left','arrow-narrow-down-right','arrow-narrow-left','arrow-narrow-right','arrow-narrow-up','arrow-narrow-up-left','arrow-narrow-up-right','pointer-down','pointer-up','pointer-right','pointer-left','chevron-down','chevron-up','chevron-left','chevron-right','chevron-left-double','chevron-right-double','download','upload','refresh','syncronyze','open-wide','maximize','minimize','normilize','arrow-circle-right','arrow-circle-down','arrow-circle-left','arrow-circle-up','arrow-circle-down-filled','arrow-circle-left-filled','arrow-circle-right-filled','arrow-circle-up-filled','arrow-block-down-filled','arrow-block-left-filled','arrow-block-right-filled','arrow-block-up-filled','arrow-block-right','arrow-block-left','sort-up','sort-down','sort','arrow-up-down','arrow-left-right','arrow-trend-up','trend-up','trend-down','spacing-height'] },
+  { id:'documents', title:'Documents', desc:'Файлы, папки и операции над документами.',
+    icons:['archive','folder','folder-plus','folder-arrow-forward','folder-arrow-forward-02','folder-close-x','folder-close-x-02','folder-back','folder-back-02','folder-delete-close','folder-check','file-forward','file-off-close','file-signed','document-signed','download-report','file-check','file-search','document-check','document-unread','file-basic','file-attachment','file','foreign-task'] },
+  { id:'calendar', title:'Calendar', desc:'Иконки календаря и операций с датами.',
+    icons:['calendar','calendar-edit','calendar-check-01','calendar-check-02','calendar-plus','calendar-minus','calendar-close-cancel'] },
+  { id:'system', title:'System', desc:'Системные иконки: контролы выбора, индикаторы загрузки, AI и служебные глифы.',
+    icons:['check-box-blank','check-box-indeterminate','check-box','radio-button-unchecked','radio-button-checked','Loader','pulsar-1','pulsar-2','gigachat','gigachat-salut','message-gigachat','ai-stars','ai-stars-02','more-dots','drag-dots','more-dots-horizontal'] },
+  { id:'gics', title:'GICS', desc:'The Global Industry Classification Standard (GICS®) — иконки для секторов экономики в фондах.',
+    icons:['battery-charging-02','trolley','burger','shopping-cart','building-07','signal-02','activity-heart','zap','server-05','factory-03','bar-chart'] },
+  { id:'menu', title:'Menu', desc:'Иконки используются в Главном меню. Каждой соответствует свой раздел системы.',
+    layout:'menu',
+    icons:[
+      ['left-menu','Раскрытие левого меню'],['pin-menu','Закрепить меню'],['unpin-menu','Открепить меню'],
+      ['main-page','Главная'],['Important-deals','Обязательные сделки'],['deals-possible-deals','Сделки / Возможные сделки'],
+      ['sales-projects','Проекты продаж CIB'],['sales-company','Кампании продаж'],['kpki-cal','Календарь КПКИ'],
+      ['tasks','Задачи'],['ckp-pipeline','Пайплайн'],['corporate-transactions','Корпоративные запросы'],
+      ['settings','Администрирование'],['cash-flow','Cash Flow СБИ'],['client-search','Поиск клиентов из ЕПК'],
+      ['logout','Выйти из системы'],['mna-pipeline','M&A пайплайн'],['reports-1-c','Отчеты 1С'],
+      ['current-depo','Текущий портфель ДИД'],['registry','Реестр выписок'],['reserve','Расчет резерва'],
+      ['calclate-fv','Расчет FV'],['payments-ib','Платежи IB'],['qliksense-reports','Отчеты Qliksense'],
+      ['pipeline','pipeline ДИД'],['admin-ckp','Администратор ЦКП'],['dcm-pipeline','DCM Pipeline'],
+      ['dcm-potentials','Потенциалы DCM'],['ecm-pipeline','ECM Pipeline'],['rwa','Риск-взвешанные активы'],
+      ['important-leads','Обязательные лиды'],['possible-leads','Возможные лиды'],['potentials-rd','Потенциалы РД'],
+      ['funds','Фонды'] ] },
+];
+
+/* display label override (file key -> shown name) */
+const LABEL = { 'thumbs-up':'thumb-up', 'Loader':'loader', 'Info-circle-filled':'info-circle-filled', 'Important-deals':'important-deals' };
+const label = k => LABEL[k] || k;
+
+const root = document.getElementById('cats');
+let TOTAL = 0;
+const missing = [];
+
+CATS.forEach(cat => {
+  const sec = document.createElement('section');
+  sec.className = 'cat'; sec.id = 'cat-' + cat.id; sec.dataset.screenLabel = cat.title;
+
+  const list = (cat.layout === 'menu')
+    ? cat.icons.filter(([k]) => I[k] || missing.push(k))
+    : cat.icons.filter(k => I[k] || missing.push(k));
+  const n = list.length;
+  TOTAL += n;
+
+  const head = document.createElement('div'); head.className = 'cat-head';
+  head.innerHTML = '<h2>' + cat.title + '</h2><span class="c-count">' + n + '</span>';
+  sec.appendChild(head);
+  const p = document.createElement('p'); p.className = 'desc'; p.textContent = cat.desc; sec.appendChild(p);
+
+  const panel = document.createElement('div'); panel.className = 'panel';
+  const thead = document.createElement('div'); thead.className = 'thead';
+  thead.innerHTML = '<span>Icon</span><span>Наименование</span>';
+  panel.appendChild(thead);
+
+  if (cat.layout === 'menu') {
+    const grid = document.createElement('div'); grid.className = 'mlist';
+    list.forEach(([k, d]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'mcell'; b.dataset.name = label(k);
+      b.innerHTML = '<span class="iwrap">' + I[k] + '</span><span><span class="m-name">' + label(k) + '</span><span class="m-desc">' + d + '</span></span>';
+      grid.appendChild(b);
+    });
+    panel.appendChild(grid);
+  } else {
+    const grid = document.createElement('div'); grid.className = 'igrid';
+    list.forEach(k => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'icell'; b.dataset.name = label(k);
+      b.innerHTML = '<span class="iwrap">' + I[k] + '</span><span class="iname">' + label(k) + '</span>';
+      grid.appendChild(b);
+    });
+    panel.appendChild(grid);
+  }
+  sec.appendChild(panel);
+  root.appendChild(sec);
+});
+
+document.getElementById('count').innerHTML = '<b>' + TOTAL + '</b> иконок';
+document.getElementById('foot-total').textContent = TOTAL + ' иконок · 7 категорий';
+if (missing.length) console.warn('Missing icons (no SVG data):', missing);
+
+/* ---- size control ---- */
+document.getElementById('size-seg').addEventListener('click', e => {
+  const btn = e.target.closest('button'); if (!btn) return;
+  [...e.currentTarget.children].forEach(c => c.setAttribute('aria-selected', String(c === btn)));
+  document.documentElement.style.setProperty('--isz', btn.dataset.sz + 'px');
+});
+
+/* ---- search filter ---- */
+const search = document.getElementById('search');
+const wrap = document.getElementById('search-wrap');
+const emptyEl = document.getElementById('empty');
+const cells = [...document.querySelectorAll('.icell, .mcell')];
+search.addEventListener('input', () => {
+  const q = search.value.trim().toLowerCase();
+  wrap.classList.toggle('has-val', q.length > 0);
+  let shown = 0;
+  cells.forEach(c => {
+    const match = c.dataset.name.toLowerCase().includes(q);
+    c.style.display = match ? '' : 'none';
+    if (match) shown++;
+  });
+  document.querySelectorAll('.cat').forEach(sec => {
+    const any = sec.querySelector('.icell:not([style*="none"]), .mcell:not([style*="none"])');
+    sec.style.display = any ? '' : 'none';
+  });
+  document.getElementById('count').innerHTML = '<b>' + shown + '</b> из ' + TOTAL;
+  emptyEl.classList.toggle('show', shown === 0);
+});
+document.getElementById('clear').addEventListener('click', () => { search.value = ''; search.dispatchEvent(new Event('input')); search.focus(); });
+
+/* ---- copy on click ---- */
+const toast = document.getElementById('toast');
+const toastName = document.getElementById('toast-name');
+let toastTimer;
+function copyName(name) {
+  const done = () => {
+    toastName.textContent = name;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(name).then(done).catch(done);
+  } else { done(); }
+}
+document.getElementById('cats').addEventListener('click', e => {
+  const cell = e.target.closest('.icell, .mcell'); if (!cell) return;
+  copyName(cell.dataset.name);
+});
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-toc.js"></script>
+</body>
+</html>

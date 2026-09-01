@@ -1,0 +1,180 @@
+/* =========================================================================
+   Design System — Checkbox
+   Box:   20px alignment area (matches Body M line-height) · 2px inner inset
+          · 16px visual mark (rounded square).
+   States: unselected · selected · indeterminate
+           ×  default · hover · focus · pressed · disabled · error
+   Label: Body M (SB Sans Text) · Helper: общий компонент подкачки (Body XS),
+   рендерится классом .ds-helper — см. label-helper.css.
+   Requires: typography.css, colors.css, label-helper.css
+   ========================================================================= */
+
+.cb {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.cb--disabled,
+.cb:has(.cb__input:disabled) { cursor: default; pointer-events: none; }
+
+/* visually-hidden native input (keeps it accessible / focusable) */
+.cb__input {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+  margin: 0;
+}
+
+/* 20px alignment box — matches Body M line-height (20px),
+   centers the 16px mark, leaving the 2px empty area all round. */
+.cb__box {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 16px visual mark */
+.cb__mark {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-2xs);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border-dark);
+  background: transparent;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.cb__mark :is(svg,[data-icon]){
+  width: 14px;
+  height: 14px;
+  display: block;
+  color: var(--text-on-dark);   /* white glyph */
+}
+
+/* ---------- selected & indeterminate (filled) -----------------------------
+   Класс покрывает форс-состояния витрины; нативный ввод (checked/indeterminate
+   на .cb__input) даёт тот же вид без класса — см. RulesAudit W1. */
+.cb--selected .cb__mark,
+.cb--indeterminate .cb__mark,
+.cb__input:checked ~ .cb__box .cb__mark,
+.cb__input:indeterminate ~ .cb__box .cb__mark {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ---------- hover --------------------------------------------------------- */
+/* empty box → primary outline + faint state layer; filled → darker fill */
+.cb:hover .cb__mark,
+.cb--hover .cb__mark {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-bg-light);
+}
+.cb:hover.cb--selected .cb__mark,
+.cb:hover.cb--indeterminate .cb__mark,
+.cb--hover.cb--selected .cb__mark,
+.cb--hover.cb--indeterminate .cb__mark,
+.cb:hover:has(.cb__input:checked) .cb__mark,
+.cb:hover:has(.cb__input:indeterminate) .cb__mark {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* ---------- pressed ------------------------------------------------------- */
+/* a larger state layer halo (Material-style) on press */
+.cb:active .cb__mark,
+.cb--pressed .cb__mark {
+  box-shadow: 0 0 0 6px var(--primary-bg);
+}
+
+/* ---------- focus (keyboard) ---------------------------------------------- */
+.cb__input:focus-visible + .cb__box .cb__mark,
+.cb--focus .cb__mark {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- error / invalid ----------------------------------------------- */
+/* a required checkbox left unchecked, or a group that failed validation */
+.cb--error .cb__mark {
+  border-color: var(--error);
+  box-shadow: none;
+}
+.cb--error.cb--selected .cb__mark,
+.cb--error.cb--indeterminate .cb__mark,
+.cb--error:has(.cb__input:checked) .cb__mark,
+.cb--error:has(.cb__input:indeterminate) .cb__mark {
+  background: var(--error);
+  border-color: var(--error);
+}
+.cb:hover.cb--error .cb__mark,
+.cb--hover.cb--error .cb__mark {
+  border-color: var(--error-dark);
+  box-shadow: 0 0 0 4px var(--error-bg);
+}
+.cb:hover.cb--error.cb--selected .cb__mark,
+.cb--hover.cb--error.cb--selected .cb__mark,
+.cb:hover.cb--error:has(.cb__input:checked) .cb__mark {
+  background: var(--error-dark);
+  border-color: var(--error-dark);
+}
+.cb--error .ds-helper { color: var(--error); }
+
+/* ---------- content (label + helper) -------------------------------------- */
+.cb__content { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cb__label  { font: var(--type-body-m);  color: var(--text-primary); }
+/* Хелпер — общий компонент подкачки (не собственный класс), см. label-helper.css → .ds-helper */
+.cb--no-content .cb__content { display: none; }
+
+/* required marker — asterisk after the label */
+.cb__req { color: var(--error); margin-left: 2px; }
+
+/* ---------- disabled ------------------------------------------------------- */
+.cb--disabled .cb__mark,
+.cb__input:disabled ~ .cb__box .cb__mark { border-color: var(--disabled); box-shadow: none; }
+.cb--disabled.cb--selected .cb__mark,
+.cb--disabled.cb--indeterminate .cb__mark,
+.cb__input:disabled:checked ~ .cb__box .cb__mark,
+.cb__input:disabled:indeterminate ~ .cb__box .cb__mark {
+  background: var(--disabled);
+  border-color: var(--disabled);
+}
+.cb--disabled .cb__label,
+.cb--disabled .ds-helper,
+.cb__input:disabled ~ .cb__content .cb__label,
+.cb__input:disabled ~ .cb__content .ds-helper { color: var(--text-inactive); }
+
+/* ---------- group ---------------------------------------------------------
+   Checkboxes can be grouped. Inside a group the active (clickable) area
+   stretches to the full row height; alignment is always to the left edge. */
+.cb-group { display: flex; flex-direction: column; }
+.cb-group__title {
+  font: var(--type-h6-strong);
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.cb-group__items { display: flex; flex-direction: column; }
+.cb-group .cb { padding: 6px 0; }
+.cb-group--indent .cb-group__items { padding-left: 28px; }
+
+/* group-level error message (Body XS, error color) */
+.cb-group__error {
+  font: var(--type-body-xs);
+  color: var(--error);
+  margin: 6px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.cb-group__error :is(svg,[data-icon]){ width: 14px; height: 14px; flex: none; }

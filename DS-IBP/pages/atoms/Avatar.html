@@ -1,0 +1,1358 @@
+<!-- @dsCard group="Components" name="Avatar" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avatar — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/avatar.css">
+<script src="../../scripts/image-slot.js"></script>
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:78ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:20px; }
+
+  
+
+  
+
+  /* ---------- демо-стадия (docs-split) ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { display:flex; align-items:center; justify-content:center; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- sizes matrix ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .size-matrix { display:grid; grid-template-columns: 70px repeat(4, 1fr); gap:26px 16px; align-items:center; min-width:560px; text-align:center; }
+  .size-matrix .col-head { font: var(--type-body-s-strong); color: var(--primary); }
+  .size-matrix .col-head .sub { font:var(--type-body-xs); color:var(--text-inactive); display:block; }
+  .size-matrix .rowname { font: var(--type-body-s-strong); color: var(--text-secondary); text-align:right; }
+  .size-matrix .cell { display:flex; justify-content:center; }
+
+  /* ---------- content type cards ---------- */
+  .type-cards { display:grid; grid-template-columns: repeat(3,1fr); gap:20px; }
+  @media (max-width:760px){ .type-cards{ grid-template-columns:1fr; } }
+  .type-card { border:1px solid var(--border-light); border-radius:14px; padding:28px 24px; background:var(--bg-tile); display:flex; flex-direction:column; align-items:center; gap:18px; text-align:center; }
+  .type-card .nm { font:var(--type-h5-strong); color:var(--text-primary); }
+  .type-card .ds { font:var(--type-body-s); color:var(--text-secondary); text-wrap:pretty; }
+
+  /* ---------- usage tiles ---------- */
+  .use-tiles { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:680px){ .use-tiles{ grid-template-columns:1fr; } }
+  .use-tile__stage { padding:24px; display:flex; align-items:center; justify-content:center; background: var(--tertiary-light); min-height:120px; }
+
+  /* entity row */
+  .entity { display:flex; align-items:center; gap:12px; }
+  .entity .ent-txt { display:flex; flex-direction:column; gap:2px; min-width:0; text-align:left; }
+  .entity .ent-name { font:var(--type-body-m-strong); color:var(--text-primary); }
+  .entity .ent-role { font:var(--type-body-xs); color:var(--text-secondary); }
+  /* comment */
+  .comment { display:flex; gap:12px; max-width:340px; }
+  .comment .cm-body { background:var(--bg-tile); border:1px solid var(--border-light); border-radius:0 12px 12px 12px; padding:10px 14px; }
+  .comment .cm-name { font:var(--type-body-s-strong); color:var(--text-primary); margin:0 0 3px; }
+  .comment .cm-text { font:var(--type-body-s); color:var(--text-secondary); margin:0; }
+
+  /* presence legend */
+  .presence { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:16px; }
+  .presence-cell { border:1px solid var(--border-light); border-radius:12px; padding:18px; display:flex; align-items:center; gap:14px; background:var(--bg-tile); }
+  .presence-cell .pc-txt { display:flex; flex-direction:column; gap:2px; }
+  .presence-cell .pc-nm { font:var(--type-body-m-strong); color:var(--text-primary); }
+  .presence-cell .pc-rl { font:var(--type-body-xs); color:var(--text-secondary); }
+
+  /* fallback chain */
+  .fallback { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .fallback .arrow { color:var(--text-inactive); display:flex; }
+  .fallback .arrow svg { width:22px; height:22px; }
+  .fallback .step { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .fallback .step .cap { font:var(--type-body-xs); color:var(--text-secondary); }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(260px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:54px 44px; display:flex; justify-content:center; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+  .anat-dia { position:relative; }
+  .anat-dia .mk { position:absolute; width:22px; height:22px; border-radius:50%; background:var(--text-primary); color:#fff; font:var(--type-body-xs); font-weight:600; display:flex; align-items:center; justify-content:center; transform:translate(-50%,-50%); }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:28px 20px; flex:1; display:flex; align-items:center; justify-content:center; gap:18px; }
+  .guide-card__cap { padding:0 20px 18px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:15px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- developer handoff ---------- */
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Avatar">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.005</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Avatar</h1>
+    <p class="lead">Аватар — компактное визуальное представление пользователя или сущности. Содержит инициалы (Text), запасную иконку (Icon) или фотографию (Image). Две формы — Circular и Rounded — четыре размера и опциональный бейдж: счётчик или индикатор статуса.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc">Может использоваться как самостоятельный компонент, так и в составе другого — например, в сущности (Entity): строка пользователя, автор комментария, участник в ячейке таблицы. Группа аватаров показывает несколько участников компактным стеком.</p>
+    <div class="panel">
+      <div class="use-tiles">
+        <div class="use-tile">
+          <div class="use-tile__stage" id="use-entity"></div>
+          <div class="use-tile__cap">Сущность (Entity): аватар + имя и роль</div>
+        </div>
+        <div class="use-tile">
+          <div class="use-tile__stage" id="use-comment"></div>
+          <div class="use-tile__cap">Автор комментария</div>
+        </div>
+        <div class="use-tile">
+          <div class="use-tile__stage" id="use-table"></div>
+          <div class="use-tile__cap">Участник в ячейке таблицы</div>
+        </div>
+        <div class="use-tile">
+          <div class="use-tile__stage" id="use-group"></div>
+          <div class="use-tile__cap">Группа участников в шапке карточки</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Аватар — это фигура-контейнер фиксированного размера с содержимым по центру и опциональным бейджем поверх. В группе у каждого аватара появляется белое кольцо-разделитель.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div class="anat-dia" id="anat-diagram"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Контейнер</span><span class="d">квадрат фиксированного размера; форма Circular (50%) или Rounded</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Содержимое</span><span class="d">инициалы, иконка-фолбэк или изображение, центрированы</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Бейдж</span><span class="d">опционально — счётчик (сверху-справа) или статус-точка (снизу-справа)</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="ContentTypes">
+    <h3>Типы содержимого</h3>
+    <p class="desc">Тип определяется доступными данными. Приоритет — изображение; если его нет, показываем инициалы; если нет и имени — нейтральную иконку.</p>
+    <div class="type-cards">
+      <div class="type-card">
+        <div id="tc-text"></div>
+        <div class="nm">Text</div>
+        <div class="ds">Инициалы — одна или две заглавные буквы имени/названия. Базовый вариант для пользователей.</div>
+      </div>
+      <div class="type-card">
+        <div id="tc-icon"></div>
+        <div class="nm">Icon</div>
+        <div class="ds">Нейтральный глиф — когда нет ни фото, ни имени. Для сущностей используется тематическая иконка.</div>
+      </div>
+      <div class="type-card">
+        <div id="tc-image"></div>
+        <div class="nm">Image</div>
+        <div class="ds">Фотография, обрезанная по форме (object-fit: cover). Перетащите изображение в область выше.</div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Shape">
+    <h3>Форма</h3>
+    <p class="desc"><b>Circular</b> — для людей (инициалы, фото). <b>Rounded</b> (скруглённый квадрат) — для сущностей, организаций, ботов. Радиус скругления у Rounded пропорционален размеру: 28 / 12 / 10 / 8 px для XL / L / M / S.</p>
+    <div class="panel">
+      <div class="row" style="gap:48px; justify-content:center; align-items:flex-end; padding:8px 0;" id="shape-demo"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Badge">
+    <h3>Бейдж на аватаре</h3>
+    <p class="desc">Аватар может нести дочерний <a class="inl" href="../atoms/Badge.html">Badge</a>. <b>Counter</b> ставится в правый верхний угол (его правая и верхняя грани совпадают с гранями аватара, не выходя за габарит) — непрочитанные сообщения, количество задач; только у размеров <b>L</b> и <b>XL</b>. <b>Dot</b> — индикатор присутствия в правом нижнем углу описанного квадрата, касается его нижней и правой граней; на всех размерах. На фото у бейджа всегда белая обводка (<code class="tok">badge--bordered</code>).</p>
+    <div class="panel">
+      <div class="row" style="gap:44px; justify-content:center; align-items:center; padding:8px 0 28px;" id="badge-demo"></div>
+      <p class="desc tight" style="margin:0 0 18px;">Индикатор присутствия — соответствие тона и статуса:</p>
+      <div class="presence" id="presence"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Group">
+    <h3>Группа аватаров</h3>
+    <p class="desc">Несколько участников показываются перекрывающимся стеком: левый аватар лежит поверх следующего, между ними — белое кольцо. Если участников больше лимита, остаток сворачивается в нейтральный чип «+N». Рекомендуемый лимит — 3–5 видимых аватаров.</p>
+    <div class="panel">
+      <div class="row" style="flex-direction:column; gap:26px; align-items:flex-start;" id="group-sizes"></div>
+    </div>
+    <div class="panel" style="margin-top:20px;">
+      <div class="guide">
+        <div class="guide-card bad">
+          <div class="guide-card__bar"></div>
+          <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+          <div class="guide-card__body" id="group-bad"></div>
+          <p class="guide-card__cap">Длинный нестриженный ряд — занимает место и не читается.</p>
+        </div>
+        <div class="guide-card good">
+          <div class="guide-card__bar"></div>
+          <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+          <div class="guide-card__body" id="group-good"></div>
+          <p class="guide-card__cap">3–4 аватара и «+N» — компактно и считываемо.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Четыре размера. Выбирайте по контексту: XL — карточка профиля, L — строки списков и шапки, M — таблицы и навигация, S — плотные перечисления и инлайн-упоминания.</p>
+    <div class="panel">
+      <div class="matrix-wrap"><div class="size-matrix" id="size-matrix"></div></div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden; margin-top:20px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px .6fr .8fr .8fr .8fr 1fr 2fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Сторона</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Инициалы</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Иконка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Радиус Rounded</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Применение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px .6fr .8fr .8fr .8fr 1fr 2fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text"><b>XL</b></span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">96 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">32 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">48 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">28 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Карточка / экран профиля</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px .6fr .8fr .8fr .8fr 1fr 2fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text"><b>L</b></span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">40 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">16 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">22 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">12 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Строки списков, шапки, Entity</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px .6fr .8fr .8fr .8fr 1fr 2fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text"><b>M</b></span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">32 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">13 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">18 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">10 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Таблицы, навигация, комментарии</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px .6fr .8fr .8fr .8fr 1fr 2fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text"><b>S</b></span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">24 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">11 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">14 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Плотные перечисления, инлайн</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Форма Circular — всегда круг. Форма Rounded даёт свой радиус на каждый размер; счётчик «+N» в группе повторяет радиус аватара того же размера.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Circular — любой размер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Rounded XL</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">28 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-5xl</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Rounded L</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xl</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Rounded M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">10 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-l</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Rounded S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-m</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Содержимое аватара определяется доступными данными, а не выбирается произвольно — см. цепочку деградации в разделе «Заглушки и фолбэк» выше. Правила текста:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li><b>Инициалы</b> — 1–2 заглавные буквы. Для человека — первая буква имени и первая буква фамилии («Игорь Белов» → «ИБ»); для однословного имени или организации — одна буква;</li>
+      <li>инициалы вычисляются автоматически из имени — не задавайте их произвольным текстом и не используйте цифры, эмодзи или более двух знаков;</li>
+      <li><b>Иконка (Icon)</b> — нейтральный глиф <code class="tok">user</code> для людей без имени; тематический глиф (например, <code class="tok">entity</code>) — для организаций и ботов;</li>
+      <li><b>Группа «+N»</b> — только целое число оставшихся участников, без знака «людей» или подписи;</li>
+      <li>полное имя выносите рядом текстом (см. Entity) — сам аватар не заменяет подпись, а дополняет её.</li>
+    </ul>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="Fallback">
+    <h3>Заглушки и фолбэк</h3>
+    <p class="desc">Содержимое выбирается по цепочке деградации: если есть фотография — показываем её; если фото нет или не загрузилось — инициалы; если нет и имени — нейтральную иконку. Это гарантирует, что аватар никогда не остаётся пустым.</p>
+    <div class="panel">
+      <div class="fallback" id="fallback"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Аватар может быть интерактивным — вести на профиль. В этом случае у него есть состояния Hover, Focus (обводка <code class="tok">--primary</code>) и Pressed. Неактивный аватар приглушается.</p>
+    <div class="panel">
+      <div class="row" style="gap:40px; align-items:flex-start;" id="states-demo"></div>
+    </div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Сам по себе аватар — визуальный, декоративный элемент. Доступность определяется контекстом использования.</p>
+    <div class="panel">
+      <ul class="bullets">
+        <li><b>Интерактивный аватар</b> (<code class="tok">av--button</code>, ведёт на профиль) — фокусируемый элемент с <code class="tok">aria-label</code>, называющим человека или сущность («Открыть профиль Игоря Белова»);</li>
+        <li><b>Аватар рядом с видимым именем</b> (Entity, комментарий, ячейка таблицы) — сам аватар помечается <code class="tok">aria-hidden="true"</code>, чтобы скрин-ридер не озвучивал инициалы отдельно от имени;</li>
+        <li><b>Изображение</b> — если фото несёт смысл сверх имени, добавьте содержательный <code class="tok">alt</code>; в остальных случаях <code class="tok">alt=""</code>, так как имя уже есть рядом текстом;</li>
+        <li><b>Индикатор присутствия (Dot)</b> — сам по себе не имеет текстовой альтернативы; статус («В сети», «Не беспокоить») дублируйте в <code class="tok">aria-label</code> родителя;</li>
+        <li><b>Группа участников</b> — контейнеру <code class="tok">.av-group</code> присваивается <code class="tok">role="group"</code> и <code class="tok">aria-label</code> со списком имён или их количеством; отдельные аватары внутри — <code class="tok">aria-hidden</code>;</li>
+        <li><code class="tok">:focus-visible</code> у интерактивного аватара — обводка 2px <code class="tok">--primary</code>, отступ 2px.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Инициалы набираются гарнитурой <b>SB Sans Text</b> начертанием Semibold. Кегль пропорционален размеру аватара (около ⅓ стороны). Используются 1–2 заглавные буквы.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">XL</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">32 px / Semibold</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">L</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">16 px / Semibold</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">13 px / Semibold</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">11 px / Semibold</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Аватар по умолчанию использует нейтральную «болотную» подложку. Для сущностей доступен акцентный тон. Индикаторы статуса наследуют семантические токены из <a class="inl" href="../atoms/Badge.html">Badge</a>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Подложка</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Нейтральная (по умолчанию)</span></span></div>
+          <div class="tc"><code class="tok">--c-swamp-100</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-swamp-100)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#E5ECEB</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Подложка</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Инициалы / иконка</span></span></div>
+          <div class="tc"><code class="tok">--text-primary</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Подложка</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Акцентная (Entity)</span></span></div>
+          <div class="tc"><code class="tok">--primary</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Группа</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Кольцо-разделитель</span></span></div>
+          <div class="tc"><code class="tok">--bg-tile</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-tile)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Группа</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Чип «+N» — фон</span></span></div>
+          <div class="tc"><code class="tok">--c-cgrey-100</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-100)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#E8EDED</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Группа</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Чип «+N» — текст</span></span></div>
+          <div class="tc"><code class="tok">--text-secondary</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Статус (Dot)</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">В сети</span></span></div>
+          <div class="tc"><code class="tok">--success</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--success)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#7CB342</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Статус (Dot)</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Нет на месте</span></span></div>
+          <div class="tc"><code class="tok">--warning</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--warning)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#FFB300</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Статус (Dot)</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Не беспокоить</span></span></div>
+          <div class="tc"><code class="tok">--error</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Статус (Dot)</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Не в сети</span></span></div>
+          <div class="tc"><code class="tok">--c-cgrey-100</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-100)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#E8EDED</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Интерактив</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Фокус</span></span></div>
+          <div class="tc"><code class="tok">--primary</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead2">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/avatar.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr .8fr .8fr .8fr .8fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">XL</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">L</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">S</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr .8fr .8fr .8fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Сторона (av-size)</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-side-xl">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-side-l">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-side-m">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-side-s">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr .8fr .8fr .8fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Кегль инициалов</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-font-xl">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-font-l">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-font-m">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-font-s">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr .8fr .8fr .8fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Иконка-фолбэк</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-icon-xl">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-icon-l">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-icon-m">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-icon-s">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr .8fr .8fr .8fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Радиус Rounded</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-rad-xl">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-rad-l">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-rad-m">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-rad-s">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr 1.4fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr 1.4fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Кольцо-разделитель (box-shadow)</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-ring">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr 1.4fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Сдвиг перекрытия (M, margin-left)</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-overlap">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr 1.4fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Badge Counter — сдвиг (transform)</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-counter">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/badge.css</code>
+      <code class="tok">styles/avatar.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Фолбэк-цепочка содержимого (при монтировании и при ошибке загрузки фото):</span>
+<span class="tk-cm">//    есть URL изображения и оно загрузилось → content = 'image'</span>
+<span class="tk-cm">//    иначе, есть имя/название → content = 'text' (вычислить инициалы)</span>
+<span class="tk-cm">//    иначе → content = 'icon' (нейтральный глиф)</span>
+<span class="tk-cm">//    обработать &lt;img&gt;.onerror — при ошибке загрузки переключиться на следующее звено цепочки</span>
+
+<span class="tk-cm">// 2. Инициалы: разбить полное имя на слова, взять первый символ первого</span>
+<span class="tk-cm">//    и первого символа последнего слова, привести к верхнему регистру; одно слово → 1 буква</span>
+
+<span class="tk-cm">// 3. Группа аватаров с переполнением:</span>
+<span class="tk-cm">//    рендерить первые limit участников (рекомендуемо 3–5);</span>
+<span class="tk-cm">//    остаток = total - limit; если &gt; 0 — добавить .av-group__more с текстом '+'+остаток;</span>
+<span class="tk-cm">//    z-index каждого аватара = (общее число видимых узлов − индекс), чтобы левый лежал сверху</span>
+
+<span class="tk-cm">// 4. Бейдж позиционируется через CSS относительно .av-stack — отдельного JS не требуется;</span>
+<span class="tk-cm">//    Counter — правый верхний угол (top:0/right:0, грани совпадают с аватаром, только L/XL); Dot — правый нижний, касается кольца</span>
+
+<span class="tk-cm">// 5. Disabled: класс .av--disabled (opacity .5 + grayscale + pointer-events: none)</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">makeAvatar</code> / <code class="tok">makeGroup</code> в коде этой страницы).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Тултип у «+N» в группе</b> — список остальных участников при наведении на счётчик переполнения (Ant Avatar.Group, Material).</li>
+        <li><b>Fallback при ошибке фото</b> — обработка неудачной загрузки изображения — сейчас неявно откатывается на инициалы, без явного состояния.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Avatar</span>
+    <span>Circular / Rounded — XL / L / M / S · Text / Icon / Image · Badge · Avatar Group</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите аватар: форма, размер, тип содержимого и бейдж. Для типа «Изображение» перетащите фото в область превью.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/avatar.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script>
+/* ---------- icons ---------- */
+const ICONS = {
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
+  entity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l6-3v4l6-3v15"/><path d="M21 21V11l-6-3"/><path d="M7 11v0M7 14v0M7 17v0"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  bad:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  good: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+};
+/* подставляем иконки из библиотеки ДС, где есть эквивалент */
+(function(){ const L=window.DS_ICONS||{}; const m={user:'user',entity:'building-02',arrow:'arrow-right',bad:'close',good:'check'};
+  for(const k in m){ if(L[m[k]]) ICONS[k]=L[m[k]]; } })();
+
+/* ---------- avatar factory ----------
+   o: { shape, size, content, text, tone, button, disabled, imgId, imgSrc } */
+function makeAvatar(o = {}) {
+  const { shape='circular', size='m', content='text', text='ИБ', tone=null,
+          button=false, disabled=false, imgId=null, imgSrc=null, label=null } = o;
+  const a = document.createElement(button ? 'button' : 'span');
+  a.className = 'av av--' + shape + ' av--' + size;
+  if (tone)     a.classList.add('av--' + tone);
+  if (disabled) a.classList.add('av--disabled');
+  if (button)   { a.classList.add('av--button'); a.type = 'button'; a.setAttribute('aria-label', label || text); }
+
+  if (content === 'text') {
+    const t = document.createElement('span'); t.className = 'av__text'; t.textContent = text; a.appendChild(t);
+  } else if (content === 'icon') {
+    const i = document.createElement('span'); i.className = 'av__icon'; i.innerHTML = o.icon || ICONS.user; a.appendChild(i);
+  } else if (content === 'image') {
+    const s = document.createElement('image-slot');
+    s.id = imgId || ('av-img-' + Math.random().toString(36).slice(2));
+    s.setAttribute('shape', shape === 'circular' ? 'circle' : 'rounded');
+    s.setAttribute('placeholder', 'Фото');
+    if (imgSrc) s.setAttribute('src', imgSrc);
+    a.appendChild(s);
+  }
+  return a;
+}
+
+/* wrap avatar + badge */
+function avStack(av, badge, square=false) {
+  const s = document.createElement('span');
+  s.className = 'av-stack' + (square ? ' av-stack--square' : '');
+  s.appendChild(av); s.appendChild(badge);
+  return s;
+}
+function dot(tone, sz='') { const b=document.createElement('span'); b.className='badge badge--dot badge--'+tone+' badge--bordered'+(sz?' '+sz:''); return b; }
+
+/* avatar group */
+function makeGroup({ size='m', shape='circular', items=[], more=0 }) {
+  const g = document.createElement('span');
+  g.className = 'av-group av-group--' + size + (shape==='rounded' ? ' av-group--rounded' : '');
+  items.forEach(txt => g.appendChild(makeAvatar({ shape, size, content:'text', text:txt })));
+  if (more > 0) { const m=document.createElement('span'); m.className='av-group__more'; m.textContent='+'+more; g.appendChild(m); }
+  [...g.children].forEach((el,i)=> el.style.zIndex = String(g.children.length - i));
+  return g;
+}
+
+/* ---------- PLAYGROUND ---------- */
+(function(){
+  const state = { shape:'circular', size:'l', content:'text', badge:'none' };
+  const controls = document.getElementById('pg-controls');
+  const preview  = document.getElementById('pg-preview');
+  const codeEl   = document.getElementById('pg-code');
+
+  function select(label, options, cur, onPick){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    options.forEach(([val,txt])=>{ const op=document.createElement('option'); op.value=val; op.textContent=txt; if(val===cur) op.selected=true; sel.appendChild(op); });
+    sel.addEventListener('change',()=>{ onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  // Контролы строятся один раз (pg-kit улучшает их в SegmentControl при загрузке).
+  // Правило «Counter — только L/XL» реализуем ковыркой значений, не пересобирая панель.
+  const shapeCtl = select('Форма', [['circular','Circular'],['rounded','Rounded']], state.shape, v=>state.shape=v);
+  const sizeCtl  = select('Размер', [['xl','XL · 96'],['l','L · 40'],['m','M · 32'],['s','S · 24']], state.size, v=>{
+    state.size=v;
+    if ((v==='m'||v==='s') && state.badge==='counter'){ state.badge='none'; setSel(badgeSel,'none'); }
+  });
+  const contentCtl = select('Содержимое', [['text','Text · инициалы'],['icon','Icon · глиф'],['image','Image · фото']], state.content, v=>state.content=v);
+  const badgeCtl = select('Бейдж', [['none','Нет'],['counter','Counter'],['dot','Статус-точка']], state.badge, v=>{
+    state.badge=v;
+    // Counter доступен только у L / XL — при выборе на M/S поднимаем размер до L
+    if (v==='counter' && (state.size==='m'||state.size==='s')){ state.size='l'; setSel(sizeSel,'l'); }
+  });
+  controls.appendChild(shapeCtl); controls.appendChild(sizeCtl); controls.appendChild(contentCtl); controls.appendChild(badgeCtl);
+  const sizeSel = sizeCtl.querySelector('select');
+  const badgeSel = badgeCtl.querySelector('select');
+  function setSel(sel, val){ sel.value = val; sel.dispatchEvent(new Event('change', { bubbles:true })); }
+
+  function render(){
+    const av = makeAvatar({ shape:state.shape, size:state.size, content:state.content, text:'ИБ', imgId:'pg-av-img' });
+    preview.innerHTML='';
+    const square = state.shape==='rounded';
+    if (state.badge==='counter') {
+      const b=document.createElement('span'); b.className='badge badge--'+ (state.size==='xl'?'m':'xs') +' badge--accent badge--bordered'; b.textContent='5';
+      preview.appendChild(avStack(av, b, false));
+    } else if (state.badge==='dot') {
+      preview.appendChild(avStack(av, dot('success'), square));
+    } else {
+      preview.appendChild(av);
+    }
+    const cls=['av','av--'+state.shape,'av--'+state.size];
+    const inner = state.content==='text' ? '<span class="av__text">ИБ</span>'
+                : state.content==='icon' ? '<span class="av__icon">…</span>'
+                : '<image-slot …></image-slot>';
+    codeEl.innerHTML = '<code>&lt;span class="'+cls.join(' ')+'"&gt;'+inner+'&lt;/span&gt;</code>';
+  }
+  render();
+})();
+
+/* ---------- USAGE ---------- */
+(function(){
+  // entity row
+  const e = document.getElementById('use-entity');
+  const ent=document.createElement('div'); ent.className='entity';
+  ent.appendChild(makeAvatar({shape:'circular',size:'l',content:'text',text:'ИБ'}));
+  const et=document.createElement('div'); et.className='ent-txt';
+  et.innerHTML='<span class="ent-name">Игорь Б.</span><span class="ent-role">Менеджер сделки</span>';
+  ent.appendChild(et); e.appendChild(ent);
+
+  // comment
+  const c = document.getElementById('use-comment');
+  const cm=document.createElement('div'); cm.className='comment';
+  cm.appendChild(makeAvatar({shape:'circular',size:'m',content:'text',text:'МА'}));
+  const cb=document.createElement('div'); cb.className='cm-body';
+  cb.innerHTML='<p class="cm-name">Мария А.</p><p class="cm-text">Согласовала, можно отправлять клиенту.</p>';
+  cm.appendChild(cb); c.appendChild(cm);
+
+  // table cell
+  const t = document.getElementById('use-table');
+  const tc=document.createElement('div'); tc.className='entity';
+  tc.appendChild(makeAvatar({shape:'circular',size:'s',content:'text',text:'КГ'}));
+  const tt=document.createElement('div'); tt.className='ent-txt';
+  tt.innerHTML='<span class="ent-name" style="font:var(--type-body-s-strong)">Кирилл Г.</span>';
+  tc.appendChild(tt); t.appendChild(tc);
+
+  // group
+  const g = document.getElementById('use-group');
+  g.appendChild(makeGroup({ size:'m', items:['ИБ','ВБ','МА','КГ'], more:3 }));
+})();
+
+/* ---------- ANATOMY ---------- */
+(function(){
+  const d = document.getElementById('anat-diagram');
+  const av = makeAvatar({shape:'circular',size:'xl',content:'text',text:'ИБ'});
+  const stack = avStack(av, dot('success','badge--dot-l'), false);
+  d.appendChild(stack);
+  [['1','-10px','-10px'],['2','50%','50%'],['3','calc(100% - 6px)','calc(100% - 6px)']].forEach(([n,left,top])=>{
+    const m=document.createElement('span'); m.className='mk'; m.textContent=n; m.style.left=left; m.style.top=top; d.appendChild(m);
+  });
+})();
+
+/* ---------- CONTENT TYPES ---------- */
+(function(){
+  document.getElementById('tc-text').appendChild(makeAvatar({shape:'circular',size:'xl',content:'text',text:'ИБ'}));
+  document.getElementById('tc-icon').appendChild(makeAvatar({shape:'rounded',size:'xl',content:'icon',icon:ICONS.entity,tone:'accent'}));
+  document.getElementById('tc-image').appendChild(makeAvatar({shape:'circular',size:'xl',content:'image',imgId:'tc-img-1'}));
+})();
+
+/* ---------- SHAPE ---------- */
+(function(){
+  const s = document.getElementById('shape-demo');
+  [['circular','Circular','ИБ','text',null],['rounded','Rounded','',  'icon','accent']].forEach(([shape,label,text,content,tone])=>{
+    const col=document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:14px;';
+    col.appendChild(makeAvatar({shape,size:'xl',content,text,tone,icon:ICONS.entity}));
+    const cap=document.createElement('span'); cap.style.cssText='font:var(--type-body-m-strong);color:var(--text-primary);'; cap.textContent=label;
+    col.appendChild(cap); s.appendChild(col);
+  });
+})();
+
+/* ---------- SIZES ---------- */
+(function(){
+  const m = document.getElementById('size-matrix');
+  const cols = [['XL','96px'],['L','40px'],['M','32px'],['S','24px']];
+  const sizes = ['xl','l','m','s'];
+  m.appendChild(Object.assign(document.createElement('div'),{className:'col-head'}));
+  cols.forEach(([n,px])=>{ const h=document.createElement('div'); h.className='col-head'; h.innerHTML=n+'<span class="sub">'+px+'</span>'; m.appendChild(h); });
+  [['Circular','circular','text','ИБ'],['Rounded','rounded','icon','']].forEach(([name,shape,content])=>{
+    const rn=document.createElement('div'); rn.className='rowname'; rn.textContent=name; m.appendChild(rn);
+    sizes.forEach(sz=>{ const c=document.createElement('div'); c.className='cell'; c.appendChild(makeAvatar({shape,size:sz,content,text:'ИБ',icon:ICONS.entity,tone:content==='icon'?'accent':null})); m.appendChild(c); });
+  });
+
+})();
+
+/* ---------- BADGE ON AVATAR ---------- */
+(function(){
+  const d = document.getElementById('badge-demo');
+  const sizes = [['xl','XL'],['l','L'],['m','M'],['s','S']];
+  // Статус-точка — на всех размерах
+  const rowDot = document.createElement('div'); rowDot.style.cssText='display:flex;gap:40px;align-items:flex-end;justify-content:center;flex-wrap:wrap;';
+  sizes.forEach(([sz,nm])=>{
+    const col=document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;';
+    col.appendChild(avStack(makeAvatar({shape:'circular',size:sz,content:'text',text:'ИБ'}), dot('success'), false));
+    const cap=document.createElement('span'); cap.style.cssText='font:var(--type-body-s);color:var(--text-secondary);'; cap.textContent=nm;
+    col.appendChild(cap); rowDot.appendChild(col);
+  });
+  // Counter — только L / XL
+  const rowCnt = document.createElement('div'); rowCnt.style.cssText='display:flex;gap:40px;align-items:flex-end;justify-content:center;flex-wrap:wrap;margin-top:28px;';
+  [['xl','XL','m'],['l','L','xs']].forEach(([sz,nm,bs])=>{
+    const col=document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;';
+    const b=Object.assign(document.createElement('span'),{className:'badge badge--'+bs+' badge--accent badge--bordered',textContent:'8'});
+    col.appendChild(avStack(makeAvatar({shape:'circular',size:sz,content:'text',text:'ИБ'}), b, false));
+    const cap=document.createElement('span'); cap.style.cssText='font:var(--type-body-s);color:var(--text-secondary);'; cap.textContent=nm;
+    col.appendChild(cap); rowCnt.appendChild(col);
+  });
+  const h1=document.createElement('p'); h1.className='desc tight'; h1.style.cssText='margin:0 0 16px;'; h1.innerHTML='<b>Статус-точка (Dot)</b> — на всех размерах, в правом нижнем углу описанного квадрата; касается его нижней и правой граней. Размер точки: XL 22 · L 12 · M 10 · S 8.';
+  const h2=document.createElement('p'); h2.className='desc tight'; h2.style.cssText='margin:24px 0 16px;'; h2.innerHTML='<b>Counter</b> — только у размеров <b>L</b> и <b>XL</b>; в правом верхнем углу описанного квадрата, верхняя и правая грани бейджа касаются граней квадрата. У M и S счётчик не ставится.';
+  d.appendChild(h1); d.appendChild(rowDot); d.appendChild(h2); d.appendChild(rowCnt);
+
+  const pres = document.getElementById('presence');
+  [['success','В сети','online'],['warning','Нет на месте','away'],['error','Не беспокоить','busy'],['neutral','Не в сети','offline']].forEach(([tone,nm,rl])=>{
+    const cell=document.createElement('div'); cell.className='presence-cell';
+    cell.appendChild(avStack(makeAvatar({shape:'circular',size:'l',content:'text',text:'ИБ'}), dot(tone), false));
+    const tx=document.createElement('div'); tx.className='pc-txt'; tx.innerHTML='<span class="pc-nm">'+nm+'</span><span class="pc-rl">'+rl+'</span>';
+    cell.appendChild(tx); pres.appendChild(cell);
+  });
+})();
+
+/* ---------- AVATAR GROUP ---------- */
+(function(){
+  const gs = document.getElementById('group-sizes');
+  [['l','L · 40'],['m','M · 32'],['s','S · 24']].forEach(([size,lbl])=>{
+    const wrap=document.createElement('div'); wrap.style.cssText='display:flex;align-items:center;gap:20px;';
+    wrap.appendChild(makeGroup({ size, items:['ИБ','ВБ','МА','КГ'], more:3 }));
+    const cap=document.createElement('span'); cap.style.cssText='font:var(--type-body-s);color:var(--text-inactive);'; cap.textContent=lbl;
+    wrap.appendChild(cap); gs.appendChild(wrap);
+  });
+
+  document.getElementById('ic-bad1').innerHTML  = ICONS.bad;
+  document.getElementById('ic-good1').innerHTML = ICONS.good;
+  document.getElementById('group-bad').appendChild(makeGroup({ size:'m', items:['ИБ','ВБ','МА','КГ','АЛ','ДС','РТ','НК'], more:0 }));
+  document.getElementById('group-good').appendChild(makeGroup({ size:'m', items:['ИБ','ВБ','МА','КГ'], more:4 }));
+})();
+
+/* ---------- FALLBACK ---------- */
+(function(){
+  const f = document.getElementById('fallback');
+  const steps = [
+    [makeAvatar({shape:'circular',size:'l',content:'image',imgId:'fb-img'}), 'Image — есть фото'],
+    [makeAvatar({shape:'circular',size:'l',content:'text',text:'ИБ'}), 'Text — есть имя'],
+    [makeAvatar({shape:'circular',size:'l',content:'icon'}), 'Icon — нет данных'],
+  ];
+  steps.forEach(([av,cap],i)=>{
+    const st=document.createElement('div'); st.className='step';
+    st.appendChild(av);
+    const c=document.createElement('span'); c.className='cap'; c.textContent=cap; st.appendChild(c);
+    f.appendChild(st);
+    if (i<steps.length-1){ const ar=document.createElement('span'); ar.className='arrow'; ar.innerHTML=ICONS.arrow; f.appendChild(ar); }
+  });
+})();
+
+/* ---------- STATES ---------- */
+(function(){
+  const d = document.getElementById('states-demo');
+  const items = [
+    ['Default', makeAvatar({shape:'circular',size:'l',content:'text',text:'ИБ',button:true})],
+    ['Hover', (()=>{ const a=makeAvatar({shape:'circular',size:'l',content:'text',text:'ИБ',button:true}); a.style.filter='brightness(.97)'; return a; })()],
+    ['Focus', (()=>{ const a=makeAvatar({shape:'circular',size:'l',content:'text',text:'ИБ',button:true}); a.style.outline='2px solid var(--primary)'; a.style.outlineOffset='2px'; return a; })()],
+    ['Disabled', makeAvatar({shape:'circular',size:'l',content:'text',text:'ИБ',disabled:true})],
+  ];
+  items.forEach(([lbl,av])=>{
+    const col=document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;';
+    col.appendChild(av);
+    const c=document.createElement('span'); c.style.cssText='font:var(--type-body-s);color:var(--text-secondary);'; c.textContent=lbl;
+    col.appendChild(c); d.appendChild(col);
+  });
+})();
+
+/* ---------- TYPOGRAPHY ---------- */
+(function(){
+  const rows = [['XL','32 px / Semibold','xl'],['L','16 px / Semibold','l'],['M','13 px / Semibold','m'],['S','11 px / Semibold','s']];
+  const tb = document.querySelector('#typo-table tbody');
+  rows.forEach(([nm,spec,sz])=>{
+    const tr=document.createElement('tr');
+    const td0=document.createElement('td'); td0.innerHTML='<b>'+nm+'</b>';
+    const td1=document.createElement('td'); td1.appendChild(makeAvatar({shape:'circular',size:sz,content:'text',text:'ИБ'}));
+    const td2=document.createElement('td'); td2.textContent='SB Sans Text';
+    const td3=document.createElement('td'); td3.className='rt-num'; td3.textContent=spec;
+    tr.append(td0,td1,td2,td3); tb.appendChild(tr);
+  });
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function(){
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue){
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r,g,b,a=1, m=v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m){ r=+m[1]*255; g=+m[2]*255; b=+m[3]*255; if(m[4]!==undefined) a=+m[4]; }
+    else { const n=v.match(/[\d.]+/g); if(!n) return cssValue; r=+n[0]; g=+n[1]; b=+n[2]; if(n[3]!==undefined) a=+n[3]; }
+    const hx=n=>Math.round(n).toString(16).padStart(2,'0').toUpperCase();
+    let s='#'+hx(r)+hx(g)+hx(b); if(a<1) s+=' · '+Math.round(a*100)+'%'; return s;
+  }
+  const groups = [
+    { name:'Подложка', rows:[
+      ['Нейтральная (по умолчанию)', '--c-swamp-100'],
+      ['Инициалы / иконка', '--text-primary'],
+      ['Акцентная (Entity)', '--primary'],
+    ]},
+    { name:'Группа', rows:[
+      ['Кольцо-разделитель', '--bg-tile'],
+      ['Чип «+N» — фон', '--c-cgrey-100'],
+      ['Чип «+N» — текст', '--text-secondary'],
+    ]},
+    { name:'Статус (Dot)', rows:[
+      ['В сети', '--success'],
+      ['Нет на месте', '--warning'],
+      ['Не беспокоить', '--error'],
+      ['Не в сети', '--c-cgrey-100'],
+    ]},
+    { name:'Интерактив', rows:[
+      ['Фокус', '--primary'],
+    ]},
+  ];
+  const root = document.getElementById('color-ref');
+  root.innerHTML = groups.map(g=>`
+    <section class="cref-group">
+      <h3>${g.name}</h3>
+      <div class="cref-rows">
+        ${g.rows.map(([role,tok])=>`
+          <div class="cref-row">
+            <div class="cref-sw"><div class="cf" style="background:var(${tok});"></div></div>
+            <div class="cref-meta"><p class="role">${role}</p><p class="tname">${tok}</p></div>
+            <div class="cref-hex">${resolveHex('var('+tok+')')}</div>
+          </div>`).join('')}
+      </div>
+    </section>`).join('');
+  probe.remove();
+})();
+
+/* ---------- DEV: redline measured from live component ---------- */
+(function(){
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  function measure(sz){
+    const a = makeAvatar({ shape:'circular', size:sz, content:'text', text:'ИБ' });
+    host.appendChild(a);
+    const cs = getComputedStyle(a);
+    return { size:cs.width, font:cs.fontSize };
+  }
+  function measureIcon(sz){
+    const a = makeAvatar({ shape:'circular', size:sz, content:'icon', icon:ICONS.user });
+    host.appendChild(a);
+    return getComputedStyle(a.querySelector('.av__icon')).width;
+  }
+  function measureRounded(sz){
+    const a = makeAvatar({ shape:'rounded', size:sz, content:'icon', icon:ICONS.entity, tone:'accent' });
+    host.appendChild(a);
+    return getComputedStyle(a).borderTopLeftRadius;
+  }
+  const sizes = ['xl','l','m','s'];
+  const d = {}; sizes.forEach(sz => d[sz] = measure(sz));
+  const icon = {}; sizes.forEach(sz => icon[sz] = measureIcon(sz));
+  const rad = {}; sizes.forEach(sz => rad[sz] = measureRounded(sz));
+
+  // group + ring + badge offsets
+  const ring = document.createElement('span'); ring.className='av-group';
+  const av1 = makeAvatar({shape:'circular',size:'m',content:'text',text:'A'});
+  const av2 = makeAvatar({shape:'circular',size:'m',content:'text',text:'B'});
+  ring.appendChild(av1); ring.appendChild(av2);
+  host.appendChild(ring);
+  const ringW = getComputedStyle(av1).boxShadow.match(/[\d.]+px/g);
+  const ringPx = ringW ? ringW[ringW.length-1] : '—';
+  const overlapPx = getComputedStyle(av2).marginLeft;
+
+  const stack = avStack(makeAvatar({shape:'circular',size:'xl',content:'text',text:'ИБ'}), (()=>{ const b=document.createElement('span'); b.className='badge badge--m badge--accent badge--bordered'; b.textContent='5'; return b; })());
+  host.appendChild(stack);
+  const counterTransform = getComputedStyle(stack.querySelector('.badge')).transform;
+
+  host.remove();
+  const r = n => Math.round(n*10)/10;
+  const px = v => { const n = parseFloat(v); return isNaN(n) ? v : r(n)+' px'; };
+
+  function set(id,v){ const n=document.getElementById(id); if(n) n.textContent=v; }
+  ['xl','l','m','s'].forEach(z=>{
+    set('dv-side-'+z, px(d[z].size));
+    set('dv-font-'+z, px(d[z].font));
+    set('dv-icon-'+z, px(icon[z]));
+    set('dv-rad-'+z, px(rad[z]));
+  });
+  set('dv-ring', ringPx);
+  set('dv-overlap', overlapPx);
+  set('dv-counter', counterTransform);
+})();
+
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Форма': 'Rounded' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- самостоятельный аватар с инициалами -->
+<span class="av av--circular av--l">
+  <span class="av__text">ИБ</span>
+</span>
+
+<!-- с бейджем: обёртка .av-stack даёт position:relative для абсолютного позиционирования -->
+<span class="av-stack" aria-label="Мария А., в сети">
+  <span class="av av--circular av--xl" aria-hidden="true">…</span>
+  <span class="badge badge--dot badge--success badge--bordered" aria-hidden="true"></span>
+</span>
+
+<!-- группа участников с переполнением -->
+<span class="av-group av-group--m" role="group" aria-label="Участники: ИБ, ВБ, МА, КГ и ещё 3">
+  <span class="av av--circular av--m" aria-hidden="true">…</span>
+  <!-- ещё 3–4 <span class="av"> — каждый смещается на --av-overlap -->
+  <span class="av-group__more" aria-hidden="true">+3</span>
+</span>
+
+<!-- интерактивный аватар-ссылка на профиль -->
+<button type="button" class="av av--circular av--l av--button" aria-label="Открыть профиль Игоря Белова">…</button></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function makeAvatar(o) {
+  // o: { shape:'circular'|'rounded', size:'xl'|'l'|'m'|'s',
+  //       content:'text'|'icon'|'image', text:'ИБ', icon, tone?, imgId? }
+  // .av.av--<shape>.av--<size>(.av--button) → .av__text | .av__icon | <image-slot>
+}
+// Бейдж: .av-stack > .av + .badge(.badge--dot|counter)(.badge--success)(.badge--bordered)
+// Группа: .av-group(.av-group--m) > .av… + .av-group__more (+N)</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Avatar
+   A compact visual representation of a user or entity: initials (Text),
+   a fallback glyph (Icon) or a photo (Image).
+
+   Shape:  circular · rounded (squircle, radius scales with size)
+   Size:   xl (96) · l (40) · m (32) · s (24)
+   Content: text · icon · image
+   Extras: badge overlay (counter / status dot) via .badge-anchor,
+           Avatar Group (overlapping stack with «+N» overflow).
+   Requires: typography.css, colors.css  (+ badge.css for the badge overlay)
+   ========================================================================= */
+
+.av {
+  --av-size: 32px;     /* set per size modifier */
+  --av-font: 13px;     /* initials cap height  */
+  --av-icon: 18px;     /* glyph box            */
+  --av-round: var(--radius-l);    /* rounded-shape radius */
+
+  box-sizing: border-box;
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--av-size);
+  height: var(--av-size);
+  border-radius: var(--radius-circle);                 /* circular by default */
+  overflow: hidden;
+  border: none;
+  background: var(--c-swamp-100);
+  color: var(--text-primary);
+  font-family: var(--font-text), system-ui, sans-serif;
+  font-weight: var(--weight-semibold);
+  font-size: var(--av-font);
+  line-height: 1;
+  letter-spacing: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------- shape --------------------------------------------------------- */
+.av--circular { border-radius: var(--radius-circle); }
+.av--rounded  { border-radius: var(--av-round); }
+
+/* ---------- sizes --------------------------------------------------------- *
+   Размеры — прямыми свойствами (не через --av-* в модификаторе); глиф
+   и радиус rounded-формы — per-size (descendant / compound). */
+.av--xl { width: 96px; height: 96px; font-size: 32px; }
+.av--l  { width: 40px; height: 40px; font-size: 16px; }
+.av--m  { width: 32px; height: 32px; font-size: 13px; }
+.av--s  { width: 24px; height: 24px; font-size: 11px; }
+.av--xl .av__icon { width: 48px; height: 48px; }
+.av--l  .av__icon { width: 22px; height: 22px; }
+.av--m  .av__icon { width: 18px; height: 18px; }
+.av--s  .av__icon { width: 14px; height: 14px; }
+.av--rounded.av--xl { border-radius: var(--radius-5xl); }
+.av--rounded.av--l  { border-radius: var(--radius-xl); }
+.av--rounded.av--m  { border-radius: var(--radius-l); }
+.av--rounded.av--s  { border-radius: var(--radius-m); }
+
+/* ---------- content ------------------------------------------------------- */
+.av__text { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.av__img  { width: 100%; height: 100%; object-fit: cover; display: block; }
+.av__icon { width: var(--av-icon); height: var(--av-icon); display: block; color: var(--text-primary); }
+.av__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* image-slot fills the whole avatar */
+.av image-slot { width: 100%; height: 100%; display: block; }
+
+/* ---------- tone (entity / accent fill) ----------------------------------- */
+.av--accent  { background: color-mix(in srgb, var(--primary) 14%, var(--c-mgrey-50)); color: var(--primary-dark); }
+.av--accent .av__icon { color: var(--primary-dark); }
+
+/* ---------- interactive (links to a profile) ------------------------------ */
+.av--button { cursor: pointer; padding: 0; appearance: none; -webkit-appearance: none; transition: box-shadow .15s ease, filter .15s ease; }
+.av--button:hover  { filter: brightness(.97); }
+.av--button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ---------- disabled ------------------------------------------------------ */
+.av--disabled { opacity: .5; filter: grayscale(.3); pointer-events: none; }
+
+/* =========================================================================
+   BADGE OVERLAY — host a counter or status dot on the avatar.
+   Wrap the avatar in `.av-stack`; the badge is placed absolutely.
+   Counter sits top-right straddling the edge; status dot sits lower-right
+   on the ring. Use `.badge--bordered` so it reads against the photo.
+   ========================================================================= */
+.av-stack { position: relative; display: inline-flex; }
+.av-stack > .badge {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+/* Counter — правый верхний угол; правая и верхняя грани бейджа совпадают с
+   гранями аватара, бейдж не выходит за габарит. Только у L / XL. */
+.av-stack > .badge:not(.badge--dot) { top: 0; right: 0; transform: none; }
+
+/* Status dot — правый нижний угол описанного квадрата; границы точки касаются
+   правой и нижней граней квадрата (не окружности). Размер точки — по размеру
+   аватара: XL 22 · L 12 · M 10 · S 8. */
+.av-stack:has(.av--xl) > .badge--dot { width: 22px; height: 22px; min-width: 22px; }
+.av-stack:has(.av--l)  > .badge--dot { width: 12px; height: 12px; min-width: 12px; }
+.av-stack:has(.av--m)  > .badge--dot { width: 10px; height: 10px; min-width: 10px; }
+.av-stack:has(.av--s)  > .badge--dot { width: 8px;  height: 8px;  min-width: 8px; }
+.av-stack > .badge--dot { right: 0; bottom: 0; top: auto; left: auto; transform: none; }
+
+/* =========================================================================
+   AVATAR GROUP — overlapping stack with a white ring between avatars and an
+   optional «+N» overflow chip. Left avatar paints on top.
+   ========================================================================= */
+.av-group {
+  --av-overlap: 10px;          /* set per group size */
+  display: inline-flex;
+  align-items: center;
+}
+.av-group .av {
+  box-shadow: 0 0 0 2px var(--bg-tile);   /* separating ring */
+}
+.av-group .av + .av,
+.av-group .av-group__more { margin-left: calc(-1 * var(--av-overlap)); }
+
+/* «+N» overflow — neutral chip shaped like the avatars */
+.av-group__more {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 0;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-cgrey-100);
+  color: var(--text-secondary);
+  font-family: var(--font-text), system-ui, sans-serif;
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-circle);
+  box-shadow: 0 0 0 2px var(--bg-tile);
+}
+
+/* per-size overlap + more-chip metrics (mirror .av sizes) *
+   overlap — прямо на margin соседних (не через --av-overlap в модификаторе). */
+.av-group--l .av + .av, .av-group--l .av-group__more { margin-left: -12px; }
+.av-group--m .av + .av, .av-group--m .av-group__more { margin-left: -10px; }
+.av-group--s .av + .av, .av-group--s .av-group__more { margin-left: -8px; }
+.av-group--l .av-group__more { width: 40px; height: 40px; font-size: 14px; }
+.av-group--m .av-group__more { width: 32px; height: 32px; font-size: 12px; }
+.av-group--s .av-group__more { width: 24px; height: 24px; font-size: 11px; }
+.av-group--rounded .av-group__more { border-radius: var(--radius-l); }
+.av-group--rounded.av-group--l .av-group__more { border-radius: var(--radius-xl); }
+.av-group--rounded.av-group--s .av-group__more { border-radius: var(--radius-m); }</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+/* =========================================================================
+   RISKMETRIC — композиция поповера риск-метрики
+   Вынесено из инлайн-<style> страницы-витрины (Фаза 3, шаг 3): те же классы
+   были скопированы в экран 02-Deal-v2, правка расходилась в двух местах.
+   Только на токенах ДС. Чип метрики — компонент Chip, здесь его нет.
+   ========================================================================= */
+.rm-body { gap: 16px; }
+.rm-blocks { display: flex; flex-direction: column; gap: 8px; }
+.rm-block { background: var(--bg-page); border-radius: var(--radius-m); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; margin: 0; }
+.rm-block__row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.rm-block__label { font: var(--type-body-s); color: var(--text-secondary); overflow-wrap: break-word; }
+.rm-block__value { font: var(--type-body-s); color: var(--text-primary); text-align: right; min-width: 0; flex: 1 1 auto; overflow-wrap: break-word; }
+.rm-block__value--strong { font: var(--type-body-m-strong); color: var(--text-primary); }
+.rm-field { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+.rm-field__label { margin: 0; font: var(--type-body-xs); color: var(--text-secondary); }
+.rm-field__value { margin: 0; font: var(--type-body-s); color: var(--text-primary); text-wrap: pretty; overflow-wrap: break-word; }
+

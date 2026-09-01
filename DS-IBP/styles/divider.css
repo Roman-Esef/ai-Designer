@@ -1,0 +1,110 @@
+/* =========================================================================
+   Design System — Divider (Разделитель)
+   Тонкая разделительная линия для визуального отделения частей интерфейса.
+   Использует только семантические токены цвета и типографики.
+   ========================================================================= */
+
+:root {
+  /* component tokens */
+  --dvd-color:        var(--border-light);    /* линия по умолчанию  */
+  --dvd-color-strong: var(--border-primary);  /* контрастная линия   */
+  --dvd-thickness:    1px;                     /* толщина линии       */
+  --dvd-section:      8px;                     /* толщина блока-секции */
+  --dvd-inset:        16px;                    /* отступ inset        */
+  --dvd-label-gap:    12px;                    /* зазор у подписи     */
+  --dvd-vmin:         16px;                    /* мин. длина вертик.  */
+}
+
+/* ----------------------------------------------------------------------- *
+   Base — линия рисуется бордером, чтобы поддержать solid и dashed
+ * ----------------------------------------------------------------------- */
+.dvd {
+  border: 0;
+  margin: 0;
+  flex: none;
+  align-self: stretch;
+  background: none;
+}
+
+/* Horizontal (по умолчанию) */
+.dvd--h {
+  width: 100%;
+  height: 0;
+  border-top: var(--dvd-thickness) solid var(--dvd-color);
+}
+
+/* Vertical */
+.dvd--v {
+  width: 0;
+  align-self: stretch;
+  min-height: var(--dvd-vmin);
+  border-left: var(--dvd-thickness) solid var(--dvd-color);
+}
+
+/* ----------------------------------------------------------------------- *
+   Colour modifiers
+ * ----------------------------------------------------------------------- */
+.dvd--strong.dvd--h { border-top-color: var(--dvd-color-strong); }
+.dvd--strong.dvd--v { border-left-color: var(--dvd-color-strong); }
+
+/* ----------------------------------------------------------------------- *
+   Style modifiers
+ * ----------------------------------------------------------------------- */
+.dvd--dashed.dvd--h { border-top-style: dashed; }
+.dvd--dashed.dvd--v { border-left-style: dashed; }
+
+/* ----------------------------------------------------------------------- *
+   Inset modifiers (only meaningful for horizontal dividers)
+ * ----------------------------------------------------------------------- */
+.dvd--inset.dvd--h    { width: calc(100% - var(--dvd-inset));        margin-left: var(--dvd-inset); }
+.dvd--middle.dvd--h   { width: calc(100% - var(--dvd-inset) * 2);    margin-inline: var(--dvd-inset); }
+
+/* ----------------------------------------------------------------------- *
+   Section divider — толстый блок для крупного группирования
+ * ----------------------------------------------------------------------- */
+.dvd--section.dvd--h {
+  height: var(--dvd-section);
+  border-top: 0;
+  background: var(--tertiary);
+}
+.dvd--section.dvd--v {
+  width: var(--dvd-section);
+  border-left: 0;
+  background: var(--tertiary);
+}
+
+/* ----------------------------------------------------------------------- *
+   Divider with label / content
+   <div class="dvd-text"><span class="dvd-text__label">…</span></div>
+ * ----------------------------------------------------------------------- */
+.dvd-text {
+  display: flex;
+  align-items: center;
+  gap: var(--dvd-label-gap);
+  width: 100%;
+}
+.dvd-text::before,
+.dvd-text::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 0;
+  border-top: var(--dvd-thickness) solid var(--dvd-color);
+}
+.dvd-text--strong::before,
+.dvd-text--strong::after { border-top-color: var(--dvd-color-strong); }
+.dvd-text--dashed::before,
+.dvd-text--dashed::after { border-top-style: dashed; }
+
+.dvd-text__label {
+  flex: 0 1 auto;
+  min-width: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* alignment — короткий сегмент с прижатой стороны */
+.dvd-text--left::before  { flex: 0 0 var(--dvd-inset); }
+.dvd-text--right::after   { flex: 0 0 var(--dvd-inset); }

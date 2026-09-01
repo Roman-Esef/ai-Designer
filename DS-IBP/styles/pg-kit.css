@@ -1,0 +1,96 @@
+/* =========================================================================
+   Playground Kit — общий слой для панелей «Конструктор» на страницах ДС.
+   Подключается ПОСЛЕ встроенных стилей страницы и переопределяет раскладку:
+   — настройки — фиксированная колонка слева, 360px по умолчанию; превью —
+     гибкая колонка справа (1fr);
+   — между ними Splitter из ДС (двигает именно ширину панели настроек,
+     превью занимает остаток; сплиттер не убираем — панель всегда можно
+     растянуть перетаскиванием);
+   — настройки в 2 колонки, при сужении — в 1 (класс ставит pg-kit.js);
+   — неактуальные контролы (.is-off) скрываются полностью;
+   — селекты из 2–4 коротких опций заменяются на SegmentControl,
+     селекты-списки иконок — на сетку глифов (см. pg-kit.js).
+   ПРАВИЛО ДЛЯ НОВЫХ СТРАНИЦ: панель настроек всегда 360px по умолчанию —
+   ничего дополнительно прописывать не нужно, это задаёт pg-kit.css; просто
+   подключите pg-kit.css/pg-kit.js, как на любой существующей странице.
+   ПРИМЕЧАНИЕ 30.08.2026: @import splitter/segment-control удалены — по file://
+   они не работают, а на страницах docs-split splitter/segment-control/tab
+   подключаются явными <link>. Живые правила контролов (.ctl/.lbl/.is-off)
+   вынесены в docs-split.css; здесь остаётся только легаси для НЕ раскатанных
+   страниц (foundations/атомы/patterns в старом формате .panel.pg).
+   ========================================================================= */
+
+/* ---------- раскладка панели: настройки | сплиттер | превью ----------
+   display/padding/overflow задаются здесь же: страницы, у которых нет своего
+   правила .panel.pg (Input*, DatePicker, NavTile — весь хром из input-pages.css),
+   иначе остаются блочными и панель рассыпается в один столбец.
+   Панели с data-pg-no-split (Pagination, Modal — настройки снизу) не трогаем. */
+.panel.pg:not([data-pg-no-split]) {
+  display: grid;
+  padding: 0;
+  overflow: hidden;
+  grid-template-columns: var(--pg-controls-w, 360px) var(--spl-size, 11px) minmax(0,1fr) !important;
+}
+.panel.pg > .pg__controls {
+  display: grid !important;
+  grid-template-columns: 1fr; /* по умолчанию — одна колонка */
+  gap: 16px 20px;
+  align-content: start;
+  padding: 26px 28px 30px;
+  border-right: none !important;
+  max-height: none !important;
+  min-width: 0;
+  overflow: visible !important;
+}
+/* две колонки — только когда панель расширена сплиттером (класс ставит pg-kit.js) */
+.panel.pg > .pg__controls.pg__controls--wide { grid-template-columns: 1fr 1fr; }
+@media (max-width: 920px) {
+  .panel.pg { grid-template-columns: 1fr !important; }
+  .panel.pg > .spl { display: none; }
+  .panel.pg > .pg__controls { border-bottom: 1px solid var(--border-light); }
+}
+
+/* ---------- контролы ---------- */
+.pg__controls .ctl { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.pg__controls .ctl--span { grid-column: 1 / -1; }
+/* неактуальные настройки скрываем, а не блокируем */
+.pg__controls .ctl.is-off { display: none !important; }
+.pg__controls .toggle.is-off { display: none !important; }
+
+/* переключатели-свитчи: в узкой панели — колонкой с воздухом, в широкой — в ряд */
+.pg__controls .ctl:has(.toggles) { grid-column: 1 / -1; }
+.pg__controls .toggles { flex-direction: column !important; flex-wrap: wrap; gap: 14px; }
+.pg__controls--wide .toggles { flex-direction: row !important; column-gap: 24px; row-gap: 14px; }
+.pg__controls .toggles .toggle { flex: 0 1 auto; justify-content: flex-start; }
+.pg__controls .toggle > span:last-child { white-space: nowrap; }
+
+/* легаси-сегменты страниц (.seg) — на всю ширину ячейки, без переноса в 2 ряда */
+.pg__controls .seg { display: flex !important; flex-wrap: nowrap !important; width: 100%; box-sizing: border-box; }
+.pg__controls .seg button { flex: 1 1 0; white-space: nowrap; }
+
+/* ---------- выбор иконки: сетка глифов ---------- */
+.pg__controls .icnpick { display: flex; flex-wrap: wrap; gap: 6px; }
+.pg__controls .icnpick__btn {
+  width: 34px; height: 34px; padding: 0;
+  border: 1px solid var(--border-light); border-radius: 8px;
+  background: var(--bg-tile); color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: border-color .12s, color .12s, background-color .12s;
+}
+.pg__controls .icnpick__btn svg { width: 18px; height: 18px; display: block; }
+.pg__controls .icnpick__btn:hover { border-color: var(--border-primary); color: var(--text-primary); }
+.pg__controls .icnpick__btn[aria-checked="true"] { border-color: var(--primary); color: var(--primary); background: var(--primary-bg); }
+.pg__controls .icnpick__btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+/* ---------- подпись контрола, сцена превью, сводка ----------
+   Раньше эти правила жили в локальном <style> каждой страницы: новая страница
+   копировала разметку .lbl/.pg__stage/.readout и оставалась без стиля
+   (Layout.html, 20.08.2026). Теперь они часть kit-а. */
+.pg__controls .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform: uppercase; letter-spacing: .05em; font-size: 11px; }
+.pg__controls .readout { display: flex; flex-direction: column; gap: 6px; padding-top: 4px; border-top: 1px solid var(--border-light); }
+.pg__controls .readout .r { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.pg__controls .readout .r .k { font: var(--type-body-s); color: var(--text-inactive); }
+.pg__controls .readout .r .v { font: var(--type-body-m-strong); color: var(--text-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; text-align: right; }
+.pg__controls .readout .r .v.tokv { color: var(--primary); }
+.panel.pg > .pg__stage { padding: 24px; min-height: 320px; background: var(--bg-tile); overflow: hidden; min-width: 0; }

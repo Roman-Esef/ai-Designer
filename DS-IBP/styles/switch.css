@@ -1,0 +1,183 @@
+/* =========================================================================
+   Design System — Switch
+   Control: 20px tall × 36px wide pill track · 16px thumb · 2px inset
+            · thumb travel 16px.
+   States:  off · on
+            ×  default · hover · focus · pressed · disabled · loading
+   Label: Body M (SB Sans Text) · Helper: общий компонент подкачки (Body XS),
+   рендерится классом .ds-helper — см. label-helper.css.
+   Off:  track --c-cgrey-100, white thumb (left).
+   On:   track --secondary-light (pale teal), --primary thumb (right).
+   Requires: typography.css, colors.css, label-helper.css
+   ========================================================================= */
+
+.sw {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.sw--disabled,
+.sw:has(.sw__input:disabled) { cursor: default; pointer-events: none; }
+
+/* visually-hidden native input (keeps it accessible / focusable) */
+.sw__input {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+  margin: 0;
+}
+
+/* ---------- control (track + thumb) --------------------------------------
+   The track is 20px tall, matching the Body M line-height, so the control
+   aligns to the first line of the label. */
+.sw__control {
+  flex: none;
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--radius-pill);
+  background: var(--c-cgrey-100);
+  transition: background-color .15s ease, box-shadow .15s ease;
+}
+
+/* 16px thumb, 2px inset, sits to the left when off */
+.sw__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-circle);
+  background: var(--c-mgrey-50);
+  box-shadow: 0 1px 2px rgba(40, 50, 55, .28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .18s cubic-bezier(.4, 0, .2, 1),
+              background-color .15s ease, width .15s ease;
+}
+
+/* ---------- on ------------------------------------------------------------
+   Класс — форс-состояние витрины; нативный .sw__input:checked даёт тот же
+   вид без класса — см. RulesAudit W1. */
+.sw--on .sw__control,
+.sw__input:checked ~ .sw__control { background: var(--secondary-light); }
+.sw--on .sw__thumb,
+.sw__input:checked ~ .sw__control .sw__thumb {
+  background: var(--primary);
+  transform: translateX(16px);
+  box-shadow: 0 1px 2px rgba(0, 99, 90, .35);
+}
+
+/* ---------- hover --------------------------------------------------------- */
+/* a faint state-layer halo around the thumb (Material-style) */
+.sw:hover .sw__thumb,
+.sw--hover .sw__thumb {
+  box-shadow: 0 1px 2px rgba(40, 50, 55, .28), 0 0 0 5px var(--primary-bg-light);
+}
+.sw:hover .sw__control,
+.sw--hover .sw__control { background: var(--c-cgrey-200); }
+.sw:hover.sw--on .sw__control,
+.sw--hover.sw--on .sw__control,
+.sw:hover:has(.sw__input:checked) .sw__control { background: var(--secondary); }
+.sw:hover.sw--on .sw__thumb,
+.sw--hover.sw--on .sw__thumb,
+.sw:hover:has(.sw__input:checked) .sw__thumb {
+  background: var(--primary-dark);
+  box-shadow: 0 1px 2px rgba(0, 99, 90, .4), 0 0 0 5px var(--primary-bg-light);
+}
+
+/* ---------- pressed -------------------------------------------------------
+   the handle expands slightly on press (Material 3) and the halo grows. */
+.sw:active .sw__thumb,
+.sw--pressed .sw__thumb {
+  width: 19px;
+  box-shadow: 0 1px 2px rgba(40, 50, 55, .28), 0 0 0 7px var(--primary-bg);
+}
+.sw:active.sw--on .sw__thumb,
+.sw--pressed.sw--on .sw__thumb,
+.sw:active:has(.sw__input:checked) .sw__thumb {
+  transform: translateX(13px);
+  box-shadow: 0 1px 2px rgba(0, 99, 90, .4), 0 0 0 7px var(--primary-bg);
+}
+
+/* ---------- focus (keyboard) ---------------------------------------------- */
+.sw__input:focus-visible + .sw__control,
+.sw--focus .sw__control {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- loading -------------------------------------------------------
+   async toggle in progress: thumb shows a spinner, control is non-interactive
+   but keeps its current colour so the pending state is still readable. */
+.sw--loading { cursor: progress; pointer-events: none; }
+.sw--loading .sw__thumb { box-shadow: 0 1px 2px rgba(40, 50, 55, .28); }
+/* Индикатор — общий Spinner: <span class="spin"> внутри .sw__thumb, цвет свой (не currentColor). */
+.sw__thumb .spin {
+  width: 11px;
+  height: 11px;
+  border: 2px solid color-mix(in srgb, var(--text-secondary) 30%, transparent);
+  border-top-color: var(--text-secondary);
+}
+.sw--on .sw__thumb .spin {
+  border-color: color-mix(in srgb, #fff 45%, transparent);
+  border-top-color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sw__thumb { transition: none; }
+}
+
+/* ---------- disabled ------------------------------------------------------ */
+.sw--disabled .sw__control,
+.sw__input:disabled ~ .sw__control { background: var(--disabled-bg); box-shadow: none; }
+.sw--disabled .sw__thumb,
+.sw__input:disabled ~ .sw__control .sw__thumb {
+  background: var(--c-mgrey-50);
+  box-shadow: 0 1px 1px rgba(40, 50, 55, .12);
+}
+.sw--disabled.sw--on .sw__control,
+.sw__input:disabled:checked ~ .sw__control { background: color-mix(in srgb, var(--secondary-light) 60%, var(--disabled-bg)); }
+.sw--disabled.sw--on .sw__thumb,
+.sw__input:disabled:checked ~ .sw__control .sw__thumb { background: var(--disabled); box-shadow: none; }
+.sw--disabled .sw__label,
+.sw--disabled .ds-helper,
+.sw__input:disabled ~ .sw__content .sw__label,
+.sw__input:disabled ~ .sw__content .ds-helper { color: var(--text-inactive); }
+
+/* ---------- content (label + helper) -------------------------------------- */
+.sw__content { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sw__label  { font: var(--type-body-m);  color: var(--text-primary); }
+/* звёздочка обязательного выбора — как у cb__req / rb__req */
+.sw__req { color: var(--error); margin-left: 2px; }
+/* Хелпер — общий компонент подкачки (не собственный класс), см. label-helper.css → .ds-helper */
+.sw--no-content .sw__content { display: none; }
+
+/* ---------- settings row --------------------------------------------------
+   common real-world usage: label on the left, switch pushed to the right.
+   The whole row is the hit target. */
+.sw-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0;
+}
+.sw-row .sw { flex-direction: row-reverse; flex: 1; width: 100%; }
+.sw-row .sw__content { flex: 1; }
+
+/* ---------- group ---------------------------------------------------------
+   A list of switches. Alignment is always to the controls (left edge of the
+   track), and the active area stretches to the full row height. */
+.sw-group { display: flex; flex-direction: column; }
+.sw-group__title {
+  font: var(--type-h6-strong);
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+.sw-group__items { display: flex; flex-direction: column; }
+.sw-group .sw { padding: 6px 0; }

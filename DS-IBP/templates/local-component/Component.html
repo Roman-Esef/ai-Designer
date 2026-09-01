@@ -1,0 +1,19 @@
+<!-- Разметка локального компонента: только компоненты ДС, без обвязки страницы.
+     Префикс классов lc-component заменить на lc-<имя>.
+     Внешние отступы и место в колонках задаёт экран, здесь их нет.
+     data-state — состояние компонента: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:            edit | view | locked -->
+<section class="lc-component" data-state="data" data-mode="view">
+  <header class="lc-component__head">
+    <h3 class="lc-component__title">Заголовок компонента</h3>
+    <!-- действия: показываются только в data-mode="edit"; в view не рисуются вовсе -->
+    <div class="lc-component__actions"></div>
+  </header>
+  <div class="lc-component__body">
+    <!-- поля в порядке из паспорта; незаполненное — прочерком, с места не уходит -->
+  </div>
+  <!-- пустое состояние: одна строка причины + действие, если у роли есть право заполнить -->
+  <div class="lc-component__empty" hidden></div>
+  <!-- ошибка: причина словами пользователя + повтор запроса; экран продолжает работать -->
+  <div class="lc-component__error" hidden></div>
+</section>

@@ -1,0 +1,17 @@
+/* Skeleton — переиспользуемый плейсхолдер загрузки: Line (текстовая строка), Block (геометрическая форма) и Surface (шиммер прямо на существующем элементе — свой размер/радиус сохраняются) + общий шиммер. Токены — colors.css, radius.css. */
+.sk-line,.sk-block,.sk-surface{background:linear-gradient(90deg, var(--st-disabled-light) 25%, var(--st-disabled-midlight) 37%, var(--st-disabled-light) 63%);background-size:400% 100%;animation:sk-shimmer 1.6s ease infinite}
+.sk-line{display:block;height:var(--sk-h, 16px);width:var(--sk-w, 100%);border-radius:var(--radius-xs)}
+.sk-line--title{height:20px}
+.sk-line--caption{height:12px}
+.sk-block{display:block;width:var(--sk-w, 100%);height:var(--sk-h, 100%);border-radius:var(--radius-s)}
+.sk-block--rounded{border-radius:var(--radius-xl)}
+.sk-block--circle{border-radius:var(--radius-circle)}
+.sk-surface{position:relative;overflow:hidden;color:transparent}
+.sk-surface>*{visibility:hidden}
+@keyframes sk-shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+@media (prefers-reduced-motion: reduce){.sk-line,.sk-block,.sk-surface{animation-duration:3.2s}}
+
+/* композиция: стопка строк / строка с ведущим блоком (аватар/иконка) + строками */
+.sk-group{display:flex;flex-direction:column;gap:8px}
+.sk-row{display:flex;align-items:center;gap:12px}
+.sk-row .sk-group{flex:1;min-width:0}

@@ -1,0 +1,271 @@
+/* =========================================================================
+   Entity — компонент для отображения объектов (компании, люди, файлы,
+   метрики) в тайлах, списках и формах. Композитный: собирается из
+   ведущего элемента (иконка/аватар), текстового блока (Header · Label ·
+   Subheaders), чипов, группы иконок-кнопок и блока действий.
+
+   Токены масштаба задаются модификатором размера (--s / --m / --l) через
+   набор --e-* переменных. Собственного фона нет — Entity наследует фон
+   контейнера и тянется на всю его ширину.
+   ========================================================================= */
+
+.entity {
+  /* дефолт = размер m (40px) */
+  --e-lead:        40px;
+  --e-lead-radius: var(--radius-xl);
+  --e-lead-icon:   22px;
+  --e-gap:         12px;   /* ведущий ↔ контент          */
+  --e-row-gap:     6px;    /* внутри строки Label         */
+  --e-head-gap:    2px;    /* Header ↔ Label              */
+  --e-block-gap:   6px;    /* Label ↔ Subheaders ↔ Chips  */
+  --e-font-header: var(--type-body-xs);
+  --e-font-label:  var(--type-body-m-strong);
+  --e-font-affix:  var(--type-body-m);
+  --e-font-sub:    var(--type-body-s);
+  --e-bookmark:    18px;
+
+  display: flex;
+  align-items: center;
+  gap: var(--e-gap);
+  min-width: 0;
+  width: 100%;
+  font-family: var(--font-text), system-ui, sans-serif;
+  color: var(--text-primary);
+}
+
+/* ширина по контенту (в inline-контекстах — таблицы, чипы) */
+.entity--inline { display: inline-flex; width: auto; }
+
+/* ---------- размеры ------------------------------------------------------- *
+   Шкала размера — прямыми свойствами на конкретных потомках (не через --e-*
+   в модификаторе), чтобы компилятор чисто регистрировал токены. Размер m = дефолты
+   .entity (отдельных правил не требует). */
+.entity--s { gap: 10px; }
+.entity--s .entity__main { gap: 5px; }
+.entity--s .entity__icon { width: 32px; height: 32px; border-radius: var(--radius-l); }
+.entity--s .entity__icon > :is(svg,[data-icon]){ width: 18px; height: 18px; }
+.entity--s .entity__label { font: var(--type-body-s-strong); }
+.entity--s .entity__prefix, .entity--s .entity__postfix { font: var(--type-body-s); }
+.entity--s .entity__subs { font: var(--type-body-xs); }
+.entity--s .entity__bookmark { width: 16px; height: 16px; }
+
+.entity--l { gap: 16px; }
+.entity--l .entity__titles { gap: 3px; }
+.entity--l .entity__main { gap: 8px; }
+.entity--l .entity__icon { width: 96px; height: 96px; border-radius: var(--radius-5xl); }
+.entity--l .entity__icon > :is(svg,[data-icon]){ width: 48px; height: 48px; }
+.entity--l .entity__header { font: var(--type-body-s); }
+.entity--l .entity__label { font: var(--type-body-xl-strong); }
+.entity--l .entity__prefix, .entity--l .entity__postfix { font: var(--type-body-xl); }
+.entity--l .entity__subs { font: var(--type-body-m); }
+.entity--l .entity__bookmark { width: 22px; height: 22px; }
+
+/* =========================================================================
+   Ведущий элемент — иконка в скруглённом контейнере / аватар / чекбокс / грип
+   ========================================================================= */
+.entity__lead { flex: none; align-self: center; }
+
+/* иконочный контейнер */
+.entity__icon {
+  box-sizing: border-box;
+  width: var(--e-lead);
+  height: var(--e-lead);
+  border-radius: var(--e-lead-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-swamp-100);
+  color: var(--text-primary);
+}
+.entity__icon > :is(svg,[data-icon]){ width: var(--e-lead-icon); height: var(--e-lead-icon); display: block; }
+
+/* тон иконочного контейнера */
+.entity__icon--accent  { background: color-mix(in srgb, var(--primary) 14%, var(--c-mgrey-50)); color: var(--primary-dark); }
+.entity__icon--neutral { background: var(--c-cgrey-100); color: var(--text-secondary); }
+
+/* аватар как ведущий (используется .av из ДС) — синхронизирует размер */
+.entity__lead .av { flex: none; }
+
+/* =========================================================================
+   Контентный блок
+   ========================================================================= */
+.entity__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-block-gap);
+}
+
+/* --- Header (надзаголовок) --- */
+.entity__header {
+  font: var(--e-font-header);
+  color: var(--text-inactive);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* группа Header + Label с малым зазором */
+.entity__titles { display: flex; flex-direction: column; gap: var(--e-head-gap); min-width: 0; }
+
+/* --- строка Label: prefix · label · postfix · bookmark --- */
+.entity__labelrow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--e-row-gap);
+  min-width: 0;
+}
+.entity__prefix-icon {
+  align-self: center;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  color: var(--text-inactive);
+  display: inline-flex;
+}
+.entity__prefix-icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.entity__prefix { font: var(--e-font-affix); color: var(--text-inactive); flex: none; }
+
+.entity__label {
+  font: var(--e-font-label);
+  color: var(--text-primary);
+  min-width: 0;
+}
+/* усечение в одну строку с многоточием (для тултипа) */
+.entity__label--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.entity__postfix { font: var(--e-font-affix); color: var(--text-inactive); flex: none; }
+
+/* закладка/избранное — иконочная кнопка внутри строки label */
+.entity__bookmark {
+  align-self: center;
+  flex: none;
+  width: var(--e-bookmark);
+  height: var(--e-bookmark);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-inactive);
+  cursor: pointer;
+  display: inline-flex;
+  transition: color .15s ease;
+}
+.entity__bookmark > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.entity__bookmark:hover { color: var(--text-secondary); }
+.entity__bookmark--active { color: var(--primary); }
+.entity__bookmark:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-xs); }
+
+/* =========================================================================
+   EntitySubtitleGroup — .entity__subs: check-icon + список подзаголовков + +N
+   ========================================================================= */
+.entity__subs {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  font: var(--e-font-sub);
+  color: var(--text-secondary);
+}
+.entity__subs-icon {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  color: var(--text-inactive);
+  display: inline-flex;
+  margin-top: .05em;
+}
+.entity__subs-icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.entity__subs-list {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.entity__subs--single .entity__subs-list { -webkit-line-clamp: 1; line-clamp: 1; }
+.entity__subs-more { flex: none; font-weight: var(--weight-semibold); color: var(--text-primary); }
+
+/* =========================================================================
+   Chips — переиспользуем .chiplist из ДС; тут только раскладка-обёртка
+   ========================================================================= */
+.entity__chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+
+/* =========================================================================
+   EntityIconButtonGroup — .entity__icons: ряд IconButton s из ДС
+   ========================================================================= */
+.entity__icons { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
+
+/* =========================================================================
+   EntityActions — трейлинг: до 2 кнопок + закрытие; выравнивание по верху
+   ========================================================================= */
+.entity__actions {
+  flex: none;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.entity__actions--center { align-self: center; }
+
+/* =========================================================================
+   Интерактивный тайл — hover / focus / selected
+   ========================================================================= */
+.entity--interactive {
+  cursor: pointer;
+  border-radius: var(--radius-m);
+  padding: 8px 10px;
+  margin: -8px -10px;
+  transition: background-color .15s ease;
+}
+.entity--interactive:hover { background: var(--bgtable-row-hover); }
+.entity--interactive:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+/* Класс .entity--selected — форс-состояние витрины; реальный выбор из списка
+   несёт aria-selected="true" на самом тайле (RulesAudit W1). */
+.entity:is(.entity--selected,[aria-selected="true"]) { background: var(--primary-bg); }
+.entity:is(.entity--selected,[aria-selected="true"]):hover { background: color-mix(in srgb, var(--primary) 10%, transparent); }
+
+/* выбор чекбоксом (список с множественным выбором) */
+.entity--selectable .entity__lead { position: relative; }
+
+/* =========================================================================
+   Drag-handle — грип для переупорядочивания
+   ========================================================================= */
+.entity__drag {
+  flex: none;
+  align-self: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-inactive);
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.entity__drag > :is(svg,[data-icon]){ width: 18px; height: 18px; display: block; }
+.entity__drag:hover { color: var(--text-secondary); }
+.entity__drag:active { cursor: grabbing; }
+
+/* =========================================================================
+   Skeleton / загрузка (компонент подкачки) — общий компонент Skeleton:
+   ведущая иконка получает .sk-surface (свой размер/радиус сохраняются),
+   строки — обычные .sk-line с шириной через --sk-w (styles/skeleton.css).
+   ========================================================================= */
+
+/* =========================================================================
+   Пустое / нет данных (—) и состояние ошибки (объект удалён/недоступен)
+   ========================================================================= */
+.entity--empty .entity__label,
+.entity__value--empty { color: var(--text-inactive); font-weight: var(--weight-regular); }
+
+.entity--error .entity__icon { background: var(--error-bg-light); color: var(--error); }
+.entity--error .entity__label { color: var(--text-secondary); text-decoration: line-through; text-decoration-color: var(--text-inactive); }
+.entity--error .entity__header { color: var(--error); }

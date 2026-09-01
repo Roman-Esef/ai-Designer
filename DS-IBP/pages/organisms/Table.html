@@ -1,0 +1,604 @@
+<!-- @dsCard group="Components" name="Table" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Table — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/button-group.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/checkbox.css">
+<link rel="stylesheet" href="../../styles/chip.css">
+<link rel="stylesheet" href="../../styles/illustration.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/table-filter.css">
+<link rel="stylesheet" href="../../styles/pagination.css">
+<link rel="stylesheet" href="../../styles/modal.css">
+<link rel="stylesheet" href="../../styles/context-menu.css">
+<link rel="stylesheet" href="../../styles/table.css">
+<link rel="stylesheet" href="../../styles/skeleton.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<style>
+a{color:var(--link);} a:hover{color:var(--link-dark);}
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:80ch;text-wrap:pretty;}
+.subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:32px 0 14px;}
+/* контролы конструктора (вкладка «Конструктор») */
+.ctl{display:flex;flex-direction:column;gap:10px;}
+.ctl.is-off{display:none;}
+.pg__grouphead{grid-column:1 / -1;font:var(--type-body-s-strong);font-size:11px;color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;padding-top:16px;margin-top:4px;border-top:1px solid var(--border-light);}
+.pg__grouphead:first-child{padding-top:0;margin-top:0;border-top:none;}
+.ctl>.lbl{font:600 11px/1 var(--font-text),sans-serif;color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+/* preview stage (демо в верхней панели) */
+.dt-stage{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg-page);border:1px solid var(--border-light);border-radius:12px;padding:28px;min-height:280px;width:100%;}
+.dt-stage .dtable{width:100%;}
+.dt-stage .dtable__body{max-height:260px;}
+.ws-cap{font:var(--type-body-xs);color:var(--text-inactive);margin:12px 0 0;text-wrap:pretty;}
+/* columns modal (demo-only chrome, not part of the shipped component) */
+.col-actions{display:flex;gap:8px;margin-bottom:12px;}
+.col-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
+.col-item{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:var(--radius-control-s);}
+.col-item.is-dragging{opacity:.4;}
+.col-item__drag{color:var(--text-inactive);cursor:grab;display:flex;}
+.col-item .cb{flex:1;min-width:0;}
+.col-item__pin{flex:none;}
+.col-item__pin[aria-pressed="true"]{color:var(--secondary-dark);}
+/* anatomy */
+.anat{display:flex;flex-direction:column;gap:28px;}
+.anat__stage{background:color-mix(in srgb,var(--primary) 5%,#fff);border:1px solid var(--border-light);border-radius:14px;padding:44px 40px;display:flex;justify-content:center;overflow-x:auto;}
+.anat-dia{position:relative;display:inline-block;width:100%;}
+.anat-dia .dtable{pointer-events:none;}
+.mk{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--text-primary);color:#fff;font:700 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5;}
+.anat__legend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:18px 28px;}
+@media(max-width:760px){.anat__legend{grid-template-columns:1fr;}}
+.anat__legend li{display:flex;gap:12px;align-items:flex-start;}
+.anat__legend li .n{width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font:700 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;flex:none;margin-top:2px;}
+.anat__legend li .d em{font-style:normal;color:var(--text-inactive);}
+/* usage / guide */
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:760px){.guide{grid-template-columns:1fr;}}
+.guide-card{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-2xl);padding:20px 22px;display:flex;flex-direction:column;gap:8px;}
+.guide-card__tag{font:var(--type-body-xs);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+.guide-card__body{font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty;}
+.guide-card__body b{color:var(--text-primary);}
+/* states */
+.states-grid{display:flex;flex-direction:column;gap:20px;}
+.st-card{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;}
+.st-card__label{font:var(--type-body-xs);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+.st-card .dtable__body{max-height:none;}
+.st-card .dtable{width:100%;}
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Table">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="dt-stage">
+          <div class="dtable" id="demo-dtable"></div>
+        </div>
+        <p class="ws-cap">Таблица интерактивна: тяните правую границу колонки, чтобы изменить ширину, перетаскивайте подпись колонки, чтобы поменять порядок, отмечайте чекбоксы строк — тело прокручивается по вертикали и горизонтали, шапка остаётся на месте.</p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+  <a class="crumb" href="../../index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Обзор компонентов
+  </a>
+  <div class="meta">
+    <span>Версия <b>1.005</b></span>
+    <span>Обновлено <b>27.08.2026</b></span>
+    <span>CSS <b>styles/table.css</b></span>
+    <span>Зависимости <b>table-cell, pagination, table-filter, button, button-group, icon-button, chip, checkbox, illustration, modal, context-menu</b></span>
+  </div>
+  <div class="eyebrow">Дизайн-система · Организмы</div>
+  <h1>Table</h1>
+  <p class="lead">Контейнер таблицы/реестра: Toolbar (заголовок, счётчик, фильтр, действия) + прокручиваемое тело с липкой шапкой + Footer. Строки и ячейки собираются из TableCell, постраничный переход и панель массовых действий — из Pagination; Table добавляет только обёртку, скролл-поведение и состояния Loading/Empty всей таблицы.</p>
+</header>
+
+<!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#demo-dtable),
+     контролы — во вкладку «Конструктор» нижней панели (см. в конце) -->
+
+<!-- 2. ИСПОЛЬЗОВАНИЕ -->
+<section class="section" id="usage" data-screen-label="Использование">
+  <h2>Использование</h2>
+  <p class="desc">Table — верхнеуровневый контейнер для любого реестра: список сделок, заявок, документов, платежей. Он не рисует содержимое строк сам — колонки и ячейки собираются из TableCell, постраничная навигация и массовые действия — из Pagination.</p>
+  <div class="guide">
+    <div class="guide-card">
+      <span class="guide-card__tag">Когда использовать</span>
+      <p class="guide-card__body">Любой список записей с колонками, который может не поместиться на экран целиком: нужен скролл, липкая шапка, счётчик, фильтр или массовые действия над выбранными строками.</p>
+    </div>
+    <div class="guide-card">
+      <span class="guide-card__tag">Когда не использовать</span>
+      <p class="guide-card__body">Короткий фиксированный список из 2–4 полей без прокрутки и без операций над строками — проще собрать на <b>Entity</b> или <b>ReadOnlyField</b>, без веса контейнера Table.</p>
+    </div>
+    <div class="guide-card">
+      <span class="guide-card__tag">Table vs TableCell</span>
+      <p class="guide-card__body"><b>TableCell</b> — атом строки: из его ячеек собирается любая колонка. <b>Table</b> — контейнер вокруг готовых строк: тулбар, скролл с липкой шапкой, футер, состояния Loading/Empty на уровне всей таблицы, а не одной ячейки.</p>
+    </div>
+    <div class="guide-card">
+      <span class="guide-card__tag">Table vs Tile</span>
+      <p class="guide-card__body">Table — сама себе контейнер (фон, рамка, радиус) и её не нужно оборачивать в Tile. Если реестр — часть более крупной рабочей области с заголовком раздела, ставьте Table внутрь <b>Tile --headless</b>, не дублируя рамку.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. АНАТОМИЯ -->
+<section class="section" id="anatomy" data-screen-label="Анатомия">
+  <h2>Анатомия</h2>
+  <p class="desc">Три вертикальные секции внутри общей рамки: Toolbar, прокручиваемое тело (шапка + строки) и Footer. Тулбар и футер — опциональны по отдельности; тело — обязательная часть всегда.</p>
+  <div class="anat">
+    <div class="anat__stage">
+      <div class="anat-dia" id="anat-dia"></div>
+    </div>
+    <ul class="anat__legend">
+      <li><span class="n">1</span><span class="d"><b>Toolbar</b> — заголовок + счётчик записей слева, <em>TableFilter</em> и первичные действия справа. Опционален.</span></li>
+      <li><span class="n">2</span><span class="d"><b>Шапка (sticky)</b> — TableHeader-ячейки (<code class="tok">.th</code>), закреплена сверху при вертикальном скролле тела.</span></li>
+      <li><span class="n">3</span><span class="d"><b>Строки</b> — TableCell-ячейки (<code class="tok">.tbl__row</code>/<code class="tok">.tc</code>), своего оформления Table не добавляет.</span></li>
+      <li><span class="n">4</span><span class="d"><b>Footer</b> — Pagination: обычный ряд <code class="tok">.pgn-row</code> или, при выборе строк, ряд массового действия <code class="tok">.pgn-bulk</code> над ним. Опционален.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 4. ВАРИАНТЫ -->
+<section class="section" id="variants" data-screen-label="Варианты">
+  <h2>Варианты</h2>
+  <p class="desc">Table — не набор визуальных тем, а набор независимо включаемых частей контейнера.</p>
+
+  <div class="subsec" data-screen-label="ColumnWidth">
+    <h3>Ширина колонки</h3>
+    <p class="desc">Не отключаемая опция и не часть «Настройки колонок»: ручка <code class="tok">.th__resize</code> стоит последним ребёнком каждой <code class="tok">.th</code> (кроме разделителей) всегда. Перетаскивание правой границы шапки и клавиши <b>← →</b> (шаг 16px, минимум 96px) меняют ширину вживую — детали см. <a class="inl" href="TableCell.html">TableCell</a>, раздел «Поведение». Поведение приходит из общего скрипта <code class="tok">scripts/tbl-resize.js</code>, который входит в <code class="tok">scripts/ds.js</code>: на собранном экране ресайз колонок работает из коробки, отдельного подключения и <code class="tok">data-</code>-атрибутов не требует.</p>
+  </div>
+  <div class="subsec" data-screen-label="ColumnsSettings">
+    <h3>Настройка колонок</h3>
+    <p class="desc">Кнопка-шестерёнка (<code class="tok">settings</code>) в тулбаре открывает Modal <code class="tok">--w4</code> со списком колонок: чекбокс видимости, перетаскивание за иконку слева меняет порядок в таблице, IconButton закрепления справа — то же закрепление, что и у колонки (фон Pinned + sticky). «Выбрать все»/«Сбросить все» — массово переключают видимость. Select/Действие в списке не участвуют — служебные, не скрываются и не переставляются.</p>
+  </div>
+  <div class="subsec" data-screen-label="SavedFilters">
+    <h3>Сохранённые фильтры</h3>
+    <p class="desc">Если у таблицы есть сохранённые пресеты фильтра, кнопка «Фильтр» становится Split Button (см. TableFilter): основная часть открывает модалку фильтра, шеврон — меню сохранённых пресетов с числом параметров у каждого. Без пресетов — обычная одиночная кнопка.</p>
+  </div>
+  <div class="subsec" data-screen-label="Toolbar">
+    <h3>Тулбар</h3>
+    <p class="desc">Опционален: таблица без заголовка (например, вложенная в Tile с собственным TileHeader) убирает <code class="tok">.dtable__toolbar</code> целиком — тело начинается сразу липкой шапкой.</p>
+  </div>
+  <div class="subsec" data-screen-label="StickyHeader">
+    <h3>Липкая шапка</h3>
+    <p class="desc">Не отключаемая опция: пока у тела есть вертикальный скролл, шапка (<code class="tok">.th</code>) держит <code class="tok">position: sticky; top: 0</code> и остаётся видимой. Если строк мало и скролла нет — шапка визуально не отличается от обычной.</p>
+  </div>
+  <div class="subsec" data-screen-label="Bulk">
+    <h3>Массовые действия</h3>
+    <p class="desc">Появляются в Footer, когда выбрана хотя бы одна строка: ряд <code class="tok">.pgn-bulk</code> со счётчиком и кнопками действий встаёт НАД строкой пагинации, которая остаётся видимой. Если Footer выключен, массовые действия недоступны — включите Footer.</p>
+  </div>
+  <div class="subsec" data-screen-label="ScrollEdges">
+    <h3>Горизонтальный скролл и закрепление колонок</h3>
+    <p class="desc">Когда колонки не помещаются по ширине, тело скроллится горизонтально; закреплённые колонки (свойство TableCell) остаются на месте. Теней-градиентов по краям тела нет — скрытый контент по бокам обозначает сам скроллбар (решение 27.08.2026: прежние <code class="tok">.dtable__edge</code> позиционировались внутри скролл-контейнера и уезжали вместе с колонками).</p>
+  </div>
+</section>
+
+<!-- 5. РАЗМЕРЫ -->
+<section class="section" id="sizes" data-screen-label="Размеры">
+  <h2>Размеры</h2>
+  <p class="desc">Не применимо: собственной размерной шкалы у Table нет. Высота строки (48px) и паддинги ячеек задаёт TableCell; высота ряда пагинации — Pagination. Table лишь добавляет фиксированные отступы Toolbar (16/20px) и Footer (0/20px по бокам).</p>
+
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Своей шкалы размеров у Table нет; радиус есть только у внешней обёртки — строки и ячейки прямоугольные.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Обёртка таблицы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xl</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Строка и ячейка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+<!-- 6. КОНТЕНТ -->
+<section class="section" id="content" data-screen-label="Контент">
+  <h2>Контент</h2>
+  <p class="desc">Правила наполнения контейнера.</p>
+  <div class="guide">
+    <div class="guide-card">
+      <span class="guide-card__tag">Заголовок и счётчик</span>
+      <p class="guide-card__body">Заголовок — короткое название реестра («Заявки», «Контрагенты»). Счётчик — общее число записей без слова «записей»/«шт.», само число рядом с заголовком серым цветом.</p>
+    </div>
+    <div class="guide-card">
+      <span class="guide-card__tag">Пустое состояние</span>
+      <p class="guide-card__body">Иллюстрация (<code class="tok">empty-folder</code>) + заголовок 3–5 слов + пояснение в одно предложение + опциональное действие («Очистить фильтр», «Добавить запись»). Текст объясняет причину: нет данных вообще или ничего не найдено по фильтру — формулировки разные.</p>
+    </div>
+    <div class="guide-card">
+      <span class="guide-card__tag">Загрузка</span>
+      <p class="guide-card__body">Строки-скелетоны того же количества колонок, что и реальные данные (обычно 5–8 строк) — заголовок и счётчик тулбара на время загрузки не скрываются, счётчик можно временно спрятать, если итог неизвестен.</p>
+    </div>
+    <div class="guide-card">
+      <span class="guide-card__tag">Переполнение</span>
+      <p class="guide-card__body">Названия колонок и значения ячеек усекаются правилами TableCell (тултип на усечении); Table не вводит собственных правил переполнения контента строк.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ПОВЕДЕНИЕ -->
+<section class="section" id="behavior" data-screen-label="Поведение">
+  <h2>Поведение</h2>
+  <p class="desc">Скролл, липкая шапка, переключение между обычным и массовым режимом футера, состояния Loading/Empty.</p>
+
+  <div class="subsec" data-screen-label="StickyScroll">
+    <h3>Липкая шапка при скролле</h3>
+    <p class="desc">Тело — <code class="tok">overflow: auto</code>; шапка внутри него <code class="tok">position: sticky; top: 0</code> с непрозрачным фоном (наследует <code class="tok">--bgtable</code> из TableCell), поэтому строки не проступают сквозь неё. Когда тело реально проскроллено вниз (<code class="tok">scrollTop &gt; 0</code>), под шапкой появляется тонкая тень-разделитель — иначе липкая шапка визуально слипается со строками.</p>
+  </div>
+  <div class="subsec" data-screen-label="BulkToggle">
+    <h3>Переключение в режим массового действия</h3>
+    <p class="desc">Выбор строки чекбоксом (TableCell) увеличивает счётчик выбранных; при переходе счётчика от 0 к 1 Footer добавляет ряд <code class="tok">.pgn-bulk</code> над строкой пагинации. Снятие последнего выделения убирает ряд. Сама пагинация не пропадает и не блокируется.</p>
+  </div>
+  <div class="subsec" data-screen-label="EmptyLoading">
+    <h3>Пустое состояние и загрузка</h3>
+    <p class="desc">Loading и Empty подменяют содержимое тела целиком (шапка и строки не рендерятся вместо них); Toolbar и Footer при этом остаются на своих местах — заголовок, счётчик и фильтр видны и во время загрузки, и когда результат пуст.</p>
+  </div>
+  <div class="subsec" data-screen-label="ActionsColumn">
+    <h3>Колонка действий</h3>
+    <p class="desc">Если у таблицы есть отдельная колонка «Действие» — её кнопки (IconButton neutral S) показываются всегда, а не по hover строки: это её единственное содержимое, прятать нечего, в отличие от <code class="tok">.tc__hidden</code> у TableCell, где действия — надстройка над обычным контентом ячейки. Если массовое удаление доступно в панели <code class="tok">.pgn-bulk</code>, то же действие удаления обязательно есть и на уровне отдельной строки в колонке действий — массовое действие не может быть единственным способом что-то удалить.</p>
+  </div>
+  <div class="subsec" data-screen-label="Responsive">
+    <h3>Адаптивность</h3>
+    <p class="desc">На узких экранах вторичные действия тулбара уходят в MenuButton (как в PageHeader); ширина колонок и необходимость горизонтального скролла остаются на стороне TableCell.</p>
+  </div>
+</section>
+
+<!-- 8. СОСТОЯНИЯ -->
+<section class="section" id="states" data-screen-label="Состояния">
+  <h2>Состояния</h2>
+  <p class="desc">Три состояния тела: Default (данные), Loading (загрузка), Empty (пусто). Disabled у контейнера нет — как и у TableCell, недоступной может быть отдельная строка/ячейка, не вся таблица.</p>
+  <div class="states-grid" id="states-grid"></div>
+</section>
+
+<!-- 9. ДОСТУПНОСТЬ -->
+<section class="section" id="a11y" data-screen-label="Доступность">
+  <h2>Доступность</h2>
+  <div class="panel">
+    <ul class="bullets">
+      <li>Разметка строк/ячеек — нативная <code class="tok">table</code> или <code class="tok">role="grid"</code>, правила — на стороне TableCell.</li>
+      <li>Тулбар — не самостоятельный landmark; заголовок реестра — обычный заголовочный уровень (<code class="tok">h2</code>/<code class="tok">h3</code> по контексту страницы), не <code class="tok">h1</code>.</li>
+      <li>Изменение счётчика выбранных строк — <code class="tok">aria-live="polite"</code> на <code class="tok">.pgn-bulk__count</code>, чтобы скринридер озвучивал новое число без повторного фокуса.</li>
+      <li>Состояние загрузки — <code class="tok">aria-busy="true"</code> на <code class="tok">.dtable</code>.</li>
+      <li>Пустое состояние — иллюстрация <code class="tok">aria-hidden="true"</code>, текст читается как обычный контент (не отдельная область <code class="tok">alert</code>/<code class="tok">status</code>).</li>
+      <li>Горизонтальный скролл тела достижим с клавиатуры (<code class="tok">tabindex="0"</code> на скролл-контейнере, если внутри нет иных фокусируемых элементов раньше первой ячейки).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 10. ТИПОГРАФИКА -->
+<section class="section" id="typography" data-screen-label="Типографика">
+  <h2>Типографика</h2>
+  <p class="desc">Заголовок тулбара — <code class="tok">--type-h5-strong</code> (18/24, SB Sans Display), как заголовок Tile. Счётчик и вспомогательный текст — <code class="tok">--type-body-s</code>. Текст пустого состояния — заголовок <code class="tok">--type-body-m-strong</code>, пояснение <code class="tok">--type-body-s</code>. Содержимое строк и шапки — токены TableCell.</p>
+</section>
+
+<!-- 11. ЦВЕТА -->
+<section class="section" id="colors" data-screen-label="Цвета">
+  <h2>Цвета</h2>
+  <p class="desc">Строки и ячейки — токены <a class="inl" href="../organisms/TableCell.html">TableCell</a> (<code class="tok">--bgtable*</code>, <code class="tok">--text-*</code>); фон ряда массового действия — токены Pagination. Ниже — токены, которые задаёт сам контейнер Table.</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" id="color-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
+  </div>
+</section>
+<script>
+(function () {
+  var probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue) {
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    var v = getComputedStyle(probe).backgroundColor;
+    var r, g, b, a = 1, m = v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m) { r = +m[1]*255; g = +m[2]*255; b = +m[3]*255; if (m[4] !== undefined) a = +m[4]; }
+    else { var n = v.match(/[\d.]+/g); if (!n) return cssValue; r = +n[0]; g = +n[1]; b = +n[2]; if (n[3] !== undefined) a = +n[3]; }
+    function hx(x) { return Math.round(x).toString(16).padStart(2, '0').toUpperCase(); }
+    var s = '#' + hx(r) + hx(g) + hx(b); if (a < 1) s += ' · ' + Math.round(a * 100) + '%'; return s;
+  }
+  var rows = [
+    ['Контейнер', 'Фон', '--bg-tile'],
+    ['Контейнер', 'Рамка', '--border-light'],
+    ['Toolbar / Footer', 'Разделитель', '--border-light'],
+    ['Липкая шапка', 'Тень-граница при скролле', '--border-primary'],
+    ['Тени горизонтального скролла', 'Базовый цвет (color-mix, не литерал)', '--text-primary'],
+    ['Пустое состояние', 'Заголовок', '--text-primary'],
+    ['Пустое состояние', 'Счётчик/текст', '--text-secondary'],
+  ];
+  function dsTbl(headers, dataRows, widths) {
+    var grid = ['8px'].concat(widths, ['8px']).join(' ');
+    var thCells = headers.map(function (h) { return '<div class="th"><span class="th__label">' + h + '</span></div>'; }).join('');
+    var head = '<div class="tbl__row" style="grid-template-columns:' + grid + ';"><div class="th th--separator"></div>' + thCells + '<div class="th th--separator"></div></div>';
+    var body = dataRows.map(function (r) {
+      var cells = r.map(function (c) { return '<div class="tc"><span class="tc__row"><span class="tc__text">' + c + '</span></span></div>'; }).join('');
+      return '<div class="tbl__row" style="grid-template-columns:' + grid + ';"><div class="tc tc--separator"></div>' + cells + '<div class="tc tc--separator"></div></div>';
+    }).join('');
+    return head + body;
+  }
+  document.getElementById('color-table').innerHTML = dsTbl(
+    ['Раздел', 'Роль', 'Токен', 'Образец', 'Hex'],
+    rows.map(function (row) {
+      var section = row[0], role = row[1], tok = row[2];
+      return [section, role,
+        '<code class="tok">' + tok + '</code>',
+        '<span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(' + tok + ')"></span>',
+        resolveHex('var(' + tok + ')')];
+    }),
+    ['1.2fr', '1.6fr', '1.2fr', '0.7fr', '0.9fr']);
+  probe.remove();
+})();
+</script>
+
+<!-- 12. ДЛЯ РАЗРАБОТЧИКОВ -->
+<section class="section" id="dev" data-screen-label="Для разработчиков">
+  <h2>Для разработчиков</h2>
+  <p class="desc">Хендофф-пакет. Имена классов условны — важны элементы, их роли и состояния.</p>
+
+  <p class="subhead">Точные размеры (redline)</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+      <div class="tbl__row" style="grid-template-columns:8px 2fr 1fr 3fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Свойство</span></div><div class="th"><span class="th__label">Значение</span></div><div class="th"><span class="th__label">Токен / описание</span></div><div class="th th--separator"></div></div>
+      <div class="tbl__row" style="grid-template-columns:8px 2fr 1fr 3fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Радиус контейнера</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-radius">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xl</code></span></span></div><div class="tc tc--separator"></div></div>
+      <div class="tbl__row" style="grid-template-columns:8px 2fr 1fr 3fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Паддинг тулбара</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-toolbar-pad">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16px / 20px (верт./гориз.)</span></span></div><div class="tc tc--separator"></div></div>
+      <div class="tbl__row" style="grid-template-columns:8px 2fr 1fr 3fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Высота тулбара</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-toolbar-h">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">по контенту (мин. ~56px)</span></span></div><div class="tc tc--separator"></div></div>
+      <div class="tbl__row" style="grid-template-columns:8px 2fr 1fr 3fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор шапка↔действия</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-toolbar-gap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16px, gap</span></span></div><div class="tc tc--separator"></div></div>
+      <div class="tbl__row" style="grid-template-columns:8px 2fr 1fr 3fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Z-index липкой шапки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-th-z">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">3 (выше строк)</span></span></div><div class="tc tc--separator"></div></div>
+    </div>
+  </div>
+
+  <p class="subhead">Поведение (framework-agnostic)</p>
+  <div class="code-wrap">
+    <button class="copy-btn" data-copy="logic">Скопировать</button>
+    <code id="code-logic">// 1. Липкая шапка
+//    Тело: overflow: auto. Шапка (.th) внутри: position: sticky; top: 0;
+//    z-index выше строк; фон непрозрачный (наследует TableCell), иначе
+//    строки просвечивают под шапкой при скролле.
+onScroll(body): body.classList.toggle('is-scrolled', body.scrollTop &gt; 0)
+//    'is-scrolled' рисует тень-разделитель под шапкой (box-shadow), не border,
+//    чтобы не сдвигать высоту строки.
+
+// 2. Режим массового действия (Footer)
+//    Считать выбранные строки (чекбоксы TableCell). 0 → count: скрыть
+//    .pgn-bulk. count &gt; 0: показать .pgn-bulk НАД .pgn-row, не заменяя её.
+//    Снять всё (крестик/чекбокс шапки) → скрыть .pgn-bulk обратно.
+onSelectionChange(count): bulkRow.hidden = (count === 0)
+
+// 3. Loading / Empty
+//    Оба состояния подменяют ТОЛЬКО тело (шапка+строки). Toolbar и Footer
+//    не скрываются — заголовок, счётчик, фильтр остаются доступны.
+//    Loading — N строк-скелетонов (.tc--skeleton) с тем же набором колонок,
+//    что у реальных данных, чтобы после загрузки раскладка не прыгала.
+//    Empty — текст различается: «нет записей» (пустой источник) vs
+//    «ничего не найдено» (активен фильтр/поиск) — состояние источника решает,
+//    какой текст и есть ли действие «Очистить фильтр».
+</code>
+  </div>
+</section>
+
+<!-- BACKLOG -->
+<section class="section" data-screen-label="Backlog">
+  <h2>Бэклог</h2>
+  <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+  <div class="panel">
+    <ul class="rules">
+      <li><b>Виртуализация строк</b> — при тысячах записей рендер всех строк не годится; нужен паттерн windowing, вне зоны CSS-компонента.</li>
+    </ul>
+  </div>
+</section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Table</span>
+    <span>v1.2 · 06.08.2026</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите таблицу: тулбар, заголовок, фильтр, сохранённые пресеты, состояние тела и пагинация. Демо обновляется наверху.</p>
+              <div class="pg__controls">
+                <div class="ctl-col">
+                  <div class="ctl" id="ctl-title-wrap">
+                    <div class="lbl">Заголовок</div>
+                    <div class="pg-text"><input id="ctl-title" type="text" value="Заявки на финансирование" maxlength="48"></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Состояние</div>
+                    <div class="pg-select"><select id="ctl-state">
+                      <option value="default" selected>Обычное</option>
+                      <option value="loading">Загрузка</option>
+                      <option value="empty">Пусто</option>
+                    </select></div>
+                  </div>
+                </div>
+                <div class="toggles">
+                  <label class="pg-toggle"><input id="ctl-toolbar" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать тулбар</span></label>
+                  <label class="pg-toggle"><input id="ctl-filter" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать фильтр в тулбаре</span></label>
+                  <label class="pg-toggle"><input id="ctl-presets" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать сохранённые пресеты</span></label>
+                  <label class="pg-toggle"><input id="ctl-footer" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать пагинацию</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка и исходники Table: HTML — из спеки, CSS — styles/table.css (полностью), JS — публичный API <code class="tok">window.DSTable</code>. Полный исходник рендера демо — в <code class="tok">scripts/table.page.js</code>.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-illustrations.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/ds-table.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/table.page.js"></script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html"><div class="dtable">
+  <div class="dtable__toolbar">
+    <div class="dtable__toolbar-left"><h3 class="dtable__title">Заявки</h3><span class="dtable__count">128</span></div>
+    <div class="dtable__toolbar-right">
+      <div class="tfilter"><button class="btn btn--outline btn--s tfilter__open"><i data-icon="filter"></i><span class="btn__label">Фильтр</span></button></div>
+      <button class="btn btn--accent btn--s"><i data-icon="add"></i><span class="btn__label">Добавить</span></button>
+    </div>
+  </div>
+  <div class="dtable__body">
+    <div class="tbl"><!-- .tbl__row/.th/.tc — см. TableCell; в каждой .th последним ребёнком .th__resize --></div>
+  </div>
+  <div class="dtable__footer">
+    <div class="pgn-row pgn-row--bulk"><div class="pgn-bulk">
+      <span class="pgn-bulk__count" aria-live="polite">Выбрано: <b>6</b> из 128</span>
+      <span class="pgn-bulk__actions"><button class="btn btn--outline btn--s">Экспорт</button><button class="btn btn--outline btn--error btn--s">Удалить</button></span>
+    </div></div>
+    <div class="pgn-row"><!-- см. Pagination --></div>
+  </div>
+</div>
+<!-- Empty: .dtable__body содержит только .dtable__empty (иллюстрация + текст + действие) -->
+<!-- Loading: .dtable__body содержит .tbl с N строками .tc--skeleton (плейсхолдер .sk-line--caption) --></script>
+
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Table — организм-контейнер таблицы/реестра.
+   Строки и ячейки — TableCell (.tbl/.tbl__row/.th/.tc), панель массовых
+   действий и постраничный переход — Pagination (.pgn-bulk/.pgn-row).
+   Table добавляет только: обёртку, Toolbar, липкую шапку при скролле
+   и состояния Loading/Empty всей таблицы.
+   Requires: table-cell.css, pagination.css. Только токены ДС (var(--*)).
+   ========================================================================= */
+
+.dtable {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-tile);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ */
+/*  TOOLBAR — заголовок + счётчик + фильтр/действия                    */
+/* ------------------------------------------------------------------ */
+.dtable__toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+  flex-wrap: wrap;
+}
+.dtable__toolbar-left { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; }
+.dtable__title-row { display: flex; align-items: baseline; gap: 10px; }
+.dtable__title { font: var(--type-h5-strong); color: var(--text-primary); margin: 0; white-space: nowrap; }
+.dtable__count { font: var(--type-body-s); color: var(--text-inactive); white-space: nowrap; }
+.dtable__toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ------------------------------------------------------------------ */
+/*  BODY — скролл-контейнер с липкой шапкой                            */
+/* ------------------------------------------------------------------ */
+.dtable__body { position: relative; overflow: auto; }
+.dtable__body .tbl { border: none; border-radius: 0; overflow: visible; }
+.dtable__body .th { position: sticky; top: 0; z-index: 3; }
+/* тень под шапкой появляется, только когда тело реально проскроллено вниз */
+.dtable--scrolled .dtable__body .th { box-shadow: 0 1px 0 var(--border-primary); }
+
+/* Теней по левому/правому краю при горизонтальном скролле у Table НЕТ
+   (убраны 27.08.2026): элемент-градиент позиционировался внутри скролл-
+   контейнера и уезжал вместе с колонками. Скрытый контент по бокам
+   обозначает сам скроллбар тела. */
+
+/* ------------------------------------------------------------------ */
+/*  FOOTER — Pagination (обычный ряд и ряд массового действия)          */
+/* ------------------------------------------------------------------ */
+.dtable__footer { border-top: 1px solid var(--border-light); }
+.dtable__footer .pgn-row { padding: 0 20px; }
+
+/* ------------------------------------------------------------------ */
+/*  EMPTY — пустая таблица (нет данных / нет результата фильтра)       */
+/* ------------------------------------------------------------------ */
+.dtable__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 56px 24px 60px;
+  text-align: center;
+}
+.dtable__empty .illu { width: 140px; height: 100px; margin-bottom: 8px; }
+.dtable__empty-title { font: var(--type-body-m-strong); color: var(--text-primary); margin: 0; }
+.dtable__empty-text { font: var(--type-body-s); color: var(--text-secondary); max-width: 38ch; margin: 0; text-wrap: pretty; }
+.dtable__empty .btn { margin-top: 8px; }
+
+/* ------------------------------------------------------------------ */
+/*  LOADING — тулбар/шапка временно неинтерактивны, строки — .tc--skeleton */
+/* ------------------------------------------------------------------ */
+.dtable[aria-busy="true"] .dtable__toolbar-right,
+.dtable[aria-busy="true"] .th__resize,
+.dtable[aria-busy="true"] .th__tools { pointer-events: none; opacity: .5; }</script>
+
+<script type="text/plain" id="src-code-js">/* Table — публичный API (рантайм: scripts/ds-table.js → window.DSTable).
+   Демо-рендер страницы: scripts/table.page.js (строит тулбар, тело, футер). */
+
+/* Оживить готовую разметку .dtable: липкая шапка, тень при скролле,
+   переключение в режим массового действия (0 → N выбранных) */
+var table = document.querySelector('.dtable');
+window.DSTable.bind(table);
+
+/* Режимы тела — подменяется содержимое .dtable__body: */
+body.innerHTML = skeletonRows;   /* Loading: N строк .tc--skeleton, тулбар/шапка остаются */
+body.innerHTML = emptyState;     /* Empty: .dtable__empty (иллюстрация + заголовок + текст + действие) */
+body.innerHTML = dataRows;       /* Default: .tbl со строками/ячейками TableCell */
+
+/* Ширина колонок — общий scripts/tbl-resize.js (в составе ds.js):
+   ручка .th__resize в каждой .th; drag и ← → пересчитывают
+   grid-template-columns всех строк, минимум 96px. Подключения на экране
+   не требуется — работает из коробки. */</script>
+
+</body>
+</html>

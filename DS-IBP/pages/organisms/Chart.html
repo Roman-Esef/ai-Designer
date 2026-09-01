@@ -1,0 +1,687 @@
+<!-- @dsCard group="Components" name="Chart" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chart — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/alert.css">
+<link rel="stylesheet" href="../../styles/tooltip.css">
+<link rel="stylesheet" href="../../styles/skeleton.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/chart.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<style>
+.section > p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:76ch;text-wrap:pretty}
+.row{display:flex;flex-wrap:wrap;align-items:flex-start;gap:40px}
+.subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:0 0 16px}
+.subhead.mt{margin-top:34px}
+.code-panel__name{color:rgba(255,255,255,.72);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;letter-spacing:.02em;font-weight:600}
+/* playground: демо — в верхнюю панель сплиттера, контролы — во вкладку «Конструктор» */
+.pg__stage{flex:1;min-height:0;width:100%;padding:40px 32px 56px;display:flex;align-items:flex-start;justify-content:safe center;position:relative;overflow:auto;background:var(--bg-page)}
+.ctl{display:flex;flex-direction:column;gap:8px}
+.ctl > .lbl{font:var(--type-body-s-strong);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.05em;font-size:11px}
+.demo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.demo-grid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:860px){.demo-grid--2{grid-template-columns:minmax(0,1fr)}}
+.demo{display:flex;flex-direction:column;gap:12px;min-width:0}
+.demo__cap{font:var(--type-body-s-strong);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;font-size:11px;margin:0}
+.demo__note{font:var(--type-body-s);color:var(--text-inactive);margin:0;text-wrap:pretty}
+.demo__box{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-control);padding:16px;min-width:0}
+.demo__box--page{background:var(--bg-page)}
+.demo__box--tile{max-width:360px}
+.anat{display:grid;grid-template-columns:minmax(320px,1fr) minmax(280px,420px);gap:44px;align-items:start}
+@media (max-width:900px){.anat{grid-template-columns:minmax(0,1fr)}}
+.anat__stage{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:14px;padding:24px}
+.anat__legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;counter-reset:a}
+.anat__legend li{display:flex;gap:14px;align-items:flex-start;font:var(--type-body-m);color:var(--text-primary)}
+.anat__legend li .n{counter-increment:a;flex:none;width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font:var(--type-body-s-strong);display:flex;align-items:center;justify-content:center}
+.anat__legend li .n::before{content:counter(a)}
+.anat__legend li .t .k{font:var(--type-body-m-strong);color:var(--text-primary)}
+kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text-primary);background:var(--bgtable-row-focus);border:1px solid var(--border-primary);border-radius:var(--radius-xs);padding:1px 7px}
+.sw{display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle}
+</style>
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Chart">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage" id="pg-stage"></div>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.000</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Организмы</p>
+    <h1>Chart</h1>
+    <p class="lead">Графики данных: столбчатые, линейные, области, круговые, точечные, водопад и спарклайн — одна анатомия на все типы. Предметной области компонент не знает: подписи серий, категории и числа приходят данными. Цвета серий — палитра <code class="tok">--chart-*</code> из <a class="inl" href="../foundations/Colors.html">Colors</a>, тултип — <a class="inl" href="../molecules/Tooltip.html">Tooltip</a>, служебные состояния — <a class="inl" href="../molecules/Alert.html">Alert</a> и <a class="inl" href="../atoms/Skeleton.html">Skeleton</a>, переключатель периода — <a class="inl" href="../molecules/SegmentControl.html">SegmentControl</a>.</p>
+  </header>
+
+  <!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#pg-stage),
+       контролы — во вкладку «Конструктор» нижней панели (см. в конце) -->
+
+  <!-- 2. ИСПОЛЬЗОВАНИЕ -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">Chart отвечает на вопрос «как величина ведёт себя по шкале» — по времени, по категориям или относительно другой величины. Компонент read-only: он не редактирует данные и не управляет фильтрами, а переключатель периода в тулбаре только сообщает выбор наружу.</p>
+
+    <div class="demo-grid demo-grid--2" style="margin-bottom:24px;">
+      <div class="demo">
+        <p class="demo__cap">В контентной области тайла</p>
+        <div class="demo__box demo__box--tile" id="use-tile"></div>
+        <p class="demo__note">Размер S, легенда и подзаголовок сняты: в тайле у графика роль иллюстрации к числу, детали читаются на отдельной странице.</p>
+      </div>
+      <div class="demo">
+        <p class="demo__cap">Самостоятельный блок на странице</p>
+        <div class="demo__box" id="use-page"></div>
+        <p class="demo__note">Размер L: заголовок, тулбар периода, легенда, кросс-хэйр и полный набор подписей.</p>
+      </div>
+    </div>
+
+    <h3>Динамика в строке таблицы</h3>
+    <p class="desc tight">Микро-график в ячейке — не отдельный компонент, а вариант ячейки <a class="inl" href="TableCell.html">TableCell</a> («Динамика»): он живёт по правилам строки — высота 24px, без осей, легенды и тултипа, значение всегда рядом числом. Рисует его тот же рантайм с <code class="tok">type: 'spark'</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:20px;" id="use-table"></div>
+
+    <div class="panel" style="margin-bottom:20px;">
+      <ul class="rules">
+        <li><b>Когда использовать.</b> Нужно увидеть форму: тренд, сравнение, состав, разброс, вклад в итог. От 4 точек данных — ниже этого таблица или пара чисел честнее.</li>
+        <li><b>Когда не использовать.</b> Одно число и его состав — <a class="inl" href="AllocationBar.html">AllocationBar</a>; одна величина относительно максимума — <a class="inl" href="../atoms/ProgressBar.html">ProgressBar</a>; точные значения, которые нужно сравнивать построчно и сортировать — <a class="inl" href="Table.html">Table</a>.</li>
+        <li><b>Против <a class="inl" href="AllocationBar.html">AllocationBar</a>.</b> AllocationBar показывает состав одного итога в один момент. Chart показывает поведение по шкале; состав в динамике — это стек-столбцы или стек-области.</li>
+        <li><b>Внутри организма продукта.</b> Тайл, модалка и карточка задают графику ширину и высоту; сам Chart собственного фона, рамки и заголовка секции не рисует — только своё шасси.</li>
+        <li><b>Один график — один вопрос.</b> Больше 6 серий на линейном и больше 3 на группированных нечитаемо: разложите на несколько графиков или сверните хвост в «Прочее».</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Анатомия одинакова для всех типов: шапка, легенда, поле построения, опционально — brush и подвал. Обязательно только поле построения, остальное включается конфигурацией.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage" id="anat-stage"></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">.chart-host</span><span class="d"> — хост с <code class="tok">container-type: inline-size</code> и <code class="tok">data-size</code>. Держит токен высоты <code class="tok">--chart-h</code>, от которого считается поле построения</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chart__head</span><span class="d"> — заголовок и подзаголовок слева, тулбар справа: <a class="inl" href="../molecules/SegmentControl.html">SegmentControl</a> периода и <a class="inl" href="../atoms/IconButton.html">IconButton</a> экспорта</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chart__legend</span><span class="d"> — кнопки серий с маркером; клик выключает серию, наведение выделяет её в поле. Форма маркера повторяет тип серии: квадрат — столбцы, линия — линия, круг — точки</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chart__plot</span><span class="d"> — поле построения: <code class="tok">svg.chart__svg</code> во всю ширину, поверх него курсор и тултип в потоке <code class="tok">position: absolute</code></span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chart__grid</span><span class="d"> — линии сетки по шкале значений; нулевая линия рисуется цветом оси, а не сетки</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chart__ser</span><span class="d"> — группа одной серии: <code class="tok">.chart__bar</code>, <code class="tok">.chart__line</code>, <code class="tok">.chart__area</code>, <code class="tok">.chart__dot</code> или <code class="tok">.chart__slice</code>. Приглушение чужих серий — на группе, не на каждом элементе</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chart__axis</span><span class="d"> — деления и подписи осей; подписи категорий прореживаются, когда не помещаются</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chart__ref</span><span class="d"> — опорная линия (цель, среднее, порог) с подписью у правого края</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chart__hit</span><span class="d"> — прозрачные зоны наведения по категориям: они ловят курсор, а не сами столбцы, поэтому тултип работает и над пустым местом колонки. Сама подсветка полосы (<code class="tok">.chart__band</code>) лежит под сериями — она подкрашивает фон колонки, а не перекрывает график</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chart__brush</span><span class="d"> — выделение диапазона: мини-график всего ряда и окно видимого участка</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Тип графика — главная ось конфигурации; остальные (размер, состав анатомии, состояние) применимы к любому типу. Правило выбора: сравнение — столбцы, динамика — линия, состав — стек или круговой, связь — точечный, вклад в итог — водопад.</p>
+
+    <h3>Тип графика</h3>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:24px;" id="type-guide-tbl"></div>
+
+    <h3>Столбчатые</h3>
+    <div class="demo-grid demo-grid--2" style="margin-bottom:32px;">
+      <div class="demo"><p class="demo__cap">Вертикальный · bar</p><div class="demo__box" id="var-bar"></div><p class="demo__note">Одна серия. Если серий передано больше, столбцы автоматически становятся группами: накладывать серии друг на друга компонент не умеет и не должен.</p></div>
+      <div class="demo"><p class="demo__cap">Горизонтальный · hbar</p><div class="demo__box" id="var-hbar"></div><p class="demo__note">Длинные названия категорий читаются в строку, поэтому подписи значений включены по умолчанию.</p></div>
+      <div class="demo"><p class="demo__cap">Группированные · grouped</p><div class="demo__box" id="var-grouped"></div><p class="demo__note">До 3 серий: дальше столбцы тоньше 4px и сравнение теряется.</p></div>
+      <div class="demo"><p class="demo__cap">Стек · stacked</p><div class="demo__box" id="var-stacked"></div><p class="demo__note">Читается общий итог и вклад каждой части; сравнивать между собой можно только нижний сегмент.</p></div>
+      <div class="demo"><p class="demo__cap">Стек 100% · stacked100</p><div class="demo__box" id="var-stacked100"></div><p class="demo__note">Ось всегда 0–100%: абсолютные значения остаются в тултипе.</p></div>
+      <div class="demo"><p class="demo__cap">Водопад · waterfall</p><div class="demo__box" id="var-waterfall"></div><p class="demo__note">Вклады красятся семантикой: рост — Success, снижение — Error, итоговый столбец — Primary и рисуется от нуля.</p></div>
+    </div>
+
+    <h3>Линии и области</h3>
+    <div class="demo-grid demo-grid--2" style="margin-bottom:32px;">
+      <div class="demo"><p class="demo__cap">Линейный · line</p><div class="demo__box" id="var-line"></div></div>
+      <div class="demo"><p class="demo__cap">Область · area</p><div class="demo__box" id="var-area"></div><p class="demo__note">Заливка 16% от цвета серии: подчёркивает объём, но не мешает читать линию.</p></div>
+      <div class="demo"><p class="demo__cap">Стек-области · stackedArea</p><div class="demo__box" id="var-stacked-area"></div><p class="demo__note">Верхняя граница — сумма серий. Не использовать при пропусках в ряду: сумма станет ложной.</p></div>
+      <div class="demo"><p class="demo__cap">Комбо · combo</p><div class="demo__box" id="var-combo"></div><p class="demo__note">Столбцы и линия на одной шкале. Разные единицы допустимы, только если это ясно из подписей серий.</p></div>
+    </div>
+
+    <h3>Круговые и точечные</h3>
+    <div class="demo-grid demo-grid--2" style="margin-bottom:32px;">
+      <div class="demo"><p class="demo__cap">Круговой · pie</p><div class="demo__box" id="var-pie"></div><p class="demo__note">2–6 секторов, отсортированных по убыванию. Доли меньше 3% сворачивайте в «Прочее».</p></div>
+      <div class="demo"><p class="demo__cap">Кольцевой · donut</p><div class="demo__box" id="var-donut"></div><p class="demo__note">В центре — итог. Кольцо не используется как индикатор прогресса: для этого есть ProgressBar.</p></div>
+      <div class="demo"><p class="demo__cap">Точечный · scatter</p><div class="demo__box" id="var-scatter"></div><p class="demo__note">Обе оси числовые и подписаны; тултип показывает пару значений X / Y.</p></div>
+    </div>
+
+    <h3>Спарклайн</h3>
+    <p class="desc tight">Микро-график без осей, легенды и тултипа. Живёт в ячейке таблицы, рядом с числом в тайле или в списке. Тон <code class="tok">auto</code> красит линию по знаку изменения от первой точки к последней.</p>
+    <div class="demo-grid demo-grid--2" style="margin-bottom:20px;">
+      <div class="demo"><p class="demo__cap">Линия, тон auto</p><div class="demo__box" style="max-width:200px;" id="var-spark"></div></div>
+      <div class="demo"><p class="demo__cap">Столбцы, цвет серии</p><div class="demo__box" style="max-width:200px;" id="var-spark-bar"></div></div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc tight">Три размера задают высоту поля построения и типографику подписей; ширину компонент всегда берёт у контейнера. Размер выбирает сборщик — автоматической смены по ширине нет, чтобы график не менял высоту при ресайзе соседней колонки.</p>
+
+    <div class="demo-grid demo-grid--2" style="margin-bottom:24px;">
+      <div class="demo"><p class="demo__cap">S — 132px</p><div class="demo__box" id="size-s"></div><p class="demo__note">Контентная область тайла, ячейка сводки. Легенду обычно снимают, подписи осей прореживаются.</p></div>
+      <div class="demo"><p class="demo__cap">M — 220px</p><div class="demo__box" id="size-m"></div><p class="demo__note">База: карточка, модалка, половина ширины страницы.</p></div>
+      <div class="demo"><p class="demo__cap">L — 320px</p><div class="demo__box" id="size-l"></div><p class="demo__note">Самостоятельный блок и полноэкранный разбор: подписи осей крупнее (Body S).</p></div>
+      <div class="demo"><p class="demo__cap">S в узком тайле</p><div class="demo__box demo__box--tile" id="size-tile"></div><p class="demo__note">Ниже 240px по ширине оставляйте только поле построения: подписи категорий прореживаются до 2–3 значений.</p></div>
+    </div>
+
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Минимальная ширина</b> — 200px для графика с осями, 64px для спарклайна. Уже — не использовать.</li>
+        <li><b>Высота фиксирована размером</b>, а не контентом: легенда, тулбар и подвал добавляются сверх поля построения.</li>
+        <li><b>Ряд графиков в сетке</b> — одинаковый размер у всех, иначе поля построения не выровняются по базовой линии.</li>
+      </ul>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиусы не зависят от размера (S / M / L) — скругление привязано к типу элемента.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Столбец (bar)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">2 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-bar-r (--radius-2xs)</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Маркер линии в легенде</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-full</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Маркер точки в легенде</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт легенды — стейт-слой</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xs</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Области brush, Empty и «Расчёт»</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xs</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Локаль ru-RU через <code class="tok">Intl.NumberFormat</code>: неразрывный пробел в разрядах, запятая в дробной части, <code class="tok">tabular-nums</code> у всех чисел. На осях — компактный формат, в тултипе — полный.</p>
+
+    <div class="demo-grid demo-grid--2" style="margin-bottom:24px;">
+      <div class="demo"><p class="demo__cap">Компактный формат на оси</p><div class="demo__box" id="cnt-compact"></div><p class="demo__note">Пороги: от 10 тыс. — «тыс.», от 1 млн — «млн», от 1 млрд — «млрд», один знак после запятой.</p></div>
+      <div class="demo"><p class="demo__cap">Полный формат</p><div class="demo__box" id="cnt-full"></div><p class="demo__note">Для малых величин и процентов: компактный формат тут врал бы округлением.</p></div>
+      <div class="demo"><p class="demo__cap">Много категорий</p><div class="demo__box" id="cnt-dense"></div><p class="demo__note">Подписи прореживаются по фактической ширине текста, не по числу точек: остаётся каждая 2-я, 3-я и так далее.</p></div>
+      <div class="demo"><p class="demo__cap">Подписи значений</p><div class="demo__box" id="cnt-labels"></div><p class="demo__note">Включаются, когда точек мало (до 8) и значения нужны без наведения. На стеках не используются — там значения только в тултипе.</p></div>
+    </div>
+
+    <h3>Легенда и переполнение</h3>
+    <div class="demo__box" style="margin-bottom:12px;" id="cnt-legend-many"></div>
+    <p class="demo__note" style="margin-bottom:24px;">Легенда переносится на следующую строку; названия серий обрезаются многоточием, полное — в <code>title</code>. Значение серии в легенде скрывается, когда контейнер уже 420px.</p>
+
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Заголовок</b> — что показано и в чём измеряется («Движение средств по месяцам, руб.»); единицу выносите в подзаголовок, а не в подписи оси.</li>
+        <li><b>Категории</b> — короткие: «Янв», «I кв.», «2025». Длинные названия — повод взять горизонтальные столбцы.</li>
+        <li><b>Иконографика.</b> Внутри поля построения иконок нет. В тулбаре — только глифы ДС через <code class="tok">&lt;i data-icon&gt;</code>; экспорт — <code class="tok">download</code>.</li>
+        <li><b>Нули и пропуски различаются.</b> Ноль — точка на нулевой линии, пропуск — разрыв ряда. Подменять <code class="tok">null</code> нулём нельзя.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BEHAVIOR -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+
+    <h3>Тултип и кросс-хэйр</h3>
+    <p class="desc tight">Курсор ловят прозрачные зоны категорий, поэтому подсказка появляется в любой точке колонки, а не только над столбцом. Тултип — компонент <a class="inl" href="../molecules/Tooltip.html">Tooltip</a> (<code class="tok">.tip .tip--main</code>) с строками серий внутри: заголовок — категория, строки — все видимые серии, внизу — «Итого» при двух и более сериях. Наведите курсор на график.</p>
+    <div class="demo__box" style="margin-bottom:32px;" id="beh-tip"></div>
+
+    <h3>Легенда: выключение и выделение серии</h3>
+    <p class="desc tight">Клик по элементу легенды скрывает серию и пересчитывает шкалу; последняя видимая серия не выключается. Наведение на элемент легенды приглушает остальные серии до <code class="tok">opacity .28</code> — тот же приём, что связывает бар и список в AllocationBar.</p>
+    <div class="demo__box" style="margin-bottom:32px;" id="beh-legend"></div>
+
+    <h3>Выделение диапазона (brush)</h3>
+    <p class="desc tight">Мини-график всего ряда под полем построения: перетаскивание окна двигает диапазон, ручки по краям меняют его ширину, двойной клик возвращает весь ряд. Включается для рядов от 12 точек — на коротких он лишний.</p>
+    <div class="demo__box" style="margin-bottom:32px;" id="beh-brush"></div>
+
+    <h3>Опорная линия</h3>
+    <p class="desc tight">Цель, среднее или порог: штриховая линия поверх сетки с подписью у правого края. Опорная линия всегда входит в расчёт шкалы — иначе она уехала бы за пределы поля.</p>
+    <div class="demo__box" style="margin-bottom:32px;" id="beh-ref"></div>
+
+    <h3>Тулбар и экспорт</h3>
+    <p class="desc tight">Переключатель периода — SegmentControl XS, он только сообщает выбор наружу: данные подменяет владелец экрана. Кнопка экспорта отдаёт текущее поле построения как SVG.</p>
+    <div class="demo__box" style="margin-bottom:32px;" id="beh-toolbar"></div>
+
+    <h3>Адаптивность и перерисовка</h3>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Ширина — от контейнера.</b> ResizeObserver на поле построения перерисовывает график с дебаунсом в один кадр; высота остаётся равной размеру.</li>
+        <li><b>Прореживание подписей</b> считается по измеренной ширине самой длинной подписи, а не по числу категорий.</li>
+        <li><b>Минимальная высота столбца и сегмента</b> — 2px: иначе ненулевое значение выглядело бы отсутствующим.</li>
+        <li><b>Анимации.</b> Появление серий не анимируется — только переходы прозрачности при выделении (120 мс). При <code class="tok">prefers-reduced-motion</code> переходы снимаются.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc tight">Пять взаимоисключающих значений <code class="tok">status</code> и три признака, производных от данных: пропуски в ряду, прогнозная часть и выделение серии при наведении.</p>
+
+    <div class="demo-grid demo-grid--2" style="margin-bottom:24px;">
+      <div class="demo"><p class="demo__cap">Loaded</p><div class="demo__box" id="st-loaded"></div></div>
+      <div class="demo"><p class="demo__cap">Loading — быстрый</p><div class="demo__box" id="st-loading"></div><p class="demo__note">Скелетон повторяет геометрию будущего графика: шесть столбцов разной высоты и строка подписей осей.</p></div>
+      <div class="demo"><p class="demo__cap">Loading — долгий расчёт (≥ 3 сек)</p><div class="demo__box" id="st-slow"></div><p class="demo__note">Вместо скелетона — плашка «Данные рассчитываются»: ожидание объяснено, а не просто затянуто.</p></div>
+      <div class="demo"><p class="demo__cap">Error</p><div class="demo__box" id="st-error"></div><p class="demo__note">Alert Error с кнопкой «Повторить» (Button Outline XS в тоне алерта). Поле построения не рисуется.</p></div>
+      <div class="demo"><p class="demo__cap">Empty</p><div class="demo__box" id="st-empty"></div><p class="demo__note">Плашка на фоне страницы вместо поля: отсутствие данных — не ошибка, поэтому Alert не используется.</p></div>
+      <div class="demo"><p class="demo__cap">Пропуски в ряду</p><div class="demo__box" id="st-gaps"></div><p class="demo__note">Линия разрывается, края сегментов помечаются точками, причина — в подвале (Alert Info).</p></div>
+      <div class="demo"><p class="demo__cap">Прогноз — столбцы</p><div class="demo__box" id="st-forecast"></div><p class="demo__note">Прогнозная часть штрихуется цветом своей серии: тот же смысл, другая уверенность.</p></div>
+      <div class="demo"><p class="demo__cap">Прогноз — линия</p><div class="demo__box" id="st-forecast-line"></div><p class="demo__note">С точки <code class="tok">forecastFrom</code> линия становится штриховой; разрыва между фактом и прогнозом нет.</p></div>
+      <div class="demo"><p class="demo__cap">Выделение серии при наведении</p><div class="demo__box" id="st-hover"></div><p class="demo__note">Наведите курсор на элемент легенды: остальные серии гаснут до 28%, шкала не меняется.</p></div>
+    </div>
+  </section>
+
+  <!-- A11Y -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <div class="row">
+      <div class="panel" style="flex:1;min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Клавиатура</p>
+        <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+          <div class="tbl__row" style="grid-template-columns:8px 1.03fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Tab</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Фокус получают кнопки легенды, тулбар и кнопки внутри Alert. Элементы поля построения из таб-порядка исключены — график read-only</span></span></div><div class="tc tc--separator"></div></div>
+          <div class="tbl__row" style="grid-template-columns:8px 1.03fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Enter</kbd> / <kbd>Space</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Выключает или возвращает серию, переключает период, запускает повтор загрузки</span></span></div><div class="tc tc--separator"></div></div>
+          <div class="tbl__row" style="grid-template-columns:8px 1.03fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>←</kbd> / <kbd>→</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Внутри SegmentControl периода — переход между значениями (поведение компонента)</span></span></div><div class="tc tc--separator"></div></div>
+        </div>
+      </div>
+      <div class="panel" style="flex:1;min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Скринридер и цвет</p>
+        <ul class="bullets">
+          <li>поле построения — <code class="tok">role="img"</code> с <code class="tok">aria-label</code>: тип графика, серии, крайние значения диапазона;</li>
+          <li>серия никогда не кодируется только цветом — рядом всегда название в легенде и значение в тултипе;</li>
+          <li>прогноз различается штриховкой, а не только оттенком; пропуск — разрывом, а не бледностью;</li>
+          <li>кнопка серии в легенде — <code class="tok">aria-pressed</code>: выключенная серия читается как «не нажата»;</li>
+          <li>тултип не перехватывает фокус и дублирует то, что уже есть в <code class="tok">aria-label</code>;</li>
+          <li>минимальный контраст подписей осей к фону — 4.5:1 (<code class="tok">--text-inactive</code> на <code class="tok">--bg-tile</code>).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Весь текст — SB Sans Text. Собственных размеров компонент не вводит; подписи внутри SVG наследуют те же токены, что и обычный текст.</p>
+    <div class="panel" style="padding:0;overflow:hidden;" id="typo-table"></div>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc tight">Серии по умолчанию красятся палитрой <code class="tok">--chart-*</code> по индексу: тот же принцип, что в <a class="inl" href="AllocationBar.html">AllocationBar</a>, поэтому одна сущность выглядит одинаково в баре и на графике. Палитра не циклится — с 13-й серии сворачивайте остаток в «Прочее».</p>
+    <div class="demo__box" style="margin-bottom:24px;" id="col-palette"></div>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:24px;" id="color-palette-table"></div>
+
+    <h3>Семантические тона</h3>
+    <p class="desc tight">Когда цвет несёт смысл, индексная палитра уступает семантике: рост и падение — <code class="tok">--success</code> / <code class="tok">--error</code>, план и факт — серый фон и <code class="tok">--primary</code>, итог водопада — <code class="tok">--primary</code>. Смешивать оба принципа в одном графике нельзя: либо цвет различает серии, либо оценивает их.</p>
+    <div class="demo-grid demo-grid--2" style="margin-bottom:24px;">
+      <div class="demo"><p class="demo__cap">План и факт</p><div class="demo__box" id="col-planfact"></div></div>
+      <div class="demo"><p class="demo__cap">Рост и снижение</p><div class="demo__box" id="col-delta"></div></div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden;" id="color-role-table"></div>
+  </section>
+
+  <!-- DEV -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры и алгоритмы. Не привязан к стеку — геометрию можно повторить на любой библиотеке рендера.</p>
+
+    <p class="subhead">Точные размеры (redline) <span class="req">— измерено на живом экземпляре через getComputedStyle</span></p>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-redline"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить:</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/chart.css</code>
+      <code class="tok">styles/tooltip.css</code>
+      <code class="tok">styles/skeleton.css</code>
+      <code class="tok">styles/alert.css</code>
+      <code class="tok">styles/button.css</code>
+      <code class="tok">styles/icon-button.css</code>
+      <code class="tok">styles/segment-control.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+    <div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Ветвление по состоянию — до любых расчётов геометрии.</span>
+if status == 'loading'        -> скелетон (fast) | плашка расчёта (slow)
+if status == 'error'          -> шапка + Alert error + «Повторить», поле не рисуется
+if status == 'empty' или все ряды пусты -> шапка + плашка «Нет данных»
+
+<span class="tk-cm">// 2. Диапазон значений и «красивые» деления.
+//    Учитываются: видимые серии (выключенные легендой — нет), опорная линия,
+//    режим накопления (stacked считает сумму по категории, stacked100 — всегда 0..100).</span>
+span = max − min
+step = 10^floor(log10(span / ticks)); err = span / ticks / step
+step *= (err ≥ 7.5 ? 10 : err ≥ 3.5 ? 5 : err ≥ 1.5 ? 2 : 1)
+min = floor(min / step) * step;  max = ceil(max / step) * step
+
+<span class="tk-cm">// 3. Поля поля построения (padding) считаются из ИЗМЕРЕННОГО текста, не из константы.</span>
+padLeft   = ширина самой длинной подписи оси значений + 10
+padBottom = 22                       <span class="tk-cm">// строка подписей категорий</span>
+padTop    = подписи значений ? 18 : 10
+у горизонтальных столбцов padLeft = min(ширина самой длинной категории + 10, 42% ширины)
+
+<span class="tk-cm">// 4. Полосы категорий и столбцы.</span>
+band = (x1 − x0) / количество_категорий
+barPad = min(band * 0.24, 12);  barW = band − barPad * 2
+группированные: слот = barW / число_серий, зазор 2px
+минимальная высота/ширина столбца = 2px  <span class="tk-cm">// ненулевое значение обязано быть видно</span>
+
+<span class="tk-cm">// 5. Пропуски и прогноз.</span>
+null в ряду -> ряд разбивается на сегменты; линия не соединяет края разрыва
+forecastFrom = i -> точки с индексом ≥ i рисуются штрихом (линия) или штриховкой (столбцы),
+                    первая прогнозная точка соединяется с последней фактической
+
+<span class="tk-cm">// 6. Наведение.</span>
+поверх поля — прозрачные прямоугольники по одной на категорию (ловят курсор всей колонкой)
+onMove: k = floor((позиция курсора − начало поля) / band); clamp в границы диапазона
+        подсветить зону, поставить кросс-хэйр в центр полосы,
+        собрать строки тултипа по всем видимым сериям + «Итого» при 2+ сериях
+позиционирование тултипа: курсор + 14px; при выходе за границу — зеркально с другой стороны
+
+<span class="tk-cm">// 7. Легенда.</span>
+клик -> переключить видимость серии, пересчитать шкалу и перерисовать;
+        последнюю видимую серию выключить нельзя
+наведение -> root[data-hover] = id серии; CSS гасит остальные группы до .28
+
+<span class="tk-cm">// 8. Диапазон (brush).</span>
+окно хранится как [i0, i1] в индексах категорий; drag окна двигает оба края,
+drag ручки — один; dblclick сбрасывает в [0, n−1]; после изменения — полная перерисовка
+
+<span class="tk-cm">// 9. Перерисовка.</span>
+ResizeObserver на поле построения -> дебаунс один кадр -> полный пересчёт
+(инкрементальных обновлений нет: SVG перестраивается целиком, это дешевле логики диффа)</code></pre>
+    </div>
+    <p class="dev-note">Рабочий референс на vanilla JS — <code class="tok">window.DSChart.make(cfg)</code> в <code class="tok">scripts/ds-chart.js</code> (подключается единой точкой входа <code class="tok">scripts/ds.js</code>). Форматтеры <code class="tok">DSChart.fmt.number</code> / <code class="tok">.compact</code> / <code class="tok">.percent</code> и палитра <code class="tok">DSChart.palette</code> экспортируются оттуда же.</p>
+  </section>
+
+  <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт компоненту, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Клавиатурная навигация по точкам</b> — стрелки перемещают виртуальный курсор по категориям с озвучиванием значений, чтобы данные читались без мыши. Сейчас доступ к числам — через <code class="tok">aria-label</code> целиком.</li>
+        <li><b>Вторая ось значений</b> — для комбо с разными единицами (объём в рублях и ставка в процентах). Сейчас обе серии живут на одной шкале, и это ограничивает применимость комбо.</li>
+        <li><b>Свёртка «Прочее»</b> — автоматическое сложение серий за пределами 12-й позиции палитры, как это уже описано для AllocationBar.</li>
+        <li><b>Аннотации на поле</b> — метка события в точке шкалы (дата решения, изменение ставки) с тултипом.</li>
+        <li><b>Экспорт в PNG и CSV</b> — сейчас кнопка тулбара отдаёт только SVG.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Chart</span>
+    <span>14 типов графиков · размеры S / M / L · палитра 12 токенов · спарклайн — вариант ячейки TableCell</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите график: тип, размер, ширина контейнера, число серий, служебные слои и состояние. Ширина контейнера и размер — главные параметры: от них зависит, что помещается в поле построения. Демо обновляется наверху, панель настроек — две колонки.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка и исходники Chart: HTML — из спеки, CSS — styles/chart.css (полностью), JS — рантайм. Демо страницы строит <code class="tok">DSChart.make()</code> из <code class="tok">scripts/chart.page.js</code>.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-tooltip.js"></script>
+<script src="../../scripts/ds-chart.js"></script>
+<script src="../../scripts/chart.page.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+
+<!-- самодостаточные подписи свитчеров конструктора (общий слой docs-split.js) -->
+<script>
+window.DS_SPLIT_SWITCH_LABELS = {
+  'Тултип':               'Показывать тултип',
+  'Кросс-хэйр':           'Показывать кросс-хэйр',
+  'Сетка':                { label: 'Показывать сетку', on: 'y' },
+  'Подписи значений':     'Показывать подписи значений',
+  'Опорная линия':        'Показывать опорную линию',
+  'Выделение диапазона':  'Включать выделение диапазона',
+  'Тулбар':               'Показывать тулбар',
+  'Формат чисел':         'Полный формат',
+};
+</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html"><div class="chart-host" data-size="m" data-type="bar">
+  <div class="chart">
+    <div class="chart__head">
+      <div class="chart__titles">
+        <div class="chart__title">Движение средств по месяцам</div>
+        <div class="chart__subtitle">руб.</div>
+      </div>
+      <div class="chart__toolbar">
+        <div class="segctrl segctrl--xs" role="radiogroup" aria-label="Период">…</div>
+        <button class="ibtn ibtn--neutral ibtn--s" aria-label="Скачать график"><i data-icon="download"></i></button>
+      </div>
+    </div>
+    <div class="chart__legend">
+      <button class="chart__legend-item" aria-pressed="true">
+        <span class="chart__marker" style="--chart-c:var(--chart-blue)"></span>
+        <span class="chart__legend-name">Поступления</span>
+        <span class="chart__legend-val">810 млн</span>
+      </button>
+    </div>
+    <div class="chart__plot">
+      <svg class="chart__svg" role="img" aria-label="Столбчатый график: Поступления от 420 млн (Янв) до 760 млн (Дек)">
+        <g class="chart__grid"><line/></g>
+        <g class="chart__ser" data-id="in" style="--chart-c:var(--chart-blue)"><rect class="chart__bar"/></g>
+        <g class="chart__axis"><text/><line/></g>
+        <g><line class="chart__ref"/><text class="chart__ref-label"/><text class="chart__vlabel"/></g>
+        <g><rect class="chart__band" data-i="0"/></g>
+        <g><rect class="chart__hit" data-i="0"/></g>
+      </svg>
+      <div class="chart__cursor"></div>
+      <div class="tip tip--main tip--multiline tip--no-arrow chart__tip" role="tooltip">
+        <span class="chart__tip-title">Июл</span>
+        <div class="chart__tip-row"><span class="chart__marker"></span><span class="chart__tip-name">Поступления</span><span class="chart__tip-val">700 млн</span></div>
+      </div>
+    </div>
+    <div class="chart__brush"><svg class="chart__brush-svg"><rect class="chart__brush-spark"/></svg><div class="chart__brush-window"><span class="chart__brush-handle chart__brush-handle--l"></span><span class="chart__brush-handle chart__brush-handle--r"></span></div></div>
+    <div class="chart__foot"><div class="alert alert--info alert--m">…</div></div>
+  </div>
+</div></script>
+
+<script type="text/plain" id="src-code-js">/* Chart — разметку строит рантайм scripts/ds-chart.js (window.DSChart). */
+
+const c = DSChart.make({
+  type: 'bar', size: 'm', title: 'Движение средств по месяцам', subtitle: 'руб.',
+  categories: [...], series: [{ id: 'in', name: 'Поступления', data: [...] }],
+  legend: 'top', tooltip: true, crosshair: false, grid: 'y', valueLabels: false,
+  refLine: null, brush: false, toolbar: false, format: 'compact',
+  status: 'loaded', yTicks: 5,
+});
+// Опции status: loaded · loading · error · empty · gaps · forecast
+// Типы: bar hbar grouped stacked stacked100 line area stackedArea combo pie donut
+//       scatter waterfall spark
+// API: DSChart.make(cfg) → el · DSChart.palette (12 токенов --chart-*) ·
+//      DSChart.fmt.number / .fmt.compact / .fmt.percent
+// Серия: { id, name, data[], type, color, dashed, forecastFrom, legendValue }</script>
+
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Chart — графики данных: столбчатые, линейные, области, круговые,
+   точечные, водопад, спарклайн. Геометрию считает scripts/ds-chart.js,
+   этот файл задаёт токены, анатомию и цвет. Все значения — токены ДС.
+   Зависимости: colors.css, typography.css, radius.css, tooltip.css,
+   skeleton.css, alert.css, button.css, icon-button.css, segment-control.css.
+   ========================================================================= */
+
+.chart-host{--chart-h:220px;--chart-gap:12px;--chart-tick-fg:var(--text-inactive);--chart-grid:var(--border-light);--chart-axis:var(--border-primary);--chart-label-fg:var(--text-secondary);--chart-bar-r:var(--radius-2xs);--chart-line-w:2px;display:block;min-width:0;container-type:inline-size;container-name:chart}
+.chart-host[data-size="s"]{--chart-h:132px;--chart-gap:8px}
+.chart-host[data-size="l"]{--chart-h:320px;--chart-gap:16px}
+
+.chart{display:flex;flex-direction:column;gap:var(--chart-gap);min-width:0;font:var(--type-body-xs);color:var(--text-primary)}
+.chart--stretch{width:100%}
+
+/* ---------- шапка ---------- */
+.chart__head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-width:0}
+.chart__titles{display:flex;flex-direction:column;gap:2px;min-width:0}
+.chart__title{font:var(--type-body-m-strong);color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart__subtitle{font:var(--type-body-xs);color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart__toolbar{display:flex;align-items:center;gap:8px;flex:none}
+.chart-host[data-size="s"] .chart__title{font:var(--type-body-s-strong)}
+.chart-host[data-size="l"] .chart__title{font:var(--type-body-l-strong)}
+
+/* ---------- легенда ---------- */
+.chart__legend{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;min-width:0}
+.chart__legend--bottom{order:9}
+.chart__legend-item{display:inline-flex;flex:0 0 auto;align-items:center;gap:6px;min-height:20px;padding:2px 4px;border:0;border-radius:var(--radius-xs);background:none;cursor:pointer;font:var(--type-body-xs);color:var(--text-secondary);max-width:100%}
+.chart__legend-item:hover{background:var(--bgtable-row-hover);color:var(--text-primary)}
+.chart__legend-item:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.chart__legend-item[aria-pressed="false"]{color:var(--text-inactive)}
+.chart__legend-item[aria-pressed="false"] .chart__marker{background:var(--disabled)}
+.chart__legend-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart__legend-val{font:var(--type-body-xs);color:var(--text-primary);font-variant-numeric:tabular-nums}
+.chart__marker{flex:none;width:10px;height:10px;border-radius:var(--radius-2xs);background:var(--chart-c,var(--primary))}
+.chart__marker--line{width:14px;height:3px;border-radius:var(--radius-full)}
+.chart__marker--dot{width:8px;height:8px;border-radius:var(--radius-circle)}
+.chart__marker--dashed{background:repeating-linear-gradient(90deg,var(--chart-c,var(--primary)) 0 4px,transparent 4px 7px)}
+
+/* ---------- поле построения ---------- */
+.chart__plot{position:relative;min-width:0}
+.chart__svg{display:block;width:100%;height:var(--chart-h);touch-action:none}
+.chart__grid line{stroke:var(--chart-grid);stroke-width:1;shape-rendering:crispEdges}
+.chart__grid line.chart__zero{stroke:var(--chart-axis)}
+.chart__axis line{stroke:var(--chart-axis);stroke-width:1;shape-rendering:crispEdges}
+.chart__axis text,.chart__tick{font:var(--type-body-xs);fill:var(--chart-tick-fg)}
+.chart-host[data-size="l"] .chart__axis text{font:var(--type-body-s)}
+.chart__axis-title{font:var(--type-body-xs);fill:var(--text-secondary)}
+.chart__vlabel{font:var(--type-body-xs);fill:var(--chart-label-fg);font-variant-numeric:tabular-nums}
+
+/* серии */
+.chart__ser{transition:opacity .12s ease}
+.chart[data-hover] .chart__ser:not(.is-active){opacity:.28}
+.chart__bar{fill:var(--chart-c,var(--primary));rx:var(--chart-bar-r)}
+.chart__bar--forecast{fill:var(--chart-forecast,url(#chartHatch))}
+.chart__line{fill:none;stroke:var(--chart-c,var(--primary));stroke-width:var(--chart-line-w);stroke-linejoin:round;stroke-linecap:round}
+.chart__line--dashed{stroke-dasharray:6 4}
+.chart__area{fill:var(--chart-c,var(--primary));opacity:.16}
+.chart__dot{fill:var(--bg-tile);stroke:var(--chart-c,var(--primary));stroke-width:2}
+.chart__dot--solid{fill:var(--chart-c,var(--primary));stroke:none}
+.chart__dot.is-active{r:5}
+.chart__slice{stroke:var(--bg-tile);stroke-width:2}
+.chart__ref{stroke:var(--text-secondary);stroke-width:1;stroke-dasharray:4 4}
+.chart__ref-label{font:var(--type-body-xs);fill:var(--text-secondary)}
+.chart__gap-note{font:var(--type-body-xs);fill:var(--text-inactive)}
+.chart__hit{fill:transparent}
+.chart__band{fill:transparent}
+.chart__band.is-active{fill:var(--bgtable-row-hover)}
+
+/* курсор */
+.chart__cursor{position:absolute;top:0;width:1px;background:var(--border-dark);opacity:0;pointer-events:none;transition:opacity .1s ease}
+.chart__cursor.is-visible{opacity:1}
+
+/* тултип: контейнер — компонент Tooltip, строки — Chart */
+.chart__tip{position:absolute;z-index:5;pointer-events:none;max-width:280px}
+.chart__tip-title{display:block;font:var(--type-body-s-strong);margin-bottom:6px}
+.chart__tip-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:8px;padding:1px 0}
+.chart__tip-row .chart__marker{width:10px;height:10px}
+.chart__tip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-body-s);opacity:.82}
+.chart__tip-val{font:var(--type-body-s-strong);font-variant-numeric:tabular-nums;text-align:right}
+.chart__tip-total{margin-top:6px;padding-top:6px;border-top:1px solid color-mix(in srgb,var(--text-on-dark) 24%,transparent)}
+
+/* ---------- brush ---------- */
+.chart__brush{position:relative;height:36px;border-radius:var(--radius-xs);background:var(--bg-page);overflow:hidden;touch-action:none}
+.chart__brush-svg{display:block;width:100%;height:36px}
+.chart__brush-spark{fill:var(--st-grey-midlight);stroke:none}
+.chart__brush-spark.is-active{fill:var(--st-primary-mid)}
+.chart__brush-window{position:absolute;top:0;bottom:0;background:var(--primary-bg-semitransparent);border-left:2px solid var(--primary);border-right:2px solid var(--primary);cursor:grab}
+.chart__brush-window:active{cursor:grabbing}
+.chart__brush-handle{position:absolute;top:0;bottom:0;width:10px;cursor:ew-resize}
+.chart__brush-handle--l{left:-6px}
+.chart__brush-handle--r{right:-6px}
+
+/* ---------- служебные состояния ---------- */
+.chart__foot{display:flex;flex-direction:column;gap:8px}
+.chart__empty{display:flex;align-items:center;justify-content:center;height:var(--chart-h);border-radius:var(--radius-xs);background:var(--bg-page);font:var(--type-body-s);color:var(--text-inactive);text-align:center;padding:0 16px}
+.chart__calc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:var(--chart-h);border-radius:var(--radius-xs);background:var(--bg-page);text-align:center;padding:0 16px}
+.chart__calc-title{font:var(--type-body-s-strong);color:var(--text-primary)}
+.chart__calc-sub{font:var(--type-body-xs);color:var(--text-secondary)}
+.chart__sk{display:flex;flex-direction:column;justify-content:flex-end;gap:8px;height:var(--chart-h)}
+.chart__sk-bars{display:flex;align-items:flex-end;gap:8px;height:100%}
+.chart__sk-bars .sk-block{flex:1 1 0;min-width:0}
+
+/* ---------- спарклайн ---------- */
+.chart-host--spark{container-type:normal}
+.chart-host--spark .chart{gap:0}
+.chart--spark .chart__svg{height:24px}
+.chart__spark-dot{fill:var(--chart-c,var(--primary))}
+
+/* ---------- контейнерные брейкпоинты ---------- */
+@container chart (max-width: 420px){
+  .chart__legend{gap:2px 8px}
+  .chart__legend-val{display:none}
+}
+@container chart (max-width: 280px){
+  .chart__subtitle{display:none}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .chart__ser,.chart__cursor{transition:none}
+}</script>
+</body>
+</html>

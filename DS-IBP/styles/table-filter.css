@@ -1,0 +1,84 @@
+/* =========================================================================
+   TableFilter — панель фильтра над таблицей.
+   Только токены ДС. Ядро компонента: кнопка «Фильтр» (Button Outline S,
+   ведущая воронка в --primary) и один чип-счётчик «Применено: N»
+   (Chip Edit M) — крестик чипа сбрасывает все параметры.
+   Модалка фильтра строится на Modal (styles/modal.css) — здесь только
+   раскладка бара над таблицей.
+   ========================================================================= */
+
+/* ---------- бар ---------- */
+.tfilter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;                 /* зазор между кнопкой и чипом — 4px */
+  width: 100%;
+}
+.tfilter > .btn,
+.tfilter > .chip { flex: none; }
+
+/* ---------- кнопка «Фильтр» ---------- */
+.tfilter__open i[data-icon="filter"] { color: var(--primary); }
+.tfilter__open[disabled] i[data-icon="filter"] { color: inherit; }
+
+/* ---------- чип-счётчик «Применено: N» ---------- */
+.tfilter__applied { max-width: none; }
+.tfilter__applied .chip__label { font-variant-numeric: tabular-nums; }
+
+/* ---------- заблокированный бар ---------- */
+.tfilter--disabled { pointer-events: none; opacity: .55; }
+
+/* ---------- скрытие неактуальных частей ---------- */
+.tfilter__applied.is-off { display: none !important; }
+
+/* =========================================================================
+   LEGACY (до 04.08.2026): чиплист отдельных параметров с «+N» и
+   шевроном-аккордеоном. Новая разметка бара — кнопка + один чип «Применено: N».
+   Правила оставлены, чтобы не ломать ранее собранные экраны-мокапы
+   (pages/screens/*), где ещё живёт старая разметка. В новых экранах
+   не использовать.
+   ========================================================================= */
+.tfilter--collapsed { flex-wrap: nowrap; overflow: hidden; }
+.tfilter__trigger { display: contents; }
+.tfilter__trigger .btn { flex: none; }
+.tfilter__trigger .btn i[data-icon="filter"],
+.tfilter__trigger .btn i[data-icon="filter-reset"] { color: var(--primary); }
+.tfilter__trigger .btn[disabled] i[data-icon="filter"],
+.tfilter__trigger .btn[disabled] i[data-icon="filter-reset"] { color: inherit; }
+.tfilter__chips { display: contents; }
+.tfilter__chips .chip { flex: 0 0 auto; }
+.tfilter__tail { display: contents; }
+.tfilter__tail .tfilter__more,
+.tfilter__tail .tfilter__toggle { flex: none; }
+.tfilter__more.badge--text { color: var(--text-inactive); font-variant-numeric: tabular-nums; }
+.tfilter__toggle { flex: none; }
+.tfilter__toggle .tfilter__chev { display: inline-flex; transition: transform .18s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .tfilter__toggle .tfilter__chev { transition: none; }
+}
+.tfilter__trigger.is-off,
+.tfilter__chips.is-off,
+.tfilter__tail.is-off { display: none !important; }
+
+
+/* ---------- Модалка фильтра (.tfm) ----------
+   Композиция вынесена со страницы-витрины (11.08.2026): корневой блок —
+   .modal.modal--w6.tfm, внутри собственная сетка «табы + панель». */
+/* модалка фильтра: высота НЕ фиксируется — растёт по контенту до 80vh,
+     прокручивается только Modal_Body (правило Modal) */
+.tfm__body { display:grid; grid-template-columns: 232px minmax(0,1fr); gap:0; padding:0; align-items:start; width:100%;
+    background-image:linear-gradient(var(--border-light),var(--border-light)); background-size:1px 100%; background-position:232px 0; background-repeat:no-repeat; }
+@media (max-width:640px){ .tfm__body { grid-template-columns:1fr; background-image:none; } }
+/* вертикальные табы вплотную к левой границе модалки; при прокрутке тела остаются видны */
+.tfm__nav { padding:16px 0; min-width:0; position:sticky; top:0; }
+@media (max-width:640px){ .tfm__nav { position:static; border-bottom:1px solid var(--border-light); } }
+.tfm__panel { padding:24px 26px 24px; display:flex; flex-direction:column; gap:28px; min-width:0; }
+.tfm__sec { display:flex; flex-direction:column; gap:16px; }
+.tfm__sec-title, .tfm__panel-title { font: var(--type-body-m-strong); color: var(--text-primary); margin:0; }
+/* двухколоночная форма: поле = одна клетка, широкое поле — .tfm__span-2 */
+.tfm__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
+/* .inp по умолчанию 280px — в сетке поле тянется на всю клетку */
+.tfm__grid > .inp { width:100%; }
+.tfm__grid > .tfm__span-2 { grid-column:1 / -1; }
+@media (max-width:640px){ .tfm__grid { grid-template-columns:1fr; } }

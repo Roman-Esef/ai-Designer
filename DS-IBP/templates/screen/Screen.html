@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!-- Шаблон экрана на IBP DS. Новый экран = копия этого файла (copy_files) + точечные правки.
+     Контекст для сборки: specs/_cheatsheet.md (обзор всех компонентов) + specs/<Имя>.md точечно.
+     CSS компонентов не читать — классы и DOM уже в спеках. -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Экран — IBP</title>
+<link rel="stylesheet" href="../../ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0; font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary); background: var(--bg-page); background-attachment: fixed;
+    min-height: 100vh;
+  }
+  /* стили экрана — ниже; значения только из токенов ДС (var(--*)) */
+</style>
+</head>
+<body>
+
+  <main data-screen-label="Screen">
+    <!-- контент экрана -->
+  </main>
+
+  <!-- локальный компонент — строкой, не копией разметки:
+  <ds-include src="../../kit/components/<Имя>/<Имя>.html" state="data" mode="view"></ds-include> -->
+  <script src="../../scripts/ds.js"></script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+/* =========================================================================
+   Design System — ButtonGroup
+   Joins related Button components into a single, visually unified control.
+   Types:        accent · outline · transparent
+   Sizes:        inherited from Button — m (40) · s (32) · xs (24)
+   Orientation:  horizontal (default) · vertical
+   Variants:     standard · split (text + chevron) · toggle (segmented select)
+   States:       buttons inherit their own states; Disabled applies to the
+                 WHOLE group; the outline type keeps its border color across
+                 hover / active.
+   Requires: typography.css, colors.css, button.css
+   ========================================================================= */
+
+:root {
+  /* seam between joined buttons */
+  --btng-divider-accent:   color-mix(in srgb, var(--primary-dark) 45%, transparent);
+  --btng-divider-disabled: color-mix(in srgb, #fff 38%, transparent);
+  /* outer corner radius — matches Button per size (M/S 8px, XS 6px) */
+  --btn-radius: var(--radius-control);
+}
+
+/* ---------- shell --------------------------------------------------------- */
+.btn-group {
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: middle;
+}
+
+/* every joined button is its own stacking context so hover / focus rings sit
+   above the neighbours instead of being clipped by them */
+.btn-group > .btn { position: relative; }
+.btn-group > .btn:hover,
+.btn-group > .btn:active,
+.btn-group > .btn.is-hover,
+.btn-group > .btn.is-active { z-index: 1; }
+.btn-group > .btn:focus-visible { z-index: 2; }
+
+/* ---------- HORIZONTAL joining (default) ---------------------------------- */
+.btn-group > .btn { border-radius: 0; }
+.btn-group > .btn:first-child {
+  border-top-left-radius: var(--btn-radius);
+  border-bottom-left-radius: var(--btn-radius);
+}
+.btn-group > .btn:last-child {
+  border-top-right-radius: var(--btn-radius);
+  border-bottom-right-radius: var(--btn-radius);
+}
+/* collapse the 1px borders of adjacent buttons into one shared line */
+.btn-group > .btn + .btn { margin-left: -1px; }
+
+/* a single child keeps the full radius (group of one — edge case) */
+.btn-group > .btn:only-child { border-radius: var(--btn-radius); }
+
+/* XS buttons use the smaller control radius (6px) — direct token, no scoped custom property */
+.btn-group:has(> .btn--xs) > .btn:first-child {
+  border-top-left-radius: var(--radius-control-s);
+  border-bottom-left-radius: var(--radius-control-s);
+}
+.btn-group:has(> .btn--xs) > .btn:last-child {
+  border-top-right-radius: var(--radius-control-s);
+  border-bottom-right-radius: var(--radius-control-s);
+}
+.btn-group:has(> .btn--xs) > .btn:only-child { border-radius: var(--radius-control-s); }
+
+/* ---------- accent: painted divider --------------------------------------- */
+/* accent borders match the fill, so the seam is drawn explicitly */
+.btn-group--accent > .btn + .btn {
+  box-shadow: inset 1px 0 0 0 var(--btng-divider-accent);
+}
+
+/* ---------- outline / transparent: keep the border line ------------------- */
+/* the collapsed 1px primary borders already form the divider — no override
+   needed for outline. The outline type must NOT change its border color on
+   hover / active inside a group (unlike a standalone button). */
+.btn-group--outline > .btn:hover,
+.btn-group--outline > .btn:active,
+.btn-group--outline > .btn.is-hover,
+.btn-group--outline > .btn.is-active { border-color: var(--primary); }
+
+/* transparent group needs a visible seam — borrow a light divider */
+.btn-group--transparent > .btn + .btn {
+  box-shadow: inset 1px 0 0 0 var(--border-light);
+}
+
+/* ---------- VERTICAL orientation ------------------------------------------ */
+.btn-group--vertical { flex-direction: column; align-items: stretch; }
+.btn-group--vertical > .btn { width: 100%; }
+.btn-group--vertical > .btn:first-child {
+  border-radius: var(--btn-radius) var(--btn-radius) 0 0;
+}
+.btn-group--vertical > .btn:last-child {
+  border-radius: 0 0 var(--btn-radius) var(--btn-radius);
+}
+.btn-group--vertical:has(> .btn--xs) > .btn:first-child {
+  border-radius: var(--radius-control-s) var(--radius-control-s) 0 0;
+}
+.btn-group--vertical:has(> .btn--xs) > .btn:last-child {
+  border-radius: 0 0 var(--radius-control-s) var(--radius-control-s);
+}
+.btn-group--vertical > .btn + .btn { margin-left: 0; margin-top: -1px; }
+.btn-group--vertical.btn-group--accent > .btn + .btn {
+  box-shadow: inset 0 1px 0 0 var(--btng-divider-accent);
+}
+.btn-group--vertical.btn-group--transparent > .btn + .btn {
+  box-shadow: inset 0 1px 0 0 var(--border-light);
+}
+
+/* ---------- FULLWIDTH / equal width --------------------------------------- */
+.btn-group--fullwidth { display: flex; width: 100%; }
+.btn-group--fullwidth > .btn { flex: 1 1 0; }
+/* split button: the text button grows, the chevron stays square */
+.btn-group--split.btn-group--fullwidth > .btn:not(.btn--icon-only) { flex: 1 1 auto; }
+.btn-group--split.btn-group--fullwidth > .btn--icon-only { flex: 0 0 auto; }
+
+/* ---------- DISABLED — applies to the whole group ------------------------- */
+.btn-group--disabled { pointer-events: none; cursor: default; }
+
+.btn-group--accent.btn-group--disabled > .btn {
+  background: var(--disabled); border-color: var(--disabled); color: var(--text-on-dark);
+}
+.btn-group--accent.btn-group--disabled > .btn svg { color: var(--text-on-dark); }
+.btn-group--accent.btn-group--disabled > .btn + .btn {
+  box-shadow: inset 1px 0 0 0 var(--btng-divider-disabled);
+}
+.btn-group--accent.btn-group--vertical.btn-group--disabled > .btn + .btn {
+  box-shadow: inset 0 1px 0 0 var(--btng-divider-disabled);
+}
+
+.btn-group--outline.btn-group--disabled > .btn {
+  background: var(--bg-tile); border-color: var(--disabled); color: var(--text-inactive);
+}
+.btn-group--outline.btn-group--disabled > .btn svg { color: var(--text-inactive); }
+
+.btn-group--transparent.btn-group--disabled > .btn {
+  background: transparent; color: var(--text-inactive);
+}
+.btn-group--transparent.btn-group--disabled > .btn svg { color: var(--text-inactive); }
+
+/* ---------- TOGGLE / segmented select ------------------------------------- */
+/* An outline group whose items behave like a single- or multi-select control.
+   The pressed item is filled with the accent color. Drives off aria-pressed. */
+.btn-group--toggle > .btn[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--text-on-dark);
+  border-color: var(--primary);
+  z-index: 1;
+}
+.btn-group--toggle > .btn[aria-pressed="true"] svg { color: var(--text-on-dark); }
+.btn-group--toggle > .btn[aria-pressed="true"]:hover { background: var(--primary-dark); }
+.btn-group--toggle.btn-group--disabled > .btn[aria-pressed="true"] {
+  background: var(--disabled); border-color: var(--disabled);
+}
+
+/* ---------- SPLIT button -------------------------------------------------- */
+/* the dropdown menu node is appended after the chevron, so the chevron is no
+   longer :last-child — radius the trailing button by type instead */
+.btn-group--split > .btn:last-of-type {
+  border-top-right-radius: var(--btn-radius);
+  border-bottom-right-radius: var(--btn-radius);
+}
+.btn-group--split:has(> .btn--xs) > .btn:last-of-type {
+  border-top-right-radius: var(--radius-control-s);
+  border-bottom-right-radius: var(--radius-control-s);
+}
+/* chevron half rotates when its menu is open (managed by .is-open on a parent) */
+.btn-group--split .btn__chevron { transition: transform .15s ease; }
+.btn-group--split.is-open .btn__chevron,
+.btn-group--split .dropdown.is-open .btn__chevron { transform: rotate(180deg); }

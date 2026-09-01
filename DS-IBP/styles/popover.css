@@ -1,0 +1,284 @@
+/* =========================================================================
+   Design System — Popover
+   Нон-модальный всплывающий контейнер, привязанный к триггеру. Показывает
+   расширенный контекстный контент (текст, интерактив, форму, легенду,
+   список) — в отличие от Tooltip требует клика для открытия и не исчезает
+   при уходе курсора; в отличие от Modal — не блокирует страницу и не имеет
+   скрима, привязан к триггеру и закрывается кликом вне себя.
+
+   Анатомия — 2 обязательные + 3 опциональные части:
+     Trigger (обязательно, вне .pop) → Header (опц.: 48px, заголовок Body S Strong
+     по центру + опц. чип/ссылка (gap 8px) + ✕) →
+     Body (обязательно, единственная гибкая/прокручиваемая зона — контент почти
+     любой, жёстких ограничений нет) →
+     Footer (опц.: foot-left и foot-right включаются независимо — слева
+     инфо/ссылка/кнопка, справа Secondary+Primary) →
+     Arrow (опц., по умолчанию выключена — как в Menu/DropdownList)
+
+   Container:  .pop            (+ --w-s/-m/-l/-xl/-max · --arrow · --floating)
+   Zones:      .pop__head · .pop__head-main · .pop__title · .pop__close
+               .pop__body (+ --flush)
+               .pop__foot · .pop__foot-left · .pop__foot-right
+   Arrow:      .pop__arrow (+ 4 placements × 3 aligns, как у Tooltip)
+   Anchor:     .pop-anchor (position:relative обёртка вокруг триггера)
+
+   Requires: typography.css, colors.css, radius.css, shadow.css, button.css,
+             icon-button.css, chip.css, link.css
+   ========================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------------
+     Шкала ширины — 5 фиксированных шагов. Резиновой ширины нет намеренно:
+     поповер — не layout-контейнер. Свыше --pop-w-max (560px) или когда
+     контенту не хватает высоты даже со скроллом — сигнал переключиться
+     на Modal.
+     --------------------------------------------------------------------- */
+  --pop-w-s:   240px;   /* легенда, короткий список, подсказка без действий */
+  --pop-w-m:   320px;   /* стандартный поповер с заголовком и текстом — дефолт */
+  --pop-w-l:   400px;   /* форма 3–5 полей, карточка сущности */
+  --pop-w-xl:  480px;   /* сложный/многоколоночный контент */
+  --pop-w-max: 560px;   /* верхняя граница — дальше Modal */
+
+  /* max-height контентной зоны на каждом шаге ширины (см. .pop--w-* ниже) */
+  --pop-mh-s:   none; /* @kind other */
+  --pop-mh-m:   320px;
+  --pop-mh-l:   440px;
+  --pop-mh-xl:  520px;
+  --pop-mh-max: 600px;
+
+  /* геометрия */
+  --pop-pad-x:      16px;
+  --pop-body-pad-y: 16px;
+  --pop-foot-pad-y: 12px;
+  --pop-gap:        8px;    /* зазор поповера от триггера */
+  --pop-guard:      16px;   /* минимальный отступ от края viewport */
+
+  /* поверхность — компактный радиус, без обводки: единственная граница — тень верхнего уровня */
+  --pop-radius:  var(--radius-m);       /* 8px */
+  --pop-bg:      var(--bg-popup);       /* #FFFFFF */
+  --pop-shadow:  var(--elevation-5);    /* внешнего бордера нет намеренно */
+  --pop-head-h:  48px;                  /* фиксированная высота шапки, контент — по центру */
+  --pop-zone-bg: var(--bgtable-pinned); /* фон шапки и подвала — Pinned Default #F5F7F7 */
+
+  /* z-index — тот же слой, что Menu/DropdownList; ниже Toast/Nav и Modal */
+  --pop-z: 40; /* @kind other */
+}
+
+/* =========================================================================
+   ANCHOR — обёртка вокруг триггера для позиционирования (как .tip-anchor)
+   ========================================================================= */
+.pop-anchor { position: relative; display: inline-flex; }
+
+/* =========================================================================
+   КОНТЕЙНЕР
+   ========================================================================= */
+.pop {
+  box-sizing: border-box;
+  position: relative; /* контекст позиционирования для .pop__arrow */
+  display: flex;
+  flex-direction: column;
+  width: var(--pop-w-m);
+  max-width: calc(100vw - (var(--pop-guard) * 2));
+  background: var(--pop-bg);
+  border-radius: var(--pop-radius);
+  box-shadow: var(--pop-shadow);
+  z-index: var(--pop-z);
+}
+
+/* модификаторы ширины — задают и ширину контейнера, и max-height тела */
+.pop--w-s   { width: var(--pop-w-s); }
+.pop--w-s   .pop__body { max-height: var(--pop-mh-s); }
+.pop--w-m   { width: var(--pop-w-m); }
+.pop--w-m   .pop__body { max-height: var(--pop-mh-m); }
+.pop--w-l   { width: var(--pop-w-l); }
+.pop--w-l   .pop__body { max-height: var(--pop-mh-l); }
+.pop--w-xl  { width: var(--pop-w-xl); }
+.pop--w-xl  .pop__body { max-height: var(--pop-mh-xl); }
+.pop--w-max { width: var(--pop-w-max); }
+.pop--w-max .pop__body { max-height: var(--pop-mh-max); }
+
+/* =========================================================================
+   HEADER — заголовок + ✕. Ничего больше: кнопки действий сюда не кладутся,
+   для них есть Footer.
+   ========================================================================= */
+.pop__head {
+  flex: none;
+  height: var(--pop-head-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 var(--pop-pad-x);
+  background: var(--pop-zone-bg);
+  border-bottom: 1px solid var(--border-light);
+  border-radius: var(--pop-radius) var(--pop-radius) 0 0;
+  position: relative;
+  transition: box-shadow .15s ease;
+}
+.pop__head.is-scrolled { box-shadow: 0 6px 12px -8px rgba(40, 50, 55, .18); }
+
+/* заголовок + опц. чип/ссылка — примыкают друг к другу с зазором 8px */
+.pop__head-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.pop__title {
+  margin: 0;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;      /* заголовок — одна строка (рекомендация: ≤25 символов) */
+}
+
+.pop__close { flex: none; } /* класс-якорь; кнопка — ibtn ibtn--neutral ibtn--s */
+
+/* =========================================================================
+   BODY — единственная обязательная и единственная прокручиваемая зона.
+   ========================================================================= */
+.pop__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--pop-body-pad-y) var(--pop-pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font: var(--type-body-m);
+  color: var(--text-primary);
+}
+.pop__body::-webkit-scrollbar { width: 8px; }
+.pop__body::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 8px; }
+
+/* тело без внутреннего паддинга — контент сам управляет отступами (таблица) */
+.pop__body--flush { padding: 0; gap: 0; }
+
+/* =========================================================================
+   FOOTER — foot-left (служебное/инфо, опционально) + foot-right
+   (Secondary + Primary). Все интерактивные действия, кроме ✕, живут здесь.
+   ========================================================================= */
+.pop__foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: var(--pop-foot-pad-y) var(--pop-pad-x);
+  background: var(--pop-zone-bg);
+  border-top: 1px solid var(--border-light);
+  border-radius: 0 0 var(--pop-radius) var(--pop-radius);
+  position: relative;
+  transition: box-shadow .15s ease;
+}
+.pop__foot.is-scrolled { box-shadow: 0 -6px 12px -8px rgba(40, 50, 55, .18); }
+
+.pop__foot-left,
+.pop__foot-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
+.pop__foot-right { margin-left: auto; gap: 10px; }
+.pop__foot-left:empty { display: none; }
+
+/* =========================================================================
+   ЗАГРУЗКА КОНТЕНТА — общий компонент Skeleton (.sk-line/.sk-group,
+   styles/skeleton.css), локальной реализации нет.
+   ========================================================================= */
+
+/* =========================================================================
+   ARROW — опциональна, выключена по умолчанию (как у Menu/DropdownList).
+   Включается модификатором .pop--arrow; направление задаётся тем же
+   набором классов размещения, что и позиционирование (top/bottom/left/right
+   × start/center/end) — приём идентичен Tooltip (.tip__arrow).
+   ========================================================================= */
+.pop__arrow { display: none; }
+.pop--arrow .pop__arrow {
+  display: block;
+  position: absolute;
+  width: 16px;
+  height: 8px;
+  background: var(--pop-bg);
+  pointer-events: none;
+}
+
+.pop--arrow.pop--top .pop__arrow    { bottom: -8px; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.pop--arrow.pop--bottom .pop__arrow { top: -8px; clip-path: polygon(50% 0, 0 100%, 100% 100%); }
+.pop--arrow.pop--left .pop__arrow   { width: 8px; height: 16px; right: -8px; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.pop--arrow.pop--right .pop__arrow  { width: 8px; height: 16px; left: -8px; clip-path: polygon(100% 0, 0 50%, 100% 100%); }
+
+.pop--arrow.pop--top.pop--start .pop__arrow,
+.pop--arrow.pop--bottom.pop--start .pop__arrow    { left: 18px; }
+.pop--arrow.pop--top.pop--center .pop__arrow,
+.pop--arrow.pop--bottom.pop--center .pop__arrow   { left: 50%; transform: translateX(-50%); }
+.pop--arrow.pop--top.pop--end .pop__arrow,
+.pop--arrow.pop--bottom.pop--end .pop__arrow      { right: 18px; }
+
+.pop--arrow.pop--left.pop--start .pop__arrow,
+.pop--arrow.pop--right.pop--start .pop__arrow     { top: 14px; }
+.pop--arrow.pop--left.pop--center .pop__arrow,
+.pop--arrow.pop--right.pop--center .pop__arrow    { top: 50%; transform: translateY(-50%); }
+.pop--arrow.pop--left.pop--end .pop__arrow,
+.pop--arrow.pop--right.pop--end .pop__arrow       { bottom: 14px; }
+
+/* стрелка красится в цвет той зоны, к которой примыкает — не всегда Body:
+   arrow сверху (placement bottom) касается Header, если он есть;
+   arrow снизу (placement top) касается Footer, если он есть */
+.pop--bottom:has(.pop__head) .pop__arrow { background: var(--pop-zone-bg); }
+.pop--top:has(.pop__foot) .pop__arrow    { background: var(--pop-zone-bg); }
+
+/* transform-origin по стороне размещения — «вырастает» от триггера */
+.pop--top    { transform-origin: bottom center; }
+.pop--bottom { transform-origin: top center; }
+.pop--left   { transform-origin: center right; }
+.pop--right  { transform-origin: center left; }
+
+/* =========================================================================
+   FLOATING — позиционируется JS-ом относительно триггера. Появление/
+   скрытие через .is-open; enter/leave — разная длительность (см. ниже).
+   ========================================================================= */
+.pop.pop--floating {
+  position: absolute;
+  opacity: 0;
+  /* закрытый поповер выключен из раскладки полностью: visibility:hidden оставляет
+     его в потоке прокрутки, и узкий экран получает горизонтальный скролл от
+     невидимой панели (карточка сделки, 21.08.2026). display в переходе —
+     с allow-discrete, чтобы анимация появления сохранилась. */
+  display: none;
+  visibility: hidden;
+  transform: translateY(-4px) scale(.98);
+  transition: opacity .1s cubic-bezier(.4,0,1,1), transform .1s cubic-bezier(.4,0,1,1), visibility 0s linear .1s, display .1s allow-discrete;
+}
+.pop.pop--floating.is-open {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity .16s cubic-bezier(.16,1,.3,1), transform .16s cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pop.pop--floating { transition: opacity .01s; transform: none; }
+  .pop.pop--floating.is-open { transform: none; }
+}
+
+/* pinned — всегда открытый поповер (демонстрации в документации) */
+.pop.pop--floating.pop--pinned {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
+}
+
+/* инлайн-встраивание превью в статичный контейнер документации/канваса —
+   вместо position:absolute относительно триггера (наследует position:relative от .pop) */
+.pop--inline { position: relative; }

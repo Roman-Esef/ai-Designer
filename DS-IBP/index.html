@@ -1,0 +1,1454 @@
+<!-- @dsCard group="Brand" name="Обзор" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дизайн-система — Обзор</title>
+<link rel="stylesheet" href="styles/typography.css">
+<link rel="stylesheet" href="styles/colors.css">
+<link rel="stylesheet" href="styles/radius.css">
+<link rel="stylesheet" href="styles/shadow.css">
+<link rel="stylesheet" href="styles/button.css">
+<link rel="stylesheet" href="styles/icon-button.css">
+<link rel="stylesheet" href="styles/link.css">
+<link rel="stylesheet" href="styles/checkbox.css">
+<link rel="stylesheet" href="styles/button-group.css">
+<link rel="stylesheet" href="styles/radio.css">
+<link rel="stylesheet" href="styles/switch.css">
+<link rel="stylesheet" href="styles/badge.css">
+<link rel="stylesheet" href="styles/chip.css">
+<link rel="stylesheet" href="styles/avatar.css">
+<link rel="stylesheet" href="styles/tooltip.css">
+<link rel="stylesheet" href="styles/divider.css">
+<link rel="stylesheet" href="styles/splitter.css">
+<link rel="stylesheet" href="styles/tab.css">
+<link rel="stylesheet" href="styles/segment-control.css">
+<link rel="stylesheet" href="styles/label-helper.css">
+<link rel="stylesheet" href="styles/toast.css">
+<link rel="stylesheet" href="styles/breadcrumbs.css">
+<link rel="stylesheet" href="styles/context-menu.css">
+<link rel="stylesheet" href="styles/dropdown-list.css">
+<link rel="stylesheet" href="styles/read-only-field.css">
+<link rel="stylesheet" href="styles/input.css">
+<link rel="stylesheet" href="styles/input-range.css">
+<link rel="stylesheet" href="styles/alert.css">
+<link rel="stylesheet" href="styles/spinner.css">
+<link rel="stylesheet" href="styles/skeleton.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0; font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary); background: var(--bg-page); background-attachment: fixed;
+  }
+  a { text-decoration: none; color: inherit; }
+
+  .page { max-width: 1240px; margin: 0 auto; padding: clamp(40px,7vw,96px) clamp(24px,5vw,72px) 130px; }
+
+  /* hero */
+  .hero { border-bottom: 1px solid var(--border-light); padding-bottom: 46px; }
+  .hero .ver { font: var(--type-body-s); color: var(--text-inactive); margin:0 0 14px; }
+  .eyebrow { font: var(--type-button-xs); letter-spacing:.14em; text-transform:uppercase; color: var(--primary); margin:0 0 18px; }
+  .hero h1 { font: var(--type-h1); margin:0 0 20px; color: var(--text-primary); }
+  @media (max-width:600px){ .hero h1{ font-size:42px; line-height:50px; } }
+  .hero p.lead { font: var(--type-body-xl); color: var(--text-secondary); max-width: 56ch; margin:0; text-wrap:pretty; }
+  .hero .meta { display:flex; gap:28px; flex-wrap:wrap; margin-top:30px; }
+  .hero .meta .m { }
+  .hero .meta .m .k { font: var(--type-button-xs); letter-spacing:.06em; text-transform:uppercase; color: var(--text-inactive); margin:0 0 4px; }
+  .hero .meta .m .v { font: var(--type-body-m-strong); color: var(--text-secondary); }
+
+  /* section heading */
+  .sec { margin-top: 72px; }
+  .sec-head { display:flex; align-items:baseline; gap:14px; margin-bottom:24px; }
+  .sec-head h2 { font: var(--type-h4-strong); margin:0; color: var(--text-primary); }
+  .sec-head .n { font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* grid of cards */
+  .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(340px,1fr)); gap:22px; }
+  .card {
+    display:flex; flex-direction:column;
+    background: var(--bg-tile); border:1px solid var(--border-light); border-radius:18px; overflow:hidden;
+    transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover { border-color: var(--border-primary); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(40,50,55,.08); }
+
+  .card__preview { height: 172px; display:flex; align-items:center; justify-content:center; padding: 24px; border-bottom:1px solid var(--border-light); overflow:hidden; }
+  .card__body { padding: 22px 24px 24px; display:flex; flex-direction:column; gap:8px; flex:1; }
+  .card__title { font: var(--type-h5-strong); color: var(--text-primary); margin:0; display:flex; align-items:center; gap:10px; }
+  .card__desc { font: var(--type-body-m); color: var(--text-secondary); margin:0; text-wrap:pretty; flex:1; }
+  .card__meta { display:flex; gap:10px; margin-top:6px; flex-wrap:wrap; }
+  .tag { font: var(--type-button-xs); letter-spacing:.04em; color: var(--text-primary); background: var(--tertiary); padding:5px 10px; border-radius:999px; }
+  .tag.file { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; text-transform:none; letter-spacing:0; color: var(--text-secondary); background: var(--bgtable-row-focus); }
+  .card__go { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-m-strong); color: var(--primary); margin-top:10px; }
+  .card__go svg { width:18px; height:18px; transition: transform .15s ease; }
+  .card:hover .card__go svg { transform: translateX(3px); }
+
+  /* preview: typography */
+  .pv-typo { display:flex; align-items:baseline; gap:18px; color: var(--text-primary); }
+  .pv-typo .ag { font-family: var(--font-display); font-weight: 300; font-size:78px; line-height:1; }
+  .pv-typo .stack { display:flex; flex-direction:column; gap:3px; }
+  .pv-typo .stack .a { font-family: var(--font-display); font-weight:600; font-size:22px; color: var(--text-primary); }
+  .pv-typo .stack .b { font-family: var(--font-text); font-size:15px; color: var(--text-secondary); }
+  .pv-typo .stack .c { font-family: var(--font-screen); font-size:14px; color: var(--text-inactive); }
+
+  /* preview: colors */
+  .pv-colors { display:flex; gap:0; width:100%; max-width:300px; border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(40,50,55,.12); }
+  .pv-colors span { flex:1; height:80px; }
+
+  /* preview: elevation */
+  .pv-elevation { display:flex; gap:22px; align-items:center; justify-content:center; }
+  .pv-elevation span { width:56px; height:56px; border-radius:14px; background:#fff; flex:none; }
+
+  /* preview: icons */
+  .pv-icons { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; color:var(--text-secondary); }
+  .pv-icons span { width:30px; height:30px; display:block; }
+  .pv-icons span svg { width:100%; height:100%; display:block; }
+
+  /* preview: button */
+  .pv-btn { display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:center; }
+
+  /* preview: checkbox */
+  .pv-link { display:flex; flex-direction:column; gap:12px; align-items:flex-start; }
+  .pv-cb { display:flex; flex-direction:column; gap:14px; }
+
+  /* preview: input autocomplete (draft page — no dedicated component CSS yet) */
+  .pv-ac { display:flex; flex-direction:column; gap:6px; }
+  .pv-ac__input { height:40px; display:flex; align-items:center; padding:0 14px; border:1px solid var(--border-primary); border-radius:var(--radius-field); font:var(--type-body-m); color:var(--text-primary); background:#fff; }
+  .pv-ac__caret { margin-left:auto; color:var(--text-inactive); font-size:11px; }
+  .pv-ac__list { background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-popup); overflow:hidden; }
+  .pv-ac__item { padding:9px 14px; font:var(--type-body-m); color:var(--text-primary); }
+  .pv-ac__item b { color:var(--text-primary); }
+  .pv-ac__item--active { background:var(--tertiary-light); }
+
+  /* foundations mini tokens row under hero */
+  .stripe { display:flex; gap:10px; margin-top:34px; flex-wrap:wrap; }
+  .stripe span { width:30px; height:30px; border-radius:7px; border:1px solid rgba(40,50,55,.10); }
+
+  footer.foot { margin-top:90px; padding-top:26px; border-top:1px solid var(--border-light);
+    font: var(--type-body-s); color: var(--text-inactive); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+</style>
+  <link rel="stylesheet" href="styles/illustration.css">
+<link rel="stylesheet" href="styles/datepicker.css">
+  <link rel="stylesheet" href="styles/empty-state.css">
+  <link rel="stylesheet" href="styles/snackbar.css">
+  <link rel="stylesheet" href="styles/progress-bar.css">
+  <link rel="stylesheet" href="styles/nav-tile.css">
+<link rel="stylesheet" href="styles/ds-nav.css">
+</head>
+<body>
+<main class="page" data-screen-label="DS Home">
+
+  <header class="hero">
+    <p class="ver">Версия 1.000 · обновлено 27.08.2026</p>
+    <p class="eyebrow">Дизайн-система · Investment Banking Platform</p>
+    <h1>ДС IBP</h1>
+    <p class="lead">Единый источник правды: токены типографики и цвета, на которых собраны все компоненты. Гарнитуры SB Sans, семантическая палитра, библиотека UI.</p>
+    <div class="meta">
+      <div class="m"><p class="k">Основы</p><p class="v">Типографика · Цвета</p></div>
+      <div class="m"><p class="k">Компоненты</p><p class="v">41 компонент · 12 атомов · 19 молекул · 10 организмов</p></div>
+      <div class="m"><p class="k">Шрифты</p><p class="v">SB Sans Display · Text · Screen</p></div>
+    </div>
+    <div class="stripe" id="stripe"></div>
+  </header>
+
+  <!-- FOUNDATIONS -->
+  <section class="sec" data-screen-label="Foundations">
+    <div class="sec-head"><h2>Основы</h2><span class="n">8 разделов</span></div>
+    <div class="grid">
+      <a class="card" href="pages/foundations/Icons.html">
+        <div class="card__preview">
+          <div class="pv-icons" id="pvIcons"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Иконки</h3>
+          <p class="card__desc">Набор иконок 24×24 для компонентов и интерфейсов. Стиль Outline, заливка <code>currentColor</code>.</p>
+          <div class="card__meta"><span class="tag">Foundations</span><span class="tag file">Icons.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/foundations/Illustrations.html">
+        <div class="card__preview">
+          <div style="display:flex; gap:14px; align-items:center;">
+            <span class="illu" data-illu="deals" style="width:64px; height:64px;"></span>
+            <span class="illu" data-illu="reports" style="width:64px; height:64px;"></span>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Иллюстрации</h3>
+          <p class="card__desc">Библиотека продуктовых иллюстраций: 32 тайловых, 4 состояния ошибок и фоновая — для NavTile, пустых состояний и онбординга.</p>
+          <div class="card__meta"><span class="tag">Foundations</span><span class="tag file">Illustrations.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/foundations/Layout.html">
+        <div class="card__preview">
+          <div style="display:flex;width:100%;max-width:280px;height:96px;border:1px solid var(--border-light);border-radius:8px;overflow:hidden;background:var(--bg-page)">
+            <div style="width:22px;background:var(--bg-mainmenu);border-right:1px solid var(--border-light)"></div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div style="height:22px;background:color-mix(in srgb, var(--error) 12%, transparent);border-bottom:1px solid var(--border-light)"></div>
+              <div style="flex:1;display:flex;gap:6px;padding:8px 10px">
+                <div style="flex:1;background:var(--bg-tile);border:1px solid var(--border-light);border-radius:4px"></div>
+                <div style="flex:1;background:var(--bg-tile);border:1px solid var(--border-light);border-radius:4px"></div>
+                <div style="flex:1;background:var(--bg-tile);border:1px solid var(--border-light);border-radius:4px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Каркас экрана</h3>
+          <p class="card__desc">Зоны страницы: панель навигации, зона крошек 44&nbsp;px и контентная область с полями 24&nbsp;px — правила построения любого экрана.</p>
+          <div class="card__meta"><span class="tag">Foundations</span><span class="tag file">Layout.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/foundations/Spacing.html">
+        <div class="card__preview">
+          <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:6px;width:100%;max-width:280px;">
+            <span style="grid-column:span 8;height:44px;border-radius:6px;background:color-mix(in srgb,var(--primary) 16%,transparent)"></span>
+            <span style="grid-column:span 4;height:44px;border-radius:6px;background:color-mix(in srgb,var(--primary) 8%,transparent)"></span>
+            <span style="grid-column:span 4;height:28px;border-radius:6px;background:color-mix(in srgb,var(--primary) 8%,transparent)"></span>
+            <span style="grid-column:span 4;height:28px;border-radius:6px;background:color-mix(in srgb,var(--primary) 8%,transparent)"></span>
+            <span style="grid-column:span 4;height:28px;border-radius:6px;background:color-mix(in srgb,var(--primary) 8%,transparent)"></span>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Сетка и отступы</h3>
+          <p class="card__desc">Модуль 4 px, шкала отступов <code>--space-*</code> и колоночная сетка: 12 резиновых колонок с зазором 16 px. Конструктор сетки внутри.</p>
+          <div class="card__meta"><span class="tag">Foundations</span><span class="tag file">Spacing.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/foundations/Radius.html">
+        <div class="card__preview">
+          <div class="pv-radius" id="pvRadius"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Скругления</h3>
+          <p class="card__desc">Шкала радиусов скругления: 15 ступеней и семантические алиасы <code>--radius-*</code>. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Foundations</span><span class="tag file">Radius.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/foundations/Elevation.html">
+        <div class="card__preview">
+          <div class="pv-elevation">
+            <span style="box-shadow: var(--elevation-1);"></span>
+            <span style="box-shadow: var(--elevation-2);"></span>
+            <span style="box-shadow: var(--shadow-modal-form);"></span>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Тени</h3>
+          <p class="card__desc">Каталог теней продукта: Elevation_1…5 и Shadow4.0_modalform. Где применяется, где расходится с кодом. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Foundations</span><span class="tag file">Elevation.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/foundations/Typography.html">
+        <div class="card__preview">
+          <div class="pv-typo">
+            <div class="ag">Ag</div>
+            <div class="stack">
+              <span class="a">Заголовок</span>
+              <span class="b">Основной текст</span>
+              <span class="c">Текст кнопки</span>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Типографика</h3>
+          <p class="card__desc">Три гарнитуры SB Sans, 22 стиля: заголовки, текст, кнопки. Токены <code>--type-*</code>.</p>
+          <div class="card__meta"><span class="tag">Type</span><span class="tag file">Typography.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/foundations/Colors.html">
+        <div class="card__preview">
+          <div class="pv-colors" id="pvColors"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Цвета</h3>
+          <p class="card__desc">Семантические токены: Static, Active, Situative, Local. Примитивы + hex, прозрачности через color-mix.</p>
+          <div class="card__meta"><span class="tag">Colors</span><span class="tag file">Colors.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+    
+    </div>
+  </section>
+
+  <!-- ATOMS -->
+  <section class="sec" data-screen-label="Atoms">
+    <div class="sec-head"><h2>Атомы</h2><span class="n">15 компонентов</span></div>
+    <div class="grid">
+      <a class="card" href="pages/atoms/Avatar.html">
+        <div class="card__preview">
+          <div class="pv-cb" id="pvAvatar" style="flex-direction:row; gap:18px; align-items:center;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Avatar</h3>
+          <p class="card__desc">Инициалы, иконка или фото. Формы Circular / Rounded, размеры XL / L / M / S, бейдж-счётчик и индикатор статуса, группа аватаров «+N». Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Avatar.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Badge.html">
+        <div class="card__preview">
+          <div class="pv-cb" id="pvBadge" style="flex-direction:row; gap:22px; align-items:center;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Badge</h3>
+          <p class="card__desc">Счётчик (Counter) и индикатор-точка (Dot). Размеры M / S / XS / XXS / Dot, семантические тона, переполнение «99+» и позиционирование. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Badge.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Buttons.html">
+        <div class="card__preview">
+          <div class="pv-btn">
+            <button class="btn btn--accent btn--m" type="button" tabindex="-1">Button</button>
+            <button class="btn btn--outline btn--m" type="button" tabindex="-1">Button</button>
+            <button class="btn btn--transparent btn--m" type="button" tabindex="-1">Button</button>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Button</h3>
+          <p class="card__desc">Три типа, три размера, состояния, лоадер, меню и Fullwidth. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Buttons.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/ButtonTest.html">
+        <div class="card__preview">
+          <div class="pv-btn">
+            <button class="btn btn--accent btn--m" type="button" tabindex="-1">Button</button>
+            <button class="btn btn--outline btn--m" type="button" tabindex="-1">Button</button>
+            <button class="btn btn--transparent btn--m" type="button" tabindex="-1">Button</button>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Button Test</h3>
+          <p class="card__desc">Тестовая копия Button: тот же конструктор и состояния плюс сводная таблица токенов в конце страницы.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">ButtonTest.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Checkbox.html">
+        <div class="card__preview">
+          <div class="pv-cb" id="pvCb"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Checkbox</h3>
+          <p class="card__desc">Unselected / Selected / Indeterminate, состояния Hover / Focus / Pressed / Disabled / Error, группы и валидация. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Checkbox.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Chip.html">
+        <div class="card__preview">
+          <div class="pv-cb" id="pvChip" style="flex-direction:row; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Chip</h3>
+          <p class="card__desc">Компактный элемент для фильтров, тегов и статусов. Типы Edit / ReadOnly, стили Fill / Outline, размеры L / M / S / XS, ведущие слоты, удаление и скругление. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Chip.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Divider.html">
+        <div class="card__preview">
+          <div id="pvDvd" style="width:100%; max-width:240px; display:flex; flex-direction:column; gap:0;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Divider</h3>
+          <p class="card__desc">Разделительная черта для визуального отделения частей интерфейса. Ориентация Horizontal / Vertical, варианты Full / Inset / Middle / Section, разделитель с подписью. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Divider.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/IconButton.html">
+        <div class="card__preview">
+          <div class="pv-btn" id="pvIbtn"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">IconButton</h3>
+          <p class="card__desc">Безрамочная кнопка с иконкой и круглым стейт-слоем. Тоны Neutral / Primary / Danger / Contrast, размеры L / M / S, режим-переключатель, встроенный вариант и бейдж. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">IconButton.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/LabelHelper.html">
+        <div class="card__preview">
+          <div class="pv-cb" id="pvLH" style="align-items:flex-start;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Label / Helper</h3>
+          <p class="card__desc">Вспомогательные текстовые слоты. Не существуют самостоятельно — встраиваются в Checkbox, Radiobutton, Switch и поля ввода (InputText, InputAutocomplete, InputDate, ReadOnlyField).</p>
+          <div class="card__meta"><span class="tag">Sub-component</span><span class="tag file">LabelHelper.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Link.html">
+        <div class="card__preview">
+          <div class="pv-link" id="pvLink"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Link</h3>
+          <p class="card__desc">Текстовая ссылка для навигации в лайауте, модалках и Хлебных крошках. Тоны Accent / Muted / Neutral, размеры M / S, инлайн, иконки, внешние ссылки, бредкрамбы. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Link.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/ProgressBar.html">
+        <div class="card__preview">
+          <div id="pvPbar" style="width:100%; max-width:260px; display:flex; flex-direction:column; gap:14px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">ProgressBar</h3>
+          <p class="card__desc">Линейный индикатор прогресса: определённый и неопределённый режимы, шесть тонов, три размера, плавающее значение, авто-подбор тона по порогам.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">ProgressBar.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Radiobutton.html">
+        <div class="card__preview">
+          <div class="pv-cb" id="pvRb"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Radiobutton</h3>
+          <p class="card__desc">Выбор одного из взаимоисключающих вариантов. Состояния Hover / Focus / Pressed / Disabled / Error, группы, валидация и навигация стрелками. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Radiobutton.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Skeleton.html">
+        <div class="card__preview">
+          <div id="pvSkel" style="display:flex; align-items:center; gap:14px; width:100%; max-width:260px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Skeleton</h3>
+          <p class="card__desc">Переиспользуемый плейсхолдер загрузки: строка текста и форма с общим шиммером. Группы строк и строка с аватаром готовы из коробки.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Skeleton.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Spinner.html">
+        <div class="card__preview">
+          <div id="pvSpin" style="display:flex; align-items:center; gap:28px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Spinner</h3>
+          <p class="card__desc">Круговой индикатор загрузки неопределённой длительности: семь тонов, четыре размера, подпись и блокирующий оверлей поверх области.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Spinner.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/atoms/Switch.html">
+        <div class="card__preview">
+          <div class="pv-cb" id="pvSw"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Switch</h3>
+          <p class="card__desc">Мгновенное переключение Off / On без подтверждения. Состояния Hover / Focus / Pressed / Disabled / Loading, строка настроек и доступность. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Атомы</span><span class="tag file">Switch.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+    
+    </div>
+  </section>
+
+  <!-- MOLECULES -->
+  <section class="sec" data-screen-label="Molecules">
+    <div class="sec-head"><h2>Молекулы</h2><span class="n">20 компонентов</span></div>
+    <div class="grid">
+      <a class="card" href="pages/molecules/Alert.html">
+        <div class="card__preview">
+          <div class="pv-cb" id="pvAlert" style="align-items:stretch; gap:10px; width:100%; max-width:280px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Alert</h3>
+          <p class="card__desc">Инлайновое сообщение о состоянии в потоке контента. Четыре тона (Info · Warning · Error · Success), два размера, опциональные заголовок, текст, кнопки и действия.</p>
+          <div class="card__meta"><span class="tag file">Alert.html</span></div>
+          <span class="card__go">Открыть раздел <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/Breadcrumbs.html">
+        <div class="card__preview">
+          <nav class="crumbs" aria-label="Хлебные крошки" style="pointer-events:none;">
+            <span class="crumbs__item"><span class="link link--muted" tabindex="-1">Главная</span></span>
+            <span class="crumbs__item"><span class="link link--muted" tabindex="-1">Сделки</span></span>
+            <span class="crumbs__item crumbs__item--current"><span class="crumbs__current" aria-current="page">Договор №4521</span></span>
+          </nav>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Breadcrumbs</h3>
+          <p class="card__desc">Трейл ссылок в шапке страницы. Единственный размер S, авто-схлопывание срединных звеньев в «…», текущая крошка не кликабельна и обрезается многоточием.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">Breadcrumbs.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/ButtonGroup.html">
+        <div class="card__preview">
+          <div class="pv-btn">
+            <div class="btn-group btn-group--accent" role="group" style="pointer-events:none;">
+              <button class="btn btn--accent btn--m" type="button" tabindex="-1">Button</button>
+              <button class="btn btn--accent btn--m" type="button" tabindex="-1">Button</button>
+              <button class="btn btn--accent btn--m" type="button" tabindex="-1">Button</button>
+            </div>
+            <div class="btn-group btn-group--outline" role="group" style="pointer-events:none;">
+              <button class="btn btn--outline btn--m" type="button" tabindex="-1">Button</button>
+              <button class="btn btn--outline btn--m" type="button" tabindex="-1">Button</button>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">ButtonGroup</h3>
+          <p class="card__desc">Объединяет 2–5 кнопок в единый блок. Типы Accent / Outline, Split Button, сегментированный выбор, вертикальная раскладка и Fullwidth. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">ButtonGroup.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/ContextMenu.html">
+        <div class="card__preview">
+          <div class="menu" role="menu" style="pointer-events:none; box-shadow:none; border-color:var(--border-light);">
+            <button type="button" class="menu__item" role="menuitem" tabindex="-1"><span class="menu__item-label">Изменить</span></button>
+            <button type="button" class="menu__item" role="menuitem" tabindex="-1"><span class="menu__item-label">Дублировать</span></button>
+            <hr class="menu__divider">
+            <button type="button" class="menu__item menu__item--danger" role="menuitem" tabindex="-1"><span class="menu__item-label">Удалить</span></button>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Context Menu</h3>
+          <p class="card__desc">Всплывающий список действий над объектом — вызывается с kebab-кнопки в шапке таблицы, строке или карточке. Иконки, горячие клавиши, подменю, деструктивные пункты.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">ContextMenu.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/DatePicker.html">
+        <div class="card__preview">
+          <div style="transform:scale(.64); transform-origin:center; pointer-events:none;">
+            <div class="dpk" style="box-shadow:none; border:1px solid var(--border-light);">
+              <div class="dpk__head">
+                <span class="dpk__caption"><span class="dpk__cap-text">Октябрь 2025</span><span class="dpk__cap-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></span>
+                <span class="dpk__nav">
+                  <span class="ibtn ibtn--neutral ibtn--s"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+                  <span class="ibtn ibtn--neutral ibtn--s"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+                </span>
+              </div>
+              <div class="dpk__weekdays"><span class="dpk__weekday">Пн</span><span class="dpk__weekday">Вт</span><span class="dpk__weekday">Ср</span><span class="dpk__weekday">Чт</span><span class="dpk__weekday">Пт</span><span class="dpk__weekday">Сб</span><span class="dpk__weekday">Вс</span></div>
+              <div class="dpk__grid">
+                <span class="dpk__day"><span class="dpk__daynum">6</span></span><span class="dpk__day"><span class="dpk__daynum">7</span></span><span class="dpk__day dpk__day--range-start"><span class="dpk__daynum">8</span></span><span class="dpk__day dpk__day--in-range"><span class="dpk__daynum">9</span></span><span class="dpk__day dpk__day--in-range"><span class="dpk__daynum">10</span></span><span class="dpk__day dpk__day--in-range"><span class="dpk__daynum">11</span></span><span class="dpk__day dpk__day--range-end"><span class="dpk__daynum">12</span></span>
+                <span class="dpk__day"><span class="dpk__daynum">13</span></span><span class="dpk__day"><span class="dpk__daynum">14</span></span><span class="dpk__day dpk__day--today"><span class="dpk__daynum">15</span></span><span class="dpk__day"><span class="dpk__daynum">16</span></span><span class="dpk__day"><span class="dpk__daynum">17</span></span><span class="dpk__day"><span class="dpk__daynum">18</span></span><span class="dpk__day"><span class="dpk__daynum">19</span></span>
+                <span class="dpk__day"><span class="dpk__daynum">20</span></span><span class="dpk__day dpk__day--selected"><span class="dpk__daynum">21</span></span><span class="dpk__day"><span class="dpk__daynum">22</span></span><span class="dpk__day"><span class="dpk__daynum">23</span></span><span class="dpk__day"><span class="dpk__daynum">24</span></span><span class="dpk__day"><span class="dpk__daynum">25</span></span><span class="dpk__day"><span class="dpk__daynum">26</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">DatePicker</h3>
+          <p class="card__desc">Календарь для InputDate / InputDateRange: выбор даты, диапазона или месяца. Представления день / месяц / год, футер с подтверждением, границы min-max. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">DatePicker.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/DropdownList.html">
+        <div class="card__preview">
+          <div class="ddl" style="width:100%; max-width:230px; box-shadow:none; border-color:var(--border-light);">
+            <button type="button" class="ddl__item" aria-selected="true" tabindex="-1">
+              <span class="ddl__item-body"><span class="ddl__item-label">Доллар США</span></span>
+              <span class="ddl__item-trail"><span class="ddl__item-check-single"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span></span>
+            </button>
+            <button type="button" class="ddl__item" tabindex="-1"><span class="ddl__item-body"><span class="ddl__item-label">Евро</span></span></button>
+            <button type="button" class="ddl__item" tabindex="-1"><span class="ddl__item-body"><span class="ddl__item-label">Фунт стерлингов</span></span></button>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">DropdownList</h3>
+          <p class="card__desc">Выпадающий список, раскрывающийся под полем Select или InputAutocomplete. Одиночный и множественный выбор, автодополнение с подсветкой совпадения, группы, авто-разворот.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">DropdownList.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/EmptyState.html">
+        <div class="card__preview">
+          <div class="es es--m" style="padding:0; gap:12px; max-width:230px;">
+            <span class="illu es__illu" data-illu="empty-folder" style="width:64px; height:64px;"></span>
+            <div class="es__body" style="gap:4px; max-width:210px;">
+              <p class="es__title" style="font:var(--type-body-m-strong);">Нет сделок</p>
+              <p class="es__text" style="font:var(--type-body-s);">Попробуйте изменить условия поиска.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">EmptyState</h3>
+          <p class="card__desc">Иллюстрация, заголовок, текст и опциональные действия — пустой список/таблица, нет результатов поиска, полноэкранная ошибка. Размер M/L, поверхность обычная/карточка.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">EmptyState.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/InputAmountRange.html">
+        <div class="card__preview">
+          <div style="width:100%; max-width:280px;">
+            <span class="ds-label ds-label--left" style="margin-bottom:6px;"><span class="ds-label__text">Сумма, ₽</span></span>
+            <div class="inp-range" style="width:100%;">
+              <div class="inp-range__row">
+                <div class="inp inp--m inp-range__field"><div class="inp__field"><span class="inp__prefix">От</span><span class="inp__control" style="color:var(--text-primary);">100 000</span></div></div>
+                <span class="inp-range__line" aria-hidden="true"></span>
+                <div class="inp inp--m inp-range__field"><div class="inp__field"><span class="inp__prefix">До</span><span class="inp__control" style="color:var(--text-primary);">5 000 000</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">InputAmountRange</h3>
+          <p class="card__desc">Числовой диапазон: два InputAmount с префиксами «От» / «До» и линией Range_Line. Независимые состояния полей, открытая граница. Только размер M. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">InputAmountRange.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/InputAutocomplete.html">
+        <div class="card__preview">
+          <div class="pv-ac" style="width:100%; max-width:230px;">
+            <div class="pv-ac__input">Валюта<span class="pv-ac__caret">▾</span></div>
+            <div class="pv-ac__list">
+              <div class="pv-ac__item"><b>До</b>ллар США</div>
+              <div class="pv-ac__item pv-ac__item--active"><b>До</b>ллар Канады</div>
+              <div class="pv-ac__item">Евро</div>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">InputAutocomplete</h3>
+          <p class="card__desc">Поле с выпадающим списком: одиночный и множественный выбор, показ выбора сводкой или чипами (в поле и внешним стеком), фильтрация с подсветкой совпадения. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">InputAutocomplete.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/InputDate.html">
+        <div class="card__preview">
+          <div style="width:100%; max-width:230px;">
+            <div class="inp inp--m" style="width:100%;">
+              <span class="ds-label ds-label--left" style="margin-bottom:6px;"><span class="ds-label__text">Дата подписания</span></span>
+              <div class="inp__field"><span class="inp__control" style="color:var(--text-primary);">12.21.2022</span><span class="inp__acts"><span class="inp__act inp__act--static"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">InputDate</h3>
+          <p class="card__desc">Ввод даты: поле с маской ММ.ДД.ГГГГ и кнопкой-календарём, поднимающей DatePicker. Размеры M / S, все состояния. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">InputDate.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/InputDateRange.html">
+        <div class="card__preview">
+          <div style="width:100%; max-width:280px;">
+            <span class="ds-label ds-label--left" style="margin-bottom:6px;"><span class="ds-label__text">Период сделки</span></span>
+            <div class="inp-range inp-range--date" style="width:100%;">
+              <div class="inp-range__row">
+                <div class="inp inp--m inp-range__field"><div class="inp__field"><span class="inp__prefix">От</span><span class="inp__control" style="color:var(--text-primary);">01.01.2021</span></div></div>
+                <span class="inp-range__line" aria-hidden="true"></span>
+                <div class="inp inp--m inp-range__field"><div class="inp__field"><span class="inp__prefix">До</span><span class="inp__control" style="color:var(--text-primary);">31.12.2021</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">InputDateRange</h3>
+          <p class="card__desc">Диапазон дат: два InputDate с префиксами «От» / «До» и линией Range_Line. Маска ММ.ДД.ГГГГ, календарь, независимые состояния полей. Только размер M. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">InputDateRange.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/InputText.html">
+        <div class="card__preview">
+          <div style="width:100%; max-width:230px;">
+            <div class="inp inp--m" style="width:100%;">
+              <span class="ds-label ds-label--left" style="margin-bottom:6px;"><span class="ds-label__text">Наименование</span></span>
+              <div class="inp__field"><span class="inp__control" style="color:var(--text-primary);">Кредитная линия</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">InputText</h3>
+          <p class="card__desc">Базовое поле ввода текста: префикс/постфикс, иконка поиска, очистка, многострочный режим и числовой InputAmount. Размеры M / S, все состояния. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">InputText.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/NavTile.html">
+        <div class="card__preview">
+          <div class="ntile" style="width:230px; min-height:96px; padding:16px; padding-right:84px; gap:6px; pointer-events:none;">
+            <span class="illu ntile__illu" data-illu="deals" style="width:56px; height:56px; right:14px;"></span>
+            <h3 class="ntile__title" style="font:var(--type-h6-strong);">Сделки</h3>
+            <p class="ntile__desc" style="font:var(--type-body-xs);">Кредитные линии и договоры</p>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">NavTile</h3>
+          <p class="card__desc">Навигационная плитка главной страницы: иллюстрация, название раздела, описание. Базовая и со ссылками на подразделы. Ширина — 3 колонки из 12. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">NavTile.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/Pagination.html">
+        <div class="card__preview">
+          <div id="pvPgn" style="width:100%; max-width:280px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Pagination</h3>
+          <p class="card__desc">Нижняя строка многостраничной таблицы: выбор размера страницы, счётчик диапазона, стрелки и номера. Composable с Action panel (массовый выбор) и Pagi counters. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">Pagination.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/ReadOnlyField.html">
+        <div class="card__preview">
+          <div class="rof" style="width:100%; max-width:220px;">
+            <span class="ds-label"><span class="ds-label__text">ID во внешней АС</span></span>
+            <div class="rof__row"><span class="rof__value">123456789012</span></div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">ReadOnlyField</h3>
+          <p class="card__desc">Пара «подпись → значение» без рамки и фона для карточек сущностей и детальных панелей. Типы значения Текст / Чипы / Ссылка, префикс/постфикс, иконки, обрезка с тултипом.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">ReadOnlyField.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/SegmentControl.html">
+        <div class="card__preview">
+          <div id="pvSeg" style="width:100%; max-width:260px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">SegmentControl</h3>
+          <p class="card__desc">Переключение значения одного параметра — периода, режима отображения — из 2–6 опций с плавающим индикатором. Размеры M / S / XS, иконки, Fullwidth. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">SegmentControl.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+
+      <a class="card" href="pages/molecules/Splitter.html">
+        <div class="card__preview">
+          <div id="pvSpl" style="display:flex; align-items:stretch; width:240px; height:120px; border:1px solid var(--border-light); border-radius:10px; overflow:hidden;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Splitter</h3>
+          <p class="card__desc">Функциональный разделитель контейнера: перетаскиванием регулирует размеры панелей. Состояния Default / Hover / Move / Focus / Disabled, ориентация и доступность. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">Splitter.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/Tab.html">
+        <div class="card__preview">
+          <div id="pvTab" style="width:100%; max-width:260px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Tab</h3>
+          <p class="card__desc">Переключение между вьюхами одного экрана. Ориентация Horizontal / Vertical, размеры M / S, состояния Selected / Hover / Active / Disabled, иконка и бейдж-счётчик. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">Tab.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/Toast.html">
+        <div class="card__preview">
+          <div id="pvToast" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:8px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Toast</h3>
+          <p class="card__desc">Пилюля-уведомление о запуске фонового (ToastBar) или блокирующего (ToastLoader) процесса. Тоны Neutral / Success / Error / Info, спиннер, стек до трёх. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">Toast.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/molecules/Tooltip.html">
+        <div class="card__preview">
+          <div class="pv-cb" id="pvTip" style="flex-direction:row; gap:30px; align-items:center; padding-top:18px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Tooltip</h3>
+          <p class="card__desc">Всплывающая подсказка при наведении или фокусе. Типы Main / Error, 12 положений стрелки, авто-разворот, триггеры и тайминги, доступность. Конструктор внутри.</p>
+          <div class="card__meta"><span class="tag">Молекулы</span><span class="tag file">Tooltip.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+    
+    </div>
+  </section>
+
+  <!-- ORGANISMS -->
+  <section class="sec" data-screen-label="Organisms">
+    <div class="sec-head"><h2>Организмы</h2><span class="n">13 компонентов</span></div>
+    <div class="grid">
+      <a class="card" href="pages/organisms/AllocationBar.html">
+        <div class="card__preview">
+          <div style="display:flex; flex-direction:column; gap:8px; width:100%; max-width:260px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px;">
+              <span style="font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">ВБС по сделке, руб.</span>
+              <span style="font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">1 000 000 000,00</span>
+            </div>
+            <div style="display:flex; gap:2px; height:8px; border-radius:999px; overflow:hidden;">
+              <span style="flex:35; background:var(--chart-indigo,#8D87F9);"></span>
+              <span style="flex:35; background:var(--chart-shiny-green,#8CCB5E);"></span>
+              <span style="flex:30; background:var(--chart-light-blue,#7DCAFA);"></span>
+            </div>
+            <div style="display:grid; grid-template-columns:8px 1fr auto; gap:8px; align-items:center; font:400 12px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">
+              <span style="width:8px; height:8px; border-radius:50%; background:var(--chart-indigo,#8D87F9);"></span><span>Кредит</span><span style="color:var(--text-secondary,#617C7C);">35,00%</span>
+              <span style="width:8px; height:8px; border-radius:50%; background:var(--chart-shiny-green,#8CCB5E);"></span><span>Акции</span><span style="color:var(--text-secondary,#617C7C);">35,00%</span>
+              <span style="width:8px; height:8px; border-radius:50%; background:var(--chart-light-blue,#7DCAFA);"></span><span>РЕПО</span><span style="color:var(--text-secondary,#617C7C);">30,00%</span>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">AllocationBar</h3>
+          <p class="card__desc">Итог и его разбивка по составляющим: стек-бар распределения и список позиций с долями. Палитра из 12 токенов графиков, адаптив по ширине контейнера, состояния загрузки, ошибки и расхождения суммы с итогом.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">AllocationBar.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/Chart.html">
+        <div class="card__preview">
+          <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:260px;">
+            <div style="display:flex; align-items:flex-end; gap:6px; height:74px;">
+              <span style="flex:1; height:42%; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>
+              <span style="flex:1; height:64%; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>
+              <span style="flex:1; height:52%; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>
+              <span style="flex:1; height:80%; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>
+              <span style="flex:1; height:70%; border-radius:2px; background:var(--chart-turquoise,#3FBFB0);"></span>
+              <span style="flex:1; height:96%; border-radius:2px; background:var(--chart-turquoise,#3FBFB0);"></span>
+              <span style="flex:1; height:86%; border-radius:2px; background:var(--chart-turquoise,#3FBFB0);"></span>
+            </div>
+            <div style="display:flex; gap:14px; font:400 12px/1.3 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">
+              <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>Поступления</span>
+              <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:2px; background:var(--chart-turquoise,#3FBFB0);"></span>Прогноз</span>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Chart</h3>
+          <p class="card__desc">Графики данных: столбчатые, линейные, области, круговые, точечные, водопад и спарклайн. Одна анатомия — легенда, оси, тултип, кросс-хэйр, опорная линия и выделение диапазона; размеры S / M / L для тайла и страницы.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">Chart.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/Entity.html">
+        <div class="card__preview">
+          <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9h0M9 12h0M9 15h0"/></svg></span>
+            <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Контрагент</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ООО ЮгСтройИнвест</span><span style="display:block; font:400 12px/1.3 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">ИНН 7701234567</span></span>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Entity</h3>
+          <p class="card__desc">Отображение объектов (компании, люди, файлы, метрики) в тайлах, списках и формах: ведущий элемент, Header · Label · Subheaders, чипы, иконки-кнопки и действия. 3 размера, служебные состояния.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">Entity.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/Modal.html">
+        <div class="card__preview">
+          <div id="pvModal" style="width:100%; max-width:280px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Modal</h3>
+          <p class="card__desc">Свод правил построения модальных форм: обязательная шапка и подвал, произвольная контентная область. 12 шагов ширины, guarded-закрытие, диалог подтверждения удаления.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">Modal.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/NavPanel.html">
+        <div class="card__preview">
+          <div style="display:flex; height:150px; border:1px solid var(--border-light,#DCE6E6); border-radius:10px; overflow:hidden; background:var(--bg-mainmenu,#fefefe);">
+            <div style="width:40px; display:flex; flex-direction:column; align-items:center; gap:12px; padding:12px 0; color:var(--text-secondary,#617C7C); border-right:1px solid var(--border-light,#DCE6E6);">
+              <i data-icon="left-menu"></i><i data-icon="main-page"></i><i data-icon="pipeline"></i><i data-icon="funds"></i>
+            </div>
+            <div style="width:150px; display:flex; flex-direction:column; gap:6px; padding:12px 10px; color:var(--text-secondary,#617C7C); font:14px/1 var(--font-text,sans-serif);">
+              <span style="display:flex; align-items:center; gap:10px; height:26px; padding:0 8px; border-radius:6px; background:var(--bgtable-row-focus,#eef3f3); color:var(--text-primary,#2f3b3b);"><i data-icon="main-page" style="width:18px;height:18px;"></i>Главная</span>
+              <span style="display:flex; align-items:center; gap:10px; padding:0 8px;"><i data-icon="pipeline" style="width:18px;height:18px;"></i>Pipeline</span>
+              <span style="display:flex; align-items:center; gap:10px; padding:0 8px;"><i data-icon="funds" style="width:18px;height:18px;"></i>Фонды</span>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">NavPanel</h3>
+          <p class="card__desc">Главная навигация приложения в левой части страницы. Три режима одного компонента: свёрнутый Rail, развёрнутый-оверлей Drawer и закреплённый Fixed. Блоки-разделы, бейджи, футер с профилем.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">NavPanel.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/PageHeader.html">
+        <div class="card__preview">
+          <div style="width:100%; max-width:280px; display:flex; align-items:flex-start; gap:10px;">
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font:600 15px/1.2 var(--font-display,sans-serif); color:var(--text-primary,#333F48); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">D-007. ПАО «Газпром»</span>
+                <span style="flex:none; height:14px; padding:0 6px; border-radius:999px; background:var(--c-swamp-a100,#EEF4F4); font:500 8px/14px var(--font-text,sans-serif); color:var(--text-secondary,#5C6870);">Черновик</span>
+              </div>
+              <span style="font:400 9px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9AA5AC);">7 · Версия 12 (07.02.2021)</span>
+            </div>
+            <div style="flex:none; display:flex; gap:4px;">
+              <span style="height:18px; padding:0 8px; border:1px solid var(--border-primary,#C4D2D2); border-radius:6px; font:500 8px/16px var(--font-text,sans-serif); color:var(--text-secondary,#5C6870);">Button</span>
+              <span style="height:18px; padding:0 8px; border-radius:6px; background:var(--primary,#08808A); font:500 8px/18px var(--font-text,sans-serif); color:#fff;">Button</span>
+              <span style="height:18px; width:18px; border:1px solid var(--border-primary,#C4D2D2); border-radius:6px; font:600 9px/16px var(--font-text,sans-serif); color:var(--text-secondary,#5C6870); text-align:center;">⋮</span>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">PageHeader</h3>
+          <p class="card__desc">Заголовок страницы: Title (h1) + Chips, кнопка возврата, Subtitle и до трёх кнопок действий с MenuButton. Адаптируется до мобильной раскладки.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">PageHeader.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/Popover.html">
+        <div class="card__preview">
+          <div id="pvPopover" style="width:100%; max-width:220px;"></div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Popover</h3>
+          <p class="card__desc">Нон-модальный всплывающий контейнер у триггера: текст, легенды, формы. Header без кнопок действий, Footer с ними, 5 ширин, 12 позиций, опциональная стрелка.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">Popover.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/RiskMetric.html">
+        <div class="card__preview">
+          <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+            <span style="display:inline-flex; align-items:center; gap:4px; height:24px; padding:0 10px; border-radius:999px; background:#E5625C; color:#FFFFFF; font:600 14px/1 var(--font-text,sans-serif);">26 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16"></line><line x1="12" y1="7.5" x2="12" y2="7.5"></line></svg></span>
+            <span style="display:inline-flex; align-items:center; gap:4px; height:24px; padding:0 10px; border-radius:999px; border:1px solid var(--border-primary,#B8CCCC); color:var(--text-secondary,#617C7C); font:600 14px/1 var(--font-text,sans-serif);">—</span>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">RiskMetric</h3>
+          <p class="card__desc">Рейтинг и зона проблемности контрагента: Chip (ReadOnly, S) + иконка-информер, раскрывающая Popover с деталями расчёта.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">RiskMetric.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/SnackBar.html">
+        <div class="card__preview">
+          <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:240px;">
+            <div class="snack snack--error" style="width:100%;pointer-events:none;">
+              <span class="snack__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+              <div class="snack__body"><div class="snack__title">Ошибка</div><div class="snack__text">Плановая дата просрочена.</div></div>
+              <button class="snack__close" tabindex="-1" aria-hidden="true"><i data-icon="close"></i></button>
+            </div>
+            <div class="snack snack--warning" style="width:100%;pointer-events:none;">
+              <span class="snack__icon" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
+              <div class="snack__body"><div class="snack__title">Внимание</div></div>
+              <button class="snack__close" tabindex="-1" aria-hidden="true"><i data-icon="close"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">SnackBar</h3>
+          <p class="card__desc">Стек уведомлений (Info · Warning · Error · Success) в правом верхнем углу, поверх всех слоёв. Дедупликация, авто-скрытие, overflow «+N».</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">SnackBar.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/Table.html">
+        <div class="card__preview">
+          <div style="display:flex;flex-direction:column;width:100%;max-width:280px;border:1px solid var(--border-light,#E1EDE7);border-radius:10px;overflow:hidden;font:400 11px/1 var(--font-text,sans-serif);">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--border-light,#E1EDE7);background:var(--bg-tile,#F7FAF9);">
+              <span style="font:600 12px/1 var(--font-display,sans-serif);color:var(--text-primary,#12312a);">Заявки</span>
+              <span style="width:44px;height:16px;border-radius:8px;background:var(--primary-bg,#E3F3EC);"></span>
+            </div>
+            <div style="display:flex;flex-direction:column;">
+              <div style="display:flex;gap:6px;padding:6px 10px;border-bottom:1px solid var(--border-light,#E1EDE7);background:var(--bg-tile,#F7FAF9);color:var(--text-inactive,#7c8f89);"><span style="flex:2;">Контрагент</span><span style="flex:1;">Сумма</span></div>
+              <div style="display:flex;gap:6px;padding:6px 10px;border-bottom:1px solid var(--border-light,#E1EDE7);"><span style="flex:2;">ООО «ЮгСтрой»</span><span style="flex:1;">1 240 500</span></div>
+              <div style="display:flex;gap:6px;padding:6px 10px;"><span style="flex:2;">АО «Ресурс»</span><span style="flex:1;">860 000</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Table</h3>
+          <p class="card__desc">Контейнер таблицы: Toolbar + прокручиваемое тело с липкой шапкой + Footer (Pagination). Строки — TableCell, массовые действия — Pagination bulk. Состояния Loading/Empty.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">Table.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/TableCell.html">
+        <div class="card__preview">
+          <div style="display:flex; flex-direction:column; width:100%; max-width:280px; border:1px solid var(--border-light,#E1EDE7); border-radius:10px; overflow:hidden; font:400 13px/1 var(--font-text,sans-serif);">
+            <div style="display:grid; grid-template-columns:1.4fr 1fr; background:var(--c-mgrey-50,#fff); border-bottom:1px solid var(--border-primary,#B8CCCC);"><span style="padding:9px 12px; font:600 12px/1.2 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">Контрагент</span><span style="padding:9px 12px; text-align:right; font:600 12px/1.2 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">Сумма ▾</span></div>
+            <div style="display:grid; grid-template-columns:1.4fr 1fr; border-bottom:1px solid var(--border-light,#E1EDE7);"><span style="padding:9px 12px; color:var(--text-primary,#1F2D2A); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ООО ЮгСтрой</span><span style="padding:9px 12px; text-align:right; font-variant-numeric:tabular-nums; color:var(--text-primary,#1F2D2A);">1 240 500</span></div>
+            <div style="display:grid; grid-template-columns:1.4fr 1fr; background:var(--primary-bg,#F0FAF8);"><span style="padding:9px 12px; color:var(--text-primary,#1F2D2A);">ПАО Ростелеком</span><span style="padding:9px 12px; text-align:right; font-variant-numeric:tabular-nums; color:var(--text-primary,#1F2D2A);">986 300</span></div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">TableCell</h3>
+          <p class="card__desc">Ячейка таблицы и шапки (TableHeader): текст, числа, дерево, чипы, контролы, редактируемые поля. 3 плотности, выравнивание, состояния (hover · selected · disabled · error · skeleton), фоны колонок, EditMark.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">TableCell.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/TableFilter.html">
+        <div class="card__preview">
+          <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; width:100%; max-width:300px; font:400 13px/1 var(--font-text,sans-serif);">
+            <span style="display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border:1px solid var(--border-primary,#B8CCCC); border-radius:8px; background:var(--c-mgrey-50,#fff); color:var(--text-primary,#1F2D2A);"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--primary,#12A594)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg>Фильтр</span>
+            <span style="display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 8px; border:1px solid var(--st-system-midlight,#CBD9D9); border-radius:8px; background:var(--st-system-light,#EEF3F3); color:var(--text-primary,#1F2D2A);">ТБ: ЦА, МБ ✕</span>
+            <span style="display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 8px; border:1px solid var(--st-system-midlight,#CBD9D9); border-radius:8px; background:var(--st-system-light,#EEF3F3); color:var(--text-primary,#1F2D2A);">Дески: RE ✕</span>
+            <span style="color:var(--text-inactive,#8A9E9E);">+3</span>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">TableFilter</h3>
+          <p class="card__desc">Панель фильтра над таблицей: кнопка «Фильтр» открывает модалку с параметрами, применённые параметры возвращаются чипами со снятием по одному и сбросом всех. Переполнение сворачивается в «+N» и разворачивается по шеврону; сохранённые фильтры-пресеты.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">TableFilter.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="card" href="pages/organisms/Tile.html">
+        <div class="card__preview">
+          <div style="display:flex; flex-direction:column; width:100%; max-width:280px; background:var(--c-mgrey-50,#fff); border:1px solid var(--border-light,#E1EDE7); border-radius:8px; overflow:hidden; font:400 13px/1 var(--font-text,sans-serif);">
+            <div style="display:flex; align-items:flex-start; gap:10px; padding:14px 16px 0;"><div style="flex:1;"><div style="font:600 15px/1.2 var(--font-display,sans-serif); color:var(--text-primary,#1F2D2A);">Проектное финансирование</div><div style="margin-top:6px; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">Нерезидент</div></div><span style="color:var(--text-inactive,#9DB1B1);">✎</span></div>
+            <div style="padding:12px 16px 16px; display:grid; grid-template-columns:1fr 1fr; gap:14px;"><div><div style="font:400 10px/1.2 var(--font-text,sans-serif); color:var(--text-inactive,#9DB1B1);">Объём, млн ед.</div><div style="margin-top:2px; font:600 14px/1.2 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">17 560</div></div><div><div style="font:400 10px/1.2 var(--font-text,sans-serif); color:var(--text-inactive,#9DB1B1);">Маржа, %</div><div style="margin-top:2px; font:600 14px/1.2 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">3</div></div></div>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Tile</h3>
+          <p class="card__desc">Основная плашка рабочей области: TileHeader (M) + контентная область. Варианты AccordionTile и TileHeadless, опц. Alert-слот. Собственных состояний нет; ширина — 3–12 колонок, отступы 10/20/24/20.</p>
+          <div class="card__meta"><span class="tag">Организмы</span><span class="tag file">Tile.html</span></div>
+          <span class="card__go">Открыть компонент <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+    
+    </div>
+  </section>
+
+  <!-- PATTERNS -->
+  <section class="sec" data-screen-label="Patterns">
+    <div class="sec-head"><h2>Правила и паттерны</h2><span class="n">1 раздел</span></div>
+    <p style="font:var(--type-body-m);color:var(--text-secondary);margin:-12px 0 24px;max-width:760px">Правила, которые действуют поверх компонентов: как собираются локальные компоненты продукта, как они описываются и связываются между собой.</p>
+    <div class="grid">
+      <a class="card" href="pages/patterns/LocalComponents.html">
+        <div class="card__preview">
+          <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/></svg></span>
+            <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Правила · продукт</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">Паспорт и состояния</span></span>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Локальные компоненты</h3>
+          <p class="card__desc">Минимум, обязательный для компонента продукта: паспорт, состояния данных и прав, обязательность заполнения, связанные артефакты, зависимости.</p>
+          <div class="card__meta"><span class="tag">Правила</span><span class="tag file">LocalComponents.html</span></div>
+          <span class="card__go">Открыть страницу <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- RND -->
+  <section class="sec" data-screen-label="RND">
+    <div class="sec-head"><h2>RND</h2><span class="n">1 раздел</span></div>
+    <p style="font:var(--type-body-m);color:var(--text-secondary);margin:-12px 0 24px;max-width:760px">Рабочая память дизайн-системы: задачи на потом. Не часть поставляемой ДС — материал для решений по ней.</p>
+    <div class="grid">
+      <a class="card" href="pages/rnd/Backlog.html">
+        <div class="card__preview">
+          <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6M9 16h6"/></svg></span>
+            <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Рабочая память</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">Задачи</span></span>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Общий бэклог</h3>
+          <p class="card__desc">Задачи на потом для всей дизайн-системы — то, что не относится к одному компоненту и не делается прямо сейчас.</p>
+          <div class="card__meta"><span class="tag">RND</span><span class="tag file">Backlog.html</span></div>
+          <span class="card__go">Открыть страницу <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- SCREENS -->
+  <section class="sec" data-screen-label="Screens">
+    <div class="sec-head"><h2>Примеры экранов</h2><span class="n">1 экран</span></div>
+    <p style="font:var(--type-body-m);color:var(--text-secondary);margin:-12px 0 24px;max-width:760px">Тест сборки целого экрана из компонентов и токенов ДС — проверка того, что компонент отдаёт наружу, а не образец продуктового паттерна.</p>
+    <div class="grid">
+      <a class="card" href="pages/screens/DealCard.html">
+        <div class="card__preview">
+          <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/><rect x="3" y="14" width="7" height="6" rx="1"/></svg></span>
+            <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Экран · Сделка</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">Карточка сделки</span></span>
+          </div>
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">Карточка сделки</h3>
+          <p class="card__desc">Общая информация, продукты ДИД, финансовые инструменты и метрики сделки — собрано из Tile, ReadOnlyField, Chip, AllocationBar, NavPanel и других компонентов ДС.</p>
+          <div class="card__meta"><span class="tag">Экраны</span><span class="tag file">DealCard.html</span></div>
+          <span class="card__go">Открыть экран <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Дизайн-система · Обзор</span>
+  </footer>
+</main>
+
+<script src="scripts/icons-data.js"></script>
+<script>
+  // hero stripe — representative tokens
+  const stripeTokens = ['--primary','--primary-dark','--secondary','--tertiary','--success','--warning','--error','--info','--text-primary','--border-primary'];
+  document.getElementById('stripe').innerHTML =
+    stripeTokens.map(t=>`<span style="background:var(${t})"></span>`).join('');
+
+  // colors preview swatches
+  const pv = ['--primary','--secondary','--success','--warning','--error','--info','--st-dpurple'];
+  document.getElementById('pvColors').innerHTML =
+    pv.map(t=>`<span style="background:var(${t})"></span>`).join('');
+
+  // radius preview
+  (function(){
+    const host=document.getElementById('pvRadius'); if(!host) return;
+    ['--radius-xs','--radius-m','--radius-xl','--radius-3xl'].forEach(t=>{
+      const s=document.createElement('span'); s.style.borderRadius='var('+t+')'; host.appendChild(s);
+    });
+  })();
+
+  // icons preview
+  (function(){
+    const host = document.getElementById('pvIcons'); if(!host) return;
+    const I = window.DS_ICONS || {};
+    ['search','edit','settings','download','activity-heart','star','trash','filter'].forEach(n=>{
+      if(!I[n]) return;
+      const s=document.createElement('span'); s.innerHTML=I[n]; host.appendChild(s);
+    });
+  })();
+
+  // icon-button preview
+  (function(){
+    const host = document.getElementById('pvIbtn'); if(!host) return;
+    const L = window.DS_ICONS || {};
+    const ic = n => L[n] || '';
+    function ib(tone, icon, extra){
+      return '<button class="ibtn ibtn--'+tone+' ibtn--l'+(extra||'')+'" type="button" tabindex="-1" aria-label="'+icon+'">'+ic(icon)+'</button>';
+    }
+    host.style.gap = '10px';
+    host.innerHTML =
+      ib('neutral','edit') +
+      ib('primary','star',' ibtn--selected') +
+      ib('neutral','more-dots') +
+      ib('danger','trash');
+  })();
+
+  // link preview
+  (function(){
+    const host = document.getElementById('pvLink'); if(!host) return;
+    const L = window.DS_ICONS || {};
+    const ic = n => L[n] || '';
+    host.innerHTML =
+      '<a class="link link--accent link--m" href="#" tabindex="-1">Перейти к документу</a>' +
+      '<a class="link link--accent link--m link--with-icon" href="#" tabindex="-1"><span >Открыть в реестре</span><span class="link__icon">'+ic('link-external')+'</span></a>' +
+      '<span style="font:var(--type-body-s); color:var(--text-inactive); display:flex; align-items:center; gap:6px;"><a class="link link--muted link--m" href="#" tabindex="-1">Сделки</a><span style="color:var(--text-inactive)">›</span><span style="color:var(--text-primary); font-weight:600;">Договор</span></span>';
+    host.querySelectorAll('a').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
+  })();
+
+  // checkbox preview
+  const CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+  const MIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 12h12"/></svg>';
+  function cb(state,label){
+    const mark = state==='selected'?CHK : state==='indeterminate'?MIN : '';
+    return `<span class="cb cb--${state}" style="pointer-events:none;"><span class="cb__box"><span class="cb__mark">${mark}</span></span><span class="cb__content"><span class="cb__label">${label}</span></span></span>`;
+  }
+  document.getElementById('pvCb').innerHTML =
+    cb('selected','Выбран') + cb('unselected','Не выбран') + cb('indeterminate','Частично');
+
+  // radiobutton preview
+  function rbIcon(state){
+    const raw = (window.DS_ICONS||{})[state==='selected' ? 'radio-button-checked' : 'radio-button-unchecked'] || '';
+    return raw.replace(/fill="(?!none)[^"]*"/g, 'fill="currentColor"');
+  }
+  function rb(state,label){
+    return `<span class="rb rb--${state}" style="pointer-events:none;"><span class="rb__box"><span class="rb__mark">${rbIcon(state)}</span></span><span class="rb__content"><span class="rb__label">${label}</span></span></span>`;
+  }
+  document.getElementById('pvRb').innerHTML =
+    rb('selected','Выбран') + rb('unselected','Вариант 2') + rb('unselected','Вариант 3');
+
+  // switch preview
+  function sw(state,label){
+    return `<span class="sw sw--${state}" style="pointer-events:none;"><span class="sw__control"><span class="sw__thumb"></span></span><span class="sw__content"><span class="sw__label">${label}</span></span></span>`;
+  }
+  document.getElementById('pvSw').innerHTML =
+    sw('on','Включено') + sw('off','Выключено');
+
+  // badge preview
+  document.getElementById('pvBadge').innerHTML =
+    '<span class="badge badge--m badge--accent">9</span>' +
+    '<span class="badge badge--m badge--neutral">99+</span>' +
+    '<span class="badge badge--dot badge--success"></span>' +
+    '<span class="badge badge--dot badge--error"></span>';
+
+  // chip preview
+  (function(){
+    const host = document.getElementById('pvChip'); if(!host) return;
+    const X = '<span class="chip__remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>';
+    host.innerHTML =
+      '<span class="chip chip--edit chip--m"><span class="chip__label">Text</span>'+X+'</span>' +
+      '<span class="chip chip--edit chip--outline chip--m"><span class="chip__label">Text</span>'+X+'</span>' +
+      '<span class="chip chip--edit chip--m chip--success"><span class="chip__label">Активна</span></span>' +
+      '<span class="chip chip--edit chip--m chip--rounded"><span class="chip__label">Rounded</span>'+X+'</span>';
+  })();
+
+  // tooltip preview
+  function tip(type,placement,align,txt){
+    return '<span class="tip tip--'+type+' tip--'+placement+' tip--'+align+'">'+txt+'<span class="tip__arrow"></span></span>';
+  }
+  document.getElementById('pvTip').innerHTML =
+    tip('main','bottom','center','Подсказка') + tip('error','bottom','center','Ошибка');
+
+  // avatar preview
+  function av(shape,content,txt){
+    const inner = content==='icon'
+      ? '<span class="av__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>'
+      : '<span class="av__text">'+txt+'</span>';
+    return '<span class="av av--'+shape+' av--l'+(content==='icon'?' av--accent':'')+'">'+inner+'</span>';
+  }
+  // divider preview
+  document.getElementById('pvDvd').innerHTML =
+    '<span style="font:var(--type-body-m); color:var(--text-primary);">Раздел A</span>' +
+    '<div style="height:14px;"></div>' +
+    '<hr class="dvd dvd--h">' +
+    '<div class="dvd-text" style="margin:14px 0;"><span class="dvd-text__label">или</span></div>' +
+    '<hr class="dvd dvd--h dvd--strong">' +
+    '<div style="height:14px;"></div>' +
+    '<span style="font:var(--type-body-m); color:var(--text-primary);">Раздел B</span>';
+
+  // splitter preview
+  (function(){
+    const host=document.getElementById('pvSpl'); if(!host) return;
+    const a=document.createElement('div'); a.style.cssText='flex:0 0 46%; background:var(--tertiary-light);';
+    const b=document.createElement('div'); b.style.cssText='flex:1 1 auto; background:var(--bg-tile);';
+    const s=document.createElement('div'); s.className='spl spl--hover';
+    const g=document.createElement('span'); g.className='spl__grip';
+    for(let i=0;i<6;i++) g.appendChild(document.createElement('i'));
+    s.appendChild(g);
+    host.appendChild(a); host.appendChild(s); host.appendChild(b);
+  })();
+
+  // tab preview
+  (function(){
+    const host=document.getElementById('pvTab'); if(!host) return;
+    const g=document.createElement('div'); g.className='tabs tabs--horiz';
+    const items=[['Обзор',true,null],['Продукты',false,'12'],['История',false,null]];
+    items.forEach(([txt,sel,bdg])=>{
+      const t=document.createElement('span'); t.className='tab tab--m tab--horiz'+(sel?' tab--selected':'');
+      const l=document.createElement('span'); l.className='tab__label'; l.textContent=txt; t.appendChild(l);
+      if(bdg){ const b=document.createElement('span'); b.className='tab__badge'; b.textContent=bdg; t.appendChild(b); }
+      g.appendChild(t);
+    });
+    host.appendChild(g);
+  })();
+
+  // segment control preview
+  (function(){
+    const host=document.getElementById('pvSeg'); if(!host) return;
+    const g=document.createElement('div'); g.className='segctrl';
+    const thumb=document.createElement('div'); thumb.className='segctrl__thumb'; g.appendChild(thumb);
+    const items=[['Неделя',false],['Месяц',true],['Год',false]];
+    items.forEach(([txt,sel])=>{
+      const b=document.createElement('span'); b.className='segctrl__item';
+      b.setAttribute('aria-checked', String(sel));
+      const l=document.createElement('span'); l.className='segctrl__label'; l.textContent=txt; b.appendChild(l);
+      g.appendChild(b);
+    });
+    host.appendChild(g);
+    requestAnimationFrame(()=>{
+      const sel=g.querySelector('.segctrl__item[aria-checked="true"]');
+      if(sel){ thumb.style.width=sel.offsetWidth+'px'; thumb.style.transform='translateX('+sel.offsetLeft+'px)'; thumb.classList.add('is-visible'); }
+    });
+  })();
+
+  // alert preview
+  (function(){
+    const host = document.getElementById('pvAlert'); if(!host) return;
+    const dot = c => '<span class="alert__icon" aria-hidden="true"><span style="width:14px;height:14px;border-radius:50%;background:var('+c+');display:block"></span></span>';
+    host.innerHTML =
+      '<div class="alert alert--info alert--m">'+dot('--info')+'<div class="alert__body"><p class="alert__title">Заголовок компонента</p></div></div>' +
+      '<div class="alert alert--error alert--m">'+dot('--error')+'<div class="alert__body"><p class="alert__title">Заголовок компонента</p></div></div>' +
+      '<div class="alert alert--success alert--m">'+dot('--success')+'<div class="alert__body"><p class="alert__title">Заголовок компонента</p></div></div>';
+  })();
+
+  // label/helper preview
+  (function(){
+    const host = document.getElementById('pvLH'); if(!host) return;
+    host.innerHTML =
+      '<span class="ds-label"><span class="ds-label__text">Label</span></span>' +
+      '<span class="ds-helper ds-helper--left">Helper</span>';
+    host.style.flexDirection = 'column';
+    host.style.gap = '10px';
+  })();
+
+  // toast preview
+  (function(){
+    const host=document.getElementById('pvToast'); if(!host) return;
+    const L=window.DS_ICONS||{};
+    const t1=document.createElement('div'); t1.className='toast'; t1.style.boxShadow='none';
+    t1.innerHTML='<span class="toast__lead"><span class="spin spin--current" aria-hidden="true"></span></span><span class="toast__msg">Выполняется маршрутизация</span>';
+    const t2=document.createElement('div'); t2.className='toast toast--success'; t2.style.boxShadow='none';
+    t2.innerHTML='<span class="toast__lead"><span class="toast__icon" aria-hidden="true">'+(L['check-circle']||'')+'</span></span><span class="toast__msg">Процесс запущен</span>';
+    host.appendChild(t1); host.appendChild(t2);
+  })();
+
+  document.getElementById('pvAvatar').innerHTML =
+    '<span class="av-group av-group--l">' +
+      av('circular','text','ИБ') + av('circular','text','ВБ') + av('circular','text','МА') +
+      '<span class="av-group__more">+3</span>' +
+    '</span>' +
+    av('rounded','icon','');
+</script>
+<script src="scripts/ds-nav.js"></script>
+<script>
+  // pagination preview
+  (function(){
+    const host=document.getElementById('pvPgn'); if(!host) return;
+    const L = window.DS_ICONS || {};
+    const chevL = L['chevron-left'] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
+    const chevR = L['chevron-right'] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+    const nav=document.createElement('div');
+    nav.style.cssText='display:flex; align-items:center; justify-content:center; gap:2px;';
+    function btn(html, current){
+      const b=document.createElement('span');
+      b.style.cssText='width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; font:13px/1 var(--font-text,sans-serif); color:'+(current?'var(--text-primary)':'var(--text-secondary)')+'; background:'+(current?'var(--bgtable-row-focus)':'transparent')+';';
+      if (typeof html === 'string' && html.length <= 2) b.textContent = html; else b.innerHTML = html;
+      if (typeof html !== 'string' || html.length > 2) { b.querySelector('svg').style.cssText='width:16px;height:16px;'; }
+      return b;
+    }
+    nav.appendChild(btn(chevL));
+    ['1','2'].forEach(n=>nav.appendChild(btn(n)));
+    nav.appendChild(btn('3', true));
+    ['4'].forEach(n=>nav.appendChild(btn(n)));
+    const dots=document.createElement('span'); dots.textContent='\u2026'; dots.style.cssText='width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; color:var(--text-inactive); font-size:13px;'; nav.appendChild(dots);
+    nav.appendChild(btn('12'));
+    nav.appendChild(btn(chevR));
+    host.appendChild(nav);
+  })();
+
+  // modal preview — miniature Modal_Top/Modal_Bottom mockup
+  (function(){
+    const host=document.getElementById('pvModal'); if(!host) return;
+    const card=document.createElement('div');
+    card.style.cssText='width:100%; max-width:220px; background:var(--bg-tile); border-radius:14px; box-shadow:0 10px 24px rgba(40,50,55,.14); overflow:hidden;';
+    card.innerHTML =
+      '<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; border-bottom:1px solid var(--border-light);">' +
+        '<span style="font:12px/1.2 var(--font-display,sans-serif); font-weight:600; color:var(--text-primary);">Новая сделка</span>' +
+        '<span style="width:14px; height:14px; color:var(--text-inactive); flex:none;">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>' +
+        '</span>' +
+      '</div>' +
+      '<div style="padding:14px; display:flex; flex-direction:column; gap:6px;">' +
+        '<span style="height:8px; width:70%; border-radius:4px; background:var(--st-disabled-midlight);"></span>' +
+        '<span style="height:8px; width:45%; border-radius:4px; background:var(--st-disabled-light);"></span>' +
+      '</div>' +
+      '<div style="display:flex; align-items:center; justify-content:flex-end; gap:6px; padding:12px 14px; border-top:1px solid var(--border-light);">' +
+        '<span style="font:600 11px/1 var(--font-screen,sans-serif); color:#fff; background:var(--primary); padding:6px 10px; border-radius:6px;">Сохранить</span>' +
+      '</div>';
+    host.appendChild(card);
+  })();
+
+  // popover preview — miniature trigger + Header/Body/Footer mockup
+  (function(){
+    const host=document.getElementById('pvPopover'); if(!host) return;
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex; flex-direction:column; align-items:center; gap:10px;';
+    wrap.innerHTML =
+      '<span style="height:32px; padding:0 14px; display:inline-flex; align-items:center; border:1px solid var(--border-primary); border-radius:8px; font:12px/1 var(--font-text,sans-serif); color:var(--text-primary); background:var(--bg-tile);">Фильтр</span>' +
+      '<div style="width:100%; max-width:200px; background:var(--bg-tile); border:1px solid var(--border-light); border-radius:12px; box-shadow:0 10px 24px rgba(40,50,55,.14); overflow:hidden;">' +
+        '<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 12px; border-bottom:1px solid var(--border-light);">' +
+          '<span style="font:12px/1.2 var(--font-text,sans-serif); font-weight:600; color:var(--text-primary);">Заголовок</span>' +
+          '<span style="width:12px; height:12px; color:var(--text-inactive); flex:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>' +
+        '</div>' +
+        '<div style="padding:12px; display:flex; flex-direction:column; gap:6px;">' +
+          '<span style="height:7px; width:80%; border-radius:4px; background:var(--st-disabled-midlight);"></span>' +
+          '<span style="height:7px; width:55%; border-radius:4px; background:var(--st-disabled-light);"></span>' +
+        '</div>' +
+        '<div style="display:flex; align-items:center; justify-content:flex-end; gap:6px; padding:10px 12px; border-top:1px solid var(--border-light);">' +
+          '<span style="font:600 10px/1 var(--font-screen,sans-serif); color:#fff; background:var(--primary); padding:5px 9px; border-radius:6px;">Применить</span>' +
+        '</div>' +
+      '</div>';
+    host.appendChild(wrap);
+  })();
+
+  // progress bar preview
+  (function(){
+    const host=document.getElementById('pvPbar'); if(!host) return;
+    function bar(tone,val){
+      return '<div class="pbar pbar--'+tone+'" style="pointer-events:none;">' +
+        '<div class="pbar__track"><div class="pbar__fill" style="width:'+val+'%;"></div></div></div>';
+    }
+    host.innerHTML = bar('accent',65) + bar('success',90) + bar('warning',45) + bar('error',20);
+  })();
+
+  // skeleton preview
+  (function(){
+    const host=document.getElementById('pvSkel'); if(!host) return;
+    host.innerHTML = '<span class="sk-block sk-block--circle" style="--sk-w:40px;--sk-h:40px"></span>' +
+      '<div class="sk-group" style="flex:1"><span class="sk-line sk-line--title" style="--sk-w:60%"></span><span class="sk-line" style="--sk-w:85%"></span></div>';
+  })();
+
+  // spinner preview
+  (function(){
+    const host=document.getElementById('pvSpin'); if(!host) return;
+    function ring(tone,size){ return '<span class="spin spin--'+size+' spin--'+tone+'" style="pointer-events:none;"></span>'; }
+    host.innerHTML = ring('accent','l') + ring('success','m') + ring('warning','m') + ring('error','s');
+  })();
+
+</script>
+</body>
+</html>

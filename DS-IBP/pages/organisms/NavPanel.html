@@ -1,0 +1,814 @@
+<!-- @dsCard group="Components" name="NavPanel" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NavPanel — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/avatar.css">
+<link rel="stylesheet" href="../../styles/nav-panel.css">
+<link rel="stylesheet" href="../../styles/context-menu.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  a { color: var(--link); }
+  a:hover { color: var(--link-dark); }
+
+  
+
+  
+
+  
+  
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:76ch; text-wrap:pretty; }
+
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:40px; }
+
+  
+
+  
+
+/* ---------- playground: демо — в верхнюю панель, контролы — во вкладку «Конструктор» ---------- */
+.pg__stage { flex:1; min-height:0; width:100%; padding:32px; position:relative; overflow:auto; background: var(--bg-page); }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+  .toggle { display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .toggle input { position:absolute; opacity:0; width:0; height:0; }
+  .toggle__track { width:38px; height:22px; border-radius:999px; background:var(--st-disabled-midlight, #c9d2d2); position:relative; transition:background-color .15s; flex:none; }
+  .toggle__track::after { content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--bg-tile); transition:transform .15s; box-shadow:var(--elevation-1); }
+  .toggle input:checked + .toggle__track { background:var(--primary); }
+  .toggle input:checked + .toggle__track::after { transform:translateX(16px); }
+  .toggle input:focus-visible + .toggle__track { outline:2px solid var(--primary); outline-offset:2px; }
+  .toggle__label { font: var(--type-body-m); color: var(--text-primary); }
+
+  /* ---------- nav frame ---------- */
+  .nav-frame { display:inline-flex; align-items:stretch; }
+  .nav-frame .nav { height:100%; }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(280px,340px) minmax(260px,1fr); gap:44px; align-items:flex-start; }
+  @media (max-width:820px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:28px; display:flex; justify-content:center; overflow:auto; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+  /* ---------- modes ---------- */
+  .modes { display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start; }
+  .mode-col { display:flex; flex-direction:column; gap:14px; }
+  .mode-col__cap { max-width:240px; }
+  .mode-col__cap .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+  .mode-col__cap .d { font: var(--type-body-s); color: var(--text-secondary); display:block; margin-top:3px; text-wrap:pretty; }
+
+  /* ---------- element variants ---------- */
+  .vgrid { display:flex; flex-direction:column; gap:16px; }
+  .vrow { display:flex; align-items:flex-start; gap:24px; padding:20px 22px; border:1px solid var(--border-light); border-radius:14px; background: var(--bg-tile); flex-wrap:wrap; }
+  .vrow__cap { flex:none; width:200px; }
+  .vrow__cap .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+  .vrow__cap .d { font: var(--type-body-s); color: var(--text-secondary); display:block; margin-top:3px; text-wrap:pretty; }
+  .vrow__demo { flex:1 1 340px; min-width:0; }
+  .el-pair { display:flex; gap:24px; flex-wrap:wrap; }
+  .el-col { display:flex; flex-direction:column; gap:8px; }
+  .el-tag { font: var(--type-body-xs); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; }
+  .el-demo { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; }
+  .el-demo--rail { width:56px; }
+  .el-demo--drawer { width:260px; }
+  .el-demo .nav { height:auto; width:auto; box-shadow:none; border-radius:0; border-right:none; }
+  .el-demo .nav__top, .el-demo .nav__footer { height:auto; min-height:0; overflow:visible; }
+  .el-demo .nav__list { overflow:visible; scrollbar-gutter:auto; }
+
+  /* ---------- sizes / tables ---------- */
+  .size-table, .dev-table, .ref-table { width:100%; border-collapse:collapse; }
+  .size-table th, .size-table td, .dev-table th, .dev-table td, .ref-table th, .ref-table td { text-align:left; padding:13px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:top; }
+  .size-table th, .dev-table th, .ref-table th { font: var(--type-body-s-strong); color: var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; font-size:12px; }
+  .size-table tr:last-child td, .dev-table tr:last-child td, .ref-table tr:last-child td { border-bottom:none; }
+  .size-table td.num, .dev-table td.rt-num { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+  kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; color: var(--text-primary); background: var(--bgtable-row-focus); border:1px solid var(--border-primary); border-radius:var(--radius-xs); padding:1px 7px; }
+
+  /* ---------- states ---------- */
+  .states { display:grid; grid-template-columns: repeat(2, 1fr); gap:22px; }
+  @media (max-width:760px){ .states { grid-template-columns: 1fr; } }
+  .state-cell { display:flex; flex-direction:column; gap:12px; align-items:flex-start; padding:20px 22px; border:1px solid var(--border-light); border-radius:14px; background: var(--bg-tile); }
+  .state-desc { font: var(--type-body-s); color: var(--text-inactive); text-wrap:pretty; }
+  /* демонстрация hover (нельзя навести программно) */
+  .state-cell .nav__item.is-hover { background: var(--bgtable-row-hover); color: var(--text-primary); }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:16px 20px 22px; font: var(--type-body-m); color: var(--text-primary); }
+  .guide-card__cap { padding:0 20px 20px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- colors ---------- */
+  
+  @media (max-width:900px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- developer handoff ---------- */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+
+  .backlog { margin-top:90px; }
+  .backlog > h2 { font: var(--type-h4-strong); margin:0 0 8px; color: var(--text-primary); }
+  .backlog > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 24px; max-width:76ch; }
+
+  /* ---------- RND: вложенные разделы (эксперимент; удалить после утверждения) ---------- */
+  .rnd { display:grid; grid-template-columns:repeat(2, minmax(280px, 1fr)); gap:28px; align-items:flex-start; }
+  @media (max-width:820px){ .rnd { grid-template-columns:1fr; } }
+  .rnd-col { display:flex; flex-direction:column; gap:14px; min-width:0; }
+  .rnd-cap .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+  .rnd-cap .d { font: var(--type-body-s); color: var(--text-secondary); display:block; margin-top:3px; text-wrap:pretty; }
+  .rnd-stage { position:relative; border:1px solid var(--border-light); border-radius:14px; background: var(--bg-tile); padding:20px; display:flex; justify-content:center; align-items:flex-start; }
+
+  /* родительский пункт — тот же <a class="nav__item …">, что и обычные пункты;
+     каретка раскрытия. У под-пунктов глифов-иконок нет. Состояние родителя
+     (nav__item--selected) красит сам компонент — страничный CSS его не трогает */
+  .nav__caret { flex:none; width:16px; height:16px; display:flex; align-items:center; justify-content:center; color:var(--text-inactive); transition:transform .15s ease; }
+  .nav__caret :is(svg,[data-icon]){ width:16px; height:16px; }
+  /* аккордеон: каретка крутится при раскрытии; у флайаута (chevron-right) — статична */
+  .nav__item--acc[aria-expanded="true"] .nav__caret { transform:rotate(180deg); color:var(--text-secondary); }
+
+  /* вариант A — аккордеон: под-список раскрывается в потоке (grid 0fr→1fr);
+     индент под-пунктов — под текст родителя (12 отступ + 24 иконка + 12 зазор) */
+  .nav__sub { display:grid; grid-template-rows:0fr; transition:grid-template-rows .2s ease; }
+  .nav__sub > .nav__sub-in { overflow:hidden; min-height:0; display:flex; flex-direction:column; gap:2px; }
+  .nav__item--acc[aria-expanded="true"] + .nav__sub { grid-template-rows:1fr; }
+  .nav__sub .nav__item { padding-left:48px; }
+
+  /* вариант B — флайаут: меню (ContextMenu) лежит снаружи .nav (прямой ребёнок
+     .rnd-stage), позиционирует bindFlyout(); в rail каретка и под-список скрыты */
+  .nav--rail .nav__caret { display:none; }
+  .nav--rail .nav__sub { display:none; }
+  
+</style>
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="NavPanel">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage" id="pg-stage"></div>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.010</b></span><span>Обновлено: <b>01.09.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Организмы</p>
+    <h1>NavPanel · Панель навигации</h1>
+    <p class="lead">Главная навигация приложения в левой части каждой страницы. Отображает все разделы продукта, сгруппированные по подразделениям и типам. Один компонент — три режима: свёрнутый <b>Rail</b>, развёрнутый-оверлей <b>Drawer</b> и закреплённый <b>Fixed</b>.</p>
+  </header>
+
+  <!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#pg-stage),
+       контролы — во вкладку «Конструктор» нижней панели (см. в конце).
+       Примечание: контролы строит nav-panel.page.js — селект «Режим» и блок
+       «Опции» со свитчерами Switch в одном .ctl; блок остаётся в левой
+       колонке (документированное отклонение, см. отчёт) -->
+
+  <!-- 2. ИСПОЛЬЗОВАНИЕ -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">NavPanel — точка входа во все разделы продукта. Живёт в левой части лайаута на каждой странице, показывает главные страницы по разделам и подсвечивает текущую. Свёрнута по умолчанию (Rail), разворачивается в Drawer поверх контента или закрепляется как Fixed-панель.</p>
+    <div class="panel">
+      <p class="desc tight" style="margin-bottom:14px;">Когда использовать</p>
+      <ul class="bullets">
+        <li>основная навигация по разделам всего приложения;</li>
+        <li>разделов много, они делятся на смысловые блоки;</li>
+        <li>нужен быстрый доступ к профилю и выходу из системы.</li>
+      </ul>
+    </div>
+
+    <div class="subsec" data-screen-label="Guidelines">
+      <h3>Рекомендации</h3>
+      <div class="guide">
+        <div class="guide-card good">
+          <div class="guide-card__bar"></div>
+          <div class="guide-card__tag"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Так</div>
+          <div class="guide-card__body">Разделы сгруппированы в блоки с заголовком (Origination, Pipeline, Отчеты). Заголовок блока виден в Drawer/Fixed и заменяется короткой чертой в Rail.</div>
+          <p class="guide-card__cap">Блоки помогают ориентироваться в длинном списке из десятков пунктов.</p>
+        </div>
+        <div class="guide-card bad">
+          <div class="guide-card__bar"></div>
+          <div class="guide-card__tag"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>Не так</div>
+          <div class="guide-card__body">Все пункты одним сплошным списком без блоков и заголовков — пользователь теряется среди 30 строк.</div>
+          <p class="guide-card__cap">Без группировки Rail превращается в неразличимую колонку иконок.</p>
+        </div>
+        <div class="guide-card good">
+          <div class="guide-card__bar"></div>
+          <div class="guide-card__tag"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Так</div>
+          <div class="guide-card__body">Счётчик сущностей — компонент Badge (accent) справа от подписи; в Rail он уходит на угол иконки.</div>
+          <p class="guide-card__cap">Badge опционален и нужен только там, где число реально помогает.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Сверху — бургер (и пин в развёрнутых режимах). Ниже — прокручиваемый список: пункт «Главная», блоки-секции с заголовками и пунктами меню. Внизу закреплён футер с профилем пользователя и выходом.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage" id="anat-stage"></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Burger</span><span class="d"> — IconButton (глиф left-menu), сворачивает/разворачивает панель</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Pin / Unpin</span><span class="d"> — закрепляет панель в режиме Fixed (только Drawer/Fixed)</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Navigation_Item</span><span class="d"> — пункт меню: иконка + подпись, опц. Badge</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Navigation-block</span><span class="d"> — блок разделов с заголовком-секцией</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Заголовок блока</span><span class="d"> — метка подраздела (в Rail — короткая черта)</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Footer</span><span class="d"> — Avatar + профиль + IconButton выхода</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Две оси конфигурации: режим отображения панели и набор элементов, из которых она собрана.</p>
+
+    <div class="subsec" data-screen-label="Modes">
+      <h3>Режимы отображения</h3>
+      <p class="desc">Rail (свёрнут), Drawer (развёрнут-оверлей с тенью) и Fixed (закреплён, шов справа). Переключение — бургером; закрепление — кнопкой пина.</p>
+      <div class="panel"><div class="modes" id="variants-modes"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Elements">
+      <h3>Элементы панели</h3>
+      <p class="desc">Каждый элемент существует в двух обликах — Rail и Drawer.</p>
+      <div class="vgrid" id="variants-el"></div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc tight">Ширина зависит от режима; высота пункта фиксирована во всех режимах. Значения измерены на живом экземпляре.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.68fr 0.81fr 0.95fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Класс</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Комментарий</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="size-table"></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус пункта одинаков во всех режимах панели — Rail, Drawer, Fixed.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт меню</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-m</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Drawer — правые углы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">10 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-l</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Drawer — левые углы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Правила подписей, иконографики и переполнения:</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Подпись пункта</b> — короткое существительное или название раздела; длинная подпись усекается многоточием, полный текст — тултипом (в Rail подпись всегда во всплывающем тултипе).</li>
+        <li><b>Иконка</b> — глиф 24×24 из раздела <a class="inl" href="../foundations/Icons.html">Icons</a> (Menu). У каждого пункта своя иконка — именно она опознаёт раздел в Rail.</li>
+        <li><b>Заголовок блока</b> — название подразделения или типа (Origination, Pipeline, Отчеты); в Rail заменяется короткой чертой-разделителем.</li>
+        <li><b>Badge</b> — только целое число сущностей; опционален. Пустой или декоративный бейдж не допускается.</li>
+        <li><b>Профиль в футере</b> — ФИО (одна строка с усечением), должность и организация с признаком «+N» дополнительных.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BEHAVIOR -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Переключение режимов, тултипы Rail, закрепление и выход.</p>
+
+    <div class="subsec" data-screen-label="RailBehavior">
+      <h3>Rail — свёрнутый режим</h3>
+      <p class="desc">Свёрнутое меню не отбрасывает тень. При наведении на пункт справа от него всплывает тултип с названием. Разворачивание в Drawer — по клику на иконку бургера.</p>
+    </div>
+
+    <div class="subsec" data-screen-label="DrawerBehavior">
+      <h3>Drawer — развёрнутый оверлей</h3>
+      <p class="desc">Развёрнутое меню лежит поверх контента и отбрасывает тень <code class="tok">Shadow4.0_modalform</code>. Сворачивается по клику на бургер или по клику вне области меню. Клик по IconButton выхода деавторизует пользователя.</p>
+    </div>
+
+    <div class="subsec" data-screen-label="FixedBehavior">
+      <h3>Fixed — закреплённая панель</h3>
+      <p class="desc">По клику на кнопку в правом верхнем углу панель закрепляется на странице: контент подстраивается под новую ширину контентной области, иконка в кнопке меняется с <code class="tok">pin-menu</code> на <code class="tok">unpin-menu</code>. Повторный клик открепляет панель и возвращает её в режим Drawer.</p>
+    </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc tight">Состояния пункта меню (.Navigation_Item):</p>
+    <div class="states" id="states-demo"></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Панель — элемент <code class="tok">&lt;nav&gt;</code> с <code class="tok">aria-label="Главное меню"</code>. Текущая страница помечена <code class="tok">aria-current="page"</code>. Кнопки бургера, пина и выхода имеют <code class="tok">aria-label</code>; пин отражает состояние через <code class="tok">aria-pressed</code>. Заблокированный пункт — <code class="tok">aria-disabled="true"</code> и вне таб-порядка.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Клавиатура</p>
+        <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.7fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Tab</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Перемещение по пунктам и кнопкам панели по порядку</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.7fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Enter</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Переход к разделу / нажатие бургера, пина, выхода</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.7fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Esc</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Сворачивает открытый Drawer</span></span></div><div class="tc tc--separator"></div></div></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:18px;">Скрин-ридер</p>
+        <ul class="bullets">
+          <li>значение Badge включается в доступную подпись пункта («Задачи, 7»);</li>
+          <li>тултип Rail дублирует подпись пункта, скрытую визуально;</li>
+          <li>фокус виден кольцом <code class="tok">--primary</code> на пункте;</li>
+          <li>пин объявляет закреплённость через <code class="tok">aria-pressed</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Три текстовых слоя панели на гарнитуре SB Sans Text.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Подпись пункта</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок блока</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Профиль: ФИО</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s-strong)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Профиль: должность / организация</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Тултип Rail</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Только семантические токены. Фон панели — Main Menu; пункты используют табличные состояния строк.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Панель</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон панели</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-mainmenu</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-mainmenu)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FEFEFE</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Панель</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Шов Fixed / разделители</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E1EDE7</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Панель</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Тень Drawer</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--shadow-modal-form</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт меню</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст подписи Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт меню</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст подписи Hover · Selected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт меню</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#B8D6D3</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт меню</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка Hover · Selected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--secondary-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--secondary-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#639994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт меню</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bgtable-row-hover</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bgtable-row-hover)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#F6FAFA</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт меню</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка Selected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bgtable-row-focus</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bgtable-row-focus)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#DEEDEC</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт меню</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст / иконка Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Служебное</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок блока</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Служебное</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Бейдж (accent)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Служебное</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Тултип Rail (фон)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-hint</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-hint)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#283237</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.8fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Служебное</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Тултип Rail (текст)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры и алгоритм поведения режимов. Не привязан к стеку — команда собирает компонент на React, беря отсюда нужное для вёрстки.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре (<code class="tok">getComputedStyle</code>); источник — токены в <code class="tok">styles/nav-panel.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить:</span>
+      <code class="tok">styles/nav-panel.css</code>
+      <code class="tok">styles/icon-button.css</code>
+      <code class="tok">styles/badge.css</code>
+      <code class="tok">styles/avatar.css</code>
+    </div>
+
+    <p class="subhead">Поведение · псевдокод (framework-agnostic)</p>
+    <div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// Состояние: mode ∈ { rail, drawer, fixed }, current (id активного пункта).</span>
+
+<span class="tk-cm">// 1. Бургер:
+//    rail   → drawer  (развернуть оверлей)
+//    drawer → rail    (свернуть)
+//    fixed  → бургер скрыт / не меняет режим (панель закреплена).</span>
+
+<span class="tk-cm">// 2. Пин (только в drawer/fixed):
+//    drawer → fixed  : закрепить, контент ужать под ширину панели,
+//                      иконка pin-menu → unpin-menu, aria-pressed=true
+//    fixed  → drawer : открепить, вернуть оверлей, unpin-menu → pin-menu.</span>
+
+<span class="tk-cm">// 3. Drawer как оверлей:
+//    показывать тень Shadow4.0_modalform;
+//    клик вне области панели ИЛИ Esc → свернуть в rail;
+//    fixed тени не имеет и клик-снаружи не сворачивает.</span>
+
+<span class="tk-cm">// 4. Rail-тултип:
+//    hover/focus пункта → показать всплывающую подпись справа
+//    (в drawer/fixed подпись видна в строке, тултип не нужен).</span>
+
+<span class="tk-cm">// 5. Выбор пункта: клик → навигация, current = id;
+//    рендер: пункт с current → nav__item--selected + aria-current.</span>
+
+<span class="tk-cm">// 6. Выход: клик по logout → деавторизация пользователя.</span></code></pre>
+    </div>
+    <p class="dev-note">Это алгоритм поверх вашего стека, не готовый сниппет. Разметку панели и режимы см. в <code class="tok">nav-panel.page.js</code> (функция <code class="tok">buildNav</code>).</p>
+  </section>
+
+  <!-- RND: экспериментальные варианты «Вложенных разделов» (пункт бэклога).
+       Демо строит nav-panel.page.js (initRnd). После утверждения одного варианта
+       раздел удаляется, вариант вписывается в компонент и документацию. -->
+  <section class="section" data-screen-label="Rnd">
+    <h2>RND</h2>
+    <p class="desc">Экспериментальные варианты «Вложенных разделов» — раскрывающийся под-список у пункта меню для разделов с подстраницами. Два подхода на пункте «Обязательные сделки» (блок Origination): аккордеон (раскрытие в потоке списка) и контекстное меню (вылетает справа от панели). Под-пункты — без иконок. Текущая страница — «Подстраница 2»: в rail подсвечен только родитель, в развёрнутом виде — родитель и подстраница; «Главная» не выделена. Сверните панель бургером, чтобы увидеть поведение в rail. После утверждения один вариант войдёт в компонент, а этот раздел будет удалён.</p>
+    <div class="rnd">
+      <div class="rnd-col">
+        <div class="rnd-cap"><span class="k">Аккордеон</span><span class="d">Под-список раскрывается в потоке и раздвигает пункты ниже; раскрыт по умолчанию. Клик по пункту — свернуть/развернуть; в rail клик по иконке разворачивает панель.</span></div>
+        <div class="rnd-stage" id="rnd-accordion"></div>
+      </div>
+      <div class="rnd-col">
+        <div class="rnd-cap"><span class="k">Контекстное меню</span><span class="d">Под-список вылетает справа от панели компонентом ContextMenu; при большом числе пунктов меню скроллится само. Клик по пункту — открыть/закрыть; в rail меню открывается сразу, без разворота панели; скролл панели закрывает меню.</span></div>
+        <div class="rnd-stage" id="rnd-dropdown"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BACKLOG -->
+  <section class="backlog" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Вложенные разделы</b> — раскрывающийся под-список у пункта (аккордеон) для разделов с подстраницами.</li>
+        <li><b>Поиск по меню</b> — поле поиска над списком при большом числе разделов.</li>
+        <li><b>Избранное / закреплённые</b> — блок часто используемых пунктов наверху списка.</li>
+        <li><b>Состояние загрузки</b> — скелетон пунктов, пока список разделов подгружается.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · NavPanel</span>
+    <span>Rail · Drawer · Fixed · Navigation_Item · Badge · Footer</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Переключите режим панели и опции пунктов. В режиме Rail наведите курсор на пункт — подпись всплывёт тултипом справа. Демо обновляется наверху.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка и исходники NavPanel: HTML — из спеки, CSS — styles/nav-panel.css (полностью), JS — рантайм режимов. Демо страницы строит <code class="tok">scripts/nav-panel.page.js</code>.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-nav-panel.js"></script>
+<script src="../../scripts/nav-panel.page.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html"><nav class="nav nav--drawer" aria-label="Главное меню">
+  <div class="nav__top">
+    <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Свернуть меню"><i data-icon="left-menu"></i></button>
+    <button class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+  </div>
+  <div class="nav__list">
+    <a class="nav__item nav__item--selected" href="#" aria-current="page"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+    <div class="nav__block">
+      <div class="nav__block-label">Origination</div>
+      <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="Important-deals"></i></span><span class="nav__label">Обязательные сделки</span></a>
+      <!-- … пункт с бейджем: -->
+      <a class="nav__item" href="#" aria-label="Задачи, 7"><span class="nav__ico"><i data-icon="tasks"></i></span><span class="nav__label">Задачи</span><span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">7</span></span></a>
+    </div>
+  </div>
+  <div class="nav__footer">
+    <a class="nav__user" href="#" aria-label="Открыть личный кабинет">
+      <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+      <span class="nav__user-text">
+        <span class="nav__user-name">Александров Петр Константинович</span>
+        <span class="nav__user-role">Консультант-аналитик ДИД</span>
+        <span class="nav__user-org">SMB Недвижимость +2</span>
+      </span>
+    </a>
+    <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+  </div>
+</nav>
+<!-- Rail: nav--rail (подписи → тултип, бейдж на угол иконки, футер = только аватар).
+     Fixed: nav--fixed (шов справа, без тени). --></script>
+
+<script type="text/plain" id="src-code-js">/* NavPanel — режимы rail/drawer/fixed оживляет рантайм scripts/ds-nav-panel.js. */
+DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
+
+// Burger: rail→drawer, drawer→rail; в fixed скрыт.
+// Pin (drawer/fixed): drawer→fixed (pin-menu→unpin-menu, aria-pressed=true), fixed→drawer.
+// Drawer-оверлей: тень Shadow4.0_modalform; клик вне области или Esc → rail.
+// Rail-тултип: hover/focus пункта → всплывающая подпись справа.
+// Выбор: клик → навигация, current=id → nav__item--selected + aria-current.
+// Событие: 'ds-nav-mode' на .nav — detail {mode, prev}.
+
+/* React API (предложение): NavPanelProps — mode · items[] {icon, label, badge,
+   disabled} · groups[] · user{name, role, org} · onNavigate(id) · onLogout */</script>
+
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   NavPanel — «Панель навигации» (организм).
+   Левая панель навигации приложения. Три режима одного компонента:
+     .nav--rail   — свёрнутый, только иконки (56px), без тени, тултип по hover;
+     .nav--drawer — развёрнутый-оверлей (272px), тень --shadow-modal-form;
+     .nav--fixed  — закреплённый развёрнутый (272px), без тени, шов справа.
+   Только токены ДС. Иконки — <i data-icon>; бейдж — компонент Badge;
+   аватар — Avatar; бургер/пин/логаут — IconButton.
+   ========================================================================= */
+
+.nav {
+  --nav-rail-w:   56px;
+  --nav-drawer-w: 272px;
+  --nav-item-h:   44px;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-mainmenu);
+  font-family: var(--font-text), system-ui, sans-serif;
+  overflow: hidden;
+}
+.nav *, .nav *::before, .nav *::after { box-sizing: border-box; }
+
+/* ---------- режимы ширины / приподнятости ---------------------------------- */
+.nav--rail   { width: var(--nav-rail-w); }
+.nav--drawer { width: var(--nav-drawer-w); box-shadow: var(--shadow-modal-form); border-radius: 0 var(--radius-l) var(--radius-l) 0; }
+.nav--fixed  { width: var(--nav-drawer-w); border-right: 1px solid var(--border-light); }
+
+/* ---------- хост-интеграция: .nav-layout — обязательная обёртка на реальных экранах -----
+   Оборачивает .nav + контент страницы: <div class="nav-layout"><nav class="nav …">…</nav><main>…</main></div>
+   Из коробки, без CSS/JS на стороне экрана: .nav всегда position:fixed на весь vh (не
+   скроллится со страницей, не участвует в потоке); контент резервирует отступ только
+   под ширину Rail — и в Rail, и в Drawer (Drawer кладётся оверлеем поверх этого отступа,
+   не раздвигая), и увеличивает его до ширины Fixed только когда .nav в режиме nav--fixed. */
+.nav-layout { display: block; min-height: 100vh; }
+.nav-layout > .nav { position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; }
+.nav-layout > *:not(.nav) { margin-left: var(--nav-rail-w, 56px); transition: margin-left .15s ease; }
+.nav-layout:has(.nav--fixed) > *:not(.nav) { margin-left: var(--nav-drawer-w, 272px); }
+
+/* ========================================================================== *
+   TOP — бургер (+ пин в развёрнутых режимах)
+   ========================================================================== */
+/* бургер, пункты и аватар — на одной вертикальной оси.
+   Ось = 28px от левого края панели во ВСЕХ режимах (= центр rail-панели 56/2):
+   иконка пункта      = list 4 + item 12 + 12 = 28
+   бургер (ibtn--m 20) = top 18 + 10 = 28
+   аватар (av--m 32)   = footer 12 + 16 = 28
+   Скроллбар списка — overlay-гаттер только справа, ось слева не смещает. */
+.nav__top,
+.nav__footer { overflow-y: hidden; }
+.nav__top {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 56px;
+  flex: none;
+  padding: 0 12px 0 18px;
+}
+.nav--rail .nav__top { justify-content: center; padding: 0; }
+.nav__pin { margin-left: auto; }
+.nav--rail .nav__pin { display: none; }
+
+/* ========================================================================== *
+   LIST — прокручиваемая область пунктов
+   ========================================================================== */
+.nav__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  padding: 6px 4px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* в Rail скроллбар скрыт полностью (скролл колесом работает),
+   гаттеры не резервируются — иконки центрируются по всей ширине 56px */
+.nav--rail .nav__list {
+  padding: 6px 4px 10px;
+  align-items: center;
+  scrollbar-gutter: auto;
+  scrollbar-width: none;
+}
+.nav--rail .nav__list::-webkit-scrollbar { display: none; }
+
+/* скроллбар виден только при наведении на панель */
+.nav:hover .nav__list { scrollbar-color: var(--border-light) transparent; }
+.nav__list::-webkit-scrollbar { width: 8px; }
+.nav__list::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; transition: background-color .15s ease; }
+.nav:hover .nav__list::-webkit-scrollbar-thumb { background: var(--border-light); }
+
+/* ---------- блок-секция ---------------------------------------------------- */
+.nav__block { display: flex; flex-direction: column; gap: 2px; flex: none; }
+.nav--rail .nav__block { width: 100%; align-items: center; }
+
+.nav__block-label {
+  height: 34px;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 12px 6px;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* в rail заголовок сохраняет ту же высоту (пункты не прыгают), текст скрыт,
+   на его месте — центрированная черта-разделитель */
+.nav--rail .nav__block-label {
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  color: transparent;
+}
+.nav--rail .nav__block-label::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: var(--border-light);
+}
+
+/* ========================================================================== *
+   ITEM — пункт меню (.Navigation_Item)
+   ========================================================================== */
+.nav__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--nav-item-h);
+  flex: none;
+  padding: 0 12px;
+  border-radius: var(--radius-m);
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .12s ease, color .12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav--rail .nav__item { width: 44px; padding: 0; justify-content: center; }
+
+.nav__ico { width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; color: var(--secondary); transition: color .12s ease; }
+.nav__ico :is(svg,[data-icon]){ width: 24px; height: 24px; }
+
+.nav__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font: var(--type-body-m);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav__badge { flex: none; margin-left: 8px; }
+
+/* ---------- состояния пункта ---------------------------------------------- */
+.nav__item:hover { background: var(--bgtable-row-hover); color: var(--text-primary); }
+.nav__item:hover .nav__ico,
+.nav__item:focus-visible .nav__ico { color: var(--secondary-dark); }
+.nav__item:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+
+/* Класс .nav__item--selected/--disabled — форс-состояние витрины; реальный
+   пункт несёт aria-current="page"/aria-disabled="true" (RulesAudit W1). */
+.nav__item--selected,
+.nav__item--selected:hover,
+.nav__item[aria-current]:not([aria-current="false"]),
+.nav__item[aria-current]:not([aria-current="false"]):hover { background: var(--bgtable-row-focus); color: var(--text-primary); }
+.nav__item--selected .nav__label,
+.nav__item[aria-current]:not([aria-current="false"]) .nav__label { font: var(--type-body-m-strong); }
+.nav__item--selected .nav__ico,
+.nav__item[aria-current]:not([aria-current="false"]) .nav__ico { color: var(--secondary-dark); }
+
+.nav__item--disabled,
+.nav__item--disabled .nav__ico,
+.nav__item[aria-disabled="true"],
+.nav__item[aria-disabled="true"] .nav__ico { color: var(--text-inactive); }
+.nav__item--disabled,
+.nav__item[aria-disabled="true"] { pointer-events: none; cursor: default; }
+.nav__item--disabled .nav__badge .badge,
+.nav__item[aria-disabled="true"] .nav__badge .badge { background: var(--disabled-bg); color: var(--text-inactive); }
+
+/* ========================================================================== *
+   RAIL — тултип по hover + бейдж-надстрочник
+   ========================================================================== */
+.nav--rail .nav__label {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translateY(-50%) translateX(-4px);
+  z-index: 2000;
+  padding: 6px 10px;
+  border-radius: var(--radius-m);
+  background: var(--bg-hint);
+  color: var(--text-on-dark);
+  font: var(--type-body-s);
+  box-shadow: var(--elevation-2);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .12s ease, transform .12s ease;
+}
+.nav--rail .nav__item:hover .nav__label,
+.nav--rail .nav__item:focus-visible .nav__label {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+/* в rail бейдж уходит на верхний-правый угол иконки */
+.nav--rail .nav__badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  margin: 0;
+}
+
+/* ========================================================================== *
+   FOOTER — профиль пользователя + логаут
+   Строка пользователя — ссылка на личный кабинет (клик по всей области),
+   выход — только кнопкой логаута. Ховер — как у пункта меню, но фоном
+   выделяется ВСЯ полоса футера.
+   ========================================================================== */
+.nav__footer {
+  flex: none;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-top: 1px solid var(--border-light);
+  transition: background-color .12s ease;
+}
+.nav__footer:hover { background: var(--bgtable-row-hover); }
+.nav--rail .nav__footer { justify-content: center; padding: 12px 0; }
+.nav--rail .nav__user { flex: none; justify-content: center; }
+
+.nav__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+.nav__user:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.nav__user-text { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.nav__user-name { font: var(--type-body-s-strong); color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav__user-role { font: var(--type-body-xs); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav__user-org  { font: var(--type-body-xs); color: var(--text-inactive); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav__logout { flex: none; }
+
+.nav--rail .nav__user-text,
+.nav--rail .nav__logout { display: none; }</script>
+</body>
+</html>

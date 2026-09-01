@@ -1,0 +1,34 @@
+/* Spinner — круговой индикатор загрузки неопределённой длительности. Токены — colors.css, radius.css. */
+.spin{display:inline-block;flex:none;box-sizing:border-box;border-radius:var(--radius-circle);border-style:solid;border-color:var(--border-light);border-top-color:var(--primary);animation:spin-rotate .8s linear infinite}
+.spin--xs{width:16px;height:16px;border-width:2px}
+.spin--s{width:20px;height:20px;border-width:2px}
+.spin--m{width:24px;height:24px;border-width:3px}
+.spin--l{width:32px;height:32px;border-width:3px}
+.spin--accent{border-top-color:var(--primary)}
+.spin--success{border-top-color:var(--st-green)}
+.spin--warning{border-top-color:var(--st-orange)}
+.spin--error{border-top-color:var(--st-red)}
+.spin--info{border-top-color:var(--st-lblue)}
+.spin--system{border-top-color:var(--st-system)}
+.spin--inverse{border-color:color-mix(in srgb, var(--text-on-dark) 28%, transparent);border-top-color:var(--text-on-dark)}
+@keyframes spin-rotate{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation-duration:1.6s}}
+
+/* режим currentColor — переиспользуется во встроенных состояниях загрузки других
+   компонентов (Button/IconButton/Toast): кольцо наследует цвет текста хоста вместо
+   тонового индикатора, без отдельного трека. flex:none — эти контексты всегда flex-строка. */
+.spin--current{border:2px solid currentColor;border-top-color:transparent;opacity:.9;flex:none}
+
+/* состав: спиннер + подпись, в строку или столбиком */
+.spin-group{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.spin-group--stack{display:inline-flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.spin-group__label{font:var(--type-body-s);color:var(--text-secondary);min-width:0;overflow-wrap:break-word}
+.spin-group--inverse .spin-group__label{color:var(--text-on-dark)}
+
+/* локальный блокирующий оверлей поверх контента, который сейчас перезагружается.
+   Родитель должен быть position:relative (или иначе создавать контекст позиционирования) —
+   оверлей растягивается на inset:0 родителя, а не всего экрана: это отличает его от
+   полноэкранного --modal-scrim у Modal. z-index — локальный (относительно родителя), не часть
+   глобальной шкалы модалок/тостов/меню. */
+.spin-overlay{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:color-mix(in srgb, var(--bg-page) 82%, transparent);border-radius:inherit}
+.spin-overlay__label{font:var(--type-body-s-strong);color:var(--text-secondary);max-width:90%;text-align:center;overflow-wrap:break-word}

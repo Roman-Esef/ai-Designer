@@ -1,0 +1,742 @@
+<!-- @dsCard group="Components" name="SegmentControl" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SegmentControl — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/button-group.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* breadcrumb back link */
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:80ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:20px; }
+  .row + .row { margin-top: 24px; }
+
+  
+
+  
+
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 30px; }
+  .demo-rowlabel { font: var(--type-body-xs); color: var(--text-inactive); margin-bottom:10px; }
+
+  /* ---------- демо-стадия (docs-split) ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:560px; display:flex; align-items:center; justify-content:center; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+  .toggles { display:flex; flex-direction:column; gap:9px; }
+  .toggle { display:inline-flex; align-items:center; gap:11px; padding:9px 12px; border:1px solid var(--border-light); border-radius:9px; font: var(--type-body-m); color: var(--text-primary); cursor:pointer; user-select:none; background: var(--bg-tile); transition:.12s; }
+
+  .pg__code { margin-top:14px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- matrices / grids ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .sizes-grid { display:grid; grid-template-columns: 130px repeat(3, 1fr); gap:18px 16px; align-items:center; min-width:560px; }
+  .sizes-grid .col-head { font: var(--type-body-s-strong); color: var(--primary); text-align:center; }
+  .sizes-grid .cell { display:flex; align-items:center; justify-content:center; padding:6px 0; }
+
+  /* two-column comparison */
+  .cols2 { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:20px; }
+  @media (max-width:680px){ .cols2{ grid-template-columns:1fr; } }
+  .demo-col__title { font: var(--type-h5-strong); color: var(--text-primary); margin:0 0 4px; }
+  .demo-col__sub { font: var(--type-body-s); color: var(--text-secondary); margin:0 0 18px; text-wrap:pretty; }
+
+  /* mock surfaces */
+  .surface { border:1px solid var(--border-light); border-radius:12px; background:var(--bg-tile); padding:0; overflow:hidden; box-shadow:0 6px 26px -18px rgba(40,50,55,.4); min-width:0; }
+  .surface__cap { font:var(--type-body-xs); color:var(--text-inactive); margin:14px 2px 0; text-wrap:pretty; }
+  .mock-toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 20px; border-bottom:1px solid var(--border-light); flex-wrap:wrap; }
+  .mock-toolbar__title { font:var(--type-h6-strong); color:var(--text-primary); }
+  .mock-chart { padding:22px 22px 26px; }
+  .mock-chart__bars { display:flex; align-items:flex-end; gap:8px; height:120px; margin-top:16px; }
+  .mock-chart__bars span { flex:1; background: linear-gradient(180deg, var(--primary-light), var(--primary)); border-radius:var(--radius-xs) var(--radius-xs) 0 0; opacity:.85; }
+  .mock-list { padding:16px 20px 20px; display:flex; flex-direction:column; gap:10px; }
+  .mock-list__row { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background: var(--tertiary-light); border-radius:9px; font:var(--type-body-s); color:var(--text-secondary); }
+
+  /* anatomy */
+  .anat { display:grid; grid-template-columns: minmax(260px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:70px 44px; display:flex; justify-content:center; }
+  .anat-dia { position:relative; }
+  .anat-dia .mk { position:absolute; width:22px; height:22px; border-radius:50%; background:var(--text-primary); color:#fff; font:var(--type-body-xs); font-weight:600; display:flex; align-items:center; justify-content:center; transform:translate(-50%,-50%); }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+
+  /* state spec tables */
+  .spec { border:1px solid var(--border-light); border-radius:14px; overflow:hidden; }
+  .spec + .spec { margin-top:16px; }
+  .spec__row { display:grid; grid-template-columns: 210px 200px 1fr; align-items:center; gap:16px; padding:20px; }
+  @media (max-width:760px){ .spec__row{ grid-template-columns:1fr; gap:14px; } }
+  .spec__cline { display:grid; grid-template-columns: 150px 18px 150px 1fr; align-items:center; gap:10px; font:var(--type-body-s); color:var(--text-secondary); }
+  @media (max-width:560px){ .spec__cline{ grid-template-columns: 100px 16px 1fr; } .spec__cline .raw{ display:none; } }
+
+  /* reference tables */
+  .ref-table th, .ref-table td { text-align:left; padding:15px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  /* do / don't */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:28px 20px; flex:1; display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; min-height:96px; }
+  .guide-card__cap { padding:0 20px 18px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+  .guide-solo { max-width:460px; margin-top:22px; }
+
+  /* color reference */
+  
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* differentiation cards (SegmentControl vs Tab vs ButtonGroup) */
+  .diff { display:grid; grid-template-columns: repeat(3, 1fr); gap:18px; }
+  @media (max-width:900px){ .diff { grid-template-columns:1fr; } }
+  .diff__card { border:1px solid var(--border-light); border-radius:14px; padding:22px 22px 24px; background: var(--bg-tile); display:flex; flex-direction:column; gap:12px; }
+  .diff__card.is-current { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary) inset; }
+  .diff__card h4 { font: var(--type-h6-strong); color: var(--text-primary); margin:0; display:flex; align-items:center; gap:8px; }
+  .diff__card h4 .star { font: var(--type-button-xs); text-transform:uppercase; letter-spacing:.06em; color: var(--primary); background: var(--primary-bg); padding:3px 8px; border-radius:999px; }
+  .diff__card .stage { min-height:52px; display:flex; align-items:center; }
+
+  /* ---------- developer code panels ---------- */
+  .code-panel__name { font: var(--type-body-s-strong); color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="SegmentControl">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <a class="crumb" href="../../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Дизайн-система</a>
+    <div class="meta"><span>Версия: <b>1.005</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>SegmentControl</h1>
+    <p class="lead">Компактный контрол для переключения одного значения параметра — периода, единиц, режима отображения — из 2–6 взаимоисключающих опций. Сегменты лежат в общем треке (rail); выбранный сегмент отмечен плавающим индикатором (thumb), который анимированно переезжает при переключении. Размеры <b>M</b>, <b>S</b>, <b>XS</b>, опциональная ведущая иконка и вариант «только иконки».</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">SegmentControl переключает <b>значение одного параметра</b> в пределах текущего контекста — период графика, единицы измерения, режим отображения списка. В отличие от навигационных сущностей он не меняет набор разделов страницы и не открывает новый раздел контента — он выбирает, <i>как</i> показать один и тот же контент.</p>
+    <div class="panel">
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li><b>Период / диапазон.</b> Переключатель над графиком или таблицей: День / Неделя / Месяц / Год.</li>
+        <li><b>Режим отображения.</b> Список / Плитка / График — компактный вариант с иконками, часто в углу карточки или тулбара.</li>
+        <li><b>Взаимоисключающий выбор.</b> Всегда выбран ровно один сегмент — как радиокнопки, но в компактной горизонтальной форме.</li>
+        <li>2–6 сегментов в одном контроле. Больше — переносите в <code class="tok">Select</code>.</li>
+      </ul>
+      <div class="cols2">
+        <div>
+          <p class="demo-rowlabel">Период над графиком</p>
+          <div class="surface">
+            <div class="mock-toolbar"><span class="mock-toolbar__title">Динамика портфеля</span><div id="use-period"></div></div>
+            <div class="mock-chart"><div class="mock-chart__bars">
+              <span style="height:38%"></span><span style="height:62%"></span><span style="height:50%"></span><span style="height:80%"></span>
+              <span style="height:66%"></span><span style="height:92%"></span><span style="height:74%"></span>
+            </div></div>
+          </div>
+          <p class="surface__cap">Контент не меняет структуру — меняется только диапазон данных на графике.</p>
+        </div>
+        <div>
+          <p class="demo-col__title" style="font:var(--type-h6-strong); margin-bottom:4px;">Режим отображения списка</p>
+          <p class="demo-rowlabel">Только иконки, компактный размер S</p>
+          <div class="surface">
+            <div class="mock-toolbar"><span class="mock-toolbar__title">Сделки ДИД</span><div id="use-view"></div></div>
+            <div class="mock-list">
+              <div class="mock-list__row"><span>ООО «Акрон Трейд»</span><span>142,5 млн ₽</span></div>
+              <div class="mock-list__row"><span>ПАО «Севмет»</span><span>68,0 млн ₽</span></div>
+              <div class="mock-list__row"><span>АО «Балт-Инвест»</span><span>310,2 млн ₽</span></div>
+            </div>
+          </div>
+          <p class="surface__cap">Иконка задаёт понятный смысл, тексту в паре с иконкой можно и не быть.</p>
+        </div>
+      </div>
+    </div>
+  
+<div class="subsec" data-screen-label="Differentiation">
+    <h3>SegmentControl, Tab и ButtonGroup — в чём разница</h3>
+    <p class="desc">Все три компонента внешне похожи на «ряд опций», но решают разные задачи. Выбирайте по смыслу действия, а не по внешнему виду.</p>
+    <div class="diff">
+      <div class="diff__card is-current">
+        <h4>SegmentControl <span class="star">Этот компонент</span></h4>
+        <p>Переключает <b>значение параметра</b> — период, единицы, режим отображения. Общий трек с фоном и один плавающий индикатор. <code class="tok">role="radiogroup"</code>.</p>
+        <div class="stage" id="diff-seg"></div>
+      </div>
+      <div class="diff__card">
+        <h4>Tab</h4>
+        <p>Переключает <b>раздел / вьюху</b> страницы или модалки — меняется набор контента целиком. Индикатор — тонкая полоса на общем рейле, без фона-«трека». <code class="tok">role="tablist"</code>.</p>
+        <div class="stage" id="diff-tab"></div>
+      </div>
+      <div class="diff__card">
+        <h4>ButtonGroup <span class="addon" style="margin:0;">toggle</span></h4>
+        <p>Набор независимых кнопок с общей рамкой — годится, когда сегменты это по сути <b>Button</b> с заливкой Accent и своей семантикой действия, без общего трека. <code class="tok">aria-pressed</code>.</p>
+        <div class="stage" id="diff-btg"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Guidelines">
+    <h3>Правила</h3>
+    <p class="desc">SegmentControl переключает значение одного параметра, а не разделы страницы. Каждая пара «так / не так» раскрывает одну конкретную ситуацию.</p>
+    <div class="guide">
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="guide-good1"></div>
+        <p class="guide-card__cap">Короткие взаимоисключающие значения одного параметра — день / неделя / месяц.</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad1"></div>
+        <p class="guide-card__cap">Длинные названия разделов — это задача Tab, а не SegmentControl.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good2"></span>Так</div>
+        <div class="guide-card__body" id="guide-good2"></div>
+        <p class="guide-card__cap">2–6 сегментов — контрол легко считывается целиком.</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad2"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad2"></div>
+        <p class="guide-card__cap">7 и больше сегментов не помещаются в трек без переноса — замените на Select.</p>
+      </div>
+    </div>
+    <p class="demo-rowlabel" style="margin-top:30px;">Дополнительно — без пары «не так»</p>
+    <div class="guide-solo">
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good3"></span>Так</div>
+        <div class="guide-card__body" id="guide-good3"></div>
+        <p class="guide-card__cap">Fullwidth уместен для пары взаимоисключающих действий на всю ширину контейнера.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Контрол — это общий трек с сегментами и одним индикатором, который абсолютно спозиционирован под текущим выбранным сегментом и анимированно едет к новому при переключении.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div class="anat-dia" id="anat-diagram"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Трек (rail)</span><span class="d">полупрозрачная нейтральная заливка — остаётся читаемым на любом фоне, включая серый фон страницы</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Индикатор (thumb)</span><span class="d">плавающая заливка выбранного сегмента — белый + мягкая тень</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Сегмент</span><span class="d">текст и/или ведущая иконка — интерактивная зона</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Разделитель</span><span class="d">тонкая линия между соседними невыбранными сегментами — скрыта у индикатора</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Счётчик (опционально)</span><span class="d">Badge в варианте без заливки — количество элементов внутри сегмента</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS (STUB) -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Не применимо: компонент существует в единственной конфигурации, отдельных вариантов нет.</p>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Три размера, высота и типографика согласованы с Button того же размера, чтобы контрол ровно вставал в один ряд с кнопками в тулбаре. <b>M</b> — базовый, над графиками и таблицами. <b>S</b> — плотные тулбары и карточки виджетов. <b>XS</b> — инлайн-контролы рядом с текстом.</p>
+    <div class="panel">
+      <div class="matrix-wrap"><div class="sizes-grid" id="sizes-grid"></div></div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden; margin-top:20px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.72fr 0.95fr 0.72fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Высота</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Типографика</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Иконка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Применение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="sizes-table"></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус сегмента меньше радиуса контейнера на величину внутреннего паддинга — так бегунок повторяет форму рамки без просвета по углам.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M — контейнер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-m</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M — сегмент и бегунок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">5 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">calc(--radius-m - 3px)</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S — контейнер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S — сегмент и бегунок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">calc(--radius-s - 2px)</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS — контейнер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS — сегмент и бегунок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">calc(--radius-s - 2px)</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc">Сегмент — это текст, иконка с текстом, только иконка или та же связка с числовым счётчиком. Для сегмента только с иконкой обязателен <code class="tok">aria-label</code> — видимого текста нет.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Текст</p>
+      <div id="content-text" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Иконка + текст</p>
+      <div id="content-icontext" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Только иконки</p>
+      <div id="content-icononly" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Со счётчиком содержимого — Badge, вариант без заливки. Зазор между иконкой и счётчиком — 6px, тот же, что между текстом и счётчиком</p>
+      <div id="content-badge"></div>
+    </div>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="Count">
+    <h3>Количество сегментов и равная ширина</h3>
+    <p class="desc">От 2 до 6 сегментов в одном контроле — больше усложняет считывание и требует замены на <code class="tok">Select</code>. По умолчанию ширина каждого сегмента зависит от контента; модификатор <b>Fullwidth</b> растягивает контрол на всю ширину контейнера с равными сегментами — удобно для двух-трёх опций на всю ширину карточки или нижней панели модалки.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">2 · 3 · 4 · 6 сегментов</p>
+      <div class="row" id="count-row"></div>
+      <p class="subhead mt">Fullwidth — равные сегменты на всю ширину контейнера</p>
+      <div style="max-width:420px;" id="fullwidth-demo"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Animation">
+    <h3>Анимация индикатора</h3>
+    <p class="desc">При переключении индикатор анимированно едет к новому сегменту и меняет ширину под его контент — <code class="tok">transform</code> и <code class="tok">width</code>, 180&nbsp;мс, <code class="tok">cubic-bezier(.4,0,.2,1)</code>. Анимация отключается при <code class="tok">prefers-reduced-motion: reduce</code>, оставляя только смену прозрачности.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Переключайте сегменты — индикатор едет и меняет ширину</p>
+      <div id="anim-demo"></div>
+    </div>
+  </div>
+  
+<div class="subsec" data-screen-label="ItemDisabled">
+    <h3>Отключение одного сегмента</h3>
+    <p class="desc">Частный случай: один сегмент временно недоступен (например, тариф вне подписки), при этом остальной контрол активен. Такой сегмент нельзя выбрать и сфокусировать — используйте точечно, по умолчанию Disabled действует на весь контрол.</p>
+    <div class="panel"><div id="item-disabled-demo"></div></div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Невыбранный сегмент проходит через Default и Hover; выбранный сегмент подсвечен индикатором и <b>не имеет отдельного hover</b> — он уже визуально выделен. Disabled применяется на весь контрол целиком.</p>
+    <div id="state-specs"></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Контейнер получает <code class="tok">role="radiogroup"</code> и осмысленный <code class="tok">aria-label</code> (например «Период»); каждый сегмент — <code class="tok">role="radio"</code> с <code class="tok">aria-checked</code>. Фокус — по одному активному сегменту (roving tabindex), переключение между сегментами и смена выбора — стрелками ← → (или ↑ ↓), <code class="tok">Home</code> / <code class="tok">End</code> — к первому/последнему. Сегмент только с иконкой обязан иметь <code class="tok">aria-label</code>.</p>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Текст сегмента набирается токенами кнопок — <b>SB Sans Screen</b>, начертание Regular, во всех состояниях включая выбранный.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.17fr 1.08fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.17fr 1.08fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-button-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Screen</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 24</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-button-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.17fr 1.08fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-button-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Screen</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-button-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.17fr 1.08fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-button-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Screen</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-button-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Трек — полупрозрачная нейтральная заливка (Swamp_400, 16%) — так контрол остаётся отчётливым на любой подложке, включая серый фон страницы, а не только на белой плашке. Индикатор — белая заливка BG_Tile с мягкой тенью (та же тень, что и активный чип сегмент-контрола в спецификации теней ДС). Текст невыбранного сегмента — Text_Secondary, при наведении — Text_Primary с лёгкой заливкой Active·PrimaryBG; выбранный — Primary (Emerald). Счётчик — Badge без заливки (--text), цвет наследует Text_Primary. Disabled — на рампе StDisabled.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Track / индикатор</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Track заливка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">color-mix(in</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Track / индикатор</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Индикатор (thumb)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-tile</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-tile)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Track / индикатор</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Разделитель</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#B8CCCC</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Unselected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Selected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover fill</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Track</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--disabled-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--disabled-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FBFBFB</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.22fr 1.26fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">40% #324844</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Эта страница ДС собрана на чистых CSS-классах и vanilla JS — но всё ниже не привязано к стеку: команда, которая верстает компонент на React (или любом другом фреймворке), может взять отсюда анатомию, точные размеры, состояния и цвета, чтобы собрать свою реализацию, не заглядывая в этот код построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Все значения — токены ДС, не хардкод; ссылки на переменные — в файле <code class="tok">styles/segment-control.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:36px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.55fr 0.55fr 0.55fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">S</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">XS</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/segment-control.css</code>
+      <span class="req">— и <code class="tok">styles/badge.css</code>, если используется счётчик.</span>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Позиция индикатора = позиция выбранного сегмента внутри трека.</span>
+<span class="tk-cm">//    Это НЕ фиксированные проценты — ширина сегмента зависит от контента</span>
+<span class="tk-cm">//    (текст/иконка/бейдж), поэтому позицию нужно ИЗМЕРЯТЬ, а не вычислять по индексу:</span>
+selectedEl = track.children[selectedIndex] <span class="tk-cm">// ref на DOM-узел выбранного сегмента</span>
+thumb.width     = selectedEl.offsetWidth
+thumb.translateX = selectedEl.offsetLeft
+
+<span class="tk-cm">// 2. Пересчитывать при: смене value, смене набора items/size,</span>
+<span class="tk-cm">//    ResizeObserver на треке (адаптивная ширина) и после загрузки шрифтов</span>
+<span class="tk-cm">//    (метрики шрифта меняют offsetWidth уже после первого рендера).</span>
+
+<span class="tk-cm">// React: измерение — побочный эффект после layout, не во время рендера</span>
+useLayoutEffect(() => {
+  <span class="tk-attr">const</span> el = itemRefs.current[selectedIndex];
+  <span class="tk-attr">if</span> (!el) <span class="tk-attr">return</span>;
+  setThumbRect({ width: el.offsetWidth, left: el.offsetLeft });
+}, [value, items, size]);
+
+useEffect(() => {
+  <span class="tk-attr">const</span> ro = <span class="tk-attr">new</span> ResizeObserver(() => recalc());
+  ro.observe(trackRef.current);
+  <span class="tk-attr">return</span> () => ro.disconnect();
+}, []);
+
+<span class="tk-cm">// 3. Клавиатура (roving tabindex) — на контейнере [role="radiogroup"]:</span>
+<span class="tk-cm">//    ArrowRight/ArrowDown  → следующий доступный сегмент (зациклено)</span>
+<span class="tk-cm">//    ArrowLeft/ArrowUp     → предыдущий доступный сегмент (зациклено)</span>
+<span class="tk-cm">//    Home / End            → первый / последний доступный сегмент</span>
+<span class="tk-cm">//    В фокус-последовательности таба участвует только выбранный сегмент —</span>
+<span class="tk-cm">//    у остальных tabIndex = -1.</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который нужно реализовать поверх вашего стека (в этом ДС он написан на vanilla JS, см. <code class="tok">segment-control.page.js</code>, функции <code class="tok">positionThumb</code> и <code class="tok">wireSegControl</code>, если нужен рабочий референс).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Иконка без подписи</b> — компактный вариант с только иконками в сегментах — тулбар-переключатель.</li>
+        <li><b>Overflow в выпадающий список</b> — при нехватке ширины лишние опции уходят в «Ещё».</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · SegmentControl</span>
+    <span>M / S / XS — Default / Hover / Selected / Disabled — Fullwidth</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите контрол: размер, количество сегментов, контент, состояние и Fullwidth — превью и код обновляются мгновенно. Кликните по сегменту в превью, чтобы увидеть анимацию индикатора.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/segment-control.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/segment-control.page.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Состояние': 'Показывать Disabled', 'Fullwidth': 'На всю ширину', 'Счётчик (badge)': 'Показывать счётчик' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- thumb идёт первым ребёнком — сегменты .segctrl__item начинаются со второго -->
+<div class="segctrl" role="radiogroup" aria-label="Период">
+  <div class="segctrl__thumb"></div>
+
+  <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1">
+    <span class="segctrl__label">Неделя</span>
+  </button>
+
+  <button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0">
+    <span class="segctrl__label">Месяц</span>
+    <!-- опциональный счётчик — реальный Badge, вариант --text (без заливки) -->
+    <span class="badge badge--text badge--s">12</span>
+  </button>
+
+  <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1">
+    <span class="segctrl__label">Год</span>
+  </button>
+</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/segment-control.page.js)
+function makeSegControl(o) {
+  // o: { size:'m'|'s'|'xs', items:[{label, icon, disabled, badge}], selected, fullwidth, disabled, label }
+  // .segctrl(.segctrl--<size>)(.segctrl--fullwidth)(.segctrl--disabled) → role="radiogroup"
+  // .segctrl__thumb — первый ребёнок (позицию задаёт рантайм), затем .segctrl__item (role="radio")
+}
+// Поведение — рантайм ДС: window.DSTabs.segment(host, { onChange }) — клик,
+// клавиатура (roving tabindex), пересчёт индикатора по выбранному сегменту.</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — SegmentControl
+   Компактный контрол переключения одного значения из 2–6 взаимоисключающих
+   опций внутри общего трека (rail) с плавающим индикатором (thumb).
+
+   В отличие от Tab (навигация между вьюхами страницы, role=tablist) и
+   ButtonGroup--toggle (сегментированный выбор из отдельных Button),
+   SegmentControl — единый трек с общим фоном и одним "плавающим" индикатором
+   выбора; семантика — role="radiogroup" / role="radio" (взаимоисключающий
+   выбор значения параметра, а не переключение контента страницы).
+
+   Sizes:   m (40) · s (32) · xs (24)
+   States:  default · hover · selected · selected+hover · disabled (группа)
+   Slots:   leading icon (опционально) · label — либо icon-only ·
+            счётчик содержимого (Badge, вариант --text, без заливки)
+   Extras:  fullwidth (равная ширина сегментов), анимированный индикатор
+   Requires: typography.css, colors.css, radius.css
+   ========================================================================= */
+
+.segctrl {
+  /* size tokens — overridden per size modifier.
+     --seg-h — высота ВНУТРЕННЕГО сегмента, не всего контрола. Обводка трека
+     (padding трека) — часть компонента: полная высота контрола = --seg-h +
+     2*--seg-pad и обязана совпадать с высотой Button того же размера.
+     M: 34 + 2*3 = 40 · S: 28 + 2*2 = 32 · XS: 20 + 2*2 = 24 */
+  --seg-h: 34px;
+  --seg-pad: 3px;
+  --seg-gap: 2px;
+  --seg-px: 14px;
+  --seg-icon: 20px;
+  --seg-font: var(--type-button-m);
+  --seg-radius: var(--radius-m);
+  --seg-item-radius: calc(var(--radius-m) - 3px);
+
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  gap: var(--seg-gap);
+  /* translucent neutral fill (rather than a flat near-white tone) so the
+     track stays legible whether it sits on the page's off-white background,
+     a white card, or any other surface */
+  background: color-mix(in srgb, var(--c-swamp-400) 16%, transparent);
+  border-radius: var(--seg-radius);
+  padding: var(--seg-pad);
+  isolation: isolate;
+  box-sizing: border-box;
+}
+
+/* ---------- fullwidth / equal-width segments ------------------------------- */
+.segctrl--fullwidth { display: flex; width: 100%; }
+.segctrl--fullwidth .segctrl__item { flex: 1 1 0; }
+
+/* ---------- floating indicator (thumb) ------------------------------------- */
+.segctrl__thumb {
+  position: absolute;
+  top: var(--seg-pad);
+  bottom: var(--seg-pad);
+  left: 0;
+  width: 0;
+  background: var(--bg-tile);
+  border-radius: var(--seg-item-radius);
+  box-shadow: 0 1px 2px rgba(40, 50, 55, .10);
+  transform: translateX(0);
+  transition: transform .18s cubic-bezier(.4, 0, .2, 1), width .18s cubic-bezier(.4, 0, .2, 1), opacity .15s ease;
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.segctrl__thumb.is-visible { opacity: 1; }
+.segctrl--no-anim .segctrl__thumb { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .segctrl__thumb { transition: opacity .15s ease; }
+}
+
+/* ---------- segment item ---------------------------------------------------- */
+.segctrl__item {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--seg-h);
+  padding: 0 var(--seg-px);
+  border: 0;
+  margin: 0;
+  background: transparent;
+  border-radius: var(--seg-item-radius);
+  font: var(--seg-font);
+  letter-spacing: 0;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: color .15s ease, background-color .15s ease;
+}
+.segctrl__item :is(svg,[data-icon]){ flex: none; width: var(--seg-icon); height: var(--seg-icon); display: block; }
+
+/* icon-only segment — square-ish, needs an aria-label */
+.segctrl__item--icon-only { padding: 0 calc(var(--seg-px) - 4px); gap: 0; }
+/* …но если рядом с иконкой стоит счётчик — зазор тот же 6px, что и в варианте
+   с текстом, иначе цифра прилипает к глифу */
+.segctrl__item--icon-only:has(.badge) { gap: 6px; }
+
+/* text label — truncates with ellipsis when constrained (fullwidth narrow) */
+.segctrl__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+/* ---------- optional count slot ---------------------------------------------
+   Reuses the Badge component in its borderless `.badge--text` variant — a
+   filled badge would double up on the track's own fill and read as noisy;
+   the borderless counter stays legible while keeping the segment quiet. */
+.segctrl__item .badge--text { flex: none; }
+.segctrl--disabled .badge--text,
+.segctrl[aria-disabled="true"] .badge--text,
+.segctrl__item:disabled .badge--text,
+.segctrl__item[aria-disabled="true"] .badge--text { color: var(--st-disabled-dark); }
+
+/* thin divider between adjacent unselected, non-hovered segments —
+   hidden next to the selected segment or a hovered neighbour so it never
+   cuts across the floating thumb */
+.segctrl__item::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--seg-gap) / 2 - .5px);
+  top: 22%;
+  bottom: 22%;
+  width: 1px;
+  background: var(--border-primary);
+}
+/* the thumb is inserted as the track's first DOM child (so it can sit behind
+   every segment), which pushes the actual first segment to be the SECOND
+   child — :first-of-type (first .segctrl__item among sibling buttons,
+   ignoring the thumb div) is what correctly targets it, not :first-child */
+.segctrl__item:first-of-type::before { display: none; }
+.segctrl__item[aria-checked="true"]::before,
+.segctrl__item[aria-checked="true"] + .segctrl__item::before,
+.segctrl__item:hover::before,
+.segctrl__item.is-hover::before,
+.segctrl__item:hover + .segctrl__item::before,
+.segctrl__item.is-hover + .segctrl__item::before { opacity: 0; }
+
+/* ---------- states: hover (unselected only — selected is already marked) --- */
+.segctrl__item:not([aria-checked="true"]):hover,
+.segctrl__item:not([aria-checked="true"]).is-hover {
+  background: var(--primary-bg);
+  color: var(--text-primary);
+}
+
+/* ---------- states: selected ------------------------------------------------ */
+.segctrl__item[aria-checked="true"] { color: var(--primary); }
+
+.segctrl__item:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ---------- states: disabled ------------------------------------------------ */
+/* default rule — Disabled применяется на весь контрол целиком */
+.segctrl--disabled,
+.segctrl[aria-disabled="true"] {
+  background: var(--disabled-bg);
+  pointer-events: none;
+}
+.segctrl--disabled .segctrl__thumb,
+.segctrl[aria-disabled="true"] .segctrl__thumb { box-shadow: none; }
+.segctrl--disabled .segctrl__item,
+.segctrl[aria-disabled="true"] .segctrl__item { color: var(--st-disabled-dark); cursor: not-allowed; }
+
+/* edge case — точечное отключение одного сегмента, остальной контрол активен */
+.segctrl__item:disabled,
+.segctrl__item[aria-disabled="true"]:not([aria-checked="true"]) {
+  color: var(--st-disabled-dark);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.segctrl__item:disabled::before,
+.segctrl__item[aria-disabled="true"]::before { opacity: 0; }
+
+/* ---------- sizes ------------------------------------------------------------ *
+   Размеры — прямыми свойствами на конкретных потомках (не через --seg-* в
+   модификаторе), чтобы компилятор чисто регистрировал токены. Размер m =
+   дефолты .segctrl (отдельных правил не требует); gap = 2px для всех размеров,
+   поэтому seg-gap-потребители (.segctrl gap, ::before left) не переопределяются. */
+.segctrl--s { padding: 2px; border-radius: var(--radius-s); }
+.segctrl--s .segctrl__thumb { top: 2px; bottom: 2px; border-radius: calc(var(--radius-s) - 2px); }
+.segctrl--s .segctrl__item { height: 28px; padding: 0 11px; font: var(--type-button-s); border-radius: calc(var(--radius-s) - 2px); }
+.segctrl--s .segctrl__item--icon-only { padding: 0 calc(11px - 4px); }
+.segctrl--s .segctrl__item :is(svg,[data-icon]){ width: 18px; height: 18px; }
+
+.segctrl--xs { padding: 2px; border-radius: var(--radius-s); }
+.segctrl--xs .segctrl__thumb { top: 2px; bottom: 2px; border-radius: calc(var(--radius-s) - 2px); }
+.segctrl--xs .segctrl__item { height: 20px; padding: 0 8px; font: var(--type-button-xs); border-radius: calc(var(--radius-s) - 2px); }
+.segctrl--xs .segctrl__item--icon-only { padding: 0 calc(8px - 4px); }
+.segctrl--xs .segctrl__item :is(svg,[data-icon]){ width: 16px; height: 16px; }</script>
+</body>
+</html>

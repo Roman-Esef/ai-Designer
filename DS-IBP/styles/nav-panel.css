@@ -1,0 +1,258 @@
+/* =========================================================================
+   NavPanel — «Панель навигации» (организм).
+   Левая панель навигации приложения. Три режима одного компонента:
+     .nav--rail   — свёрнутый, только иконки (56px), без тени, тултип по hover;
+     .nav--drawer — развёрнутый-оверлей (272px), тень --shadow-modal-form;
+     .nav--fixed  — закреплённый развёрнутый (272px), без тени, шов справа.
+   Только токены ДС. Иконки — <i data-icon>; бейдж — компонент Badge;
+   аватар — Avatar; бургер/пин/логаут — IconButton.
+   ========================================================================= */
+
+.nav {
+  --nav-rail-w:   56px;
+  --nav-drawer-w: 272px;
+  --nav-item-h:   44px;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-mainmenu);
+  font-family: var(--font-text), system-ui, sans-serif;
+  overflow: hidden;
+}
+.nav *, .nav *::before, .nav *::after { box-sizing: border-box; }
+
+/* ---------- режимы ширины / приподнятости ---------------------------------- */
+.nav--rail   { width: var(--nav-rail-w); }
+.nav--drawer { width: var(--nav-drawer-w); box-shadow: var(--shadow-modal-form); border-radius: 0 var(--radius-l) var(--radius-l) 0; }
+.nav--fixed  { width: var(--nav-drawer-w); border-right: 1px solid var(--border-light); }
+
+/* ---------- хост-интеграция: .nav-layout — обязательная обёртка на реальных экранах -----
+   Оборачивает .nav + контент страницы: <div class="nav-layout"><nav class="nav …">…</nav><main>…</main></div>
+   Из коробки, без CSS/JS на стороне экрана: .nav всегда position:fixed на весь vh (не
+   скроллится со страницей, не участвует в потоке); контент резервирует отступ только
+   под ширину Rail — и в Rail, и в Drawer (Drawer кладётся оверлеем поверх этого отступа,
+   не раздвигая), и увеличивает его до ширины Fixed только когда .nav в режиме nav--fixed. */
+.nav-layout { display: block; min-height: 100vh; }
+.nav-layout > .nav { position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; }
+.nav-layout > *:not(.nav) { margin-left: var(--nav-rail-w, 56px); transition: margin-left .15s ease; }
+.nav-layout:has(.nav--fixed) > *:not(.nav) { margin-left: var(--nav-drawer-w, 272px); }
+
+/* ========================================================================== *
+   TOP — бургер (+ пин в развёрнутых режимах)
+   ========================================================================== */
+/* бургер, пункты и аватар — на одной вертикальной оси.
+   Ось = 28px от левого края панели во ВСЕХ режимах (= центр rail-панели 56/2):
+   иконка пункта      = list 4 + item 12 + 12 = 28
+   бургер (ibtn--m 20) = top 18 + 10 = 28
+   аватар (av--m 32)   = footer 12 + 16 = 28
+   Скроллбар списка — overlay-гаттер только справа, ось слева не смещает. */
+.nav__top,
+.nav__footer { overflow-y: hidden; }
+.nav__top {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 56px;
+  flex: none;
+  padding: 0 12px 0 18px;
+}
+.nav--rail .nav__top { justify-content: center; padding: 0; }
+.nav__pin { margin-left: auto; }
+.nav--rail .nav__pin { display: none; }
+
+/* ========================================================================== *
+   LIST — прокручиваемая область пунктов
+   ========================================================================== */
+.nav__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  padding: 6px 4px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* в Rail скроллбар скрыт полностью (скролл колесом работает),
+   гаттеры не резервируются — иконки центрируются по всей ширине 56px */
+.nav--rail .nav__list {
+  padding: 6px 4px 10px;
+  align-items: center;
+  scrollbar-gutter: auto;
+  scrollbar-width: none;
+}
+.nav--rail .nav__list::-webkit-scrollbar { display: none; }
+
+/* скроллбар виден только при наведении на панель */
+.nav:hover .nav__list { scrollbar-color: var(--border-light) transparent; }
+.nav__list::-webkit-scrollbar { width: 8px; }
+.nav__list::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; transition: background-color .15s ease; }
+.nav:hover .nav__list::-webkit-scrollbar-thumb { background: var(--border-light); }
+
+/* ---------- блок-секция ---------------------------------------------------- */
+.nav__block { display: flex; flex-direction: column; gap: 2px; flex: none; }
+.nav--rail .nav__block { width: 100%; align-items: center; }
+
+.nav__block-label {
+  height: 34px;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 12px 6px;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* в rail заголовок сохраняет ту же высоту (пункты не прыгают), текст скрыт,
+   на его месте — центрированная черта-разделитель */
+.nav--rail .nav__block-label {
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  color: transparent;
+}
+.nav--rail .nav__block-label::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: var(--border-light);
+}
+
+/* ========================================================================== *
+   ITEM — пункт меню (.Navigation_Item)
+   ========================================================================== */
+.nav__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--nav-item-h);
+  flex: none;
+  padding: 0 12px;
+  border-radius: var(--radius-m);
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .12s ease, color .12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav--rail .nav__item { width: 44px; padding: 0; justify-content: center; }
+
+.nav__ico { width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; color: var(--secondary); transition: color .12s ease; }
+.nav__ico :is(svg,[data-icon]){ width: 24px; height: 24px; }
+
+.nav__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font: var(--type-body-m);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav__badge { flex: none; margin-left: 8px; }
+
+/* ---------- состояния пункта ---------------------------------------------- */
+.nav__item:hover { background: var(--bgtable-row-hover); color: var(--text-primary); }
+.nav__item:hover .nav__ico,
+.nav__item:focus-visible .nav__ico { color: var(--secondary-dark); }
+.nav__item:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+
+/* Класс .nav__item--selected/--disabled — форс-состояние витрины; реальный
+   пункт несёт aria-current="page"/aria-disabled="true" (RulesAudit W1). */
+.nav__item--selected,
+.nav__item--selected:hover,
+.nav__item[aria-current]:not([aria-current="false"]),
+.nav__item[aria-current]:not([aria-current="false"]):hover { background: var(--bgtable-row-focus); color: var(--text-primary); }
+.nav__item--selected .nav__label,
+.nav__item[aria-current]:not([aria-current="false"]) .nav__label { font: var(--type-body-m-strong); }
+.nav__item--selected .nav__ico,
+.nav__item[aria-current]:not([aria-current="false"]) .nav__ico { color: var(--secondary-dark); }
+
+.nav__item--disabled,
+.nav__item--disabled .nav__ico,
+.nav__item[aria-disabled="true"],
+.nav__item[aria-disabled="true"] .nav__ico { color: var(--text-inactive); }
+.nav__item--disabled,
+.nav__item[aria-disabled="true"] { pointer-events: none; cursor: default; }
+.nav__item--disabled .nav__badge .badge,
+.nav__item[aria-disabled="true"] .nav__badge .badge { background: var(--disabled-bg); color: var(--text-inactive); }
+
+/* ========================================================================== *
+   RAIL — тултип по hover + бейдж-надстрочник
+   ========================================================================== */
+.nav--rail .nav__label {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translateY(-50%) translateX(-4px);
+  z-index: 2000;
+  padding: 6px 10px;
+  border-radius: var(--radius-m);
+  background: var(--bg-hint);
+  color: var(--text-on-dark);
+  font: var(--type-body-s);
+  box-shadow: var(--elevation-2);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .12s ease, transform .12s ease;
+}
+.nav--rail .nav__item:hover .nav__label,
+.nav--rail .nav__item:focus-visible .nav__label {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+/* в rail бейдж уходит на верхний-правый угол иконки */
+.nav--rail .nav__badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  margin: 0;
+}
+
+/* ========================================================================== *
+   FOOTER — профиль пользователя + логаут
+   Строка пользователя — ссылка на личный кабинет (клик по всей области),
+   выход — только кнопкой логаута. Ховер — как у пункта меню, но фоном
+   выделяется ВСЯ полоса футера.
+   ========================================================================== */
+.nav__footer {
+  flex: none;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-top: 1px solid var(--border-light);
+  transition: background-color .12s ease;
+}
+.nav__footer:hover { background: var(--bgtable-row-hover); }
+.nav--rail .nav__footer { justify-content: center; padding: 12px 0; }
+.nav--rail .nav__user { flex: none; justify-content: center; }
+
+.nav__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+.nav__user:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.nav__user-text { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.nav__user-name { font: var(--type-body-s-strong); color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav__user-role { font: var(--type-body-xs); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav__user-org  { font: var(--type-body-xs); color: var(--text-inactive); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav__logout { flex: none; }
+
+.nav--rail .nav__user-text,
+.nav--rail .nav__logout { display: none; }

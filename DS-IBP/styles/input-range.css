@@ -1,0 +1,61 @@
+/* ============================================================
+   INPUT RANGE — диапазон из двух полей (InputAmount / InputDate),
+   размещённых горизонтально, с компонентом Range_Line между ними.
+   Общая метка (Label) сверху и общий хелпер (Helper) снизу.
+   Каждое поле — самостоятельный экземпляр .inp (styles/input.css)
+   со своими состояниями (Hover/Focus/Error/Warning/Disabled).
+   Зависимости: input.css, label-helper.css, colors.css.
+   Размер только M (40px) — размера S нет.
+   ============================================================ */
+
+.inp-range {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  --inp-h: 40px;
+  --range-line-w: 14px;
+  --range-line-bar: 8px;
+}
+
+/* метка и хелпер — общие для всего диапазона (LabelHelper) */
+.inp-range > .ds-label { margin-bottom: 4px; }
+.inp-range > .ds-helper { margin-top: 4px; }
+
+/* строка с двумя полями и линией */
+.inp-range__row {
+  display: flex;
+  align-items: flex-start; /* тултипы *-focus свисают под своим полем */
+  gap: 0;
+}
+
+/* поле диапазона — гибкое, ширину задаёт контейнер */
+.inp-range__field {
+  flex: 1 1 0;
+  min-width: 120px;
+  width: auto !important;
+}
+/* у InputDateRange минимальная ширина поля — 186px
+   (ширина контента: дата + иконки крестика и календаря) */
+.inp-range--date .inp-range__field { min-width: 186px; }
+
+/* Range_Line — толщина и цвет аналогичны бордеру инпута */
+.inp-range__line {
+  flex: none;
+  align-self: flex-start;
+  width: var(--range-line-w);
+  height: var(--inp-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.inp-range__line::before {
+  content: "";
+  display: block;
+  width: var(--range-line-bar);
+  height: 1px;
+  background: var(--border-primary);
+}
+
+/* диапазон целиком в Disabled — линия светлее (как бордер disabled-поля) */
+.inp-range--disabled .inp-range__line::before { background: var(--border-light); }

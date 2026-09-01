@@ -1,0 +1,132 @@
+/* =========================================================================
+   Design System — IconButton
+   Безрамочная кнопка-иконка. РАЗМЕР КОМПОНЕНТА В ЛЕЙАУТЕ = РАЗМЕР ИКОНКИ
+   (L 24 · M 20 · S 16). Круглый стейт-слой — это отдельный слой (::before),
+   который появляется на hover/pressed и ВЫХОДИТ ЗА ГРАНИЦЫ кнопки, никак не
+   влияя на её размер в потоке. Он же расширяет зону клика (pointer-events).
+   Tones:  neutral (--secondary) · primary · danger · contrast
+   States: default · hover · pressed · focus · selected · disabled · loading
+   Shape:  circle (default) · square
+   Variant: embedded (без стейт-слоя — для полей ввода/плотных тулбаров)
+   Requires: typography.css, colors.css
+   ========================================================================= */
+
+.ibtn {
+  /* layout box = размер иконки */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ibtn-size, 20px);
+  height: var(--ibtn-size, 20px);
+  padding: 0;
+  flex: none;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  user-select: none;
+  overflow: visible;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .15s ease;
+}
+
+/* иконка — поверх стейт-слоя; правило покрывает обе формы разметки:
+   вставленный <svg> и <i data-icon> (ds-icons.js) */
+.ibtn :is(svg,[data-icon]){ position: relative; z-index: 1; width: var(--ibtn-icon, 20px); height: var(--ibtn-icon, 20px); display: block; flex: none; }
+/* ---------- стейт-слой (::before) — больше кнопки, hover-only, оверфлоу ---- *
+   Размер слоя повторяет прежние габариты кнопки (L 40 · M 32 · S 24): визуально
+   рипл и зона клика те же, а в лейауте кнопка занимает ровно размер иконки. */
+.ibtn::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--ibtn-layer-w, 32px);
+  height: var(--ibtn-layer-w, 32px);
+  border-radius: var(--radius-circle);
+  background: transparent;
+  transition: background-color .15s ease;
+  pointer-events: auto;   /* стейт-слой ловит клики → зона клика больше иконки */
+  z-index: 0;
+}
+
+.ibtn:focus { outline: none; }
+.ibtn:focus-visible,
+.ibtn.is-focus { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ---------- sizes: box = иконка; слой = прежний габарит ------------------- */
+.ibtn--l { width: 24px; height: 24px; }
+.ibtn--m { width: 20px; height: 20px; }
+.ibtn--s { width: 16px; height: 16px; }
+.ibtn--l::before { width: 40px; height: 40px; }
+.ibtn--m::before { width: 32px; height: 32px; }
+.ibtn--s::before { width: 24px; height: 24px; }
+.ibtn--l :is(svg,[data-icon]), .ibtn--l .spin{ width: 24px; height: 24px; }
+.ibtn--m :is(svg,[data-icon]), .ibtn--m .spin{ width: 20px; height: 20px; }
+.ibtn--s :is(svg,[data-icon]), .ibtn--s .spin{ width: 16px; height: 16px; }
+/* square / embedded — стейт-слой со скруглением control вместо круга */
+.ibtn--l.ibtn--square::before, .ibtn--l.ibtn--embedded::before { border-radius: var(--radius-control); }
+.ibtn--m.ibtn--square::before, .ibtn--m.ibtn--embedded::before { border-radius: var(--radius-control); }
+.ibtn--s.ibtn--square::before, .ibtn--s.ibtn--embedded::before { border-radius: var(--radius-control-s); }
+
+/* ---------- tones (цвет иконки; стейт-слой миксуется из currentColor) ----- */
+.ibtn--neutral  { color: var(--secondary); }
+.ibtn--primary  { color: var(--primary); }
+.ibtn--danger   { color: var(--error); }
+.ibtn--contrast { color: var(--text-on-dark); }
+.ibtn:not([class*="ibtn--neutral"]):not([class*="ibtn--primary"]):not([class*="ibtn--danger"]):not([class*="ibtn--contrast"]) {
+  color: var(--secondary);
+}
+
+/* ---------- интерактивные состояния — фон на стейт-слое (::before) --------- */
+.ibtn:hover::before,
+.ibtn.is-hover::before   { background: color-mix(in srgb, currentColor 12%, transparent); }
+.ibtn:active::before,
+.ibtn.is-pressed::before { background: color-mix(in srgb, currentColor 22%, transparent); }
+.ibtn--contrast:hover::before,   .ibtn--contrast.is-hover::before   { background: color-mix(in srgb, #fff 18%, transparent); }
+.ibtn--contrast:active::before,  .ibtn--contrast.is-pressed::before { background: color-mix(in srgb, #fff 30%, transparent); }
+
+/* ---------- selected (toggle on) ------------------------------------------
+   Класс .ibtn--selected — форс-состояние витрины; реальный toggle несёт
+   aria-pressed="true" на самой кнопке (RulesAudit W1). */
+.ibtn:is(.ibtn--selected,[aria-pressed="true"]) { color: var(--primary); }
+.ibtn:is(.ibtn--selected,[aria-pressed="true"])::before { background: color-mix(in srgb, var(--primary) 12%, transparent); }
+.ibtn:is(.ibtn--selected,[aria-pressed="true"]):hover::before,
+.ibtn:is(.ibtn--selected,[aria-pressed="true"]).is-hover::before { background: color-mix(in srgb, var(--primary) 20%, transparent); }
+
+/* ---------- variant: embedded (поля ввода / плотные тулбары) -------------- */
+/* Стейт-слоя нет; на hover иконка перекрашивается в primary. */
+.ibtn--embedded { color: var(--text-inactive); }
+.ibtn--embedded::before { display: none; }
+.ibtn--embedded:hover,
+.ibtn--embedded.is-hover { color: var(--primary); }
+.ibtn--embedded:active,
+.ibtn--embedded.is-pressed { color: var(--primary-dark); }
+
+/* ---------- disabled ------------------------------------------------------- */
+.ibtn:disabled,
+.ibtn--disabled {
+  color: var(--text-inactive);
+  cursor: default;
+  pointer-events: none;
+}
+.ibtn:disabled::before,
+.ibtn--disabled::before { background: transparent; }
+
+/* ---------- loading -------------------------------------------------------- */
+/* Индикатор — общий Spinner: <span class="spin spin--current">, размер — правила выше. */
+.ibtn--loading { pointer-events: none; }
+.ibtn .spin { position: relative; z-index: 1; }
+
+/* ---------- badge slot ----------------------------------------------------- */
+/* Бейдж прижат к правому верхнему углу иконки (= габарит кнопки), не выходит
+   за него; счётчик ≤ 2 символов, при значении >99 — «9+». */
+.ibtn__badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+}

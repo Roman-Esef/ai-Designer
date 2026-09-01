@@ -1,0 +1,756 @@
+<!-- @dsCard group="Components" name="Tooltip" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tooltip — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/tooltip.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:74ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:40px; }
+
+  
+
+  
+
+  /* ---------- демо-стадия (docs-split) ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:64px 40px; display:flex; align-items:center; justify-content:center; position:relative;
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* select + text input */
+  .pg-text { width:100%; height:40px; padding:0 14px; border:1px solid var(--border-primary); border-radius:9px;
+    background: var(--bg-tile); color: var(--text-primary); font: var(--type-body-m); }
+  .pg-text:focus-visible { outline:2px solid var(--primary); outline-offset:1px; }
+
+  .toggle { display:inline-flex; align-items:center; gap:11px; padding:9px 12px; border:1px solid var(--border-light); border-radius:9px; font: var(--type-body-m); color: var(--text-primary); cursor:pointer; user-select:none; background: var(--bg-tile); transition:.12s; }
+
+  /* target chip used inside stages */
+  .tgt { display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:10px;
+    background: var(--bg-tile); border:1px solid var(--border-primary); color: var(--text-secondary); cursor:default; }
+  .tgt svg { width:22px; height:22px; }
+
+  /* ---------- variants grid (placement showcase) ---------- */
+  .vgrid { display:grid; grid-template-columns: repeat(3, 1fr); gap:34px 26px; }
+  @media (max-width:760px){ .vgrid { grid-template-columns: repeat(2,1fr); } }
+  .vcell { display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
+  .vcell .cap { font: var(--type-body-xs); color: var(--text-inactive); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .vcell .tipbox { display:flex; align-items:center; justify-content:flex-start; min-height:46px; }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(280px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:54px 44px; display:flex; justify-content:center; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary); }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+  /* spec / paddings */
+  .spec { display:flex; align-items:center; gap:44px; flex-wrap:wrap; }
+  .spec__cap { font: var(--type-body-s); color: var(--text-secondary); max-width:40ch; text-wrap:pretty; }
+  .spec__cap b { color: var(--text-primary); font: var(--type-body-s-strong); }
+  /* paddings diagram */
+  .padbox { position:relative; display:inline-block; margin:8px 0; }
+  .padtip { display:inline-block; background: var(--bg-hint); border-radius:14px; padding:28px 42px; }
+  .padtip__c { display:inline-block; font: 600 26px/1 var(--font-text); color:#fff; outline:1.5px dashed rgba(255,255,255,.45); outline-offset:0; }
+  .padlbl { position:absolute; font: 600 12px/1 var(--font-text); color:#fff; background: var(--c-emerald-700); padding:2px 6px; border-radius:4px; }
+  .padlbl--top   { top:7px;  left:50%; transform:translateX(-50%); }
+  .padlbl--bot   { bottom:7px; left:50%; transform:translateX(-50%); }
+  .padlbl--left  { left:8px;  top:50%; transform:translateY(-50%); }
+  .padlbl--right { right:8px; top:50%; transform:translateY(-50%); }
+
+  /* ---------- type swatch ---------- */
+  .types { display:flex; gap:48px; flex-wrap:wrap; }
+  .type-item { display:flex; flex-direction:column; gap:14px; }
+  .type-item .th { font: var(--type-body-s-strong); color: var(--text-secondary); }
+
+  /* ---------- collision / live boxes ---------- */
+  .vp { position:relative; height:300px; border:1px dashed var(--border-primary); border-radius:14px; overflow:hidden;
+    background:
+      linear-gradient(var(--tertiary-light),var(--tertiary-light)) padding-box,
+      repeating-conic-gradient(var(--c-cgrey-50) 0% 25%, var(--bg-tile) 0% 50%) 0 / 20px 20px; }
+  .vp .tgt { position:absolute; cursor:grab; touch-action:none; background: var(--primary); border-color: var(--primary-dark); color:#fff; }
+  .vp .tgt:active { cursor:grabbing; }
+  .vp .hint-drag { position:absolute; left:14px; bottom:12px; font: var(--type-body-xs); color: var(--text-primary); }
+
+  /* trigger demo toolbar */
+  .toolbar { position:relative; display:inline-flex; gap:8px; padding:10px 12px; background: var(--bg-tile); border:1px solid var(--border-light); border-radius:12px; }
+  .iconbtn { width:40px; height:40px; border-radius:8px; border:1px solid transparent; background:transparent; color: var(--text-secondary); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:.12s; }
+  .iconbtn:hover { background: var(--tertiary-light); color: var(--text-primary); }
+  .iconbtn:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+  .iconbtn svg { width:22px; height:22px; }
+  .tgt i, .iconbtn i, .use-field__input i { display:contents; }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:26px 20px; flex:1; display:flex; align-items:center; justify-content:center; min-height:120px; }
+  .guide-card__cap { padding:0 20px 20px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- usage tiles ---------- */
+  .use-tiles { display:grid; grid-template-columns: repeat(3,1fr); gap:20px; }
+  @media (max-width:820px){ .use-tiles { grid-template-columns:1fr; } }
+  .use-tile__stage { padding:30px 20px; display:flex; align-items:center; justify-content:center; background: var(--tertiary-light); min-height:110px; }
+  .use-truncate { max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:var(--type-body-m); color:var(--text-primary); border-bottom:1px dashed var(--border-primary); cursor:default; }
+  .use-field { display:flex; flex-direction:column; gap:6px; width:100%; max-width:200px; }
+  .use-field__label { font:var(--type-body-s-strong); color:var(--text-primary); }
+  .use-field__input { height:40px; border:1.5px solid var(--error); border-radius:9px; padding:0 12px; font:var(--type-body-m); color:var(--text-primary); background:var(--bg-tile); display:flex; align-items:center; gap:8px; }
+  .use-field__input svg { width:18px; height:18px; color:var(--error); flex:none; }
+
+  /* ---------- developer handoff ---------- */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 34px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Tooltip">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage" id="pg-stage">
+          <span class="tgt" id="pg-target">
+            <i data-icon="info-circle"></i>
+          </span>
+        </div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>2.004</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Tooltip</h1>
+    <p class="lead">Всплывающая подсказка при наведении или фокусе на объект — иконку, IconButton, обрезанный текст или поле с ошибкой. Контент — строка, тултип не может быть пустым. Хинт может быть со стрелкой или без неё, в любом из 12 краевых положений.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc">Три типичных сценария — пояснение иконки, полное значение обрезанного текста, сообщение об ошибке рядом с полем. Наведите курсор на каждый пример.</p>
+    <div class="panel">
+      <div class="use-tiles">
+        <div class="use-tile">
+          <div class="use-tile__stage" id="use-iconbtn"></div>
+          <div class="use-tile__cap">IconButton без подписи — тултип поясняет действие</div>
+        </div>
+        <div class="use-tile">
+          <div class="use-tile__stage" id="use-truncate"></div>
+          <div class="use-tile__cap">Обрезанный текст — тултип показывает полное значение</div>
+        </div>
+        <div class="use-tile">
+          <div class="use-tile__stage" id="use-field"></div>
+          <div class="use-tile__cap">Поле с ошибкой — тултип типа Error уточняет причину</div>
+        </div>
+      </div>
+    </div>
+  
+<div class="subsec" data-screen-label="WhenToUse">
+    <h3>Когда использовать</h3>
+    <p class="desc tight">Используйте тултип, когда нужно:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>пояснить назначение иконки или <a class="inl" href="../atoms/IconButton.html">IconButton</a> без подписи;</li>
+      <li>показать полное значение обрезанного текста;</li>
+      <li>дать короткое уточнение или сообщение об ошибке рядом с полем.</li>
+    </ul>
+    <p class="desc">Тултип — вспомогательный, временный слой. Не размещайте в нём контент, без которого нельзя выполнить задачу, и интерактивные элементы (ссылки, кнопки) — для этого подходят поповер или модальное окно. Текст должен быть коротким; тултип не может быть пустым.</p>
+  </div>
+
+<div class="subsec" data-screen-label="Guidelines">
+    <h3>Рекомендации</h3>
+    <p class="desc">Держите текст коротким и по делу. Тултип поясняет объект, а не дублирует видимую подпись и не содержит длинных инструкций.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad2"></span>Не так</div>
+        <div class="guide-card__body" id="copy-bad"></div>
+        <p class="guide-card__cap">Длинный абзац перегружает временную подсказку.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good2"></span>Так</div>
+        <div class="guide-card__body" id="copy-good"></div>
+        <p class="guide-card__cap">Одна короткая фраза — суть подсказки.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Тултип состоит из контейнера с фоном, текстового контента и опциональной стрелки, направленной на объект подсказки.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage" id="anat-diagram"></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Контейнер</span><span class="d"> — фон, радиус 8px, тень</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Контент</span><span class="d"> — строка, стиль Body S (14/16)</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Стрелка</span><span class="d"> — опционально, указывает на объект</span></span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PADDINGS -->
+    <div class="panel">
+      <div class="spec">
+        <div id="pad-diagram"></div>
+        <p class="spec__cap">Паддинги контентной области — <b>8 / 12 / 8 / 12</b>. Расстояние от стрелки до края тултипа при краевом размещении — <b>6px</b>. Стрелка выносится за контейнер на <b>7px</b>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Types">
+    <h3>Типы</h3>
+    <p class="desc">Виды тултипа отличаются между собой цветом фона. <b>Main</b> — нейтральные подсказки, <b>Error</b> — сообщения об ошибке рядом с полем или контролом.</p>
+    <div class="panel">
+      <div class="types" id="types-demo"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Rich">
+    <h3>Богатый контент</h3>
+    <p class="desc">Расширенный тултип: заголовок, описание в 1–3 строки и опциональное действие (класс <code class="tok">tip--rich</code>). Нужен там, где одной строки не хватает: термин требует определения, метрика — методики расчёта. Максимальная ширина — <b>320px</b>, паддинги <b>12 / 16</b>, текст всегда переносится.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:300px;">
+        <p class="desc tight" style="margin-bottom:18px;">Наведите курсор или перейдите <b>Tab</b>’ом на иконку — курсор можно завести в сам тултип</p>
+        <div id="rich-demo" style="display:flex; justify-content:center; padding:8px 0 190px;"></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:14px;">Когда какой</p>
+        <ul class="bullets">
+          <li><b>Обычный</b> — до одной строки: пояснение иконки, полное значение обрезанного текста. Не интерактивен.</li>
+          <li><b>Богатый</b> — заголовок + описание, опционально одно действие. Открывается тем же hover / focus, но не закрывается, пока курсор на самом тултипе (задержка скрытия 300&nbsp;мс).</li>
+          <li>Больше одного действия, форма, список или закрытие крестиком — это уже <a class="inl" href="../organisms/Popover.html">Popover</a>, а не тултип.</li>
+          <li>Действие внутри — не единственный способ его выполнить: то же должно быть доступно со страницы.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">В общем случае размер тултипа определяется размером контента. Задаётся максимальная ширина контейнера (<code class="tok">--tip-max</code> = 280px). Если ширина контента с паддингами меньше максимальной — тултип сжимается до обтекания контента.</p>
+    <div class="panel">
+      <div class="row" style="gap:32px; align-items:flex-start;">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <span class="th" style="font:var(--type-body-s-strong); color:var(--text-secondary);">Короткий контент — обтекание</span>
+          <div id="size-short"></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <span class="th" style="font:var(--type-body-s-strong); color:var(--text-secondary);">Длинный контент — перенос по max-width</span>
+          <div id="size-long"></div>
+        </div>
+      </div>
+    </div>
+    <p class="desc" style="margin-top:28px;">Однострочный текст не переносится — тултип растёт по ширине до максимума. Текст длиннее максимальной ширины переносится на несколько строк (<code class="tok">.tip--multiline</code>), сохраняя паддинги 8/12.</p>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус не зависит ни от размера контента, ни от места стрелки.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Плашка тултипа</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--tip-radius (--radius-control)</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кнопка-действие внутри</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стрелка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Текст тултипа — единственное содержимое компонента; пустым он не бывает. Правила:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>одна короткая фраза — идеально в одну строку (см. «Размеры» выше); длинный текст — признак того, что нужен поповер или другой компонент, а не тултип;</li>
+      <li>тип <b>Main</b> — нейтральное пояснение без точки в конце, если это не полное предложение (например, полное значение обрезанного текста);</li>
+      <li>тип <b>Error</b> — конкретная причина и (по возможности) что сделать для исправления — не общее «Ошибка!»;</li>
+      <li>не дублируйте видимую рядом подпись дословно — тултип добавляет смысл, а не повторяет его;</li>
+      <li>без интерактивных элементов внутри (см. «Когда использовать») — ссылки и кнопки недоступны внутри тултипа.</li>
+    </ul>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="Placement">
+    <h3>Размещение и стрелка</h3>
+    <p class="desc">Тултип размещается с одной из 4 сторон объекта (<code class="tok">top</code> · <code class="tok">bottom</code> · <code class="tok">left</code> · <code class="tok">right</code>), а стрелка выравнивается вдоль края по одному из 3 положений (<code class="tok">start</code> · <code class="tok">center</code> · <code class="tok">end</code>) — всего 12 комбинаций. Стрелка всегда направлена на объект подсказки.</p>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between; align-items:center; margin-bottom:26px;">
+        <span style="font:var(--type-body-m-strong); color:var(--text-primary);">12 положений стрелки</span>
+        <button type="button" class="toggle" id="vtype-toggle" aria-pressed="false"><span class="sw-mini"></span><span>Показать Error</span></button>
+      </div>
+      <div class="vgrid" id="variants-grid"></div>
+    </div>
+    <p class="desc" style="margin-top:28px;">Стрелку можно отключить — тогда тултип просто отступает от объекта на 8px. Без стрелки уместен для подсказок, не привязанных к конкретной точке.</p>
+    <div class="panel">
+      <div class="row" style="gap:40px; align-items:center;">
+        <div id="noarrow-with"></div>
+        <div id="noarrow-without"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="AutoFlip">
+    <h3>Авто-разворот и смещение</h3>
+    <p class="desc">Если у предпочтительной стороны не хватает места, тултип разворачивается на противоположную сторону, а вдоль края смещается, чтобы не выходить за границы экрана — при этом стрелка остаётся направленной на объект. Перетащите цель к краям области, чтобы увидеть поведение.</p>
+    <div class="panel">
+      <div class="row" style="margin-bottom:18px; gap:18px; align-items:center;">
+        <span style="font:var(--type-body-s-strong); color:var(--text-secondary);">Предпочтительная сторона</span>
+        <div class="pg-select" style="width:180px;">
+          <select id="flip-prefer">
+            <option value="top">Top</option>
+            <option value="bottom" selected>Bottom</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+      </div>
+      <div class="vp" id="flip-vp">
+        <span class="tgt" id="flip-target" style="left:140px; top:128px;">
+          <i data-icon="info-circle"></i>
+        </span>
+        <span class="hint-drag">Перетащите цель ↕↔</span>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Triggers">
+    <h3>Триггеры и тайминги</h3>
+    <p class="desc">Тултип появляется при наведении курсора и при фокусе с клавиатуры, скрывается при уходе курсора, потере фокуса или нажатии <b>Esc</b>. Чтобы случайные пересечения курсора не вызывали мелькания, появление задерживается на ~400&nbsp;мс, скрытие — мгновенное. На тач-устройствах тултип вызывается долгим нажатием.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Наведите курсор или перейдите <b>Tab</b>’ом на иконку</p>
+        <div style="display:flex; justify-content:center; padding:20px 0 40px;">
+          <div class="toolbar" id="trigger-demo"></div>
+        </div>
+      </div>
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:18px;">Тайминги</p>
+        <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div id="timing-table"></div></div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+    <!-- Состояния (STUB) -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Не применимо: у компонента нет интерактивных состояний.</p>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Контейнеру присваивается <code class="tok">role="tooltip"</code> и уникальный <code class="tok">id</code>, а объект-триггер ссылается на него через <code class="tok">aria-describedby</code>. Триггер должен быть фокусируемым (кнопка, ссылка или элемент с <code class="tok">tabindex="0"</code>). Тултип не перехватывает фокус и закрывается по <b>Esc</b>.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body" id="a11y-bad"></div>
+        <p class="guide-card__cap">Критичная информация и действия спрятаны в тултипе — недоступны с клавиатуры и на тач-устройствах.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="a11y-good"></div>
+        <p class="guide-card__cap">Короткое пояснение, продублированное в <code class="tok">aria-describedby</code>; объект остаётся доступным.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Текст тултипа набирается гарнитурой <b>SB Sans Text</b> токеном <code class="tok">--type-body-s</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.03fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.03fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Контент</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены. Стрелка наследует фон контейнера через переменную <code class="tok">--tip-bg</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.53fr 1.08fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.53fr 1.08fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Main</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон контейнера и стрелки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-hint</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-hint)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#283237</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.53fr 1.08fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Main</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.53fr 1.08fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон контейнера и стрелки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.53fr 1.08fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/tooltip.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/tooltip.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Триггеры: hover (задержка ≈400мс перед показом, чтобы случайное пересечение курсора</span>
+<span class="tk-cm">//    не вызывало мелькание), focus (мгновенно, без задержки); скрытие — мгновенно по mouseleave/blur/Esc</span>
+
+<span class="tk-cm">// 2. Позиционирование (вызывается при показе и при resize):</span>
+<span class="tk-cm">//    взять getBoundingClientRect() цели и тултипа относительно позиционирующего родителя;</span>
+<span class="tk-cm">//    top/bottom — y = край цели ± gap(8px); left/right — аналогично по X;</span>
+<span class="tk-cm">//    align center/start/end сдвигает вторую ось относительно центра цели (start/end — отступ 13px для стрелки)</span>
+
+<span class="tk-cm">// 3. Авто-разворот: проверить свободное место по предпочтительной стороне относительно viewport/контейнера;</span>
+<span class="tk-cm">//    не хватает — пробовать противоположную, затем перпендикулярные стороны; выбрать первую подходящую;</span>
+<span class="tk-cm">//    затем зажать позицию внутри границ контейнера и пересчитать позицию стрелки, чтобы она всё ещё указывала на цель</span>
+
+<span class="tk-cm">// 4. Перенос: если ширина одной строки &gt; --tip-max — включить white-space:normal (.tip--multiline)</span>
+
+<span class="tk-cm">// 5. Доступность: триггер должен быть фокусируем элементом; тултип не перехватывает фокус и закрывается по Esc без сброса фокуса с триггера</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">makeTip</code> / <code class="tok">placeTip</code> в <code class="tok">tooltip.page.js</code>).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Задержка появления</b> — настраиваемый delay до показа/скрытия (hover-intent).</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Tooltip</span>
+    <span>Main · Error — top / bottom / left / right × start / center / end</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите тултип: тип, размещение, выравнивание стрелки и текст — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/tooltip.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-tooltip.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/tooltip.page.js"></script>
+<script src="../../scripts/icons-data.js"></script>
+<script>
+/* подставляем иконку-цель из библиотеки ДС */
+(function(){ const i=(window.DS_ICONS||{})['info-circle']; if(!i) return;
+  document.querySelectorAll('#pg-target, #flip-target').forEach(el=>{ const s=el.querySelector('svg'); if(s) s.outerHTML=i; });
+})();
+</script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Тип': 'Показывать Error', 'Стрелка': 'Показывать стрелку', 'Богатый контент': 'Показывать богатый контент', 'Перенос (multiline)': 'Перенос текста' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- триггер ссылается на тултип через aria-describedby -->
+<button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Удалить" aria-describedby="tip-1">…</button>
+
+<!-- сам тултип: позиционируется JS относительно триггера, скрыт до показа -->
+<span class="tip tip--main tip--top tip--center tip--floating" role="tooltip" id="tip-1">
+  Удалить
+  <span class="tip__arrow"></span>
+</span>
+
+<!-- без стрелки / с переносом -->
+<span class="tip tip--error tip--bottom tip--start tip--no-arrow tip--multiline" role="tooltip">…</span></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/tooltip.page.js)
+// Тултип и позиционирование — общий рантайм: window.DSTooltip.make(text, o) / .place(tip, target, o)
+const spec = {
+  type: 'main',                      // 'main' | 'error'
+  placement: 'top',                  // top/bottom/left/right
+  align: 'center',                   // start/center/end (стрелка)
+  arrow: true,                       // tip--no-arrow без стрелки
+  multiline: false, rich: false,     // перенос / заголовок+действие
+  text: 'Подсказка'
+};
+// .tip(.tip--<type>)(.tip--<placement>)(.tip--<align>)(.tip--no-arrow)(.tip--multiline)(.tip--rich)
+// Триггеры: hover (≈400мс), focus (мгновенно); скрытие — mouseleave/blur/Esc; авто-разворот + зажим в границах.</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Tooltip
+   Всплывающая подсказка при наведении / фокусе на объект (иконка, IconButton,
+   обрезанный текст, поле с ошибкой). Контент — строка, может переноситься.
+
+   Types:      main · error
+   Placement:  top · bottom · left · right
+   Align:      start · center · end        (положение стрелки вдоль края)
+   Extras:     no-arrow · multiline
+
+   Tokens:
+     --tip-bg   — фон тултипа и стрелки
+     --tip-fg   — цвет текста
+     --tip-max  — максимальная ширина контейнера
+   Requires: typography.css, colors.css
+   ========================================================================= */
+
+.tip {
+  --tip-bg: var(--bg-hint);          /* #283237 */
+  --tip-fg: var(--text-on-dark);     /* #FFFFFF */
+  --tip-max: 280px;
+  --tip-radius: var(--radius-control);
+  --tip-arrow: 7px;                  /* высота стрелки (вынос за край) */
+  --tip-arrow-edge: 6px;             /* отступ стрелки от края при краевом размещении */
+
+  box-sizing: border-box;
+  position: relative;
+  display: inline-block;
+  max-width: var(--tip-max);
+  padding: 8px 12px;                 /* 8/12/8/12 */
+  border-radius: var(--tip-radius);
+  background: var(--tip-bg);
+  color: var(--tip-fg);
+  font: var(--type-body-s);          /* Body S — 14/16 */
+  letter-spacing: 0;
+  white-space: nowrap;               /* по умолчанию — одна строка, обтекание контента */
+  overflow: hidden;
+  text-overflow: ellipsis;           /* защита, если контент длиннее --tip-max и JS не переключил на --multiline */
+  box-shadow: 0 4px 14px rgba(40, 50, 55, .18);
+  z-index: 30;
+}
+
+/* перенос длинного контента — ограничение по --tip-max */
+.tip--multiline { white-space: normal; text-wrap: pretty; }
+
+/* ---------- rich — заголовок + описание + действие ------------------------ *
+   Расширенный тултип для случаев, когда одной строки не хватает: термин,
+   метрика, правило расчёта. В отличие от обычного он ИНТЕРАКТИВЕН — курсор
+   может зайти внутрь (см. тайминг скрытия в поведении). */
+.tip--rich {
+  /* ширина задаётся прямым свойством, а не подменой --tip-max в модификаторе —
+     так компилятор ДС чисто регистрирует токены компонента */
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 16px;
+  white-space: normal;
+  text-wrap: pretty;
+}
+.tip__title { font: var(--type-body-s-strong); color: var(--tip-fg); }
+.tip__text  { font: var(--type-body-s); color: var(--tip-fg); opacity: .82; }
+.tip__actions { display: flex; gap: 4px; margin-top: 8px; }
+.tip__action {
+  appearance: none;
+  margin: 0;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: var(--radius-control-s);
+  background: transparent;
+  color: var(--tip-fg);
+  font: var(--type-button-xs);
+  cursor: pointer;
+  transition: background-color .12s ease;
+}
+/* подложка действия — производная от цвета текста тултипа, не новый цвет */
+.tip__action:hover { background: color-mix(in srgb, var(--tip-fg) 16%, transparent); }
+.tip__action:focus-visible { outline: 2px solid var(--tip-fg); outline-offset: 2px; }
+
+
+/* ---------- types --------------------------------------------------------- *
+   Тип = фон тултипа и стрелки напрямую (не через --tip-bg в модификаторе). */
+.tip--main  { background: var(--bg-hint); }
+.tip--main  .tip__arrow { background: var(--bg-hint); }
+.tip--error { background: var(--error); }
+.tip--error .tip__arrow { background: var(--error); }
+
+/* ---------- arrow --------------------------------------------------------- */
+.tip__arrow {
+  position: absolute;
+  width: calc(var(--tip-arrow) * 2);
+  height: var(--tip-arrow);
+  background: var(--tip-bg);
+  pointer-events: none;
+}
+.tip--no-arrow .tip__arrow { display: none; }
+
+/* --- placement: tooltip ABOVE target → arrow at bottom, points down --- */
+.tip--top .tip__arrow {
+  bottom: calc(var(--tip-arrow) * -1);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+/* --- placement: tooltip BELOW target → arrow at top, points up --- */
+.tip--bottom .tip__arrow {
+  top: calc(var(--tip-arrow) * -1);
+  clip-path: polygon(50% 0, 0 100%, 100% 100%);
+}
+/* --- placement: tooltip LEFT of target → arrow at right, points right --- */
+.tip--left .tip__arrow {
+  width: var(--tip-arrow);
+  height: calc(var(--tip-arrow) * 2);
+  right: calc(var(--tip-arrow) * -1);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+/* --- placement: tooltip RIGHT of target → arrow at left, points left --- */
+.tip--right .tip__arrow {
+  width: var(--tip-arrow);
+  height: calc(var(--tip-arrow) * 2);
+  left: calc(var(--tip-arrow) * -1);
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+
+/* --- arrow alignment along a horizontal edge (top / bottom placement) --- */
+.tip--top.tip--start  .tip__arrow,
+.tip--bottom.tip--start  .tip__arrow { left: var(--tip-arrow-edge); }
+.tip--top.tip--center .tip__arrow,
+.tip--bottom.tip--center .tip__arrow { left: 50%; transform: translateX(-50%); }
+.tip--top.tip--end    .tip__arrow,
+.tip--bottom.tip--end    .tip__arrow { right: var(--tip-arrow-edge); }
+
+/* --- arrow alignment along a vertical edge (left / right placement) --- */
+.tip--left.tip--start  .tip__arrow,
+.tip--right.tip--start  .tip__arrow { top: var(--tip-arrow-edge); }
+.tip--left.tip--center .tip__arrow,
+.tip--right.tip--center .tip__arrow { top: 50%; transform: translateY(-50%); }
+.tip--left.tip--end    .tip__arrow,
+.tip--right.tip--end    .tip__arrow { bottom: var(--tip-arrow-edge); }
+
+/* =========================================================================
+   FLOATING — тултип, спозиционированный относительно цели (через JS).
+   Контейнер-якорь получает position:relative, тултип — position:absolute.
+   Появление/скрытие через .is-visible.
+   ========================================================================= */
+.tip-anchor { position: relative; display: inline-flex; }
+
+.tip.tip--floating {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(.96);
+  transform-origin: var(--tip-origin, center);
+  transition: opacity .14s ease, transform .14s ease, visibility 0s linear .14s;
+}
+.tip.tip--floating.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  transition: opacity .14s ease, transform .14s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tip.tip--floating { transition: opacity .01s; transform: none; }
+  .tip.tip--floating.is-visible { transform: none; }
+}
+
+/* pinned — always-visible positioned tooltip (demos that aren't hover-triggered) */
+.tip.tip--floating.tip--pinned {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
+}</script>
+</body>
+</html>

@@ -1,0 +1,728 @@
+<!-- @dsCard group="Foundations" name="Spacing" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сетка и отступы — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/spacing.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:76ch; text-wrap:pretty; }
+.subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:34px 0 16px; }
+.subhead:first-child { margin-top:0; }
+
+/* ---------- playground ---------- */
+@media (max-width:860px){ }
+.pg__stage { flex:1; min-height:0; width:100%; padding:32px; display:block;  background: var(--bg-tile); overflow:hidden; }
+.ctl { display:flex; flex-direction:column; gap:10px; }
+.ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+.ctl input[type=range] { width:100%; accent-color: var(--primary); }
+.ctl .rng-row { display:flex; align-items:center; justify-content:space-between; }
+.ctl .rng-row .val { font: var(--type-body-s-strong); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.readout { display:flex; flex-direction:column; gap:6px; padding-top:4px; border-top:1px solid var(--border-light); }
+.readout .r { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+.readout .r .k { font: var(--type-body-s); color: var(--text-inactive); }
+.readout .r .v { font: var(--type-body-m-strong); color: var(--text-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; text-align:right; }
+.readout .r .v.tokv { color: var(--primary); }
+
+/* сцена сетки */
+.gwrap { overflow:hidden; }
+.gbox { transform-origin: 0 0; position:relative; border:1px dashed var(--border-primary); background: var(--bg-tile); }
+.gbox.is-mod::before { content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    repeating-linear-gradient(to right, color-mix(in srgb, var(--primary) 16%, transparent) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--primary) 16%, transparent) 0 1px, transparent 1px 4px); }
+.gcols { position:relative; display:grid; height:280px; }
+.gcol { background: color-mix(in srgb, var(--primary) 10%, transparent); border-radius: var(--radius-xs); }
+.gcaption { display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-top:14px; font: var(--type-body-xs); color: var(--text-inactive); }
+.glay { position:absolute; inset:0; display:grid; padding:0; }
+.glay .blk { background: var(--bg-tile); border:1px solid var(--border-primary); border-radius: var(--radius-card); display:flex; align-items:center; justify-content:center; font: var(--type-body-s-strong); color: var(--text-secondary); }
+
+/* схемы раскладок в колонках */
+.gspan { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); column-gap:16px; row-gap:8px; }
+.gspan .c { background:var(--bg-tile); border:1px solid var(--border-primary); border-radius:var(--radius-xs); padding:10px 8px; text-align:center; font:var(--type-body-s); color:var(--text-secondary); min-width:0; }
+.gspan .c b { font:var(--type-body-s-strong); color:var(--text-primary); }
+.gspan .c.empty { background:transparent; border-style:dashed; color:var(--text-inactive); }
+.gspan-lbl { font:var(--type-body-xs); color:var(--text-inactive); margin:0 0 8px; }
+.gspan-lbl + .gspan { margin-bottom:20px; }
+.gspan:last-child { margin-bottom:0; }
+
+/* ---------- шкала отступов ---------- */
+.sc { display:flex; flex-direction:column; }
+.sc-row { display:grid; grid-template-columns: 92px 128px 1fr; align-items:center; gap:20px; padding:10px 22px; border-bottom:1px solid var(--border-light); }
+.sc-row:last-child { border-bottom:none; }
+.sc-row:hover { background: var(--bgtable-row-hover); }
+.sc-name { font: var(--type-body-m-strong); color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.sc-tok { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; color: var(--primary); }
+.sc-bar { display:flex; align-items:center; gap:14px; }
+.sc-bar i { display:block; height:20px; background: color-mix(in srgb, var(--primary) 22%, transparent); border-radius:2px; flex:none; }
+.sc-use { font: var(--type-body-s); color: var(--text-secondary); text-wrap:pretty; }
+.sc--half .sc-bar i { background: color-mix(in srgb, var(--warning) 34%, transparent); }
+.sc--half .sc-tok { color: var(--text-secondary); }
+
+/* ---------- раскладки ---------- */
+.lays { display:flex; flex-direction:column; gap:22px; }
+.lay { display:flex; flex-direction:column; gap:8px; }
+.lay .bars { display:grid; gap: var(--space-8); }
+.lay .bars > span { height:44px; border-radius: var(--radius-xs); background: color-mix(in srgb, var(--primary) 12%, transparent); display:flex; align-items:center; justify-content:center; font: var(--type-body-xs); color: var(--primary-dark); }
+.lay .cap { font: var(--type-body-s); color: var(--text-secondary); }
+.lay .cap b { color: var(--text-primary); }
+
+/* ---------- правила ---------- */
+.guides { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap:18px; }
+.guide { background: var(--bg-tile); border:1px solid var(--border-light); border-radius: var(--radius-2xl); padding:24px 26px; }
+.guide h3 { font: var(--type-h6-strong); color: var(--text-primary); margin:0 0 8px; display:flex; align-items:center; gap:9px; }
+.guide p { font: var(--type-body-s); color: var(--text-secondary); margin:0; text-wrap:pretty; }
+.guide .ic { width:22px; height:22px; flex:none; color: var(--primary); }
+.guide.dont .ic { color: var(--error); }
+
+/* пример «близость» */
+.prox { display:flex; gap:30px; flex-wrap:wrap; margin-top:22px; align-items:flex-start; }
+.prox-card { background: var(--bg-tile); border:1px solid var(--border-light); border-radius: var(--radius-2xl); padding:16px; width:240px; display:flex; flex-direction:column; }
+.prox-card .fld { display:flex; flex-direction:column; gap:4px; }
+.prox-card .fld .l { font: var(--type-body-xs); color: var(--text-inactive); }
+.prox-card .fld .i { height:32px; border:1px solid var(--border-primary); border-radius: var(--radius-field); background: var(--bg-tile); }
+.prox-card.good .fld + .fld { margin-top:16px; }
+.prox-card.bad .fld { gap:16px; }
+.prox-card.bad .fld + .fld { margin-top:4px; }
+.prox-label { font: var(--type-body-xs); color: var(--text-inactive); margin:10px 0 0; text-align:center; }
+</style>
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Spacing">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage">
+        <div class="gwrap" id="gwrap">
+          <div class="gbox" id="gbox">
+            <div class="gcols" id="gcols"></div>
+            <div class="glay" id="glay" style="display:none"></div>
+          </div>
+        </div>
+        <div class="gcaption"><span id="capLeft">12 колонок · зазор 16 px · поля 0 px</span><span id="capRight">колонка 85.3 px</span></div>
+      </div>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.004</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Основы</p>
+    <h1>Сетка и отступы</h1>
+    <p class="lead">Вся система построена на модуле <b>4&nbsp;px</b>: отступы, зазоры и размеры кратны четырём. Горизонтальную структуру задаёт колоночная сетка — контентная область делится на 12 резиновых колонок с постоянным зазором. Значения берутся из токенов <code class="tok">--space-*</code> и <code class="tok">--grid-*</code>, а не подбираются на глаз.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- ИСПОЛЬЗОВАНИЕ -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc">Сетка и отступы работают на двух разных уровнях. Колоночная сетка отвечает за горизонтальную структуру страницы, шкала отступов — за расстояния внутри и между блоками. Их не смешивают: ширину блока определяет число колонок, расстояние между блоками — токен <code class="tok">--space-*</code>.</p>
+
+    <h3>Когда использовать колоночную сетку</h3>
+    <ul class="rules">
+      <li><b>Раскладка страницы и крупных блоков.</b> Карточки, таблицы, формы, панели выравниваются по колонкам контентной области.</li>
+      <li><b>Ширина в колонках, а не в пикселях.</b> Блок занимает 4, 6, 8 колонок — при изменении ширины окна он тянется вместе с сеткой.</li>
+      <li><b>Соседние блоки одного уровня</b> разделяет зазор сетки. Собственных горизонтальных отступов у них нет.</li>
+    </ul>
+
+    <h3>Когда использовать шкалу отступов</h3>
+    <ul class="rules">
+      <li><b>Внутри блока.</b> Паддинги карточки, расстояние между полем и подписью, между иконкой и текстом.</li>
+      <li><b>Вертикальный ритм.</b> Между полями, группами, секциями — сетка колонок вертикаль не задаёт.</li>
+      <li><b>В сетке внутри контейнера.</b> Если контейнер уже сам стоит в колонках, внутреннюю раскладку строят на токенах отступов, а не на второй колоночной сетке.</li>
+    </ul>
+
+    <h3>Что считается нарушением</h3>
+    <ul class="rules">
+      <li>Значение вне шкалы: 13, 18, 22, 30&nbsp;px. Округляйте до ближайшего шага.</li>
+      <li>Фиксированная ширина колонки в пикселях — колонки резиновые.</li>
+      <li>Контент, заходящий в зазор между колонками или в поля контентной области.</li>
+    </ul>
+  </section>
+
+  <!-- МОДУЛЬ -->
+  <section class="section" data-screen-label="Module">
+    <h2>Модуль 4 px</h2>
+    <p class="desc">Базовая единица системы — 4&nbsp;px. Любой отступ, зазор и размер элемента должен быть кратен четырём: так интерфейс остаётся ритмичным, а макет — предсказуемым при масштабировании (1×, 1.5×, 2×) без дробных пикселей. Основной шаг ритма — 8&nbsp;px; 4&nbsp;px используется как подшаг для плотных мест.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="sc" id="scaleRows"></div>
+    </div>
+    <p class="desc" style="margin-top:22px;">Полушаги <b>2 / 6 / 10 / 14&nbsp;px</b> — исключения. Они допустимы только там, где кратность четырём даёт оптически неверный результат: обводка фокуса, компенсация круглых форм, компактные контролы XS. Новых полушагов не вводим — при сомнении берём ближайший шаг из основной шкалы.</p>
+    <div class="panel" style="padding:0;overflow:hidden;margin-top:14px;">
+      <div class="sc sc--half" id="halfRows"></div>
+    </div>
+  </section>
+
+  <!-- КОЛОНОЧНАЯ СЕТКА -->
+  <section class="section" data-screen-label="Grid">
+    <h2>Колоночная сетка</h2>
+    <p class="desc">Контентная область — любая область, в которой живёт контент: вся страница, тело модального окна, рабочая зона рядом с навигацией. Какой бы ширины она ни была, она делится на <b>12 колонок</b> с постоянным зазором <b>16&nbsp;px</b>. Колонки резиновые: при изменении ширины области меняется ширина колонки, а не зазор.</p>
+
+    <p class="subhead">Формула</p>
+    <div class="panel" style="padding:22px 26px;">
+      <p style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:var(--text-primary);margin:0 0 10px;">ширина колонки = (W − 2 × margin − (N − 1) × gutter) / N</p>
+      <p style="font:var(--type-body-s);color:var(--text-secondary);margin:0;text-wrap:pretty;">W — ширина контентной области, N — число колонок (12), gutter — зазор (16&nbsp;px), margin — поля внутри области (по умолчанию 0: поля задаёт лайаут экрана). Ширина колонки почти всегда дробная — это нормально. Кратность четырём требуется от отступов и зазоров, а не от вычисленных ширин.</p>
+    </div>
+
+    <p class="subhead">Типовые раскладки</p>
+    <div class="lays" id="layGrid"></div>
+
+    <p class="subhead">Ширина блока в колонках</p>
+    <ul class="rules">
+      <li><b>Любое число от 1 до 12.</b> Утилиты <code class="tok">.col-1</code> … <code class="tok">.col-12</code>. Кратность трём или четырём не требуется: блок занимает столько колонок, сколько нужно его контенту.</li>
+      <li><b>Ряд набирается до 12 колонок.</b> Блок, которому не хватило места, переносится на следующий ряд. Недобор — норма: ряд может закончиться пустым местом.</li>
+      <li><b>Таблица занимает все 12 колонок.</b> Реестр — один блок <code class="tok">.col-12</code> во всю ширину контентной области.</li>
+      <li><b>Исключение: ширина вне колонок.</b> В редких случаях плитка может иметь кастомный фиксированный размер или ширину по своему контенту. Это осознанное исключение, а не приём по умолчанию, и в макете оно указывается явно: на блоке ставится <code class="tok">data-off-grid="причина"</code>. Без пометки блок вне колонок — ошибка и ловится линтером (L2).</li>
+    </ul>
+
+    <p class="subhead">Раскладки экранов продукта</p>
+    <div class="panel" style="padding:22px 26px;">
+      <p class="gspan-lbl">Главная — навигационные плитки по 3 колонки</p>
+      <div class="gspan"><div class="c col-3"><b>3</b></div><div class="c col-3"><b>3</b></div><div class="c col-3"><b>3</b></div><div class="c col-3"><b>3</b></div></div>
+      <p class="gspan-lbl">Реестр — таблица во всю ширину рабочей области</p>
+      <div class="gspan"><div class="c col-12"><b>12</b></div></div>
+      <p class="gspan-lbl">Карточка сущности — плитки по 3 и по 6 колонок</p>
+      <div class="gspan"><div class="c col-3"><b>3</b></div><div class="c col-3"><b>3</b></div><div class="c col-6"><b>6</b></div><div class="c col-6"><b>6</b></div><div class="c col-3"><b>3</b></div><div class="c col-3"><b>3</b></div><div class="c col-6"><b>6</b></div></div>
+    </div>
+
+    <p class="subhead">Перестроение при сужении</p>
+    <p class="desc">Блок объявляет две ширины: основную и узкую. Когда рабочая область сужается, узкая ширина заменяет основную, и блоки, стоявшие рядом, встают друг под друга. Общего для ДС набора брейкпоинтов нет — порог переключения задаёт экран: «узко» для карточки сущности и для реестра наступает на разной ширине. Порог отсчитывается от ширины рабочей области, а не окна (см. <a class="link" href="Layout.html">Каркас экрана</a>): боковая панель сужает контент, не меняя вьюпорт.</p>
+    <div class="panel" style="padding:22px 26px;">
+      <p class="gspan-lbl">Широкая рабочая область — основные ширины</p>
+      <div class="gspan"><div class="c col-3"><b>3</b></div><div class="c col-3"><b>3</b></div><div class="c col-6"><b>6</b></div><div class="c col-6"><b>6</b></div><div class="c col-3"><b>3</b></div><div class="c col-3"><b>3</b></div></div>
+      <p class="gspan-lbl">Узкая рабочая область — те же блоки на узких ширинах: два трёхколоночных стали шестиколоночными и разошлись по рядам</p>
+      <div class="gspan grid12--narrow"><div class="c col-3 colw-3"><b>3</b></div><div class="c col-3 colw-3"><b>3</b></div><div class="c col-6 colw-6"><b>6</b></div><div class="c col-6 colw-6"><b>6</b></div><div class="c col-3 colw-6"><b>3 → 6</b></div><div class="c col-3 colw-6"><b>3 → 6</b></div></div>
+    </div>
+    <ul class="rules">
+      <li><b>Узкая ширина объявляется на блоке.</b> <code class="tok">class="col-3 colw-6"</code> — три колонки в основном режиме, шесть в узком. Блок, у которого узкой ширины нет, не перестраивается.</li>
+      <li><b>Порог включает экран.</b> Либо контейнерным запросом по ширине рабочей области, либо классом <code class="tok">.grid12--narrow</code> на сетке — когда режим зависит от состояния экрана (открыта боковая панель), а не от ширины.</li>
+      <li><b>Ширин две, не больше.</b> Нужна третья ступень — это отдельное решение по экрану, а не утилита сетки.</li>
+    </ul>
+    <div class="panel" style="padding:22px 26px;">
+      <p style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:var(--text-primary);margin:0;white-space:pre;overflow-x:auto;">&lt;section class="col-3 colw-6"&gt;Сроки&lt;/section&gt;
+
+@container screen (max-width: 1240px) {
+  .grid12 &gt; [class*="colw-"] { grid-column: span var(--colw); }
+}</p>
+    </div>
+
+    <p class="subhead">Правила выравнивания</p>
+    <ul class="rules">
+      <li><b>Блок начинается и заканчивается на границе колонки.</b> Промежуточных позиций нет.</li>
+      <li><b>Зазор — только между колонками.</b> Крайние колонки прижаты к границам контентной области; внешние поля добавляет лайаут, а не сетка.</li>
+      <li><b>Вложенная сетка наследует зазор.</b> Внутри блока, занимающего 6 колонок, можно построить собственную сетку — но зазор берут тот же, 16&nbsp;px.</li>
+      <li><b>Сетка — инструмент, а не догма.</b> Служебные элементы (плавающие панели, тултипы, поповеры) позиционируются относительно якоря, а не колонок.</li>
+    </ul>
+  </section>
+
+  <!-- ГДЕ ПРИМЕНЯЕТСЯ -->
+  <section class="section" data-screen-label="Mapping">
+    <h2>Где применяется</h2>
+    <p class="desc">Типовые расстояния интерфейса и токены, которыми они задаются. Компоненты и экраны ссылаются на семантические алиасы — меняете алиас, меняется расстояние во всех местах сразу.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;" id="mapTable"></div>
+    </div>
+  </section>
+
+  <!-- ПРАВИЛА -->
+  <section class="section" data-screen-label="Rules">
+    <h2>Правила</h2>
+    <p class="desc">Пять принципов, которые удерживают ритм системы.</p>
+    <div class="guides">
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Только из шкалы</h3>
+        <p>Берите значения из токенов <code class="tok">--space-*</code>. «13&nbsp;px» или «18&nbsp;px» ломают ритм — округлите до ближайшего шага.</p>
+      </div>
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Близость = связь</h3>
+        <p>Расстояние внутри группы всегда меньше расстояния до соседней группы. Метка ближе к своему полю, чем поля друг к другу.</p>
+      </div>
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Отступ задаёт контейнер</h3>
+        <p>Расстояния между дочерними элементами задаёт родитель через <code>gap</code>. Так удаление или перестановка элемента не оставляет «висящих» полей.</p>
+      </div>
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Чем крупнее блок — тем больше воздух</h3>
+        <p>Контрол 4–8&nbsp;px, карточка 16&nbsp;px, панель 24&nbsp;px, секция страницы 40&nbsp;px. Шаг растёт вместе с уровнем структуры.</p>
+      </div>
+      <div class="guide dont">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Не складывайте отступы</h3>
+        <p>Внешний <code>margin</code> элемента поверх паддинга контейнера даёт непредсказуемую сумму. Один отступ — одна точка ответственности.</p>
+      </div>
+    </div>
+
+    <div class="prox">
+      <div>
+        <div class="prox-card good">
+          <div class="fld"><span class="l">Метка</span><span class="i"></span></div>
+          <div class="fld"><span class="l">Метка</span><span class="i"></span></div>
+        </div>
+        <p class="prox-label">Верно: метка ↔ поле 4, поле ↔ поле 16</p>
+      </div>
+      <div>
+        <div class="prox-card bad">
+          <div class="fld"><span class="l">Метка</span><span class="i"></span></div>
+          <div class="fld"><span class="l">Метка</span><span class="i"></span></div>
+        </div>
+        <p class="prox-label">Неверно: метка оторвана от своего поля</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ДЛЯ РАЗРАБОТЧИКОВ -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc tight">Значения считаны с <code class="tok">:root</code> живой страницы (<code class="tok">getComputedStyle</code>), источник — <code class="tok">styles/spacing.css</code>.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:30px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;" id="devTable"></div>
+    </div>
+
+    <p class="subhead">Поведение · псевдокод (framework-agnostic)</p>
+    <div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Расчёт колоночной сетки</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Копировать</button>
+      </div>
+      <pre><code id="code-grid">// 1. Контентная область — любой контейнер, отданный под контент
+//    (страница, тело модалки, рабочая зона рядом с навигацией).
+//    Её ширину задаёт лайаут; сетка ширину не назначает.
+
+columns = 12                 // не меняется между брейкпоинтами
+gutter  = token(space-16)    // постоянный, не тянется
+margin  = token(space-0)     // поля внутри области; по умолчанию 0
+
+// 2. Раскладка = CSS Grid, колонки резиновые:
+//    grid-template-columns: repeat(12, minmax(0, 1fr))
+//    column-gap: gutter
+//    Ширины колонок в px не назначаются — их считает браузер.
+
+colWidth(W) = (W - 2*margin - (columns - 1) * gutter) / columns
+// дробный результат — норма; кратность 4 требуется от отступов, не от ширин
+
+// 3. Блок занимает целое число колонок:
+//    span(n): grid-column: span n     // 12, 8+4, 6+6, 4+4+4, 3+3+3+3
+//    начало/конец блока всегда на границе колонки
+
+// 4. Внутренние отступы блока берутся из шкалы, не из сетки:
+//    padding: token(pad-card|pad-panel)
+//    gap между дочерними: token(gap-inline|gap-stack|gap-group)
+
+// 5. Округление при переносе из макета:
+//    v = round(v / 4) * 4
+//    исключения 2/6/10/14 — только микро-оптика, новые не вводить</code></pre>
+    </div>
+  </section>
+
+  <!-- БЭКЛОГ -->
+  <section class="section" data-screen-label="Proposals">
+    <h2>Бэклог<span class="badge-proposal">Предложение</span></h2>
+    <p class="desc">Открытые вопросы и то, что сознательно не вошло в v1.0. Значения ниже требуют решения — до этого страница описывает базовый случай.</p>
+    <ul class="bullets">
+      <li><b>Общие брейкпоинты.</b> Число колонок фиксировано (12) на любой ширине, перестроение идёт только сменой ширины блока (<code class="tok">.colw-*</code>), а порог задаёт каждый экран сам. Открытый вопрос — нужен ли ДС общий набор порогов и сворачивается ли сетка в 8 / 6 / 4 колонки на узких ширинах.</li>
+      <li><b>Обособленные боковые панели.</b> Растягиваемая панель справа (AI-данные по корпзапросу, «Заведение сделки») в 12 колонок не входит и живёт вне рабочей области. Общих правил по ней — ширины, границ растягивания, внутренней сетки — пока нет: описываются на уровне конкретного экрана.</li>
+      <li><b>Вертикальный baseline-ритм.</b> Кратность 4 сейчас применяется к отступам, но не к базовым линиям текста. Привязка line-height к сетке 4&nbsp;px даст сквозной вертикальный ритм — требует сверки с токенами <code class="tok">--type-*</code>.</li>
+      <li><b>Плотности (compact / default).</b> Для плотных экранов (таблицы, реестры) может понадобиться сжатый набор алиасов: тот же модуль 4&nbsp;px, но на шаг ниже по шкале.</li>
+      <li><b>Утилиты раскладки.</b> Хелперы <code class="tok">.stack-*</code> / <code class="tok">.inline-*</code> поверх токенов отступов — чтобы экраны не писали <code>gap</code> руками. Пока в ДС есть только утилиты сетки <code class="tok">.grid12</code> и <code class="tok">.col-*</code>.</li>
+    </ul>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Сетка и отступы</span>
+    <span>Модуль 4 px — шкала --space-* — 12 колонок, зазор 16 px</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Задайте ширину контентной области, число колонок и зазор — ширина колонки пересчитается по формуле. Превью масштабируется под панель, значения в сводке всегда реальные.</p>
+              <div class="pg__controls">
+        <div class="ctl-col">
+        <div class="ctl">
+          <div class="rng-row"><span class="lbl">Контентная область</span><span class="val" id="pgWVal">1200&nbsp;px</span></div>
+          <input type="range" id="pgW" min="480" max="1920" step="4" value="1200">
+        </div>
+        <div class="ctl">
+          <span class="lbl">Колонок</span>
+          <div class="pg-select"><select id="pgCols"><option value="12" selected>12</option><option value="8">8</option><option value="6">6</option><option value="4">4</option></select></div>
+        </div>
+        <div class="ctl">
+          <span class="lbl">Зазор (gutter)</span>
+          <div class="pg-select"><select id="pgGut"><option value="8">8 px</option><option value="12">12 px</option><option value="16" selected>16 px</option><option value="20">20 px</option><option value="24">24 px</option><option value="32">32 px</option></select></div>
+        </div>
+        <div class="ctl">
+          <span class="lbl">Поля (margin)</span>
+          <div class="pg-select"><select id="pgMar"><option value="0" selected>0 px</option><option value="16">16 px</option><option value="24">24 px</option><option value="32">32 px</option><option value="40">40 px</option></select></div>
+        </div>
+        </div><!-- /ctl-col -->
+        <div class="toggles">
+          <label class="pg-toggle"><input type="checkbox" id="pgMod"><span class="pg-toggle__sw"></span>Показывать модуль 4 px</label>
+          <label class="pg-toggle"><input type="checkbox" id="pgLay"><span class="pg-toggle__sw"></span>Показывать пример раскладки 8 + 4</label>
+        </div>
+        <div class="readout">
+          <div class="r"><span class="k">Ширина колонки</span><span class="v" id="roCol">85.3 px</span></div>
+          <div class="r"><span class="k">Сумма зазоров</span><span class="v" id="roGaps">176 px</span></div>
+          <div class="r"><span class="k">Формула</span><span class="v" id="roFormula">(1200 − 0 − 176) / 12</span></div>
+          <div class="r"><span class="k">CSS</span><span class="v tokv" id="roCss">gap: var(--space-16)</span></div>
+          <div class="r"><span class="k">Масштаб превью</span><span class="v" id="roScale">100%</span></div>
+        </div>
+      </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+
+<script>
+/* ---------- данные ---------- */
+var SCALE = [
+  {px:0,  tok:'--space-0',  use:'Нулевой отступ: слитные элементы, сброс'},
+  {px:4,  tok:'--space-4',  use:'Иконка ↔ текст, метка ↔ поле, подсказка под полем'},
+  {px:8,  tok:'--space-8',  use:'Соседние контролы, внутренний отступ мелкого контрола'},
+  {px:12, tok:'--space-12', use:'Горизонтальный паддинг контрола, плотные списки'},
+  {px:16, tok:'--space-16', use:'Поля формы между собой, паддинг карточки, зазор сетки'},
+  {px:20, tok:'--space-20', use:'Паддинг средней панели'},
+  {px:24, tok:'--space-24', use:'Группы полей, паддинг панели и модального окна'},
+  {px:32, tok:'--space-32', use:'Блоки внутри секции, поля рабочей области'},
+  {px:40, tok:'--space-40', use:'Секции страницы'},
+  {px:48, tok:'--space-48', use:'Крупные секции'},
+  {px:64, tok:'--space-64', use:'Разделы страницы, отступ до подвала'},
+  {px:80, tok:'--space-80', use:'Геро-блоки, пустые состояния'},
+  {px:96, tok:'--space-96', use:'Максимальный вертикальный интервал'}
+];
+var HALF = [
+  {px:2,  tok:'--space-2',  use:'Обводка фокуса, микро-сдвиги'},
+  {px:6,  tok:'--space-6',  use:'Компактные контролы XS, чип S'},
+  {px:10, tok:'--space-10', use:'Оптическая компенсация круглых элементов'},
+  {px:14, tok:'--space-14', use:'Редкий шаг между 12 и 16 (наследие)'}
+];
+var MAP = [
+  ['Иконка ↔ подпись в контроле', '--gap-icon-text', '--space-8'],
+  ['Label ↔ поле, поле ↔ Helper', '--gap-label-field', '--space-4'],
+  ['Соседние контролы в ряд', '--gap-inline', '--space-8'],
+  ['Поля формы по вертикали', '--gap-stack', '--space-16'],
+  ['Группы полей, карточки в списке', '--gap-group', '--space-24'],
+  ['Секции страницы', '--gap-section', '--space-40'],
+  ['Внутренний отступ контрола S', '--pad-control-s', '--space-8'],
+  ['Внутренний отступ контрола M/L', '--pad-control', '--space-12'],
+  ['Паддинг карточки, тайла', '--pad-card', '--space-16'],
+  ['Паддинг панели, модального окна', '--pad-panel', '--space-24'],
+  ['Поля рабочей области экрана', '--pad-page', '--space-32'],
+  ['Зазор колоночной сетки', '--grid-gutter', '--space-16']
+];
+var LAYOUTS = [
+  {spans:[12], cap:'<b>12</b> — таблица, широкая форма, полноширинная секция'},
+  {spans:[8,4], cap:'<b>8 + 4</b> — контент и боковая панель: карточка сделки, детали справа'},
+  {spans:[6,6], cap:'<b>6 + 6</b> — две равные колонки: сравнение, парные формы'},
+  {spans:[4,4,4], cap:'<b>4 + 4 + 4</b> — три карточки-метрики в ряд'},
+  {spans:[3,3,3,3], cap:'<b>3 + 3 + 3 + 3</b> — плитка показателей, компактные тайлы'}
+];
+
+/* ---------- шкала ---------- */
+function scaleRows(host, data){
+  document.getElementById(host).innerHTML = data.map(function(s){
+    return '<div class="sc-row">'+
+      '<span class="sc-name">'+s.px+' px</span>'+
+      '<span class="sc-tok">'+s.tok+'</span>'+
+      '<span class="sc-bar"><i style="width:'+Math.max(s.px,1)+'px"></i><span class="sc-use">'+s.use+'</span></span>'+
+    '</div>';
+  }).join('');
+}
+scaleRows('scaleRows', SCALE);
+scaleRows('halfRows', HALF);
+
+/* ---------- раскладки ---------- */
+(function(){
+  document.getElementById('layGrid').innerHTML = LAYOUTS.map(function(l){
+    var cols = l.spans.map(function(n){ return n+'fr'; }).join(' ');
+    var bars = l.spans.map(function(n){ return '<span>'+n+'</span>'; }).join('');
+    return '<div class="lay"><div class="bars" style="grid-template-columns:'+cols+'">'+bars+'</div><p class="cap">'+l.cap+'</p></div>';
+  }).join('');
+})();
+
+/* ---------- таблицы (.tbl из TableCell) ---------- */
+function tbl(host, cols, head, rows){
+  var gt = cols;
+  var h = '<div class="tbl__row" style="grid-template-columns:'+gt+';">'+
+    '<div class="th th--separator"></div>'+
+    head.map(function(t){ return '<div class="th"><span class="th__label">'+t+'</span></div>'; }).join('')+
+    '<div class="th th--separator"></div></div>';
+  var b = rows.map(function(r){
+    return '<div class="tbl__row" style="grid-template-columns:'+gt+';">'+
+      '<div class="tc tc--separator"></div>'+
+      r.map(function(c){ return '<div class="tc"><span class="tc__row"><span class="tc__text">'+c+'</span></span></div>'; }).join('')+
+      '<div class="tc tc--separator"></div></div>';
+  }).join('');
+  document.getElementById(host).innerHTML = h + b;
+}
+tbl('mapTable', '8px 1.6fr 1.1fr 1fr 8px', ['Расстояние', 'Алиас', 'Ссылается на'],
+  MAP.map(function(m){ return [m[0], '<code class="tok">'+m[1]+'</code>', '<code class="tok">'+m[2]+'</code>']; }));
+
+(function(){
+  var cs = getComputedStyle(document.documentElement);
+  function v(t){ return (cs.getPropertyValue(t) || '').trim() || '—'; }
+  var rows = [
+    ['Базовый модуль', '--space-unit', v('--space-unit')],
+    ['Колонок в контентной области', '--grid-columns', v('--grid-columns')],
+    ['Зазор сетки', '--grid-gutter', v('--grid-gutter')],
+    ['Поля контентной области', '--grid-margin', v('--grid-margin')],
+    ['Шкала отступов', '--space-0 … --space-96', '0 · 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64 · 80 · 96'],
+    ['Полушаги (исключения)', '--space-2 / 6 / 10 / 14', '2 · 6 · 10 · 14'],
+    ['Утилита сетки', '.grid12', 'grid-template-columns: repeat(12, minmax(0,1fr))'],
+    ['Утилита ширины блока', '.col-1 … .col-12', 'grid-column: span N']
+  ];
+  tbl('devTable', '8px 1.3fr 1.1fr 1.6fr 8px', ['Параметр', 'Токен / класс', 'Значение'],
+    rows.map(function(r){ return [r[0], '<code class="tok">'+r[1]+'</code>', r[2]]; }));
+})();
+
+/* ---------- копирование ---------- */
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('[data-copy-target]');
+  if (!btn) return;
+  var src = document.getElementById(btn.getAttribute('data-copy-target'));
+  if (!src) return;
+  navigator.clipboard.writeText(src.textContent).then(function(){
+    btn.classList.add('is-copied');
+    setTimeout(function(){ btn.classList.remove('is-copied'); }, 1400);
+  });
+});
+
+/* ---------- конструктор ---------- */
+(function(){
+  var W = document.getElementById('pgW'), WV = document.getElementById('pgWVal');
+  var C = document.getElementById('pgCols'), G = document.getElementById('pgGut'), M = document.getElementById('pgMar');
+  var MOD = document.getElementById('pgMod'), LAY = document.getElementById('pgLay');
+  var wrap = document.getElementById('gwrap'), box = document.getElementById('gbox');
+  var colsHost = document.getElementById('gcols'), layHost = document.getElementById('glay');
+
+  function render(){
+    var w = +W.value, n = +C.value, g = +G.value, m = +M.value;
+    var col = (w - 2*m - (n-1)*g) / n;
+
+    colsHost.style.gridTemplateColumns = 'repeat('+n+', minmax(0,1fr))';
+    colsHost.style.columnGap = g+'px';
+    colsHost.style.padding = '0 '+m+'px';
+    colsHost.innerHTML = Array.from({length:n}, function(){ return '<div class="gcol"></div>'; }).join('');
+
+    box.style.width = w+'px';
+    box.classList.toggle('is-mod', MOD.checked);
+
+    if (LAY.checked) {
+      layHost.style.display = 'grid';
+      layHost.style.gridTemplateColumns = 'repeat('+n+', minmax(0,1fr))';
+      layHost.style.columnGap = g+'px';
+      layHost.style.padding = '0 '+m+'px';
+      var a = Math.max(1, Math.round(n*2/3)), b = n - a;
+      layHost.innerHTML = '<div class="blk" style="grid-column:span '+a+'">'+a+' колонки</div>'+
+        (b>0 ? '<div class="blk" style="grid-column:span '+b+'">'+b+'</div>' : '');
+    } else {
+      layHost.style.display = 'none';
+    }
+
+    var avail = wrap.clientWidth || 600;
+    var k = Math.min(1, avail / w);
+    box.style.transform = 'scale('+k+')';
+    wrap.style.height = (280 * k) + 'px';
+
+    WV.innerHTML = w+'&nbsp;px';
+    document.getElementById('roCol').textContent = (Math.round(col*10)/10) + ' px';
+    document.getElementById('roGaps').textContent = ((n-1)*g) + ' px';
+    document.getElementById('roFormula').textContent = '('+w+' − '+(2*m)+' − '+((n-1)*g)+') / '+n;
+    document.getElementById('roCss').textContent = 'gap: var(--space-'+g+')';
+    document.getElementById('roScale').textContent = Math.round(k*100) + '%';
+    document.getElementById('capLeft').textContent = n+' колонок · зазор '+g+' px · поля '+m+' px';
+    document.getElementById('capRight').textContent = 'колонка ' + (Math.round(col*10)/10) + ' px';
+  }
+
+  [W,C,G,M,MOD,LAY].forEach(function(el){ el.addEventListener('input', render); el.addEventListener('change', render); });
+  window.addEventListener('resize', render);
+  if (window.ResizeObserver) new ResizeObserver(render).observe(wrap);
+  render();
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = {};</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- сетка 12 колонок: контентная область + колонки -->
+<div class="screen__content" style="--grid-cols: 12; --grid-gap: 16px;">
+  <div class="tile" style="grid-column: span 4;">…</div>
+  <div class="tile" style="grid-column: span 8;">…</div>
+</div>
+<!-- поля контента: 0 24px 24px; ритм блоков 24px --></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+// Параметры сетки: контентная область (range#pgW), колонок (pgCols), зазор (pgGut)
+// → ширина колонки пересчитывается по формуле, превью масштабируется под панель;
+// сводка readout (roW/roCol/roGut/roGap) — реальные значения.
+// Правила: .screen__content (поля 0 24px 24px), .tile-row + .tile-row = 16px</script>
+<script type="text/plain" id="src-code-css">/* ============================================================
+   SPACING & GRID — модуль 4 px, шкала отступов, колоночная сетка
+   Часть основ дизайн-системы. Подключается как styles/spacing.css
+   Все размеры системы кратны 4 px; полушаги 2/6/10/14 — исключения
+   для микро-оптики (обводки, оптическая компенсация иконок).
+   ============================================================ */
+
+:root {
+  /* ---------- модуль ---------- */
+  --space-unit: 4px;          /* базовый модуль системы                        */
+
+  /* ---------- шкала отступов (кратно 4) ---------- */
+  --space-0:   0px;
+  --space-4:   4px;   /* иконка ↔ текст, метка ↔ поле                          */
+  --space-8:   8px;   /* соседние контролы, внутренний отступ мелкого контрола */
+  --space-12:  12px;  /* горизонтальный паддинг контрола, плотные списки       */
+  --space-16:  16px;  /* поля формы между собой, паддинг карточки, зазор сетки */
+  --space-20:  20px;  /* паддинг средней панели                                */
+  --space-24:  24px;  /* группы полей, паддинг панели и модалки                */
+  --space-32:  32px;  /* блоки внутри секции                                   */
+  --space-40:  40px;  /* секции страницы                                       */
+  --space-48:  48px;  /* крупные секции                                        */
+  --space-64:  64px;  /* разделы страницы, отступ до подвала                   */
+  --space-80:  80px;  /* геро-блоки, пустые состояния                          */
+  --space-96:  96px;  /* максимальный вертикальный интервал                    */
+
+  /* ---------- полушаги (исключения, только микро-оптика) ---------- */
+  --space-2:   2px;   /* обводка фокуса, микро-сдвиги                          */
+  --space-6:   6px;   /* компактные контролы XS, чип S                         */
+  --space-10:  10px;  /* оптическая компенсация круглых элементов              */
+  --space-14:  14px;  /* редкий шаг между 12 и 16 (наследие)                   */
+
+  /* ---------- семантические алиасы ----------
+     Компоненты и экраны ссылаются на них, а не на числа. */
+  --gap-icon-text:  var(--space-8);   /* иконка ↔ подпись в контроле           */
+  --gap-label-field: var(--space-4);  /* Label ↔ поле, поле ↔ Helper           */
+  --gap-inline:     var(--space-8);   /* соседние контролы в ряд               */
+  --gap-stack:      var(--space-16);  /* поля формы по вертикали               */
+  --gap-group:      var(--space-24);  /* группы полей, карточки в списке       */
+  --gap-section:    var(--space-40);  /* секции страницы                       */
+
+  --pad-control-s:  var(--space-8);   /* внутренний отступ мелкого контрола    */
+  --pad-control:    var(--space-12);  /* внутренний отступ контрола M/L        */
+  --pad-card:       var(--space-16);  /* карточка, тайл                        */
+  --pad-panel:      var(--space-24);  /* панель, модальное окно                */
+  --pad-page:       var(--space-24);  /* поля контентной области экрана
+                                         (см. Каркас экрана: 24px слева/справа) */
+
+  /* ---------- колоночная сетка ---------- */
+  --grid-columns: 12; /* @kind other */
+  --grid-gutter:  var(--space-16);    /* зазор между колонками                 */
+  --grid-margin:  var(--space-0);     /* поля внутри контентной области        */
+}
+
+/* ---------- утилиты сетки ----------
+   Ширина колонки не фиксируется: колонки резиновые, зазор постоянный.
+   Формула: col = (W − 2·margin − (N−1)·gutter) / N */
+.grid12 {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+  row-gap: var(--grid-gutter);
+  padding-inline: var(--grid-margin);
+}
+/* локальная подмена зазора — инлайн: style="--grid-gutter:var(--space-16)" */
+
+.col-1  { grid-column: span 1; }
+.col-2  { grid-column: span 2; }
+.col-3  { grid-column: span 3; }
+.col-4  { grid-column: span 4; }
+.col-5  { grid-column: span 5; }
+.col-6  { grid-column: span 6; }
+.col-7  { grid-column: span 7; }
+.col-8  { grid-column: span 8; }
+.col-9  { grid-column: span 9; }
+.col-10 { grid-column: span 10; }
+.col-11 { grid-column: span 11; }
+.col-12 { grid-column: span 12; }
+
+/* ---------- перестроение: пара span'ов (широкий / узкий) ----------
+   Блок объявляет вторую, узкую ширину рядом с основной:
+       <section class="col-3 colw-6">…</section>
+   Сам класс .colw-N ширину не меняет — только объявляет значение (--colw).
+   Узкие ширины включает экран, одним из двух способов:
+     1) порогом ширины рабочей области (см. Каркас экрана):
+        @container screen (max-width: 1240px) {
+          .grid12 > [class*="colw-"] { grid-column: span var(--colw); }
+        }
+     2) классом на сетке — когда узкий режим зависит от состояния экрана
+        (открыта боковая панель), а не от ширины: class="grid12 grid12--narrow".
+   Общего для ДС набора брейкпоинтов нет: порог задаёт экран. */
+.colw-1  { --colw: 1;   /* @kind other */ }
+.colw-2  { --colw: 2;   /* @kind other */ }
+.colw-3  { --colw: 3;   /* @kind other */ }
+.colw-4  { --colw: 4;   /* @kind other */ }
+.colw-5  { --colw: 5;   /* @kind other */ }
+.colw-6  { --colw: 6;   /* @kind other */ }
+.colw-7  { --colw: 7;   /* @kind other */ }
+.colw-8  { --colw: 8;   /* @kind other */ }
+.colw-9  { --colw: 9;   /* @kind other */ }
+.colw-10 { --colw: 10;  /* @kind other */ }
+.colw-11 { --colw: 11;  /* @kind other */ }
+.colw-12 { --colw: 12;  /* @kind other */ }
+
+.grid12--narrow > [class*="colw-"] { grid-column: span var(--colw); }</script>
+</body>
+</html>

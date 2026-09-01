@@ -1,0 +1,1227 @@
+<!-- @dsCard group="Components" name="Switch" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Switch — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/switch.css">
+<link rel="stylesheet" href="../../styles/spinner.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:74ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:40px; }
+
+  
+
+  /* inline token chip */
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:420px; display:flex; align-items:center; justify-content:center; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* select control */
+
+  /* ---------- states matrix ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .matrix { display:grid; grid-template-columns: 130px repeat(6, 1fr); gap:26px 18px; align-items:center; min-width:680px; }
+  .matrix .col-head { font: var(--type-body-s-strong); color: var(--text-secondary); text-align:center; }
+  .matrix .cell { display:flex; justify-content:center; }
+
+  /* ---------- composition grid ---------- */
+  .compo { display:grid; grid-template-columns: 150px repeat(3, 1fr); gap:30px 24px; align-items:center; }
+  @media (max-width:720px){ .compo { grid-template-columns: 110px 1fr 1fr; } .compo .col3 { display:none; } }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(280px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:40px 44px; display:flex; justify-content:center; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary); }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+  /* ---------- spec / guard ---------- */
+  .spec { display:flex; align-items:center; gap:36px; flex-wrap:wrap; }
+  .spec__art { position:relative; flex:none; }
+  .spec__art .ring { position:absolute; border:1px dashed color-mix(in srgb, var(--primary) 55%, transparent); border-radius:999px; }
+  .spec__cap { font: var(--type-body-s); color: var(--text-secondary); max-width:34ch; text-wrap:pretty; }
+  .spec__cap b { color: var(--text-primary); font: var(--type-body-s-strong); }
+
+  /* ---------- group demo card ---------- */
+
+  /* ---------- settings card ---------- */
+  .settings { background: var(--bg-tile); border:1px solid var(--border-light); border-radius:14px; overflow:hidden; }
+  .settings .sw-row { padding:16px 20px; }
+  .settings .sw-row + .sw-row { border-top:1px solid var(--border-light); }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:20px 20px 0; flex:1; }
+  .guide-card__cap { padding:16px 20px 20px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- size spec ---------- */
+  @media (max-width:720px){ .size-spec { grid-template-columns:1fr; } }
+  .size-spec__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:44px; display:flex; justify-content:center; align-items:center; }
+
+  /* ---------- developer handoff ---------- */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 34px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Switch">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.008</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Switch</h1>
+    <p class="lead">Свитч мгновенно переключает состояние — например, включает или отключает определённую опцию. Действие применяется сразу, без подтверждения. Два состояния — Off / On — и интерактивные состояния Default / Hover / Focus / Pressed / Disabled / Loading.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND (interactive — always first) -->
+  
+
+  <!-- WHEN TO USE -->
+  <section class="section" data-screen-label="WhenToUse">
+    <h2>Использование</h2>
+    <p class="desc tight">Используйте свитч, когда нужно:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>дать пользователю возможность мгновенно включить / выключить или показать / скрыть что-либо;</li>
+      <li>дать мгновенный ответ без подтверждения действия.</li>
+    </ul>
+    <p class="desc">Свитчи всегда мгновенно выполняют действие, поэтому не стоит использовать их в сценариях с кнопкой отправки данных или кнопкой сохранения — это может запутать пользователя. В этих случаях используйте <a class="inl" href="../atoms/Radiobutton.html">Radiobutton</a> или <a class="inl" href="../atoms/Checkbox.html">Checkbox</a>.</p>
+    <p class="desc">Свитч нельзя использовать для выбора пунктов в списке из нескольких вариантов. Для этого используйте группу <a class="inl" href="../atoms/Checkbox.html">Checkbox</a>.</p>
+  
+</section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Контрол свитча имеет размер 20×36 px: трек 20px высотой (равен интерлиньяжу Body M) с круглым ползунком 16px и отступом 2px со всех сторон. В группе сверху может быть заголовок.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage">
+          <div id="anat-diagram"></div>
+        </div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Заголовок группы</span><span class="d"> — опционально, H6 Strong</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Свитч-контрол</span><span class="d"> — трек 20×36px, ползунок 16px</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Название свитча</span><span class="d"> — Body M, справа от контрола</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Хелпер</span><span class="d"> — опционально, Body XS, общий компонент подкачки — см. <a class="inl" href="../atoms/LabelHelper.html">Label / Helper</a></span></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="spec">
+        <div class="spec__art" id="spec-art"></div>
+        <p class="spec__cap">У ползунка свитча есть охранное поле: компонент контрола имеет размер <b>20×36 px</b>, а круглый ползунок внутри него — <b>16×16 px</b> с отступом <b>2px</b>. Ход ползунка — <b>16px</b>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Composition">
+    <h3>Состав</h3>
+    <p class="desc">Вспомогательные части — название и хелпер — опциональны. Свитч рендерится без названия (например, на карточке), с названием и с хелпером. Контрол всегда выровнен по первой строке текста.</p>
+    <div class="panel">
+      <div class="compo" id="compo"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">У свитча один размер. Трек высотой 20px равен интерлиньяжу Body M, чтобы контрол центрировался по первой строке названия. Значения ниже измерены на живом экземпляре.</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="size-spec">
+        <div class="size-spec__stage" id="size-stage"></div>
+        <ul class="bullets">
+          <li>Трек — 36×20px, радиус <code class="tok">--radius-pill</code>.</li>
+          <li>Ползунок — 16×16px с отступом 2px от края трека; ход ползунка — 16px.</li>
+          <li>Зазор контрол ↔ название — 10px; название ↔ хелпер — 2px.</li>
+          <li>Pressed: ползунок временно расширяется до 19px (Material-style).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.7fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Источник</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="size-table"></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Один размер, радиус фиксирован: трек — пилюля, ползунок — круг.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ползунок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Текстовый контент свитча — название и опциональный хелпер. Краткий свод правил (подробно — в «Название свитча» ниже):</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li><b>Название</b> (Body M, справа от контрола; слева в строке настроек) — короткое, описывает действие в состоянии On, в положительном ключе, без указания текущего состояния в скобках;</li>
+      <li><b>Хелпер</b> (Body XS под названием) — поясняет неочевидный эффект включения, может отражать текущий статус (например, «Применяем…» в Loading); общий компонент — см. <a class="inl" href="../atoms/LabelHelper.html">Label / Helper</a>;</li>
+      <li>в строке настроек название слева, свитч прижат к правому краю (см. «Свитч в строке настроек»);</li>
+      <li>не обрезайте название многоточием — оно может переноситься в несколько строк (см. «Описание работы»).</li>
+    </ul>
+  
+<div class="subsec" data-screen-label="LabelRules">
+    <h3>Название свитча</h3>
+    <p class="desc">Название должно быть коротким и понятным. Название должно описывать, что делает свитч в активном (On) состоянии, и пишется в положительном ключе — без отрицаний и без указания текущего состояния.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad2"></span>Не так</div>
+        <div class="guide-card__body" id="label-bad"></div>
+        <p class="guide-card__cap">«Не выключать…» — двойное отрицание; состояние «(включено)» дублирует сам свитч.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good2"></span>Так</div>
+        <div class="guide-card__body" id="label-good"></div>
+        <p class="guide-card__cap">Короткая положительная формулировка описывает действие в On-состоянии.</p>
+      </div>
+    </div>
+    <p class="desc" style="margin-top:26px;">Если пользователю может быть не очевидно, что произойдёт при включении, объясните это дополнительным текстом-хелпером.</p>
+  </div>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="HowItWorks">
+    <h3>Описание работы</h3>
+    <p class="desc">Клик по названию свитча или по самому контролу приводит к его переключению. Повторное нажатие переключает свитч обратно. Поиграйте с примером:</p>
+    <div class="panel" style="margin-bottom:28px;">
+      <div class="demo-card" id="how-demo" style="max-width:320px;"></div>
+    </div>
+
+    <p class="desc">Свитч может использоваться как с названием, так и без него — когда понятен контекст использования (например, на карточке).</p>
+    <div class="panel" style="margin-bottom:28px;">
+      <div class="row" id="card-demo" style="gap:20px;"></div>
+    </div>
+
+    <p class="desc">Название и хелпер (вспомогательный текст) могут располагаться в несколько рядов. Контрол всегда выравнивается по первой строке текста.</p>
+    <div class="panel">
+      <div class="demo-card" id="multiline-demo" style="max-width:300px;"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="SettingsRow">
+    <h3>Свитч в строке настроек</h3>
+    <p class="desc">Частый паттерн: название слева, контрол прижат к правому краю строки. Вся строка — активная область. Так свитчи легко сканировать в списке настроек, а контролы выровнены по правому краю.</p>
+    <div class="panel">
+      <div class="settings" id="settings-demo" style="max-width:520px;"></div>
+    </div>
+    <p class="desc" style="margin-top:28px;">В строке настроек контролы выравнивайте по правому краю — по общей вертикальной оси, а не по концу текста.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body" id="align-bad"></div>
+        <p class="guide-card__cap">Выравнивание по тексту ломает вертикальную ось контролов.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="align-good"></div>
+        <p class="guide-card__cap">Контролы прижаты к правому краю — общая ось сохраняется.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec" data-screen-label="Loading">
+    <h3>Загрузка и асинхронное действие</h3>
+    <p class="desc">Свитч выполняет действие мгновенно. Но если переключение запускает запрос к серверу, который может занять время, покажите промежуточное состояние <b>Loading</b>: в ползунке появляется индикатор, контрол временно недоступен для повторного нажатия. Когда ответ получен — свитч фиксируется в новом состоянии; при ошибке возвращается в исходное.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:16px;">Состояние загрузки</p>
+        <div class="demo-card" id="loading-static" style="max-width:300px;"></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:16px;">Живой пример — переключение с задержкой ~1.2с</p>
+        <div class="demo-card" id="loading-live" style="max-width:300px;"></div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Два состояния по вертикали — Off / On — и интерактивные состояния по горизонтали. Состояния <b>Hover</b>, <b>Focus</b>, <b>Pressed</b> и <b>Loading</b> добавлены к исходной матрице Default / Disabled.</p>
+    <div class="panel">
+      <div class="matrix-wrap"><div class="matrix" id="matrix"></div></div>
+    </div>
+  </section>
+
+  <!-- HIT AREA / A11Y (NEW) -->
+  <section class="section" data-screen-label="HitArea">
+    <h2>Доступность</h2>
+    <p class="desc">Видимый контрол — 20×36px, но кликабельная область шире: она включает название и хелпер. В строке настроек активная область вытягивается на всю строку. Управление с клавиатуры: <b>Tab</b> ставит фокус на свитч, <b>Space</b> / <b>Enter</b> переключают его, фокус показывается обводкой <code class="tok">--primary</code>. Контролу присваивается <code class="tok">role="switch"</code> с <code class="tok">aria-checked</code>.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:16px;">Активная область строки</p>
+        <div class="demo-card" style="background:var(--tertiary-light); border:none;" id="hit-demo"></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:16px;">Фокус и переключение — Tab, затем Space</p>
+        <div class="demo-card" id="focus-demo" style="display:flex; gap:28px; flex-wrap:wrap;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Название набирается гарнитурой <b>SB Sans Text</b> токеном <code class="tok">--type-body-m</code>, хелпер — <code class="tok">--type-body-xs</code>, заголовок группы — <code class="tok">--type-h6-strong</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.17fr 1.13fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.17fr 1.13fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Название</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.17fr 1.13fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Хелпер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.17fr 1.13fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок группы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-h6-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Display</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-h6-strong)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены. Производные оттенки (hover) и state-слои вычисляются из <code class="tok">--primary</code> через <code class="tok">color-mix</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Off</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-cgrey-100</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-100)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E8EDED</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Off · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-cgrey-200</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-200)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#BEC5C8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · On</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--secondary-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--secondary-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#CDE2E0</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · On · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#B8D6D3</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ползунок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Off</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-mgrey-50</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-mgrey-50)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ползунок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">On</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ползунок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">On · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#007A6D</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ползунок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">State-слой · Hover / Pressed</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Название</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Хелпер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок группы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст · Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--disabled-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--disabled-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FBFBFB</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.71fr 1.22fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Ползунок · On</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--disabled)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#BEC5C8</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/switch.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/label-helper.css</code>
+      <code class="tok">styles/switch.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Состояние — бинарное на нативном input (checked=off/on),</span>
+<span class="tk-cm">//    отражается также в aria-checked для ассистивных технологий</span>
+
+<span class="tk-cm">// 2. Действие применяется МГНОВЕННО по клику, без подтверждения</span>
+
+<span class="tk-cm">// 3. Loading (асинхронное действие):</span>
+<span class="tk-cm">//    клик → оптимистично показать .sw--loading (спиннер вместо точки, ввод заблокирован)</span>
+<span class="tk-cm">//    → дождаться ответа сервера → успех: зафиксировать новое состояние;</span>
+<span class="tk-cm">//    ошибка: откатиться к предыдущему состоянию, снять .sw--loading</span>
+
+<span class="tk-cm">// 4. Клик по названию ИЛИ контролу переключает (&lt;label&gt; оборачивает input)</span>
+
+<span class="tk-cm">// 5. Интерактивные состояния — чистый CSS (:hover / :active / :focus-visible);</span>
+<span class="tk-cm">//    hover: halo 5px; pressed: halo 7px и ползунок расширяется до 19px</span>
+<span class="tk-cm">//    классы .sw--hover / .sw--focus / .sw--pressed — только для спецификации в документации</span>
+
+<span class="tk-cm">// 6. Клавиатура: Tab фокусирует input, Space или Enter переключают;</span>
+<span class="tk-cm">//    :focus-visible → outline 2px --primary, offset 2px</span>
+
+<span class="tk-cm">// 7. Disabled: input.disabled + .sw--disabled (pointer-events: none)</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">makeSw</code> / <code class="tok">wireToggle</code> в коде этой страницы).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Подтверждение перед переключением</b> — например для необратимых настроек — модалка или тултип-предупреждение перед сменой состояния.</li>
+        <li><b>Текстовый индикатор состояния</b> — «Вкл/Выкл» рядом с контролом как опция для доступности и аналитики.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Switch</span>
+    <span>Off · On — Default / Hover / Focus / Pressed / Disabled / Loading</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите свитч: переключайте состояние, интерактивное состояние и состав — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script>
+/* ---------- icons ---------- */
+const UI_ICONS = {
+  bad:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  good: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+};
+/* подставляем иконки из библиотеки ДС */
+(function(){ const L=window.DS_ICONS||{}; const m={bad:'close',good:'check'};
+  for(const k in m){ if(L[m[k]]) UI_ICONS[k]=L[m[k]]; } })();
+
+/* ---------- switch factory ----------
+   o: { state:'off'|'on', label, helper, disabled, loading, force, frozen } */
+function makeSw(o = {}) {
+  const { state='off', label=null, helper=null, disabled=false,
+          loading=false, force=null, frozen=false, required=false } = o;
+  const root = document.createElement('label');
+  root.className = 'sw sw--' + state;
+  if (disabled) root.classList.add('sw--disabled');
+  if (loading)  root.classList.add('sw--loading');
+  if (force)    root.classList.add('sw--' + force);
+  if (label==null && helper==null) root.classList.add('sw--no-content');
+
+  const input = document.createElement('input');
+  input.type = 'checkbox'; input.className = 'sw__input'; input.role = 'switch';
+  input.checked = state === 'on';
+  input.setAttribute('aria-checked', String(state === 'on'));
+  if (disabled) input.disabled = true;
+
+  const control = document.createElement('span'); control.className = 'sw__control';
+  const thumb = document.createElement('span'); thumb.className = 'sw__thumb';
+  if (loading) { const sp = document.createElement('span'); sp.className = 'spin'; thumb.appendChild(sp); }
+  control.appendChild(thumb);
+
+  root.appendChild(input); root.appendChild(control);
+
+  if (label != null || helper != null) {
+    const content = document.createElement('span'); content.className = 'sw__content';
+    if (label != null) {
+      const l = document.createElement('span'); l.className = 'sw__label'; l.textContent = label;
+      if (required) { const r = document.createElement('span'); r.className = 'sw__req'; r.textContent = '*'; l.appendChild(r); }
+      content.appendChild(l);
+    }
+    if (helper != null) {
+      const h = document.createElement('span'); h.className = 'ds-helper ds-helper--left'; h.textContent = helper;
+      content.appendChild(h);
+    }
+    root.appendChild(content);
+  }
+
+  if (frozen) root.addEventListener('click', e => e.preventDefault());
+  return root;
+}
+function setSwState(root, state){
+  root.classList.remove('sw--off','sw--on');
+  root.classList.add('sw--' + state);
+  const input = root.querySelector('.sw__input');
+  input.checked = state==='on';
+  input.setAttribute('aria-checked', String(state==='on'));
+}
+/* wire a switch to toggle on click */
+function wireToggle(root, onChange){
+  root.addEventListener('click', e=>{
+    e.preventDefault();
+    if (root.classList.contains('sw--disabled') || root.classList.contains('sw--loading')) return;
+    const on = root.classList.contains('sw--on');
+    setSwState(root, on ? 'off' : 'on');
+    if (onChange) onChange(!on);
+  });
+  // keyboard (Space / Enter) via the hidden input
+  const input = root.querySelector('.sw__input');
+  input.addEventListener('change', ()=>{
+    setSwState(root, input.checked ? 'on' : 'off');
+    if (onChange) onChange(input.checked);
+  });
+}
+
+/* ---------- PLAYGROUND ---------- */
+(function(){
+  const state = { sel:'on', istate:'default', label:true, helper:false, group:false, required:false };
+  const controls = document.getElementById('pg-controls');
+  const preview  = document.getElementById('pg-preview');
+  const codeEl   = document.getElementById('pg-code');
+
+  function select(label, options, getCur, onPick){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    options.forEach(([val,txt])=>{ const op=document.createElement('option'); op.value=val; op.textContent=txt; if(val===getCur()) op.selected=true; sel.appendChild(op); });
+    sel.addEventListener('change',()=>{ onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+  /* Бинарные опции — селекты: docs-split.js конвертирует их в свитчи ДС (урок Л4) */
+  function ctlToggle(label, key){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    [['no','Нет'],['yes','Да']].forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; if((v==='yes')===!!state[key]) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{ state[key]=sel.value==='yes'; render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  controls.appendChild(select('Состояние',
+    [['off','Off'],['on','On']],
+    ()=>state.sel, v=>state.sel=v));
+  controls.appendChild(select('Интерактивное состояние',
+    [['default','Default'],['hover','Hover'],['focus','Focus'],['pressed','Pressed'],['disabled','Disabled'],['loading','Loading']],
+    ()=>state.istate, v=>state.istate=v));
+
+  controls.appendChild(ctlToggle('Название','label'));
+  controls.appendChild(ctlToggle('Хелпер','helper'));
+  controls.appendChild(ctlToggle('Группа','group'));
+  controls.appendChild(ctlToggle('Обязательный выбор (*)','required'));
+
+  function render(){
+    const o = { state: state.sel };
+    if (state.label)  o.label  = 'Тёмная тема';
+    if (state.helper) o.helper = 'Применяется ко всему интерфейсу';
+    o.disabled = state.istate==='disabled';
+    o.loading  = state.istate==='loading';
+    if (['hover','focus','pressed'].includes(state.istate)) o.force = state.istate;
+    o.frozen = true;
+    // одиночный свитч: звёздочка на названии, если обязательный и НЕ в группе
+    if (state.required && !state.group) o.required = true;
+    const swEl = makeSw(o);
+    preview.innerHTML='';
+    if (state.group){
+      const group=document.createElement('div'); group.className='sw-group';
+      const title=document.createElement('p'); title.className='sw-group__title';
+      title.innerHTML='Уведомления'+(state.required?'<span class="sw__req">*</span>':'');
+      const items=document.createElement('div'); items.className='sw-group__items';
+      items.appendChild(swEl);
+      group.appendChild(title); group.appendChild(items);
+      preview.appendChild(group);
+    } else {
+      preview.appendChild(swEl);
+    }
+
+    const cls=['sw','sw--'+state.sel];
+    if (o.disabled) cls.push('sw--disabled');
+    if (o.loading)  cls.push('sw--loading');
+    if (o.force) cls.push('sw--'+o.force);
+    if (!state.label && !state.helper) cls.push('sw--no-content');
+    const labelCode='<code>&lt;label class="'+cls.join(' ')+'"&gt;</code>';
+    codeEl.innerHTML = state.group
+      ? '<code>&lt;div class="sw-group"&gt;&lt;p class="sw-group__title"&gt;…'+(state.required?'&lt;span class="sw__req"&gt;*&lt;/span&gt;':'')+'&lt;/p&gt;</code>'+labelCode
+      : labelCode;
+  }
+  render();
+})();
+
+/* ---------- HOW IT WORKS (interactive) ---------- */
+(function(){
+  const root = document.getElementById('how-demo');
+  const sw = makeSw({ state:'on', label:'Название свитча', helper:'Дополнительный текст' });
+  wireToggle(sw);
+  root.appendChild(sw);
+})();
+
+/* ---------- CARD USAGE ---------- */
+(function(){
+  const host = document.getElementById('card-demo');
+  const defs = [['Заголовок карточки 1','off'],['Заголовок карточки 2','on'],['Заголовок карточки 3','off']];
+  defs.forEach(([title,st])=>{
+    const card = document.createElement('div');
+    card.style.cssText = 'flex:1; min-width:200px; background:var(--bg-tile); border:1px solid var(--border-light); border-radius:12px; padding:18px 20px; display:flex; flex-direction:column; gap:16px;';
+    const head = document.createElement('div');
+    head.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:16px;';
+    const t = document.createElement('span'); t.style.font='var(--type-body-m-strong)'; t.style.color='var(--text-primary)'; t.textContent=title;
+    const s = makeSw({ state:st }); wireToggle(s);
+    head.appendChild(t); head.appendChild(s);
+    const body = document.createElement('p'); body.style.cssText='margin:0; font:var(--type-body-s); color:var(--text-secondary);'; body.textContent='Контент карточки';
+    card.appendChild(head); card.appendChild(body); host.appendChild(card);
+  });
+})();
+
+/* ---------- MULTILINE ---------- */
+(function(){
+  const root = document.getElementById('multiline-demo');
+  const sw = makeSw({ state:'off', label:'Длинное название свитча, которое переносится на несколько строк', helper:'Очень длинный вспомогательный текст, поясняющий поведение опции', frozen:true });
+  root.appendChild(sw);
+})();
+
+/* ---------- ANATOMY DIAGRAM ---------- */
+(function(){
+  const d = document.getElementById('anat-diagram');
+  const group = document.createElement('div'); group.className='sw-group';
+  const title = document.createElement('p'); title.className='sw-group__title'; title.textContent='Заголовок группы';
+  const items = document.createElement('div'); items.className='sw-group__items';
+  items.appendChild(makeSw({ state:'on', label:'Название свитча', frozen:true }));
+  items.appendChild(makeSw({ state:'off', label:'Название свитча', helper:'Хелпер', frozen:true }));
+  items.appendChild(makeSw({ state:'off', label:'Название свитча', frozen:true }));
+  group.appendChild(title); group.appendChild(items); d.appendChild(group);
+
+  // guard-field spec art
+  const art = document.getElementById('spec-art');
+  const wrap = document.createElement('div'); wrap.style.cssText='position:relative; padding:14px;';
+  const s = makeSw({ state:'off', frozen:true });
+  s.style.transform='scale(2)'; s.style.transformOrigin='left center';
+  wrap.appendChild(s); art.appendChild(wrap);
+})();
+
+/* ---------- STATES MATRIX ---------- */
+(function(){
+  const m = document.getElementById('matrix');
+  const cols = ['Default','Hover','Focus','Pressed','Disabled','Loading'];
+  m.appendChild(Object.assign(document.createElement('div'),{className:'col-head'}));
+  cols.forEach(c=>{ const d=document.createElement('div'); d.className='col-head'; d.textContent=c; m.appendChild(d); });
+
+  const rows = [['Off','off'],['On','on']];
+  rows.forEach(([name,sel])=>{
+    const rn=document.createElement('div'); rn.className='rowname'; rn.textContent=name; m.appendChild(rn);
+    [['default'],['hover'],['focus'],['pressed'],['disabled'],['loading']].forEach(([k])=>{
+      const cell=document.createElement('div'); cell.className='cell';
+      const o={ state:sel, frozen:true };
+      if (k==='disabled') o.disabled=true;
+      else if (k==='loading') o.loading=true;
+      else if (k!=='default') o.force=k;
+      cell.appendChild(makeSw(o));
+      m.appendChild(cell);
+    });
+  });
+})();
+
+/* ---------- COMPOSITION ---------- */
+(function(){
+  const g = document.getElementById('compo');
+  const heads = ['', 'Label: No','Label: Yes','Label + Helper'];
+  heads.forEach((h,i)=>{ const d=document.createElement('div'); d.className= i===0?'rh':'ch'; if(i===3)d.classList.add('col3'); d.textContent=h; g.appendChild(d); });
+  [['Off','off'],['On','on']].forEach(([name,sel])=>{
+    const rh=document.createElement('div'); rh.className='rh'; rh.textContent=name; g.appendChild(rh);
+    [null, {label:'Text'}, {label:'Text', helper:'Helper'}].forEach((cfg,i)=>{
+      const cell=document.createElement('div'); cell.className='cell'+(i===2?' col3':'');
+      cell.appendChild(makeSw(Object.assign({ state:sel, frozen:true }, cfg||{})));
+      g.appendChild(cell);
+    });
+  });
+})();
+
+/* ---------- LOADING (static + live) ---------- */
+(function(){
+  const stat = document.getElementById('loading-static');
+  stat.appendChild(makeSw({ state:'off', loading:true, label:'Синхронизация', helper:'Применяем изменения…', frozen:true }));
+
+  const live = document.getElementById('loading-live');
+  const sw = makeSw({ state:'off', label:'Двухфакторная аутентификация', helper:'Нажмите, чтобы включить' });
+  const helper = sw.querySelector('.ds-helper');
+  sw.addEventListener('click', e=>{
+    e.preventDefault();
+    if (sw.classList.contains('sw--loading')) return;
+    const turningOn = !sw.classList.contains('sw--on');
+    sw.classList.add('sw--loading');
+    // show spinner in thumb
+    const thumb = sw.querySelector('.sw__thumb');
+    if (!thumb.querySelector('.spin')) { const sp=document.createElement('span'); sp.className='spin'; thumb.appendChild(sp); }
+    helper.textContent = 'Применяем…';
+    setTimeout(()=>{
+      sw.classList.remove('sw--loading');
+      const sp = thumb.querySelector('.spin'); if (sp) sp.remove();
+      setSwState(sw, turningOn ? 'on' : 'off');
+      helper.textContent = turningOn ? 'Включена' : 'Нажмите, чтобы включить';
+    }, 1200);
+  });
+  live.appendChild(sw);
+})();
+
+/* ---------- SETTINGS ROWS ---------- */
+(function(){
+  const host = document.getElementById('settings-demo');
+  const defs = [
+    ['Push-уведомления','Сообщения о новых сделках','on'],
+    ['Скрывать суммы','Маскировать денежные значения на экране','off'],
+    ['Тёмная тема',null,'off'],
+  ];
+  defs.forEach(([label,helper,st])=>{
+    const rowEl = document.createElement('div'); rowEl.className='sw-row';
+    const s = makeSw(Object.assign({ state:st, label }, helper?{helper}:{}));
+    wireToggle(s);
+    rowEl.appendChild(s);
+    host.appendChild(rowEl);
+  });
+})();
+
+/* ---------- ALIGNMENT DO / DON'T ---------- */
+(function(){
+  const LABELS = ['Свитч','Длинное название свитча','Название свитча'];
+
+  // bad: full-width rows, but the control is glued to the end of the text → ragged axis
+  const bad = document.getElementById('align-bad');
+  const gb = document.createElement('div'); gb.style.cssText='display:flex; flex-direction:column; gap:14px;';
+  LABELS.forEach(t=>{
+    const row = document.createElement('div');
+    row.style.cssText='display:flex; align-items:center; gap:12px;';
+    const lab = document.createElement('span');
+    lab.style.font='var(--type-body-m)'; lab.style.color='var(--text-primary)'; lab.textContent=t;
+    const s = makeSw({ state:'off', frozen:true });
+    row.appendChild(lab); row.appendChild(s);   // control follows the text, not pinned right
+    gb.appendChild(row);
+  });
+  bad.appendChild(gb);
+
+  // good: control pinned to the right edge of a full-width row → aligned axis
+  const good = document.getElementById('align-good');
+  const gg = document.createElement('div'); gg.style.cssText='display:flex; flex-direction:column; gap:14px;';
+  LABELS.forEach(t=>{
+    const row = document.createElement('div');
+    row.style.cssText='display:flex; align-items:center; justify-content:space-between; gap:24px;';
+    const lab = document.createElement('span');
+    lab.style.font='var(--type-body-m)'; lab.style.color='var(--text-primary)'; lab.textContent=t;
+    const s = makeSw({ state:'off', frozen:true });
+    row.appendChild(lab); row.appendChild(s);
+    gg.appendChild(row);
+  });
+  good.appendChild(gg);
+})();
+
+/* ---------- LABEL GUIDELINES ---------- */
+(function(){
+  const bad = document.getElementById('label-bad');
+  const g1 = document.createElement('div'); g1.className='sw-group';
+  const i1 = document.createElement('div'); i1.className='sw-group__items';
+  i1.appendChild(makeSw({ state:'on', label:'Не выключать уведомления о сделках (включено)', frozen:true }));
+  g1.appendChild(i1); bad.appendChild(g1);
+
+  const good = document.getElementById('label-good');
+  const g2 = document.createElement('div'); g2.className='sw-group';
+  const i2 = document.createElement('div'); i2.className='sw-group__items';
+  i2.appendChild(makeSw({ state:'on', label:'Уведомления о сделках', frozen:true }));
+  g2.appendChild(i2); good.appendChild(g2);
+})();
+
+/* ---------- GUIDE ICONS ---------- */
+['ic-bad1','ic-bad2'].forEach(id=> document.getElementById(id).innerHTML = UI_ICONS.bad);
+['ic-good1','ic-good2'].forEach(id=> document.getElementById(id).innerHTML = UI_ICONS.good);
+
+/* ---------- HIT AREA + FOCUS DEMOS ---------- */
+(function(){
+  const hit = document.getElementById('hit-demo');
+  const card = document.createElement('div'); card.className='settings'; card.style.maxWidth='340px';
+  [['Название настройки 1','on'],['Название настройки 2','off'],['Название настройки 3','off']].forEach(([t,st])=>{
+    const rowEl = document.createElement('div'); rowEl.className='sw-row';
+    const s = makeSw({ state:st, label:t }); wireToggle(s);
+    rowEl.appendChild(s); card.appendChild(rowEl);
+  });
+  hit.appendChild(card);
+
+  const fd = document.getElementById('focus-demo');
+  ['Tab сюда','и сюда'].forEach((t,i)=>{
+    const s = makeSw({ state:i===1?'on':'off', label:t }); wireToggle(s);
+    fd.appendChild(s);
+  });
+})();
+
+/* ---------- TYPOGRAPHY REFERENCE ---------- */
+(function(){
+  const rows = [
+    ['Название',        'Тёмная тема',          '--type-body-m',     'SB Sans Text',   '16 / 20', 'sw__label'],
+    ['Хелпер',          'Применяется ко всему', '--type-body-xs',    'SB Sans Text',   '12 / 16', 'ds-helper ds-helper--left'],
+    ['Заголовок группы','Заголовок группы',     '--type-h6-strong',  'SB Sans Display','16 / 20', 'sw-group__title'],
+  ];
+  const tb = document.querySelector('#typo-table tbody');
+  tb.innerHTML = rows.map(([part,sample,tok,font,sl,cls])=>`
+    <tr>
+      <td>${part}</td>
+      <td><span class="${cls}" style="display:inline;">${sample}</span></td>
+      <td class="rt-tok"><code>${tok}</code></td>
+      <td>${font}</td>
+      <td class="rt-num">${sl}</td>
+    </tr>`).join('');
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function(){
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue){
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r,g,b,a=1, m=v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m){ r=+m[1]*255; g=+m[2]*255; b=+m[3]*255; if(m[4]!==undefined) a=+m[4]; }
+    else { const n=v.match(/[\d.]+/g); if(!n) return cssValue; r=+n[0]; g=+n[1]; b=+n[2]; if(n[3]!==undefined) a=+n[3]; }
+    const hx=n=>Math.round(n).toString(16).padStart(2,'0').toUpperCase();
+    let s='#'+hx(r)+hx(g)+hx(b); if(a<1) s+=' · '+Math.round(a*100)+'%'; return s;
+  }
+  const groups = [
+    { name:'Трек', rows:[
+      ['Фон · Off', '--c-cgrey-100'],
+      ['Фон · Off · Hover', '--c-cgrey-200'],
+      ['Фон · On', '--secondary-light'],
+      ['Фон · On · Hover', '--secondary'],
+    ]},
+    { name:'Ползунок', rows:[
+      ['Off', '--c-mgrey-50'],
+      ['On', '--primary'],
+      ['On · Hover', '--primary-dark'],
+      ['State-слой · Hover / Pressed', '--primary-bg'],
+    ]},
+    { name:'Текст', rows:[
+      ['Название', '--text-primary'],
+      ['Хелпер', '--text-inactive'],
+      ['Заголовок группы', '--text-primary'],
+      ['Текст · Disabled', '--text-inactive'],
+    ]},
+    { name:'Disabled', rows:[
+      ['Трек', '--disabled-bg'],
+      ['Ползунок · On', '--disabled'],
+    ]},
+  ];
+  const root = document.getElementById('color-ref');
+  root.innerHTML = groups.map(g=>`
+    <section class="cref-group">
+      <h3>${g.name}</h3>
+      <div class="cref-rows">
+        ${g.rows.map(([role,tok])=>`
+          <div class="cref-row">
+            <div class="cref-sw"><div class="cf" style="background:var(${tok});"></div></div>
+            <div class="cref-meta"><p class="role">${role}</p><p class="tname">${tok}</p></div>
+            <div class="cref-hex">${resolveHex('var('+tok+')')}</div>
+          </div>`).join('')}
+      </div>
+    </section>`).join('');
+  probe.remove();
+})();
+
+/* ---------- DEV + SIZES: redline measured from live component ---------- */
+(function(){
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  const base = makeSw({ state:'on', label:'X', helper:'Y' });
+  const off  = makeSw({ state:'off' });
+  const foc  = makeSw({ state:'on', force:'focus' });
+  const hov  = makeSw({ state:'on', force:'hover' });
+  const prs  = makeSw({ state:'on', force:'pressed' });
+  host.append(base, off, foc, hov, prs);
+
+  const csBase = getComputedStyle(base);
+  const csTrack= getComputedStyle(base.querySelector('.sw__control'));
+  const csThumbOff = getComputedStyle(off.querySelector('.sw__thumb'));
+  const csThumbOn  = getComputedStyle(base.querySelector('.sw__thumb'));
+  const csCont = getComputedStyle(base.querySelector('.sw__content'));
+  const csFoc  = getComputedStyle(foc.querySelector('.sw__control'));
+  const csPrsThumb = getComputedStyle(prs.querySelector('.sw__thumb'));
+  const spread = el => { const nums = getComputedStyle(el.querySelector('.sw__thumb')).boxShadow.match(/-?[\d.]+px/g); return nums && nums.length>=8 ? Math.round(parseFloat(nums[7]))+'px' : '—'; };
+  const travel = () => { const m = csThumbOn.transform.match(/matrix\(([^)]+)\)/); if(!m) return '—'; const parts = m[1].split(',').map(s=>parseFloat(s)); return Math.round(parts[4])+'px'; };
+
+  const r = n => Math.round(n*10)/10;
+  const px = v => { const n = parseFloat(v); return isNaN(n) ? v : r(n)+' px'; };
+  const D = {
+    trackW: px(csTrack.width),
+    trackH: px(csTrack.height),
+    thumb:  px(csThumbOff.width),
+    inset:  px(csThumbOff.top),
+    travel: travel(),
+    gapCtrl:px(csBase.columnGap),
+    gapCont:px(csCont.rowGap),
+    focusW: px(csFoc.outlineWidth),
+    focusOff:px(csFoc.outlineOffset),
+    hoverHalo: spread(hov),
+    pressHalo: spread(prs),
+    pressThumbW: px(csPrsThumb.width),
+  };
+  host.remove();
+
+  const sizeRows = [
+    ['\u0422\u0440\u0435\u043a', D.trackW + ' \u00d7 ' + D.trackH, '<code>.sw__control</code>'],
+    ['\u041f\u043e\u043b\u0437\u0443\u043d\u043e\u043a', D.thumb + ' \u00d7 ' + D.thumb, '<code>.sw__thumb</code>'],
+    ['\u041e\u0442\u0441\u0442\u0443\u043f \u043e\u0442 \u043a\u0440\u0430\u044f \u0442\u0440\u0435\u043a\u0430', D.inset, '<code>.sw__thumb</code> top/left'],
+    ['\u0425\u043e\u0434 \u043f\u043e\u043b\u0437\u0443\u043d\u043a\u0430 (Off \u2192 On)', D.travel, '<code>.sw--on .sw__thumb</code> translateX'],
+    ['\u0417\u0430\u0437\u043e\u0440 \u043a\u043e\u043d\u0442\u0440\u043e\u043b \u2194 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u043c\u043e\u0435', D.gapCtrl, '<code>.sw</code> gap'],
+    ['\u0417\u0430\u0437\u043e\u0440 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u2194 \u0445\u0435\u043b\u043f\u0435\u0440', D.gapCont, '<code>.sw__content</code> gap'],
+  ];
+  const sizeTb = document.querySelector('#size-table');
+  if (sizeTb) sizeTb.innerHTML = sizeRows.map(([p,v,src]) =>
+    `<div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.7fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${p}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${v}</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">${src}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
+
+  const devRows = [
+    ['\u0422\u0440\u0435\u043a', D.trackW + ' \u00d7 ' + D.trackH],
+    ['\u041f\u043e\u043b\u0437\u0443\u043d\u043e\u043a', D.thumb + ' \u00d7 ' + D.thumb],
+    ['\u041e\u0442\u0441\u0442\u0443\u043f \u043e\u0442 \u043a\u0440\u0430\u044f \u0442\u0440\u0435\u043a\u0430', D.inset],
+    ['\u0425\u043e\u0434 \u043f\u043e\u043b\u0437\u0443\u043d\u043a\u0430', D.travel],
+    ['\u041f\u043e\u043b\u0437\u0443\u043d\u043e\u043a \u043f\u0440\u0438 Pressed', D.pressThumbW],
+    ['\u0417\u0430\u0437\u043e\u0440 \u043a\u043e\u043d\u0442\u0440\u043e\u043b \u2194 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u043c\u043e\u0435', D.gapCtrl],
+    ['\u0417\u0430\u0437\u043e\u0440 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u2194 \u0445\u0435\u043b\u043f\u0435\u0440', D.gapCont],
+    ['\u041e\u0431\u0432\u043e\u0434\u043a\u0430 \u0444\u043e\u043a\u0443\u0441\u0430', D.focusW + ' / \u043e\u0442\u0441\u0442\u0443\u043f ' + D.focusOff],
+    ['State-\u0441\u043b\u043e\u0439 Hover / Pressed (halo)', D.hoverHalo + ' / ' + D.pressHalo],
+  ];
+  const devTb = document.querySelector('#dev-spec-table');
+  if (devTb) devTb.innerHTML = devRows.map(([p,v]) =>
+    `<div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${p}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${v}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
+})();
+
+/* ---------- SIZES: annotated sample ---------- */
+(function(){
+  const stage = document.getElementById('size-stage');
+  if(!stage) return;
+  const wrap = document.createElement('div'); wrap.style.cssText = 'display:flex; gap:28px; align-items:center;';
+  wrap.appendChild(makeSw({ state:'off', frozen:true }));
+  wrap.appendChild(makeSw({ state:'on', frozen:true }));
+  wrap.appendChild(makeSw({ state:'on', label:'\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435', helper:'\u0425\u0435\u043b\u043f\u0435\u0440', frozen:true }));
+  stage.appendChild(wrap);
+})();
+
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = '\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Состояние': 'Включён', 'Название': 'Показывать название', 'Хелпер': 'Показывать хелпер', 'Группа': 'Показывать группу', 'Обязательный выбор (*)': 'Обязательный выбор' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- свитч с названием и хелпером; контрол и текст — внутри <label> -->
+<label class="sw sw--on">
+  <input type="checkbox" class="sw__input" role="switch" aria-checked="true" checked>
+  <span class="sw__control"><span class="sw__thumb"></span></span>
+  <span class="sw__content">
+    <span class="sw__label">Тёмная тема</span>
+    <span class="ds-helper ds-helper--left">Применяется ко всему интерфейсу</span>
+  </span>
+</label>
+
+<!-- loading: класс .sw--loading + спиннер внутри ползунка, ввод блокируется -->
+<label class="sw sw--loading">
+  <input type="checkbox" class="sw__input" role="switch" disabled>
+  <span class="sw__control"><span class="sw__thumb"><span class="spin"></span></span></span>
+</label>
+
+<!-- строка настроек: название слева, свитч прижат вправо -->
+<div class="sw-row">
+  <label class="sw sw--on">…</label> <!-- .sw-row разворачивает .sw в row-reverse -->
+</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function makeSw(o) {
+  // o: { state:'off'|'on', istate, label?, helper?, group?, required? }
+  // label.sw(.sw--on)(.sw--disabled)(.sw--loading)(.sw--error) → .sw__input + .sw__track > .sw__thumb + .sw__label
+  // группа: .sw-group; required — «*» в подписи (если не в группе)
+}</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Switch
+   Control: 20px tall × 36px wide pill track · 16px thumb · 2px inset
+            · thumb travel 16px.
+   States:  off · on
+            ×  default · hover · focus · pressed · disabled · loading
+   Label: Body M (SB Sans Text) · Helper: общий компонент подкачки (Body XS),
+   рендерится классом .ds-helper — см. label-helper.css.
+   Off:  track --c-cgrey-100, white thumb (left).
+   On:   track --secondary-light (pale teal), --primary thumb (right).
+   Requires: typography.css, colors.css, label-helper.css
+   ========================================================================= */
+
+.sw {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.sw--disabled,
+.sw:has(.sw__input:disabled) { cursor: default; pointer-events: none; }
+
+/* visually-hidden native input (keeps it accessible / focusable) */
+.sw__input {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+  margin: 0;
+}
+
+/* ---------- control (track + thumb) --------------------------------------
+   The track is 20px tall, matching the Body M line-height, so the control
+   aligns to the first line of the label. */
+.sw__control {
+  flex: none;
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--radius-pill);
+  background: var(--c-cgrey-100);
+  transition: background-color .15s ease, box-shadow .15s ease;
+}
+
+/* 16px thumb, 2px inset, sits to the left when off */
+.sw__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-circle);
+  background: var(--c-mgrey-50);
+  box-shadow: 0 1px 2px rgba(40, 50, 55, .28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .18s cubic-bezier(.4, 0, .2, 1),
+              background-color .15s ease, width .15s ease;
+}
+
+/* ---------- on ------------------------------------------------------------
+   Класс — форс-состояние витрины; нативный .sw__input:checked даёт тот же
+   вид без класса — см. RulesAudit W1. */
+.sw--on .sw__control,
+.sw__input:checked ~ .sw__control { background: var(--secondary-light); }
+.sw--on .sw__thumb,
+.sw__input:checked ~ .sw__control .sw__thumb {
+  background: var(--primary);
+  transform: translateX(16px);
+  box-shadow: 0 1px 2px rgba(0, 99, 90, .35);
+}
+
+/* ---------- hover --------------------------------------------------------- */
+/* a faint state-layer halo around the thumb (Material-style) */
+.sw:hover .sw__thumb,
+.sw--hover .sw__thumb {
+  box-shadow: 0 1px 2px rgba(40, 50, 55, .28), 0 0 0 5px var(--primary-bg-light);
+}
+.sw:hover .sw__control,
+.sw--hover .sw__control { background: var(--c-cgrey-200); }
+.sw:hover.sw--on .sw__control,
+.sw--hover.sw--on .sw__control,
+.sw:hover:has(.sw__input:checked) .sw__control { background: var(--secondary); }
+.sw:hover.sw--on .sw__thumb,
+.sw--hover.sw--on .sw__thumb,
+.sw:hover:has(.sw__input:checked) .sw__thumb {
+  background: var(--primary-dark);
+  box-shadow: 0 1px 2px rgba(0, 99, 90, .4), 0 0 0 5px var(--primary-bg-light);
+}
+
+/* ---------- pressed -------------------------------------------------------
+   the handle expands slightly on press (Material 3) and the halo grows. */
+.sw:active .sw__thumb,
+.sw--pressed .sw__thumb {
+  width: 19px;
+  box-shadow: 0 1px 2px rgba(40, 50, 55, .28), 0 0 0 7px var(--primary-bg);
+}
+.sw:active.sw--on .sw__thumb,
+.sw--pressed.sw--on .sw__thumb,
+.sw:active:has(.sw__input:checked) .sw__thumb {
+  transform: translateX(13px);
+  box-shadow: 0 1px 2px rgba(0, 99, 90, .4), 0 0 0 7px var(--primary-bg);
+}
+
+/* ---------- focus (keyboard) ---------------------------------------------- */
+.sw__input:focus-visible + .sw__control,
+.sw--focus .sw__control {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- loading -------------------------------------------------------
+   async toggle in progress: thumb shows a spinner, control is non-interactive
+   but keeps its current colour so the pending state is still readable. */
+.sw--loading { cursor: progress; pointer-events: none; }
+.sw--loading .sw__thumb { box-shadow: 0 1px 2px rgba(40, 50, 55, .28); }
+/* Индикатор — общий Spinner: <span class="spin"> внутри .sw__thumb, цвет свой (не currentColor). */
+.sw__thumb .spin {
+  width: 11px;
+  height: 11px;
+  border: 2px solid color-mix(in srgb, var(--text-secondary) 30%, transparent);
+  border-top-color: var(--text-secondary);
+}
+.sw--on .sw__thumb .spin {
+  border-color: color-mix(in srgb, #fff 45%, transparent);
+  border-top-color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sw__thumb { transition: none; }
+}
+
+/* ---------- disabled ------------------------------------------------------ */
+.sw--disabled .sw__control,
+.sw__input:disabled ~ .sw__control { background: var(--disabled-bg); box-shadow: none; }
+.sw--disabled .sw__thumb,
+.sw__input:disabled ~ .sw__control .sw__thumb {
+  background: var(--c-mgrey-50);
+  box-shadow: 0 1px 1px rgba(40, 50, 55, .12);
+}
+.sw--disabled.sw--on .sw__control,
+.sw__input:disabled:checked ~ .sw__control { background: color-mix(in srgb, var(--secondary-light) 60%, var(--disabled-bg)); }
+.sw--disabled.sw--on .sw__thumb,
+.sw__input:disabled:checked ~ .sw__control .sw__thumb { background: var(--disabled); box-shadow: none; }
+.sw--disabled .sw__label,
+.sw--disabled .ds-helper,
+.sw__input:disabled ~ .sw__content .sw__label,
+.sw__input:disabled ~ .sw__content .ds-helper { color: var(--text-inactive); }
+
+/* ---------- content (label + helper) -------------------------------------- */
+.sw__content { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sw__label  { font: var(--type-body-m);  color: var(--text-primary); }
+/* звёздочка обязательного выбора — как у cb__req / rb__req */
+.sw__req { color: var(--error); margin-left: 2px; }
+/* Хелпер — общий компонент подкачки (не собственный класс), см. label-helper.css → .ds-helper */
+.sw--no-content .sw__content { display: none; }
+
+/* ---------- settings row --------------------------------------------------
+   common real-world usage: label on the left, switch pushed to the right.
+   The whole row is the hit target. */
+.sw-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0;
+}
+.sw-row .sw { flex-direction: row-reverse; flex: 1; width: 100%; }
+.sw-row .sw__content { flex: 1; }
+
+/* ---------- group ---------------------------------------------------------
+   A list of switches. Alignment is always to the controls (left edge of the
+   track), and the active area stretches to the full row height. */
+.sw-group { display: flex; flex-direction: column; }
+.sw-group__title {
+  font: var(--type-h6-strong);
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+.sw-group__items { display: flex; flex-direction: column; }
+.sw-group .sw { padding: 6px 0; }</script>
+</body>
+</html>

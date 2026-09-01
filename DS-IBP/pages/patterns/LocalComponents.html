@@ -1,0 +1,551 @@
+<!-- @dsCard group="Правила и паттерны" name="Локальные компоненты" viewport="1440x900" subtitle="Паспорт, обязательные состояния, права, связанные артефакты" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Локальные компоненты — правила — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-toc.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+.page{max-width:1560px;margin:0 auto;padding:clamp(40px,7vw,96px) clamp(24px,4vw,56px) 140px}
+a{color:var(--link)}a:hover{color:var(--link-dark)}
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:92ch;text-wrap:pretty}
+.section h3+p.desc{margin-top:0}
+.claim{font:var(--type-body-l);color:var(--text-primary);margin:0 0 10px;max-width:92ch;text-wrap:pretty}
+ul.tight{margin:0 0 24px;padding-left:22px;font:var(--type-body-m);color:var(--text-primary);max-width:92ch}
+ul.tight li{margin:0 0 8px;text-wrap:pretty}
+ul.tight li b{font-weight:600}
+ol.tight{margin:0 0 24px;padding-left:22px;font:var(--type-body-m);color:var(--text-primary);max-width:92ch}
+ol.tight li{margin:0 0 8px;text-wrap:pretty}
+ol.tight li b{font-weight:600}
+.tree{font:13px/1.75 var(--font-screen),ui-monospace,monospace;color:var(--text-primary);background:var(--c-cgrey-50);border-radius:var(--radius-s);padding:20px 24px;margin:0 0 28px;white-space:pre;overflow-x:auto}
+.tree b{font-weight:700}
+.tree i{font-style:normal;color:var(--text-secondary)}
+.note{font:var(--type-body-m);color:var(--text-secondary);border-left:3px solid var(--c-cgrey-100);padding:2px 0 2px 16px;margin:0 0 28px;max-width:92ch;text-wrap:pretty}
+.out{font:var(--type-body-m);color:var(--text-primary);background:var(--c-cgrey-50);border-radius:var(--radius-s);padding:16px 20px;margin:0 0 24px;max-width:92ch}
+.out b{font-weight:600}
+.tbl{margin:0 0 28px}
+</style>
+</head>
+<body>
+<main class="page">
+  <a class="crumb" href="../../index.html">← Дизайн-система</a>
+  <header class="masthead">
+    <p class="eyebrow">Правила и паттерны</p>
+    <h1>Локальные компоненты</h1>
+    <p class="meta"><span>Версия: <b>1.003</b></span><span>Обновлено: <b>21.08.2026</b></span></p>
+    <p class="lead">Локальный компонент знает предметную область: он собран из компонентов этой ДС, но фиксирует конкретный состав полей, порядок, термины и правила отображения одного продукта. Тайлы, таблицы, формы, панели — всё это локальные компоненты и живёт по правилам с этой страницы. Сами компоненты и их паспорта хранятся в проекте продукта, здесь только правила.</p>
+  </header>
+
+  <section class="section" data-screen-label="Рамка">
+    <h2>Что здесь есть и чего здесь нет</h2>
+    <p class="claim">Общих правил немного и так и задумано. Локальные компоненты сильно отличаются друг от друга и ещё сильнее — от проекта к проекту; у каждого дизайнера свои приёмы, и универсальный шаблон, натянутый на всё, только мешал бы.</p>
+    <p class="desc">Поэтому страница фиксирует минимум, который обязателен для любого локального компонента в любом проекте: паспорт, набор состояний, права, связанные артефакты и зависимости. Всё, что специфично для конкретного компонента — свои варианты, свои состояния, свои правила пересчёта, — описывается в его паспорте и не приводится к общему виду.</p>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.4fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Уровень</span></div>
+        <div class="th"><span class="th__label">За что отвечает</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Эта ДС</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Токены, компоненты, раскладка и правила с этой страницы. Предметной области не знает и знать не должна</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Локальный компонент</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Состав и порядок полей, термины, источники данных, состояния, права, переполнение, связанные артефакты. Живёт в проекте продукта</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Экран</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Какие компоненты стоят, в каком порядке и в каких колонках. Внутрь компонента не залезает и его стили не переопределяет</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+    <p class="note">Если внутри компонента понадобился элемент, которого нет в ДС, — это не повод рисовать его на месте. Сначала элемент заводится компонентом ДС, потом используется в локальном компоненте.</p>
+  </section>
+
+  <section class="section" data-screen-label="Паспорт">
+    <h2>Паспорт компонента</h2>
+    <p class="desc">У каждого локального компонента есть паспорт — файл <i>&lt;Имя&gt;.md</i> рядом с разметкой. Это единственное описание компонента: по нему его читает другой дизайнер, разработчик и агент. Поля ниже обязательны для всех; уникальные правила и состояния добавляются своими разделами в том же файле.</p>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Поле</span></div>
+        <div class="th"><span class="th__label">Что в нём</span></div>
+        <div class="th"><span class="th__label">Обязательно</span></div>
+        <div class="th"><span class="th__label">Откуда берётся</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>name</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Название компонента словами продукта — так, как его называют на встречах</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">со слов владельца</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>purpose</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Краткое назначение одной строкой: зачем компонент на экране и какое решение по нему принимают. Это подпись компонента в реестрах и панели управления, поэтому она короткая</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">со слов владельца</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>description</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Развёрнутое описание: место компонента в процессе, откуда берутся значения по смыслу, что с ними делает пользователь, оговорки и исключения. Длина не ограничена — текст, а не строка. Пишется под <i>purpose</i> отдельным разделом паспорта</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да, если краткого мало</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">со слов владельца</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>category</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Одна категория из списка проекта. По ней компонент попадает в группу витрины и в левую навигацию. Две категории сразу — знак, что это два компонента или один переиспользуемый</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">дизайнер</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>usedOn</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Экраны, на которых компонент стоит, и место на них. Пока нет генератора реестра — ведётся руками</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">из экранов</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>fields</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Список полей в порядке отображения: подпись, смысл, тип значения, единица, обязательность</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">со слов владельца</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>sources</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Откуда приходят данные: система, справочник, ручной ввод, расчёт. По каждому полю — свой источник, если они разные</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">со слов владельца</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>required</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Обязателен ли компонент к заполнению целиком и какие поля внутри обязательны; что происходит, если обязательное не заполнено</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">со слов владельца</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>roles</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Матрица роль → просмотр / редактирование. Роли называются так же, как в требованиях</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">со слов владельца</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>states</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Обязательный набор из раздела «Состояния» плюс состояния, которые есть только у этого компонента</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">дизайнер + владелец</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>opens</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Что компонент открывает или вызывает: модальное окно, панель, поповер, переход на экран, тост. Каждый артефакт — ссылкой на его описание</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да, если есть</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">дизайнер + владелец</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>dependsOn</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Другие локальные компоненты и сценарии, от которых зависит вид или значения, и как именно зависит</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да, если есть</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">со слов владельца</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>ds</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Компоненты ДС, из которых собран. Строка сразу показывает, что сломается при правке компонента ДС</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">из разметки</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>overflow</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Что происходит с длинным текстом, большим числом строк и узкой шириной: обрезка, перенос, «ещё N», сворачивание</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">дизайнер</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>variants</b> · <b>modifiers</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Закрытый список вариантов и переопределений. Чего нет в списке, того не бывает</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да, если есть</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">дизайнер</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>version</b> · <b>updated</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Формат М.ммм и дата ДД.ММ.ГГГГ — как у компонентов ДС</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">дизайнер</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>rulesVersion</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Версия этих правил, по которой паспорт заполнен. Меняется только тогда, когда компонент действительно приведён к новым правилам</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">из шаблона</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.65fr 1.5fr 0.42fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>requirements</b> · <b>knowledge</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Требования, по которым компонент менялся, и исследования или решения, на которых он стоит</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">да, если есть</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">из требований</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+    <p class="note">Пара <i>purpose</i> и <i>description</i> — не дублирование: короткая строка нужна там, где компонент виден списком, развёрнутый текст — тому, кто будет его собирать или менять. Ограничение по длине есть только у <i>purpose</i>.</p>
+    <div class="out"><b>Пустое поле — не оформление.</b> Пустое поле паспорта — не оформление, а неизвестность. Если значение неизвестно, в поле пишется <i>не решено</i> с датой, а не догадка: догадка в паспорте неотличима от факта и через месяц расходится по документации и экранам.</div>
+  </section>
+
+  <section class="section" data-screen-label="Состояния">
+    <h2>Состояния</h2>
+    <p class="claim">Это самая жёсткая часть правил. Любой локальный компонент проектируется сразу во всех состояниях ниже, даже когда на макете нарисовано только одно — заполненное.</p>
+    <p class="desc">Состояния делятся на две оси, которые действуют одновременно: состояние данных (их нет, они грузятся, они есть, они не пришли) и состояние прав (можно смотреть, можно править). Компонент обязан иметь вид для каждой комбинации, встречающейся в продукте.</p>
+    <h3>Состояние данных</h3>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.95fr 1.3fr 0.62fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Состояние</span></div>
+        <div class="th"><span class="th__label">Когда</span></div>
+        <div class="th"><span class="th__label">Что показывает компонент</span></div>
+        <div class="th"><span class="th__label">Чем собирается</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.95fr 1.3fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Загрузка</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Данные запрошены, ответа нет</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Каркас компонента уже на месте: рамка, заголовок, число и габариты будущих строк. Скелетоны стоят в габаритах итогового содержимого, чтобы раскладка не прыгала после ответа</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Skeleton</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.95fr 1.3fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Данные есть</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Все поля заполнены</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Базовый вид. Он же эталонный снимок компонента</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.95fr 1.3fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Заполнено частично</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Часть полей без значения</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Поля остаются на своих местах, незаполненные показываются прочерком. Поля не скрываются и порядок не сжимается: пропавшее поле читается как отсутствие сущности, а не значения. Исключения — только те, что названы в паспорте</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">ReadOnlyField</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.95fr 1.3fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Данных нет</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Ответ пришёл пустым: записей нет, заполнение не начиналось</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Пустое состояние внутри компонента: одна строка о том, почему пусто, и действие — если у роли есть право заполнить. Компонент не исчезает с экрана</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">EmptyState</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.95fr 1.3fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Ошибка</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Запрос не выполнен или данные не пришли</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Ошибка живёт внутри компонента, а не на весь экран: короткая причина словами пользователя и повтор запроса. Остальные компоненты экрана продолжают работать</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Alert · Button</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.95fr 1.3fr 0.62fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Обновление</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Данные есть, идёт повторный запрос или сохранение</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Прежние значения остаются видимыми, компонент не подменяется скелетоном. Индикация локальная: у действия или в шапке компонента</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Spinner</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+    <div class="out"><b>Три разные пустоты, которые нельзя показывать одинаково:</b> значения нет (прочерк в поле), записей нет вообще (пустое состояние компонента), данные не удалось получить (ошибка с повтором). Четвёртая, отдельная от них, — у роли нет права видеть эти данные.</div>
+    <h3>Состояние прав</h3>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.5fr 0.8fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Состояние</span></div>
+        <div class="th"><span class="th__label">Правило</span></div>
+        <div class="th"><span class="th__label">Чем собирается</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.5fr 0.8fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Редактирование доступно</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Точки входа в редактирование видны сразу, а не только при наведении: скрытое действие не находят. После сохранения компонент показывает новое значение и подтверждает изменение</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">IconButton · Button · Toast</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.5fr 0.8fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Только просмотр</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Действия не рисуются вообще, а не показываются выключенными. Выключенная кнопка обещает право, которого у роли нет, и порождает вопрос «почему нельзя». Состав и порядок полей тот же, что в режиме редактирования</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">ReadOnlyField</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.5fr 0.8fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Правка временно запрещена</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Право есть, но статус сущности или этап процесса не даёт править. Здесь действие остаётся видимым и выключенным, а причина называется в подсказке: она устранима</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Button · Tooltip</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.5fr 0.8fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Нет права видеть</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Компонент на экране не появляется, а не показывается пустым: пустота читается как «данных нет». Решение принимает экран, не компонент; в паспорте это записано явно</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+    <p class="note">Матрица ролей у каждого продукта своя, поэтому в ДС её нет. В паспорте она задаётся строками «роль → просмотр / редактирование» с теми же названиями ролей, что в требованиях, и заполняется со слов владельца.</p>
+    <h3>Обязательность заполнения</h3>
+    <ul class="tight">
+      <li><b>Обязательность объявляется в паспорте</b> на двух уровнях: обязателен ли компонент к заполнению целиком и какие поля внутри обязательны.</li>
+      <li><b>Незаполненное обязательное поле видно</b> — оно не выглядит так же, как незаполненное необязательное. Что именно показывается (пометка у поля, тон плашки, счётчик в шапке) решается в паспорте компонента, но одинаково внутри одного продукта.</li>
+      <li><b>Компонент не решает за экран.</b> Блокировка перехода по шагу, сообщение о незаполненном и подсветка — работа экрана или формы; компонент отдаёт наружу признак «обязательное не заполнено».</li>
+    </ul>
+    <h3>Витрина состояний</h3>
+    <p class="desc">Все состояния компонента лежат рядом в его витрине — файле <i>&lt;Имя&gt;.doc.html</i> с демо-данными. Состояние, которого нет в витрине, считается непроработанным: на экране оно всплывёт при первом тесте с реальными данными.</p>
+  </section>
+
+  <section class="section" data-screen-label="Артефакты">
+    <h2>Связанные артефакты</h2>
+    <p class="claim">Если компонент что-то открывает или вызывает, это «что-то» тоже описывается и связывается с компонентом в обе стороны.</p>
+    <p class="desc">Модальное окно, боковая панель, поповер, переход на другой экран, подтверждение, уведомление — всё это отдельные артефакты со своим описанием. В паспорте компонента они перечислены в поле <i>opens</i> ссылкой, в описании артефакта названо, откуда он вызывается. Ненайденный обратный конец связи — расхождение, такое же как компонент без паспорта.</p>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 1.7fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Что описать</span></div>
+        <div class="th"><span class="th__label">Содержание</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 1.7fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Триггер</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Что именно нажимают: элемент внутри компонента, целиком компонент, действие в его шапке. Каким ролям триггер виден</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 1.7fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Тип артефакта</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Модальное окно, панель, поповер, подсказка, переход на экран, уведомление. Тип определяет, теряется ли контекст экрана</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 1.7fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Что внутри</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Состав артефакта и его собственные состояния данных и прав — он подчиняется тем же правилам, что компонент</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 1.7fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Что меняется после</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Что происходит с компонентом при подтверждении и при отмене: обновились значения, изменился вариант, ничего. Куда возвращается фокус</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 1.7fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Кто ещё вызывает</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Другие компоненты и экраны с тем же артефактом. Два похожих окна из разных мест — повод объединить их в один артефакт</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+    <div class="out"><b>Артефакт не дублируется на каждый компонент.</b> Одно окно описывается один раз и связывается со всеми компонентами, которые его открывают: иначе правка проходит в одном месте из трёх.</div>
+  </section>
+
+  <section class="section" data-screen-label="Зависимости">
+    <h2>Зависимости</h2>
+    <ul class="tight">
+      <li><b>От компонентов ДС</b> — поле <i>ds</i> в паспорте. По нему видно, кого затронет правка компонента ДС, ещё до правки.</li>
+      <li><b>От других локальных компонентов</b> — поле <i>dependsOn</i> с указанием, как зависимость меняет вид или значения: компонент финансовой сводки, собирающий суммы из других компонентов, зависит и от их наличия, и от их значений. Пересчёт сейчас не автоматизирован — связь фиксируется в паспорте.</li>
+      <li><b>От сценария</b> — если компонент выглядит по-разному на разных шагах процесса, это состояние, а не два компонента. Список шагов и вид на каждом — в паспорте.</li>
+      <li><b>Циклы запрещены.</b> Два компонента, ссылающиеся друг на друга через <i>dependsOn</i>, означают, что границы проведены неверно: либо это один компонент, либо зависимость односторонняя.</li>
+    </ul>
+  </section>
+
+  <section class="section" data-screen-label="Вёрстка">
+    <h2>Вёрстка и токены</h2>
+    <ul class="tight">
+      <li><b>Только токены ДС.</b> Цвета, шрифты, отступы, радиусы, тени — через <i>var(--*)</i>. Нет нужного токена — вопрос в ДС, а не значение на месте.</li>
+      <li><b>Свой CSS узкий:</b> внутренняя раскладка компонента и перестроение при изменении его ширины. Внешние отступы и место в колонках задаёт экран.</li>
+      <li><b>Компонент реагирует на свою ширину, а не на ширину окна.</b> Один и тот же компонент в трети колонки и во всю ширину раскладывается по-разному при одном разрешении.</li>
+      <li><b>Экран не переопределяет стили компонента.</b> Нужен другой вид — заводится вариант или модификатор в паспорте.</li>
+      <li><b>Переполнение решается внутри.</b> Компонент не растягивает ряд и не ломает сетку: длинный текст и лишние строки обрабатываются по правилу из поля <i>overflow</i>.</li>
+    </ul>
+  </section>
+
+  <section class="section" data-screen-label="Версии">
+    <h2>Версионирование и журнал</h2>
+    <ul class="tight">
+      <li><b>Формат версии М.ммм</b> — как в ДС: правка стилей, поведения или состава полей даёт +0.001, кардинальная переделка — +1 в мажорной части.</li>
+      <li><b>Журнал у каждого компонента.</b> Строка на правку: дата, что изменилось, почему, по какому требованию. Без «почему» через месяц правку откатывают обратно.</li>
+      <li><b>Правка описания без правки компонента</b> версию не меняет — только дату.</li>
+      <li><b>Эталонный снимок обновляется вместе с правкой вида</b>, иначе он перестаёт быть эталоном.</li>
+    </ul>
+  </section>
+
+  <section class="section" data-screen-label="Шаблон">
+    <h2>Шаблон папки</h2>
+    <p class="desc">Компонент начинается с копии шаблона <i>templates/local-component/</i> в этой ДС, а не с пустого файла. В проекте продукта копия кладётся в <i>kit/components/&lt;Имя&gt;/</i>, файлы <i>Component.*</i> переименовываются в имя компонента.</p>
+    <div class="tree"><b>kit/components/&lt;Имя&gt;/</b>
+  &lt;Имя&gt;.md          <i>паспорт: шапка полей плюс разделы описания, полей, прав, состояний</i>
+  &lt;Имя&gt;.html        <i>разметка компонента без обвязки страницы</i>
+  &lt;Имя&gt;.css         <i>внутренняя раскладка и перестроение по своей ширине</i>
+  &lt;Имя&gt;.doc.html    <i>витрина: все состояния рядом, плюс узкая ширина</i>
+  fixtures.json      <i>демо-данные по состояниям и данные максимальной длины</i>
+  baseline.png       <i>эталонный снимок базового состояния</i>
+  CHANGELOG.md       <i>журнал: дата, версия, что, почему, по какому требованию</i></div>
+    <p class="desc">Порядок заполнения и что менять в первую очередь — в <i>README.md</i> внутри шаблона.</p>
+    <h3>Как правила попадают в проект и как обновляются</h3>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 0.9fr 1.2fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Что</span></div>
+        <div class="th"><span class="th__label">Где источник</span></div>
+        <div class="th"><span class="th__label">Как обновляется в проекте</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 0.9fr 1.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Страница правил</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Эта страница в ДС</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Приходит вместе с привязанной ДС и обновляется вместе с ней. В проекте не копируется и не правится</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 0.9fr 1.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Шаблон папки</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">templates/local-component/</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Тоже приходит с ДС. Новые компоненты берутся с актуального шаблона; созданные ранее он не трогает</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.7fr 0.9fr 1.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Заполненный компонент</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">kit/components/&lt;Имя&gt;/ в проекте</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Автоматически не обновляется и не должен: текст паспорта принадлежит продукту. Расхождение видно через <i>rulesVersion</i></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+    <div class="out"><b>Версия правил в паспорте.</b> Каждый компонент хранит <i>rulesVersion</i> — версию этой страницы, по которой он заполнен. Когда правила меняются, компоненты с прежней версией попадают в список расхождений: «правила изменились» становится конечным списком работ, а не обязанностью всё помнить. Приведение к новым правилам — отдельная работа со своей строкой в журнале компонента.</div>
+    <p class="note">Изменение правил не требует переделки всего кита сразу. Новые компоненты делаются по новым правилам, старые приводятся к ним при очередной правке или отдельной задачей.</p>
+  </section>
+
+  <section class="section" data-screen-label="Категории">
+    <h2>Категории и витрина кита</h2>
+    <p class="claim">Локальных компонентов будет много, поэтому у кита есть своя витрина с левой навигацией по категориям — одна страница, с которой открывается любой компонент.</p>
+    <p class="desc">Сам список категорий задаёт проект — в ДС его нет и быть не может. Пример для IBP: переиспользуемые, компоненты инструментов, компоненты сделки, компоненты отчётов, прочее. ДС требует трёх вещей: категория есть у каждого компонента, она одна, и она совпадает с группой в навигации.</p>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.6fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Требование</span></div>
+        <div class="th"><span class="th__label">Как выполняется</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.6fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Одна витрина на кит</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Страница <i>kit/index.html</i>: слева — навигация по категориям и компонентам, справа — карточки группами. Оттуда открывается витрина компонента</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.6fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Навигация на каждой странице</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Та же левая панель стоит и в витрине компонента: переход между компонентами без возврата на обзор. Текущий пункт подсвечен</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.6fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Список собирается из паспортов</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Навигация строится по полю <i>category</i>, а не ведётся руками: ручной список устаревает на второй неделе. До генератора список живёт в одном файле, не копией в каждой витрине</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.6fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Порядок внутри группы</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">По алфавиту видимого названия — как в этой ДС. Порядок групп задаёт проект: переиспользуемые первыми, дальше предметные</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.6fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Категория не влияет на вид</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Это способ найти компонент, а не его свойство. Правила отображения у всех категорий одни и те же</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+    <div class="out"><b>Переиспользуемые — особая категория.</b> В неё попадают компоненты, используемые более чем в одной предметной области. Перенос туда — отдельное решение со строкой в журнале: у такого компонента появляется больше одного владельца, и любая правка затрагивает все его места сразу.</div>
+    <p class="note">Левая панель витрины собирается на компонентах этой ДС, а не вёрстается заново в каждом проекте.</p>
+  </section>
+
+  <section class="section" data-screen-label="Чек-лист">
+    <h2>Чек-лист нового локального компонента</h2>
+    <ol class="tight">
+      <li>Проверить, нет ли компонента с тем же составом полей — два похожих компонента лучше объединить сразу.</li>
+      <li>Скопировать <i>templates/local-component/</i> в <i>kit/components/&lt;Имя&gt;/</i> и переименовать файлы.</li>
+      <li>Собрать из компонентов ДС. Не хватает элемента — сначала завести компонент в ДС.</li>
+      <li>Записать паспорт: обязательные поля целиком, неизвестное — как <i>не решено</i>, а не догадкой.</li>
+      <li>Нарисовать все состояния данных и прав, а не только заполненное.</li>
+      <li>Описать связанные артефакты и проставить связь в обе стороны.</li>
+      <li>Проверить переполнение: длинный текст, много строк, узкая и полная ширина.</li>
+      <li>Собрать витрину со всеми состояниями и снять эталонный снимок.</li>
+      <li>Проставить <i>category</i> и <i>usedOn</i>, открыть журнал компонента и проверить, что компонент появился в своей группе витрины.</li>
+    </ol>
+  </section>
+
+  <section class="section" data-screen-label="Бэклог">
+    <h2>Бэклог</h2>
+    <ul class="tight">
+      <li><b>Шаблон папки создан</b> (<i>templates/local-component/</i>): как только первые два реальных компонента будут собраны, шаблон уточняется по ним.</li>
+      <li><b>Пометка незаполненного обязательного поля</b> — правило пока задаётся в паспорте каждого компонента. Как только продукт определится с единым видом, оно переедет сюда и станет общим.</li>
+      <li><b>Проверка правил линтером и панелью управления</b> — паспорт без обязательного поля, состояние без витрины, артефакт без обратной связи, цикл в <i>dependsOn</i>, устаревший <i>rulesVersion</i>. Пока проверяется глазами на ревью.</li>
+      <li><b>Автоматический пересчёт связанных значений</b> — сейчас связь только фиксируется в <i>dependsOn</i> и <i>sources</i>.</li>
+    </ul>
+  </section>
+</main>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-toc.js"></script>
+</body>
+</html>

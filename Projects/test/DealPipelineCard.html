@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<!-- FIDELITY-GATE: N/A · нет исходного макета · 26.08.2026 -->
+<!-- Экран «Карточка сделки» (DealPipelineCard). Собран по протоколу screen-builder на компонентах IBP DS.
+     Контекст для правки: DS-IBP/specs/_cheatsheet.md + DS-IBP/specs/RiskMetric.md + DS-IBP/specs/TableCell.md. CSS компонентов не читать. -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карточка сделки — IBP</title>
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0; font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary); background: var(--bg-page); background-attachment: fixed;
+    min-height: 100vh;
+  }
+  /* Раскладка экрана — только порог перестроения; ширины задаются
+     утилитами Spacing (.col-N / .colw-N), вертикальный зазор рядов
+     держит обёртка .tile-group (16px). */
+  @container screen (max-width: 1240px) {
+    .tile-row > [class*="colw-"] { grid-column: span var(--colw); }
+  }
+  /* Категории документов — список ссылок со счётчиками, 2 колонки
+     (ячейка ~270px, счётчик короткий). Колонки — классом, не инлайном:
+     инлайн перебил бы @container и узкая раскладка не отработала бы. */
+  .dpc-docs { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-16) var(--space-24); }
+  @container screen (max-width: 900px) {
+    .dpc-docs { grid-template-columns: 1fr; }
+  }
+  /* Строка-переход: название слева, счётчик справа. Компонента «пункт-переход
+     со счётчиком» в ДС нет — собрано из Link + Badge, раскладка своя
+     (предложение в бэклог ДС — см. screen.md). */
+  .dpc-doc-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+</style>
+</head>
+<body>
+
+  <div class="nav-layout">
+    <nav class="nav nav--rail" aria-label="Главное меню">
+      <div class="nav__top">
+        <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+        <button class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+      </div>
+      <div class="nav__list">
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+        <div class="nav__block">
+          <div class="nav__block-label">DCM</div>
+          <a class="nav__item nav__item--selected" href="#" aria-current="page"><span class="nav__ico"><i data-icon="dcm-pipeline"></i></span><span class="nav__label">DCM Pipeline</span></a>
+          <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="ecm-pipeline"></i></span><span class="nav__label">ECM Pipeline</span></a>
+          <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="tasks"></i></span><span class="nav__label">Задачи</span></a>
+        </div>
+      </div>
+      <div class="nav__footer">
+        <div class="nav__user">
+          <span class="av av--circular av--m"><span class="av__text">ИИ</span></span>
+          <span class="nav__user-text"><span class="nav__user-name">Иванова Мария Сергеевна</span><span class="nav__user-role">Клиентский менеджер</span></span>
+        </div>
+        <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+      </div>
+    </nav>
+
+    <div class="screen">
+      <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
+        <li class="crumbs__item"><a class="link link--muted" href="#">Главная</a></li>
+        <li class="crumbs__item"><a class="link link--muted" href="#">ECM Pipeline</a></li>
+        <li class="crumbs__item crumbs__item--current">
+          <span class="crumbs__current" aria-current="page">ECM-125. ООО «Газпром-инвест». Облигации привилегированные</span>
+        </li>
+      </nav>
+
+      <main class="screen__content">
+
+        <header class="phead">
+          <div class="phead__main">
+            <div class="phead__title-row">
+              <div class="phead__title-group">
+                <h1 class="phead__title">DCM-2025. ООО «Газпром-инвест». Облигации привилегированные</h1>
+                <button class="ibtn ibtn--neutral ibtn--s phead__edit" aria-label="Переименовать сделку"><i data-icon="edit"></i></button>
+              </div>
+            </div>
+            <div class="phead__subtitle">
+              <span class="phead__meta"><span class="phead__meta-ico phead__meta-ico--ok"><i data-icon="check-circle-filled"></i></span>Изменено 24.10.2025, 14:32, Иванов И.И.</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="tile-group">
+  <!-- Ряд 1: Клиент + Эмитент + Стадия (4+4+4) -->
+          <div class="tile-row">
+            <section class="tile col-4 colw-12">
+              <header class="tile__header">
+                <div class="tile__header-main">
+                  <div class="tile__title-row">
+                    <h3 class="tile__title">Клиент</h3>
+                  </div>
+                </div>
+                <div class="tile__actions">
+                  <button class="ibtn ibtn--neutral ibtn--m" aria-label="Перейти к клиенту"><i data-icon="arrow-right"></i></button>
+                </div>
+              </header>
+              <div class="tile__body">
+                <div class="tile__grid" style="grid-template-columns:repeat(2,1fr)">
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Наименование</span></span>
+                    <div class="rof__row">
+                      <span class="rof__value">ООО «Газпром-инвест»</span>
+                      <span data-riskmetric data-risk="18" data-zone="green"></span>
+                    </div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">КМ</span></span>
+                    <div class="rof__row"><span class="rof__value">Иванова Мария Сергеевна</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Табельный номер</span></span>
+                    <div class="rof__row">
+                      <span class="rof__value">00123456</span>
+                      <span class="rof__icon rof__icon--interactive" role="button" tabindex="0" aria-label="Перейти в карточку сотрудника"><i data-icon="arrow-up-right"></i></span>
+                    </div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Название клиента (псевдоним)</span></span>
+                    <div class="rof__row"><span class="rof__value">Тот, кого нельзя называть</span></div>
+                  </div>
+                  <label class="cb cb--selected">
+                    <input type="checkbox" class="cb__input" checked>
+                    <span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span>
+                    <span class="cb__content"><span class="cb__label">Использовать как псевдоним</span></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <section class="tile col-4 colw-12">
+              <header class="tile__header">
+                <div class="tile__header-main">
+                  <div class="tile__title-row">
+                    <h3 class="tile__title">Эмитент</h3>
+                  </div>
+                </div>
+                <div class="tile__actions">
+                  <button class="ibtn ibtn--neutral ibtn--m" aria-label="Перейти к эмитенту"><i data-icon="arrow-right"></i></button>
+                </div>
+              </header>
+              <div class="tile__body">
+                <div class="tile__grid" style="grid-template-columns:repeat(2,1fr)">
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Наименование</span></span>
+                    <div class="rof__row">
+                      <span class="rof__value">ПАО «СтальИнвест»</span>
+                      <span data-riskmetric data-risk="9" data-zone="green"></span>
+                    </div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">КМ</span></span>
+                    <div class="rof__row"><span class="rof__value">Петров Пётр Петрович</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Табельный номер</span></span>
+                    <div class="rof__row">
+                      <span class="rof__value">00119832</span>
+                      <span class="rof__icon rof__icon--interactive" role="button" tabindex="0" aria-label="Перейти в карточку сотрудника"><i data-icon="arrow-up-right"></i></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="tile col-4 colw-12">
+              <header class="tile__header">
+                <div class="tile__header-main">
+                  <div class="tile__title-row">
+                    <h3 class="tile__title">Стадия</h3>
+                  </div>
+                </div>
+                <div class="tile__actions">
+                  <button class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать стадию"><i data-icon="edit"></i></button>
+                </div>
+              </header>
+              <div class="tile__body">
+                <div class="tile__grid" style="grid-template-columns:repeat(2,1fr)">
+                  <!-- Стадия — длинное значение из справочника, на всю ширину -->
+                  <div class="rof tile__grid-full">
+                    <span class="ds-label"><span class="ds-label__text">Стадия</span></span>
+                    <div class="rof__row"><span class="rof__value">Согласование коммерческих условий</span></div>
+                  </div>
+                  <!-- Статус и Вероятность — две качественные оценки из справочников,
+                       оба чипом, в одном ряду (по ТЗ вероятность — значение
+                       «Низкая/Средняя/Высокая», а не числовая шкала) -->
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Статус</span></span>
+                    <div class="rof__row"><span class="chip chip--s chip--success"><span class="chip__label">Активная</span></span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Вероятность сделки</span></span>
+                    <div class="rof__row"><span class="chip chip--s"><span class="chip__label">Высокая</span></span></div>
+                  </div>
+                  <!-- Прогресс = доля выполнения → ProgressBar (единственная величина-доля в блоке) -->
+                  <div class="pbar pbar--accent tile__grid-full" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" aria-label="Прогресс">
+                    <div class="pbar__head">
+                      <span class="pbar__label">Прогресс</span>
+                      <span class="pbar__value">45%</span>
+                    </div>
+                    <div class="pbar__track"><div class="pbar__fill" style="width:45%"></div></div>
+                  </div>
+                  <!-- Комментарий — свободный текст, реальное значение может быть
+                       вчетверо длиннее демо-строки. Кламп на 2 строки фиксирует
+                       высоту тайла: без него ряд 1 разъезжается на первом же
+                       длинном комментарии (полный текст — в тултипе). -->
+                  <div class="rof tile__grid-full">
+                    <span class="ds-label"><span class="ds-label__text">Комментарий</span></span>
+                    <div class="rof__row"><span class="rof__value rof__value--clamp-n" title="Ожидаем финальное согласование ставки купона до конца месяца.">Ожидаем финальное согласование ставки купона до конца месяца.</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Ряд 2: Условия сделки -->
+          <div class="tile-row">
+            <section class="tile col-8 colw-12">
+              <header class="tile__header">
+                <div class="tile__header-main">
+                  <div class="tile__title-row">
+                    <h3 class="tile__title">Условия сделки</h3>
+                  </div>
+                </div>
+              </header>
+              <div class="tile__body">
+                <div class="tile__grid" style="grid-template-columns:repeat(4,1fr)">
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Тип сделки</span></span>
+                    <div class="rof__row"><span class="chip chip--s"><span class="chip__label">DCM</span></span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Продукт</span></span>
+                    <div class="rof__row"><span class="rof__value">DCM</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Доход текущего года</span></span>
+                    <div class="rof__row"><span class="rof__value">45,00 млн руб.</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Индикативный размер сделки</span></span>
+                    <div class="rof__row"><span class="rof__value">500,00 млн руб.</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Ожидаемый доход</span></span>
+                    <div class="rof__row"><span class="rof__value">62,50 млн руб.</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Ожидаемый доход с учётом вероятности</span></span>
+                    <div class="rof__row"><span class="rof__value">46,88 млн руб.</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Ожидаемая дата дохода</span></span>
+                    <div class="rof__row"><span class="rof__value">15.12.2025</span></div>
+                  </div>
+                  <!-- длинный текст на всю ширину — внутри той же сетки (.tile__grid-full), не соседним блоком -->
+                  <div class="rof tile__grid-full">
+                    <span class="ds-label"><span class="ds-label__text">Описание</span></span>
+                    <div class="rof__row"><span class="rof__value rof__value--clamp-n" title="Сделка предполагает размещение выпуска облигаций для рефинансирования краткосрочной задолженности клиента и финансирования инвестиционной программы на 2026 год. Обеспечение по выпуску не предусмотрено, ковенанты соответствуют типовым для данного класса эмитентов.">Сделка предполагает размещение выпуска облигаций для рефинансирования краткосрочной задолженности клиента и финансирования инвестиционной программы на 2026 год. Обеспечение по выпуску не предусмотрено, ковенанты соответствуют типовым для данного класса эмитентов.</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="tile col-4 colw-12">
+              <header class="tile__header">
+                <div class="tile__header-main">
+                  <div class="tile__title-row">
+                    <h3 class="tile__title">Команда сделки</h3>
+                  </div>
+                </div>
+                <div class="tile__actions">
+                  <button class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать команду сделки"><i data-icon="edit"></i></button>
+                </div>
+              </header>
+              <div class="tile__body">
+                <div class="tile__grid" style="grid-template-columns:repeat(2,1fr)">
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Сотрудники DCM</span></span>
+                    <div class="rof__row">
+                      <div class="rof__value rof__value--chips">
+                        <div class="chiplist chiplist--s">
+                          <span class="chip chip--s"><span class="chip__label">Смирнова А.В.</span></span>
+                          <span class="chip chip--s"><span class="chip__label">Ковалёв Д.С.</span></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Менеджер</span></span>
+                    <div class="rof__row"><span class="rof__value">Иванова Мария Сергеевна</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Менеджер (сторонний)</span></span>
+                    <div class="rof__row"><span class="rof__value">Николаева Е.П.</span></div>
+                  </div>
+                  <!-- перечень сотрудников — тем же чиплистом, что и «Сотрудники DCM»:
+                       однотипная величина оформляется одинаково (K7) -->
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Сотрудники сторонних подразделений</span></span>
+                    <div class="rof__row">
+                      <div class="rof__value rof__value--chips">
+                        <div class="chiplist chiplist--s">
+                          <span class="chip chip--s"><span class="chip__label">Николаева Е.П.</span></span>
+                          <span class="chip chip--s"><span class="chip__label">Гордеев С.А.</span></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Ряд 3: Условия выпуска -->
+          <div class="tile-row">
+            <section class="tile col-8 colw-12">
+              <header class="tile__header">
+                <div class="tile__header-main">
+                  <div class="tile__title-row">
+                    <h3 class="tile__title">Условия выпуска</h3>
+                  </div>
+                </div>
+                <div class="tile__actions">
+                  <button class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать условия выпуска"><i data-icon="edit"></i></button>
+                </div>
+              </header>
+              <div class="tile__body">
+                <!-- 11 полей в 3 колонки. Порядок подобран так, чтобы смысловые
+                     пачки ложились целыми строками и не разрывались переносом:
+                     идентификация · объём и сумма · три даты · параметры купона -->
+                <div class="tile__grid" style="grid-template-columns:repeat(4,1fr)">
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">ISIN</span></span>
+                    <div class="rof__row"><span class="rof__value">RU000A105XY7</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Наименование</span></span>
+                    <div class="rof__row"><span class="rof__value">СтальИнвест-БО-01</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Рейтинг эмиссии</span></span>
+                    <div class="rof__row">
+                      <span class="chip chip--s chip--success"><span class="chip__label">AA</span></span>
+                      <span class="rof__value">НКР, 13.10.2024</span>
+                    </div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Номинальная стоимость</span></span>
+                    <div class="rof__row"><span class="rof__value">1 000 руб.</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Объём выпуска, шт.</span></span>
+                    <div class="rof__row"><span class="rof__value">300 000</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Сумма финансирования, валюта номинала</span></span>
+                    <div class="rof__row"><span class="rof__value">300,00 млн руб.</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Дата выпуска</span></span>
+                    <div class="rof__row"><span class="rof__value">20.11.2025</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Дата оферты</span></span>
+                    <div class="rof__row"><span class="rof__value">20.11.2026</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Дата погашения</span></span>
+                    <div class="rof__row"><span class="rof__value">20.11.2028</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Процентная ставка</span></span>
+                    <div class="rof__row"><span class="rof__value">RUONIA + 2%</span></div>
+                  </div>
+                  <div class="rof">
+                    <span class="ds-label"><span class="ds-label__text">Кол-во купонов в год</span></span>
+                    <div class="rof__row"><span class="rof__value">4</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="tile col-4 colw-12">
+              <header class="tile__header">
+                <div class="tile__header-main">
+                  <div class="tile__title-row">
+                    <h3 class="tile__title">Документы</h3>
+                  </div>
+                </div>
+                <div class="tile__actions">
+                  <button class="ibtn ibtn--neutral ibtn--m" aria-label="Перейти к документам"><i data-icon="arrow-right"></i></button>
+                </div>
+              </header>
+              <div class="tile__body">
+                <!-- Категория — ссылка (Link), счётчик — Badge справа (по ТЗ «бейдж-счётчик»).
+                     Не ReadOnlyField: у категории нет пары «метка → значение», это
+                     пункт-переход со счётчиком. -->
+                <div class="dpc-docs">
+                  <a class="dpc-doc-row link" href="#">Договоры<span class="badge badge--s badge--neutral">3</span></a>
+                  <a class="dpc-doc-row link" href="#">Акты<span class="badge badge--s badge--neutral">2</span></a>
+                  <a class="dpc-doc-row link" href="#">Счета<span class="badge badge--s badge--neutral">1</span></a>
+                  <a class="dpc-doc-row link" href="#">Счета-фактуры<span class="badge badge--s badge--neutral">0</span></a>
+                  <a class="dpc-doc-row link" href="#">Акт сверки<span class="badge badge--s badge--neutral">1</span></a>
+                  <a class="dpc-doc-row link" href="#">Прочие документы<span class="badge badge--s badge--neutral">4</span></a>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Ряд 4: График платежей -->
+          <div class="tile-row">
+            <section class="tile col-12">
+              <header class="tile__header">
+                <div class="tile__header-main">
+                  <div class="tile__title-row">
+                    <h3 class="tile__title">График платежей</h3>
+                  </div>
+                </div>
+                <div class="tile__actions">
+                  <button class="ibtn ibtn--neutral ibtn--m" aria-label="Перейти к полному графику платежей"><i data-icon="arrow-right"></i></button>
+                </div>
+              </header>
+              <div class="tile__body">
+                <div class="dtable">
+                  <div class="dtable__body">
+                    <div class="tbl" data-table>
+                      <div class="tbl__row" style="grid-template-columns:8px 240px 160px 220px 160px minmax(8px,1fr);">
+                        <div class="th th--separator"></div>
+                        <div class="th th--right"><span class="th__label">Сумма с НДС, млн руб.</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                        <div class="th th--sorted" aria-sort="ascending">
+                          <span class="th__label">Дата</span>
+                          <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort aria-label="Сортировка по дате"><i data-icon="arrow-narrow-up"></i></button></span>
+                          <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                        </div>
+                        <div class="th"><span class="th__label">Статус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                        <div class="th"><span class="th__label">Дата оплаты</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                        <div class="th th--separator"></div>
+                      </div>
+
+                      <div class="tbl__row" style="grid-template-columns:8px 240px 160px 220px 160px minmax(8px,1fr);">
+                        <div class="tc tc--separator"></div>
+                        <div class="tc tc--numbers"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="arrow-up-right"></i></span><span class="tc__text">15,00</span></span></div>
+                        <div class="tc"><span class="tc__row"><span class="tc__text">20.11.2025</span></span></div>
+                        <div class="tc"><span class="chip chip--s chip--success"><span class="chip__marker"><i data-icon="check-circle-filled"></i></span><span class="chip__label">Оплачен</span></span></div>
+                        <div class="tc"><span class="tc__row"><span class="tc__text">20.11.2025</span></span></div>
+                        <div class="tc tc--separator"></div>
+                      </div>
+
+                      <div class="tbl__row" style="grid-template-columns:8px 240px 160px 220px 160px minmax(8px,1fr);">
+                        <div class="tc tc--separator"></div>
+                        <div class="tc tc--numbers"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="arrow-up-right"></i></span><span class="tc__text">45,00</span></span></div>
+                        <div class="tc"><span class="tc__row"><span class="tc__text">20.02.2026</span></span></div>
+                        <div class="tc"><span class="chip chip--s"><span class="chip__marker"><i data-icon="clock-timer"></i></span><span class="chip__label">Запланирован</span></span></div>
+                        <div class="tc"><span class="tc__empty">—</span></div>
+                        <div class="tc tc--separator"></div>
+                      </div>
+
+                      <div class="tbl__row" style="grid-template-columns:8px 240px 160px 220px 160px minmax(8px,1fr);">
+                        <div class="tc tc--separator"></div>
+                        <div class="tc tc--numbers"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="arrow-up-right"></i></span><span class="tc__text">45,00</span></span></div>
+                        <div class="tc"><span class="tc__row"><span class="tc__text">20.05.2026</span></span></div>
+                        <div class="tc"><span class="chip chip--s"><span class="chip__marker"><i data-icon="clock-timer"></i></span><span class="chip__label">Запланирован</span></span></div>
+                        <div class="tc"><span class="tc__empty">—</span></div>
+                        <div class="tc tc--separator"></div>
+                      </div>
+
+                      <div class="tbl__row" style="grid-template-columns:8px 240px 160px 220px 160px minmax(8px,1fr);">
+                        <div class="tc tc--separator"></div>
+                        <div class="tc tc--numbers"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="arrow-up-right"></i></span><span class="tc__text">45,00</span></span></div>
+                        <div class="tc"><span class="tc__row"><span class="tc__text">20.08.2026</span></span></div>
+                        <div class="tc"><span class="chip chip--s"><span class="chip__marker"><i data-icon="clock-timer"></i></span><span class="chip__label">Запланирован</span></span></div>
+                        <div class="tc"><span class="tc__empty">—</span></div>
+                        <div class="tc tc--separator"></div>
+                      </div>
+
+                      <div class="tbl__row" style="grid-template-columns:8px 240px 160px 220px 160px minmax(8px,1fr);">
+                        <div class="tc tc--separator"></div>
+                        <div class="tc tc--numbers"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="arrow-up-right"></i></span><span class="tc__text">45,00</span></span></div>
+                        <div class="tc"><span class="tc__row"><span class="tc__text">20.11.2026</span></span></div>
+                        <div class="tc"><span class="chip chip--s"><span class="chip__marker"><i data-icon="clock-timer"></i></span><span class="chip__label">Запланирован</span></span></div>
+                        <div class="tc"><span class="tc__empty">—</span></div>
+                        <div class="tc tc--separator"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+
+      </main>
+    </div>
+  </div>
+
+  <script src="../../DS-IBP/scripts/ds.js"></script>
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!-- @dsCard group="Foundations" name="Radius" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Скругления — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:72ch; text-wrap:pretty; }
+
+  /* ---------- playground ---------- */
+  @media (max-width:860px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:44px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+  .ctl input[type=range] { width:100%; accent-color: var(--primary); }
+  .ctl .rng-row { display:flex; align-items:center; justify-content:space-between; }
+  .ctl .rng-row .val { font: var(--type-body-s-strong); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+  .readout { display:flex; flex-direction:column; gap:6px; padding-top:4px; border-top:1px solid var(--border-light); }
+  .readout .r { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+  .readout .r .k { font: var(--type-body-s); color: var(--text-inactive); }
+  .readout .r .v { font: var(--type-body-m-strong); color: var(--text-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; }
+  .readout .r .v.tokv { color: var(--primary); }
+
+  .stagebox {
+    background: color-mix(in srgb, var(--primary) 9%, var(--bg-tile));
+    border:1.5px solid var(--primary-light);
+    width:200px; height:200px; transition: border-radius .18s ease, width .18s ease, height .18s ease;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--primary-dark); font: var(--type-body-s-strong);
+  }
+
+  /* ---------- scale grid ---------- */
+  .scale { display:grid; grid-template-columns: repeat(auto-fill, minmax(184px,1fr)); gap:16px; }
+  .scale-card {
+    background: var(--bg-tile); border:1px solid var(--border-light); border-radius: var(--radius-2xl);
+    padding:16px; display:flex; flex-direction:column; gap:14px;
+    transition: border-color .15s ease;
+  }
+  .scale-card:hover { border-color: var(--border-primary); }
+  .scale-demo { height:104px; display:flex; align-items:flex-start; justify-content:flex-start; }
+  .scale-demo .box {
+    width:100%; height:104px;
+    background: color-mix(in srgb, var(--primary) 8%, var(--bg-tile));
+    border:1.5px solid var(--primary-light);
+  }
+  .scale-info { display:flex; flex-direction:column; gap:3px; }
+  .scale-name { font: var(--type-body-m-strong); color: var(--text-primary); display:flex; align-items:baseline; gap:8px; }
+  .scale-name .px { margin-left:auto; font: var(--type-body-s-strong); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .scale-token { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color: var(--primary); word-break:break-all; }
+  .scale-use { font: var(--type-body-xs); color: var(--text-inactive); margin-top:3px; text-wrap:pretty; }
+
+  /* ---------- tables ---------- */
+  .tbl-wrap { overflow-x: auto; }
+  .tbl--alias { min-width: 820px; }
+  .tbl--alias .tbl__row { grid-template-columns: 8px 54px 1.1fr 1.1fr 120px 1.8fr 8px; }
+  .tbl--map { min-width: 760px; }
+  .tbl--map .tbl__row { grid-template-columns: 8px 54px 1.6fr 1.2fr 120px 8px; }
+  .tbl .swatch { width:30px; height:30px; flex:none; background: color-mix(in srgb,var(--primary) 12%, var(--bg-tile)); border:1.5px solid var(--primary-light); }
+  .tbl .tc code { font-size:12.5px; color: var(--text-secondary); white-space:nowrap; }
+  .tbl .tc--token code { color: var(--primary); }
+
+  /* ---------- guidelines ---------- */
+  .guides { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap:18px; }
+  .guide { background: var(--bg-tile); border:1px solid var(--border-light); border-radius: var(--radius-2xl); padding:24px 26px; }
+  .guide h3 { font: var(--type-h6-strong); color: var(--text-primary); margin:0 0 8px; display:flex; align-items:center; gap:9px; }
+  .guide p { font: var(--type-body-s); color: var(--text-secondary); margin:0; text-wrap:pretty; }
+  .guide .ic { width:22px; height:22px; flex:none; color: var(--primary); }
+  .guide.dont .ic { color: var(--error); }
+
+  /* nesting demo */
+  .nest-demo { display:flex; gap:30px; flex-wrap:wrap; margin-top:6px; align-items:flex-start; }
+  .nest-card { background: var(--bg-tile); border:1px solid var(--border-light); border-radius: var(--radius-2xl); padding:16px; width:200px; }
+  .nest-inner { background: color-mix(in srgb,var(--primary) 9%, var(--bg-tile)); border:1.5px solid var(--primary-light); border-radius: var(--radius-m); height:84px; }
+  .nest-card.bad .nest-inner { border-radius: var(--radius-2xl); }
+  .nest-label { font: var(--type-body-xs); color: var(--text-inactive); margin:10px 0 0; text-align:center; }
+</style>
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Radius">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage">
+        <div class="stagebox" id="pgBox"></div>
+      </div>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.000</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Основы</p>
+    <h1>Скругления</h1>
+    <p class="lead">Единая шкала радиусов скругления. Компоненты и лайауты ссылаются на семантические токены <code class="tok">--radius-*</code>, а не на «магические» пиксели — так скругления остаются согласованными и управляются из одной точки.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- SCALE -->
+  <section class="section" data-screen-label="Scale">
+    <h2>Шкала</h2>
+    <p class="desc">15 ступеней от острых углов до круга. Шкала расширена с запасом — крупные ступени (<code class="tok">3xl</code>…<code class="tok">7xl</code>) зарезервированы для модальных окон, геро-блоков и будущих поверхностей.</p>
+    <div class="scale" id="scaleGrid"></div>
+  </section>
+
+  <!-- SEMANTIC ALIASES -->
+  <section class="section" data-screen-label="Aliases">
+    <h2>Семантические алиасы</h2>
+    <p class="desc">Прикладные токены, на которые ссылаются компоненты. Меняете алиас — меняется скругление во всех местах сразу. Сами компоненты не должны указывать пиксели напрямую.</p>
+    <div class="tbl-wrap">
+      <div class="tbl tbl--alias" id="aliasRows">
+        <div class="tbl__row">
+          <div class="th th--separator"></div>
+          <div class="th"></div>
+          <div class="th"><span class="th__label">Алиас</span></div>
+          <div class="th"><span class="th__label">Ссылается на</span></div>
+          <div class="th th--right"><span class="th__label">Значение</span></div>
+          <div class="th"><span class="th__label">Назначение</span></div>
+          <div class="th th--separator"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPONENT MAPPING -->
+  <section class="section" data-screen-label="Mapping">
+    <h2>Где применяется</h2>
+    <p class="desc">Текущая раскладка скруглений по компонентам системы.</p>
+    <div class="tbl-wrap">
+      <div class="tbl tbl--map" id="mapRows">
+        <div class="tbl__row">
+          <div class="th th--separator"></div>
+          <div class="th"></div>
+          <div class="th"><span class="th__label">Компонент / поверхность</span></div>
+          <div class="th"><span class="th__label">Токен</span></div>
+          <div class="th th--right"><span class="th__label">Значение</span></div>
+          <div class="th th--separator"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUIDELINES -->
+  <section class="section" data-screen-label="Guidelines">
+    <h2>Правила</h2>
+    <p class="desc">Несколько принципов, чтобы скругления работали как система.</p>
+    <div class="guides">
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Только из шкалы</h3>
+        <p>Берите значения из токенов <code class="tok">--radius-*</code>. Произвольные «13px» или «18px» ломают ритм — округлите до ближайшей ступени.</p>
+      </div>
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Чем крупнее — тем больше</h3>
+        <p>Радиус растёт вместе с размером поверхности: контролы 6–8px, карточки 16px, модалки 24px, геро-блоки 28–32px.</p>
+      </div>
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Концентричность</h3>
+        <p>Радиус вложенного элемента = радиус контейнера − его внутренний отступ. Так внутренние и внешние углы остаются параллельными.</p>
+      </div>
+      <div class="guide dont">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Full ≠ большой радиус</h3>
+        <p><code class="tok">--radius-full</code> делает пилюлю/круг при любом размере. Не используйте его там, где нужен фиксированный угол — берите числовую ступень.</p>
+      </div>
+    </div>
+
+    <div class="nest-demo">
+      <div>
+        <div class="nest-card"><div class="nest-inner"></div></div>
+        <p class="nest-label">Верно: 16 − 8 → внутренний 8</p>
+      </div>
+      <div>
+        <div class="nest-card bad"><div class="nest-inner"></div></div>
+        <p class="nest-label">Неверно: внутренний радиус = внешнему</p>
+      </div>
+    </div>
+  </section>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Выберите токен и размер элемента — превью и значения обновляются мгновенно.</p>
+              <div class="pg__controls">
+        <div class="ctl">
+          <span class="lbl">Токен радиуса</span>
+          <div class="pg-select"><select id="pgToken"></select></div>
+        </div>
+        <div class="ctl">
+          <div class="rng-row"><span class="lbl">Размер элемента</span><span class="val" id="pgSizeVal">200&nbsp;px</span></div>
+          <input type="range" id="pgSize" min="48" max="280" step="4" value="200">
+        </div>
+        <div class="readout">
+          <div class="r"><span class="k">Токен</span><span class="v tokv" id="roToken">--radius-2xl</span></div>
+          <div class="r"><span class="k">Значение</span><span class="v" id="roVal">16px</span></div>
+          <div class="r"><span class="k">CSS</span><span class="v" id="roCss">border-radius</span></div>
+        </div>
+      </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+
+<script>
+  // ---------- данные шкалы ----------
+  var SCALE = [
+    {token:'--radius-none',   name:'none',   px:'0',   use:'Острые углы: таблицы, врезки, разделители'},
+    {token:'--radius-2xs',    name:'2xs',    px:'2',   use:'Чекбокс, мелкие индикаторы'},
+    {token:'--radius-xs',     name:'xs',     px:'4',   use:'Компактные инпуты, мелкие плашки, фокус ссылки'},
+    {token:'--radius-s',      name:'s',      px:'6',   use:'Кнопка XS, чип S/XS'},
+    {token:'--radius-m',      name:'m',      px:'8',   use:'Кнопка, чип, тултип, поле ввода'},
+    {token:'--radius-l',      name:'l',      px:'10',  use:'Аватар rounded M, средние плашки'},
+    {token:'--radius-xl',     name:'xl',     px:'12',  use:'Меню, поповеры, аватар rounded L'},
+    {token:'--radius-2xl',    name:'2xl',    px:'16',  use:'Карточки, панели, группы'},
+    {token:'--radius-3xl',    name:'3xl',    px:'20',  use:'Крупные карточки, секции'},
+    {token:'--radius-4xl',    name:'4xl',    px:'24',  use:'Модальные окна, листы'},
+    {token:'--radius-5xl',    name:'5xl',    px:'28',  use:'Аватар XL rounded, крупные поверхности'},
+    {token:'--radius-6xl',    name:'6xl',    px:'32',  use:'Геро-блоки, баннеры'},
+    {token:'--radius-7xl',    name:'7xl',    px:'40',  use:'Очень крупные поверхности (резерв)'},
+    {token:'--radius-full',   name:'full',   px:'999', use:'Пилюли: чип-rounded, бейдж, свитч'},
+    {token:'--radius-circle', name:'circle', px:'50%', use:'Круг: аватар, радио, icon-button'}
+  ];
+
+  var ALIASES = [
+    {token:'--radius-control-s', map:'--radius-s',      px:'6',   use:'Кнопка XS, чип S/XS, icon-button S'},
+    {token:'--radius-control',   map:'--radius-m',      px:'8',   use:'Кнопка M/S, чип L/M, тултип'},
+    {token:'--radius-field',     map:'--radius-xs',     px:'4',   use:'Поля ввода, выпадающие списки'},
+    {token:'--radius-popup',     map:'--radius-xl',     px:'12',  use:'Меню, поповеры, дропдауны'},
+    {token:'--radius-card',      map:'--radius-2xl',    px:'16',  use:'Карточки, панели, группы'},
+    {token:'--radius-modal',     map:'--radius-m',      px:'8',   use:'Модальные окна, шиты'},
+    {token:'--radius-pill',      map:'--radius-full',   px:'999', use:'Пилюли'},
+    {token:'--radius-round',     map:'--radius-circle', px:'50%', use:'Круглые элементы'}
+  ];
+
+  var MAP = [
+    ['Button — M / S',        '--radius-m',      '8',   '8'],
+    ['Button — XS',           '--radius-s',      '6',   '6'],
+    ['IconButton — L / M',    '--radius-m',      '8',   '8'],
+    ['IconButton — S',        '--radius-s',      '6',   '6'],
+    ['Chip — L / M',          '--radius-m',      '8',   '8'],
+    ['Chip — S / XS',         '--radius-s',      '6',   '6'],
+    ['Chip — rounded',        '--radius-full',   '999', '20'],
+    ['Link — фокус-обводка',   '--radius-xs',     '4',   '4'],
+    ['Checkbox',              '--radius-2xs',    '2',   '2'],
+    ['Tooltip',               '--radius-m',      '8',   '8'],
+    ['Avatar rounded — L',    '--radius-xl',     '12',  '12'],
+    ['Avatar rounded — XL',   '--radius-5xl',    '28',  '20'],
+    ['Badge / Switch / Tab',  '--radius-full',   '999', '20'],
+    ['Card · Panel · Group',  '--radius-2xl',    '16',  '16'],
+    ['Avatar · Radio — круг', '--radius-circle', '50%', '20']
+  ];
+
+  function px(v){ return v==='50%' ? '50%' : (v==='999' ? '999px' : v+'px'); }
+
+  // ---------- шкала ----------
+  (function(){
+    var host = document.getElementById('scaleGrid');
+    host.innerHTML = SCALE.map(function(s){
+      return '<div class="scale-card">'+
+        '<div class="scale-demo"><div class="box" style="border-radius:var('+s.token+')"></div></div>'+
+        '<div class="scale-info">'+
+          '<div class="scale-name">'+s.name+'<span class="px">'+(s.px==='50%'||s.px==='999'?s.px:s.px+' px')+'</span></div>'+
+          '<div class="scale-token">'+s.token+'</div>'+
+          '<div class="scale-use">'+s.use+'</div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+  })();
+
+  // ---------- алиасы ----------
+  (function(){
+    var host = document.getElementById('aliasRows');
+    host.insertAdjacentHTML('beforeend', ALIASES.map(function(a){
+      return '<div class="tbl__row">'+
+        '<div class="tc tc--separator"></div>'+
+        '<div class="tc"><span class="swatch" style="border-radius:'+(a.px==='50%'?'50%':Math.min(parseInt(a.px),14)+'px')+'"></span></div>'+
+        '<div class="tc tc--token"><span class="tc__row"><span class="tc__text"><code>'+a.token+'</code></span></span></div>'+
+        '<div class="tc"><span class="tc__row"><span class="tc__text"><code>'+a.map+'</code></span></span></div>'+
+        '<div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">'+(a.px==='50%'||a.px==='999'?px(a.px):a.px+' px')+'</span></span></div>'+
+        '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">'+a.use+'</span></span></div>'+
+        '<div class="tc tc--separator"></div>'+
+      '</div>';
+    }).join(''));
+  })();
+
+  // ---------- маппинг ----------
+  (function(){
+    var host = document.getElementById('mapRows');
+    host.insertAdjacentHTML('beforeend', MAP.map(function(m){
+      var demoR = m[3]==='50%' ? '50%' : m[3]+'px';
+      return '<div class="tbl__row">'+
+        '<div class="tc tc--separator"></div>'+
+        '<div class="tc"><span class="swatch" style="border-radius:'+demoR+'"></span></div>'+
+        '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">'+m[0]+'</span></span></div>'+
+        '<div class="tc tc--token"><span class="tc__row"><span class="tc__text"><code>'+m[1]+'</code></span></span></div>'+
+        '<div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">'+(m[2]==='50%'||m[2]==='999'?px(m[2]):m[2]+' px')+'</span></span></div>'+
+        '<div class="tc tc--separator"></div>'+
+      '</div>';
+    }).join(''));
+  })();
+
+  // ---------- конструктор ----------
+  (function(){
+    var sel = document.getElementById('pgToken');
+    sel.innerHTML = SCALE.map(function(s){
+      var lbl = s.token + '  ·  ' + (s.px==='50%'||s.px==='999'?s.px:s.px+'px');
+      return '<option value="'+s.token+'"'+(s.token==='--radius-2xl'?' selected':'')+'>'+lbl+'</option>';
+    }).join('');
+
+    var box   = document.getElementById('pgBox');
+    var size  = document.getElementById('pgSize');
+    var sizeV = document.getElementById('pgSizeVal');
+    var roTok = document.getElementById('roToken');
+    var roVal = document.getElementById('roVal');
+    var roCss = document.getElementById('roCss');
+
+    function find(tok){ for(var i=0;i<SCALE.length;i++){ if(SCALE[i].token===tok) return SCALE[i]; } return SCALE[0]; }
+
+    function render(){
+      var s = find(sel.value);
+      var sz = +size.value;
+      box.style.width = sz+'px';
+      box.style.height = sz+'px';
+      box.style.borderRadius = 'var('+s.token+')';
+      sizeV.innerHTML = sz+'&nbsp;px';
+      roTok.textContent = s.token;
+      roVal.textContent = (s.px==='50%'||s.px==='999'?px(s.px):s.px+'px');
+      roCss.textContent = 'border-radius: var('+s.token+')';
+    }
+    sel.addEventListener('change', render);
+    size.addEventListener('input', render);
+    render();
+  })();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = {};</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- токен радиуса на элементе -->
+<div class="card" style="border-radius: var(--radius-2xl);">16px</div>
+<!-- шкала: --radius-xs 4 · --radius-s 6 · --radius-m 8 · --radius-l 12 ·
+     --radius-xl 14 · --radius-2xl 16 · --radius-3xl 20 -->
+<div style="border-radius: var(--radius-m);">8px</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+// Шкала радиусов: --radius-xs … --radius-3xl (styles/radius.css)
+// Конструктор: select#pgToken + range#pgSize (размер элемента) →
+//   превью меняет border-radius по токену, сводка roToken/roVal читается
+//   из getComputedStyle (реальные px).</script>
+<script type="text/plain" id="src-code-css">/* ============================================================
+   RADIUS — токены радиусов скругления
+   Часть основ дизайн-системы. Подключается как styles/radius.css
+   Шкала намеренно расширена «на будущее» — компоненты ссылаются
+   на семантические алиасы, а не на числовые примитивы.
+   ============================================================ */
+
+:root {
+  /* ---------- примитивы шкалы (ramp) ---------- */
+  --radius-none: 0px;
+  --radius-2xs:  2px;   /* микроэлементы: чекбокс, мелкие индикаторы            */
+  --radius-xs:   4px;   /* инпуты-компакт, мелкие плашки, фокус-ссылка    */
+  --radius-s:    6px;   /* мелкие контролы: кнопка XS, чип S/XS               */
+  --radius-m:    8px;   /* базовый контрол: кнопка, чип, тултип, инпут          */
+  --radius-l:    10px;  /* аватар-rounded M, средние плашки                     */
+  --radius-xl:   12px;  /* поповеры, меню, аватар-rounded L                     */
+  --radius-2xl:  16px;  /* карточки, панели, группы                             */
+  --radius-3xl:  20px;  /* крупные карточки, секции                             */
+  --radius-4xl:  24px;  /* модальные окна, листы                                */
+  --radius-5xl:  28px;  /* аватар XL-rounded, крупные поверхности               */
+  --radius-6xl:  32px;  /* геро-блоки, баннеры                                  */
+  --radius-7xl:  40px;  /* очень крупные поверхности (резерв)                   */
+
+  --radius-full:   999px; /* пилюли: чип-rounded, бейдж, свитч, таб-маркер      */
+  --radius-circle: 50%;   /* круг: аватар, радио, иконочная кнопка              */
+
+  /* ---------- семантические алиасы ----------
+     Компоненты и лайауты ссылаются на них, а не на примитивы. */
+  --radius-control-s: var(--radius-s);    /* кнопка XS, чип S/XS, icon-button S */
+  --radius-control:   var(--radius-m);    /* кнопка M/S, чип L/M, тултип, инпут */
+  --radius-field:     var(--radius-xs);   /* поля ввода, селекты               */
+  --radius-popup:     var(--radius-xl);   /* меню, поповеры, дропдауны          */
+  --radius-card:      var(--radius-2xl);  /* карточки, панели, группы          */
+  --radius-modal:     var(--radius-m);    /* модальные окна, шиты (8px)        */
+  --radius-pill:      var(--radius-full); /* пилюли                            */
+  --radius-round:     var(--radius-circle); /* круглые элементы                */
+}</script>
+</body>
+</html>

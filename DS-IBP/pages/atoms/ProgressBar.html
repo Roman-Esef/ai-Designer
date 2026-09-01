@@ -1,0 +1,1110 @@
+<!-- @dsCard group="Components" name="ProgressBar" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProgressBar — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/progress-bar.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:74ch; text-wrap:pretty; }
+  .badge-proposal { display:inline-block; font: var(--type-button-xs); letter-spacing:.06em; text-transform:uppercase; color: var(--text-secondary); background: var(--c-cgrey-100); border:1px solid var(--border-light); padding:3px 9px; border-radius:999px; margin-left:12px; vertical-align:middle; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:40px; }
+
+  
+
+  
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:380px; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+  .ctl input[type=range] { width:100%; accent-color: var(--primary); }
+  .ctl .rng-row { display:flex; align-items:center; justify-content:space-between; }
+  .ctl .rng-row .val { font: var(--type-body-s-strong); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(280px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:40px 44px; display:flex; justify-content:center; width:100%; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary); }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+  /* ---------- composition grid ---------- */
+  .compo-list { display:flex; flex-direction:column; gap:22px; }
+  .compo-row { display:grid; grid-template-columns: 200px 1fr; gap:28px; align-items:center; }
+  @media (max-width:640px){ .compo-row { grid-template-columns:1fr; } }
+  .compo-row .ch { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .compo-row .cd { font: var(--type-body-s); color: var(--text-secondary); margin-top:2px; }
+  .compo-row .cell { min-width:0; }
+  .compo-row + .compo-row { padding-top:22px; border-top:1px solid var(--border-light); }
+
+  /* ---------- states matrix ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .matrix { display:flex; flex-direction:column; gap:22px; min-width:520px; }
+  .matrix-row { display:grid; grid-template-columns: 170px 1fr; gap:24px; align-items:center; }
+  .matrix-row .rn { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .matrix-row .rd { font: var(--type-body-s); color: var(--text-secondary); margin-top:2px; }
+
+  /* ---------- tone scale ---------- */
+  .tone-grid { display:flex; flex-direction:column; gap:18px; }
+  .tone-row { display:grid; grid-template-columns: 120px 1fr; gap:24px; align-items:center; }
+  .tone-row .tn { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+  /* ---------- corner cases ---------- */
+  .cc-grid { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+  @media (max-width:760px){ .cc-grid { grid-template-columns:1fr; } }
+  .cc-card { background: var(--bg-tile); border:1px solid var(--border-light); border-radius:14px; padding:20px 22px; display:flex; flex-direction:column; gap:14px; }
+  .cc-card .ct { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .cc-card .cd { font: var(--type-body-s); color: var(--text-secondary); text-wrap:pretty; }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:20px 20px 0; flex:1; }
+  .guide-card__cap { padding:16px 20px 20px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- size spec ---------- */
+  @media (max-width:720px){ .size-spec { grid-template-columns:1fr; } }
+  .size-spec__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:44px; display:flex; flex-direction:column; gap:22px; justify-content:center; }
+
+  /* ---------- developer handoff ---------- */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 34px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="ProgressBar">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.002</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>ProgressBar</h1>
+    <p class="lead">Линейный индикатор прогресса: заполнение трека отражает долю значения от максимума. Определённый режим (значение известно) и неопределённый (длительность неизвестна); шесть тональных вариантов на локальных статусных токенах; три размера.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- WHEN TO USE -->
+  <section class="section" data-screen-label="WhenToUse">
+    <h2>Использование</h2>
+    <p class="desc tight">Используйте ProgressBar, когда нужно:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>показать долю выполнения известного процесса — загрузка файла, заполнение анкеты, прогресс к цели;</li>
+      <li>визуализировать величину в диапазоне 0–100 без бинарного статуса — например, вероятность сделки, скор, заполненность лимита;</li>
+      <li>показать, что процесс идёт, но точный процент неизвестен — режим <b>Indeterminate</b>;</li>
+    </ul>
+    <p class="desc">Не используйте ProgressBar, чтобы просто показать факт статуса без величины («Активна», «В архиве») — для этого есть <a class="inl" href="../atoms/Chip.html">Chip</a> или <a class="inl" href="../atoms/Badge.html">Badge</a>. Для мгновенного действия внутри кнопки (сохранение, отправка) используйте <code class="tok">.btn--loading</code> в <a class="inl" href="../atoms/Buttons.html">Buttons</a>, а не отдельный ProgressBar. Для уведомления о фоновом процессе, который не привязан к конкретному месту на экране, используйте <a class="inl" href="../molecules/Toast.html">Toast</a>.</p>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Компонент состоит из трека и заливки; заголовок, значение и хелпер — опциональные вспомогательные слоты вокруг трека.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div id="anat-diagram" style="width:100%; max-width:340px;"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Заголовок (Label)</span><span class="d"> — опционально, Body S, слева над треком</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Значение (Value)</span><span class="d"> — опционально, Body S Strong, справа над треком, синхронизировано с заливкой</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Трек (Track)</span><span class="d"> — фон на 100% ширины родителя, скругление <code class="tok">--radius-pill</code></span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Заливка (Fill)</span><span class="d"> — ширина = value / max, тот же радиус, что и трек</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Хелпер</span><span class="d"> — опционально, Body XS, под треком; общий компонент — см. <a class="inl" href="../atoms/LabelHelper.html">Label / Helper</a></span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Composition">
+    <h3>Состав</h3>
+    <p class="desc">Заголовок, значение и хелпер добавляются независимо друг от друга. Плавающее значение — расширенный вариант, решающий частную задачу (величина без формы), добавлен поверх исходного материала.</p>
+    <div class="panel"><div class="compo-list" id="compo-list"></div></div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Три размера различаются только высотой трека и заливки; типографика заголовка/значения/хелпера не меняется. Значения ниже измерены на живом экземпляре.</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="size-spec">
+        <div class="size-spec__stage" id="size-stage"></div>
+        <ul class="bullets">
+          <li><b>S — 4px</b>: компактные места — таблицы, списки, карточки.</li>
+          <li><b>M — 6px</b>: размер по умолчанию для форм и карточек.</li>
+          <li><b>L — 8px</b>: акцентные показатели — дашборды, крупные карточки метрик.</li>
+          <li>Скругление трека и заливки — всегда <code class="tok">--radius-pill</code>, независимо от размера.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.7fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Источник</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="size-table"></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус одинаков во всех трёх размерах: трек и заливка всегда пилюля, поэтому на малых высотах полоса читается как капсула.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек — L / M / S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка — L / M / S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <ul class="bullets">
+      <li><b>Заголовок</b> — короткое существительное или словосочетание (1–4 слова), описывающее, что именно измеряется («Вероятность сделки», «Заполнено анкетой»); без указания текущего значения в тексте — значение выводится отдельным слотом.</li>
+      <li><b>Значение</b> — всегда число: процент («50%») или дробь текущее/максимум («50/100»); формат выбирается один раз для всего экрана, не смешивайте оба на одной странице.</li>
+      <li><b>Хелпер</b> — поясняет контекст или следующий шаг («Осталось 2 поля», «Обновляется каждую минуту»); опционален, не дублирует заголовок.</li>
+      <li>Не обрезайте значение и не переносите его на вторую строку — заголовок обрезается многоточием первым.</li>
+    </ul>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="AutoTone">
+    <h3>Авто-подбор тона по порогам</h3>
+    <p class="desc">Опциональный helper вычисляет тон автоматически из значения по процентным порогам — вместо ручного выбора тона. Направление по умолчанию — «выше — лучше» (прогресс к цели); для метрик, где высокое значение означает риск (просрочка, нагрузка), передайте свои пороги с обратным порядком тонов — компонент не диктует направление, это делает конфигурация.</p>
+    <div class="panel">
+      <div id="autotone-demo"></div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden; margin-top:20px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.31fr 1.17fr 1.76fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Диапазон (% от max)</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Тон по умолчанию</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Смысл</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.31fr 1.17fr 1.76fr 8px;"><div class="tc tc--separator"></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">0–29%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Далеко от цели — критично</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.31fr 1.17fr 1.76fr 8px;"><div class="tc tc--separator"></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">30–69%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Warning</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">В процессе — требует внимания</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.31fr 1.17fr 1.76fr 8px;"><div class="tc tc--separator"></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">70–100%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Близко к цели — выполнено</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <p class="desc" style="margin-top:20px;">Пороги и тона на них — предложенные значения по умолчанию, а не жёсткое требование ДС: продукт задаёт свою шкалу и направление под конкретную метрику.</p>
+  </div>
+
+<div class="subsec" data-screen-label="CornerCases">
+    <h3>Корнер-кейсы</h3>
+    <p class="desc">Случаи, не покрытые исходным референсом, но важные для корректной реализации.</p>
+    <div class="cc-grid" id="cc-grid"></div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Состояния описывают поведение самого индикатора — независимо от них выбирается тон (см. «Цвета»). <b>Indeterminate</b> и явная граница «сливера» на малых значениях добавлены поверх исходного материала.</p>
+    <div class="panel"><div class="matrix-wrap"><div class="matrix" id="matrix"></div></div></div>
+
+    <p class="desc" style="margin-top:34px;">Тон — независимая от состояния настройка на локальных статусных токенах. Нейтральный тон <code class="tok">system</code> соответствует референсному материалу («Вероятность сделки»); остальные — расширение под ситуативную семантику success/warning/error/info.</p>
+    <div class="panel"><div class="tone-grid" id="tone-grid"></div></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="Accessibility">
+    <h2>Доступность</h2>
+    <ul class="bullets">
+      <li>Корневой элемент несёт <code class="tok">role="progressbar"</code> с <code class="tok">aria-valuenow</code> / <code class="tok">aria-valuemin</code> / <code class="tok">aria-valuemax</code>; в <b>Indeterminate</b> атрибут <code class="tok">aria-valuenow</code> не указывается вовсе (это предписывает WAI-ARIA), вместо него — опциональный <code class="tok">aria-valuetext</code> со словесным статусом («Загрузка»).</li>
+      <li>Если видимого заголовка нет — обязателен <code class="tok">aria-label</code>, описывающий, что именно измеряется.</li>
+      <li>Тон не должен быть единственным носителем смысла: если статус критичен (например, ошибка), продублируйте его текстом в заголовке/хелпере, а не только цветом заливки.</li>
+      <li>Анимация заливки и Indeterminate — уважают <code class="tok">prefers-reduced-motion</code>: переход ширины отключается, цикл Indeterminate замедляется вдвое (1.6с → 3.2с).</li>
+      <li>Компонент не интерактивен и не входит в таб-порядок — фокус на него не ставится.</li>
+    </ul>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Заголовок и хелпер набираются гарнитурой SB Sans Text; значение — тем же семейством с моноширинными цифрами (<code class="tok">tabular-nums</code>) для устойчивой ширины при обновлении.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 2.97fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.97fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Не применимо — компонент не содержит собственного текста</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Трек — всегда нейтральный <code class="tok">--border-light</code> независимо от тона. Заливка — базовый цвет локальной статусной рампы; Disabled переопределяет и трек, и заливку токенами <code class="tok">--disabled-*</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон — все тона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E1EDE7</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка — тон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка — тон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-green</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-green)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#4CAF50</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка — тон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Warning</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-orange</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-orange)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFA000</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка — тон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-red</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-red)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#EF5350</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка — тон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Info</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-lblue</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-lblue)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#03A9F4</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка — тон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">System</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#7A9994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Значение / метка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.17fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Хелпер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/progress-bar.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/label-helper.css</code>
+      <code class="tok">styles/progress-bar.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Значение всегда клампится в границы [0, max] перед рендером —</span>
+<span class="tk-cm">//    отрицательные и превышающие max значения не должны ломать вёрстку</span>
+value = Math.max(0, Math.min(max, rawValue));
+widthPercent = (value / max) * 100;
+
+<span class="tk-cm">// 2. Сливер: при 0 &lt; value &lt; ~6% принудительно задаём min-width = высоте</span>
+<span class="tk-cm">//    трека (.pbar__fill--sliver), иначе скругление трека визуально «съедает»</span>
+<span class="tk-cm">//    заливку и прогресс выглядит пустым. При value === 0 сливер НЕ применяется —</span>
+<span class="tk-cm">//    пустой трек означает «ещё не начато».</span>
+
+<span class="tk-cm">// 3. Indeterminate: aria-valuenow не рендерится вовсе (не «0»), а не просто скрывается;</span>
+<span class="tk-cm">//    визуальная анимация — на отдельном элементе, не на реальной ширине</span>
+
+<span class="tk-cm">// 4. Плавающее значение (.pbar--floating): метка — потомок заливки; в CSS у метки</span>
+<span class="tk-cm">//    явный width:max-content — это критично, иначе при width:auto width решается через</span>
+<span class="tk-cm">//    равенство left+width+right=containerWidth, если заданы и left, и right, и метка</span>
+<span class="tk-cm">//    растягивается на ширину контейнера вместо ширины текста. После отрисовки</span>
+<span class="tk-cm">//    (requestAnimationFrame + повтор на document.fonts.ready) измерить:</span>
+<span class="tk-cm">//      trackW = track.clientWidth; fillW = fill.getBoundingClientRect().width; markW = marker.offsetWidth;</span>
+<span class="tk-cm">//    left = clamp(fillW - markW/2, 0, trackW - markW);  // центр метки — над краем заливки,</span>
+<span class="tk-cm">//                                                        // но не выходит за границы трека</span>
+<span class="tk-cm">//    Пересчитывать при каждом изменении value и при resize контейнера.</span>
+
+<span class="tk-cm">// 5. Плавная анимация ширины — переход CSS width .3s ease;</span>
+<span class="tk-cm">//    под prefers-reduced-motion переход отключается (значение появляется мгновенно),</span>
+<span class="tk-cm">//    а цикл Indeterminate замедляется вдвое, а не отключается полностью</span>
+<span class="tk-cm">//    (полное исчезновение анимации у Indeterminate убрало бы единственный сигнал «идёт процесс»)</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">makePbar</code> / <code class="tok">positionFloatingMarkers</code> в коде этой страницы).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Proposals">
+    <h2>Бэклог<span class="badge-proposal">Предложение</span></h2>
+    <p class="desc">Референс из исходной ДС покрывал только два статичных варианта (форма с Label/Value и вариант с плавающим значением). Ниже — идеи, сверенные с практиками Material Design, Ant Design, Carbon и Polaris, которые в этой версии <b>не реализованы</b> и требуют отдельного решения перед стартом.</p>
+    <ul class="bullets">
+      <li><b>Круговой / радиальный прогресс</b> — кольцевой индикатор для аватаров с загрузкой, миниатюр файлов и виджетов дашборда (аналог Material CircularProgress, Ant <code class="tok">Progress type="circle"</code>). Другая геометрия и разметка — отдельный компонент, не модификатор линейного.</li>
+      <li><b>Составной Upload-прогресс</b> — карточка с именем файла, размером/скоростью/ETA и действиями «Отменить» / «Повторить» (аналог Carbon FileUploader, Ant Upload). Требует состояний ошибки загрузки и повторной попытки — лучше собрать как отдельный организм поверх текущего ProgressBar, а не расширять его API.</li>
+      <li><b>Анимированный счётчик значения</b> — плавный count-up текста значения синхронно с ростом заливки; микро-интеракция для отчётов и результатов, не критична для форм.</li>
+    </ul>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · ProgressBar</span>
+    <span>Determinate · Indeterminate — S / M / L — Accent / Success / Warning / Error / Info / System</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите прогресс-бар: тон, размер, значение, формат и состав — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script>
+/* ================= ProgressBar factory ================= */
+function pbClamp(v, max){ v = Number(v); if (Number.isNaN(v)) v = 0; return Math.max(0, Math.min(max, v)); }
+function pbFormat(v, max, fmt){
+  if (fmt === 'fraction') return Math.round(v) + '/' + max;
+  return Math.round(v / max * 100) + '%';
+}
+/* auto-tone by percentage thresholds — default assumes "higher = better" (progress-style);
+   for "risk"-like metrics pass an inverted thresholds array */
+function pbarAutoTone(value, max, thresholds) {
+  const list = thresholds || [
+    { upTo: 30, tone: 'error' },
+    { upTo: 70, tone: 'warning' },
+    { upTo: 100, tone: 'success' },
+  ];
+  const pct = Math.max(0, Math.min(100, (value / (max || 100)) * 100));
+  for (const t of list) { if (pct <= t.upTo) return t.tone; }
+  return list[list.length - 1].tone;
+}
+/* o: { tone,size,value,max,valueFormat,label,showValue,helper,floating,indeterminate,compact,stack:[{value,color}] } */
+function makePbar(o = {}) {
+  const {
+    tone='accent', size='m', value=50, max=100, valueFormat='percent',
+    label=null, showValue=true, helper=null,
+    floating=false, indeterminate=false, compact=false,
+    stack=null,
+  } = o;
+  const v = pbClamp(value, max);
+  const root = document.createElement('div');
+  root.className = `pbar pbar--${size} pbar--${tone}`;
+  if (floating) root.classList.add('pbar--floating');
+  if (indeterminate) root.classList.add('pbar--indeterminate');
+  if (compact) root.classList.add('pbar--compact');
+  root.setAttribute('role', 'progressbar');
+  if (indeterminate) {
+    root.setAttribute('aria-valuetext', o.ariaText || 'Загрузка');
+  } else {
+    root.setAttribute('aria-valuenow', String(v));
+    root.setAttribute('aria-valuemin', '0');
+    root.setAttribute('aria-valuemax', String(max));
+  }
+  const ariaLabel = o.ariaLabel || label;
+  if (ariaLabel) root.setAttribute('aria-label', ariaLabel);
+
+  if (!floating && !compact && (label != null || showValue)) {
+    const head = document.createElement('div'); head.className = 'pbar__head';
+    const l = document.createElement('span'); l.className = 'pbar__label';
+    if (label != null) l.textContent = label;
+    head.appendChild(l);
+    if (showValue && !indeterminate) {
+      const val = document.createElement('span'); val.className = 'pbar__value';
+      val.textContent = pbFormat(v, max, valueFormat);
+      head.appendChild(val);
+    }
+    root.appendChild(head);
+  }
+
+  const track = document.createElement('div'); track.className = 'pbar__track';
+  if (stack) {
+    track.classList.add('pbar__track--stack');
+    stack.forEach(seg => {
+      const s = document.createElement('div'); s.className = 'pbar__seg-stack';
+      s.style.width = seg.value + '%'; s.style.background = seg.color;
+      track.appendChild(s);
+    });
+  } else {
+    const fill = document.createElement('div'); fill.className = 'pbar__fill';
+    if (!indeterminate) {
+      fill.style.width = v + '%';
+      if (v > 0 && v < 6) fill.classList.add('pbar__fill--sliver');
+      if (floating) {
+        const marker = document.createElement('span'); marker.className = 'pbar__marker';
+        marker.textContent = pbFormat(v, max, valueFormat);
+        fill.appendChild(marker);
+      }
+    }
+    track.appendChild(fill);
+  }
+  root.appendChild(track);
+
+  if (!compact && helper != null) {
+    const h = document.createElement('span'); h.className = 'ds-helper ds-helper--left pbar__helper';
+    h.textContent = helper;
+    root.appendChild(h);
+  }
+  return root;
+}
+/* clamp floating markers to stay within the track after layout.
+   The marker has an explicit `width: max-content` in CSS (styles/progress-bar.css)
+   so its offsetWidth is a reliable content-based measurement. Positioning must not
+   rely on requestAnimationFrame as the retry mechanism: rAF is throttled/paused
+   entirely while the document is hidden (background tab / not-yet-focused preview
+   iframe), which left markers permanently unpositioned in that environment. A plain
+   setInterval keeps retrying regardless of visibility until every marker converges. */
+function positionFloatingMarkers(scope) {
+  function run() {
+    let allSet = true;
+    (scope || document).querySelectorAll('.pbar--floating .pbar__marker').forEach(marker => {
+      const fill = marker.parentElement;
+      const track = fill && fill.closest('.pbar__track');
+      if (!track) return;
+      const markW = marker.offsetWidth;
+      if (markW === 0 && marker.textContent.trim() !== '') { allSet = false; return; }
+      const trackW = track.clientWidth;
+      const fillW = fill.getBoundingClientRect().width;
+      let left = fillW - markW / 2;
+      left = Math.max(0, Math.min(left, Math.max(0, trackW - markW)));
+      marker.style.left = left + 'px';
+    });
+    return allSet;
+  }
+  run();
+  let tries = 0;
+  const timer = setInterval(() => {
+    tries++;
+    if (run() || tries > 20) clearInterval(timer);
+  }, 50);
+  document.addEventListener('visibilitychange', run);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(run);
+}
+
+/* ---------- PLAYGROUND ---------- */
+(function () {
+  const state = { tone: 'system', size: 'm', value: 85, valueFormat: 'percent',
+    label: true, showValue: true, helper: false, floating: false, indeterminate: false, autoTone: false };
+  const controls = document.getElementById('pg-controls');
+  const preview = document.getElementById('pg-preview');
+  const codeEl = document.getElementById('pg-code');
+
+  function select(label, options, getCur, onPick) {
+    const wrap = document.createElement('div'); wrap.className = 'ctl';
+    const l = document.createElement('div'); l.className = 'lbl'; l.textContent = label; wrap.appendChild(l);
+    const box = document.createElement('div'); box.className = 'pg-select';
+    const sel = document.createElement('select');
+    options.forEach(([val, txt]) => { const op = document.createElement('option'); op.value = val; op.textContent = txt; if (val === getCur()) op.selected = true; sel.appendChild(op); });
+    sel.addEventListener('change', () => { onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+  function range(label, min, max, step, getCur, onInput, fmt) {
+    const wrap = document.createElement('div'); wrap.className = 'ctl';
+    const row = document.createElement('div'); row.className = 'rng-row';
+    const l = document.createElement('span'); l.className = 'lbl'; l.textContent = label;
+    const val = document.createElement('span'); val.className = 'val';
+    row.appendChild(l); row.appendChild(val); wrap.appendChild(row);
+    const inp = document.createElement('input'); inp.type = 'range'; inp.min = min; inp.max = max; inp.step = step; inp.value = getCur();
+    function upd() { val.textContent = fmt ? fmt(inp.value) : inp.value; }
+    inp.addEventListener('input', () => { onInput(Number(inp.value)); upd(); render(); });
+    upd(); wrap.appendChild(inp); return wrap;
+  }
+  /* Бинарные опции — селекты: docs-split.js конвертирует их в свитчи ДС (урок Л4) */
+  function ctlToggle(label, key) {
+    const wrap = document.createElement('div'); wrap.className = 'ctl';
+    const l = document.createElement('div'); l.className = 'lbl'; l.textContent = label; wrap.appendChild(l);
+    const box = document.createElement('div'); box.className = 'pg-select';
+    const sel = document.createElement('select');
+    [['no', 'Нет'], ['yes', 'Да']].forEach(([v, t]) => {
+      const op = document.createElement('option'); op.value = v; op.textContent = t;
+      if ((v === 'yes') === !!state[key]) op.selected = true;
+      sel.appendChild(op);
+    });
+    sel.addEventListener('change', () => { state[key] = sel.value === 'yes'; render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  const toneCtl = select('Тон',
+    [['accent','Accent'],['success','Success'],['warning','Warning'],['error','Error'],['info','Info'],['system','System']],
+    () => state.tone, v => state.tone = v);
+  controls.appendChild(toneCtl);
+  controls.appendChild(select('Размер',
+    [['s','S'],['m','M'],['l','L']],
+    () => state.size, v => state.size = v));
+  const valueCtl = range('Значение', 0, 100, 1, () => state.value, v => state.value = v, v => v + '%');
+  controls.appendChild(valueCtl);
+  const fmtCtl = select('Формат значения',
+    [['percent','Проценты'],['fraction','Дробь']],
+    () => state.valueFormat, v => state.valueFormat = v);
+  controls.appendChild(fmtCtl);
+
+  const tLabel = ctlToggle('Заголовок', 'label');
+  const tValue = ctlToggle('Значение в заголовке', 'showValue');
+  const tHelper = ctlToggle('Хелпер', 'helper');
+  const tFloating = ctlToggle('Плавающее значение', 'floating');
+  const tIndet = ctlToggle('Неопределённый', 'indeterminate');
+  const tAutoTone = ctlToggle('Авто-тон по порогам', 'autoTone');
+  controls.appendChild(tLabel);
+  controls.appendChild(tValue);
+  controls.appendChild(tHelper);
+  controls.appendChild(tFloating);
+  controls.appendChild(tIndet);
+  controls.appendChild(tAutoTone);
+
+  function render() {
+    valueCtl.classList.toggle('is-off', state.indeterminate);
+    tValue.classList.toggle('is-off', state.floating);
+    tFloating.classList.toggle('is-off', state.indeterminate);
+    // плавающее значение: хелпер отдельная опция, по умолчанию выключен
+    tHelper.classList.toggle('is-off', state.indeterminate);
+    toneCtl.classList.toggle('is-off', state.autoTone);
+
+    const tone = state.autoTone ? pbarAutoTone(state.value, 100) : state.tone;
+    const o = {
+      tone, size: state.size, value: state.value, valueFormat: state.valueFormat,
+      showValue: state.showValue && !state.floating,
+      floating: state.floating && !state.indeterminate,
+      indeterminate: state.indeterminate,
+    };
+    if (state.label) o.label = state.floating ? undefined : 'Заголовок';
+    if (state.helper) o.helper = state.floating ? 'Вероятность сделки' : 'Хелпер';
+
+    preview.innerHTML = '';
+    const el = makePbar(o);
+    preview.appendChild(el);
+    positionFloatingMarkers(preview);
+
+    const cls = ['pbar', 'pbar--' + state.size, 'pbar--' + tone];
+    if (o.floating) cls.push('pbar--floating');
+    if (o.indeterminate) cls.push('pbar--indeterminate');
+    codeEl.innerHTML = '<code>&lt;div class="' + cls.join(' ') + '" role="progressbar" ' +
+      (o.indeterminate ? 'aria-valuetext="Загрузка"' : 'aria-valuenow="' + Math.round(pbClamp(state.value,100)) + '"') + '&gt;</code>' +
+      (state.autoTone ? ' <span style="color:var(--text-inactive)">— тон подобран автоматически (' + tone + ')</span>' : '');
+  }
+  render();
+})();
+
+/* ---------- ANATOMY DIAGRAM ---------- */
+(function () {
+  const d = document.getElementById('anat-diagram');
+  d.appendChild(makePbar({ tone: 'accent', value: 62, label: 'Заголовок', helper: 'Хелпер' }));
+})();
+
+/* ---------- SIZES ---------- */
+(function () {
+  const stage = document.getElementById('size-stage');
+  if (!stage) return;
+  [['s', 'S — 4px'], ['m', 'M — 6px'], ['l', 'L — 8px']].forEach(([size, cap]) => {
+    const wrap = document.createElement('div');
+    wrap.appendChild(makePbar({ tone: 'accent', size, value: 62, showValue: false }));
+    const label = document.createElement('div');
+    label.style.cssText = 'margin-top:8px; font:var(--type-body-s); color:var(--text-secondary);';
+    label.textContent = cap;
+    wrap.appendChild(label);
+    stage.appendChild(wrap);
+  });
+})();
+
+/* ---------- COMPOSITION LIST ---------- */
+(function () {
+  const host = document.getElementById('compo-list');
+  const defs = [
+    ['Bare', 'Только трек — плотные списки и карточки без подписей', () => makePbar({ tone: 'accent', value: 62, label: null, showValue: false })],
+    ['Заголовок + значение', 'Базовый вариант формы (Label / Value) — исходный референс', () => makePbar({ tone: 'accent', value: 50, label: 'Label', valueFormat: 'fraction' })],
+    ['+ Хелпер', 'Поясняющий текст под треком', () => makePbar({ tone: 'accent', value: 50, label: 'Label', valueFormat: 'fraction', helper: 'Helper' })],
+    ['Плавающее значение', 'Метка следует за краем заливки — исходный референс («Вероятность сделки»)', () => makePbar({ tone: 'system', value: 85, floating: true, helper: 'Вероятность сделки' })],
+    ['Компактный (таблицы/списки)', 'Без заголовка и хелпера, минимальные зазоры — одна строка таблицы', () => makePbar({ tone: 'success', size: 's', value: 78, compact: true })],
+  ];
+  defs.forEach(([title, desc, build]) => {
+    const row = document.createElement('div'); row.className = 'compo-row';
+    const head = document.createElement('div');
+    head.innerHTML = '<div class="ch">' + title + '</div><div class="cd">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.className = 'cell';
+    cell.appendChild(build());
+    row.appendChild(head); row.appendChild(cell);
+    host.appendChild(row);
+  });
+  positionFloatingMarkers(host);
+})();
+
+/* ---------- STATES MATRIX ---------- */
+(function () {
+  const m = document.getElementById('matrix');
+  const rows = [
+    ['Default', 'Значение известно, заливка отражает долю', () => makePbar({ tone: 'accent', value: 45, label: 'Заголовок' })],
+    ['Empty — 0%', 'Трек пуст, заливка не рендерится (без сливера)', () => makePbar({ tone: 'accent', value: 0, label: 'Заголовок' })],
+    ['Complete — 100%', 'Заливка занимает весь трек', () => makePbar({ tone: 'success', value: 100, label: 'Заголовок' })],
+    ['Indeterminate', 'Длительность неизвестна — анимированная полоса, value не отображается', () => makePbar({ tone: 'accent', indeterminate: true, label: 'Загрузка' })],
+  ];
+  rows.forEach(([name, desc, build]) => {
+    const row = document.createElement('div'); row.className = 'matrix-row';
+    const rn = document.createElement('div');
+    rn.innerHTML = '<div class="rn">' + name + '</div><div class="rd">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.style.maxWidth = '360px';
+    cell.appendChild(build());
+    row.appendChild(rn); row.appendChild(cell);
+    m.appendChild(row);
+  });
+})();
+
+/* ---------- AUTO TONE DEMO ---------- */
+(function () {
+  const host = document.getElementById('autotone-demo');
+  if (!host) return;
+  const wrap = document.createElement('div'); wrap.style.cssText = 'display:flex; flex-direction:column; gap:18px; max-width:420px;';
+
+  const scaleWrap = document.createElement('div'); scaleWrap.style.cssText = 'display:flex; flex-direction:column; gap:6px;';
+  const scale = document.createElement('div'); scale.style.cssText = 'display:flex; height:8px; border-radius:var(--radius-pill); overflow:hidden;';
+  [['var(--st-red)', 30], ['var(--st-orange)', 40], ['var(--st-green)', 30]].forEach(([color, w]) => {
+    const seg = document.createElement('div'); seg.style.cssText = 'height:100%; width:' + w + '%; background:' + color + ';'; scale.appendChild(seg);
+  });
+  const legend = document.createElement('div');
+  legend.style.cssText = 'display:flex; justify-content:space-between; font:var(--type-body-xs); color:var(--text-inactive);';
+  legend.innerHTML = '<span>0%</span><span>30%</span><span>70%</span><span>100%</span>';
+  scaleWrap.appendChild(scale); scaleWrap.appendChild(legend);
+
+  const rngRow = document.createElement('div'); rngRow.className = 'rng-row';
+  const l = document.createElement('span'); l.className = 'lbl'; l.textContent = 'Значение';
+  const val = document.createElement('span'); val.className = 'val';
+  rngRow.appendChild(l); rngRow.appendChild(val);
+  const rng = document.createElement('input'); rng.type = 'range'; rng.min = 0; rng.max = 100; rng.step = 1; rng.value = 62;
+
+  const barBox = document.createElement('div');
+
+  function draw() {
+    const v = Number(rng.value);
+    const tone = pbarAutoTone(v, 100);
+    val.textContent = v + '% \u2192 ' + tone;
+    barBox.innerHTML = '';
+    barBox.appendChild(makePbar({ tone, value: v, label: '\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a', valueFormat: 'percent' }));
+  }
+  rng.addEventListener('input', draw);
+
+  wrap.appendChild(scaleWrap);
+  wrap.appendChild(rngRow); wrap.appendChild(rng);
+  wrap.appendChild(barBox);
+  host.appendChild(wrap);
+  draw();
+})();
+
+/* ---------- TONE SCALE ---------- */
+(function () {
+  const g = document.getElementById('tone-grid');
+  const tones = [
+    ['accent', 'Accent', 'По умолчанию — нейтрально-положительный прогресс'],
+    ['success', 'Success', 'Показатель на уровне цели/нормы'],
+    ['warning', 'Warning', 'Приближение к пороговому значению'],
+    ['error', 'Error', 'Критическое значение / просрочено'],
+    ['info', 'Info', 'Информационная величина без оценки «хорошо/плохо»'],
+    ['system', 'System', 'Нейтральный тон — соответствует референсу («Вероятность сделки»)'],
+  ];
+  tones.forEach(([tone, name, desc]) => {
+    const row = document.createElement('div'); row.className = 'tone-row';
+    const tn = document.createElement('div');
+    tn.innerHTML = '<div class="tn">' + name + '</div><div class="cd" style="font:var(--type-body-s);color:var(--text-secondary);margin-top:2px;">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.style.maxWidth = '360px';
+    cell.appendChild(makePbar({ tone, value: 62, showValue: false }));
+    row.appendChild(tn); row.appendChild(cell);
+    g.appendChild(row);
+  });
+})();
+
+/* ---------- CORNER CASES ---------- */
+(function () {
+  const g = document.getElementById('cc-grid');
+  const cases = [
+    ['Значение вне диапазона', 'value < 0 или > max клампится в [0, max] до рендера — компонент никогда не получает ширину > 100% или отрицательную.', () => makePbar({ tone: 'error', value: 140, max: 100, label: 'Перерасход', valueFormat: 'fraction' })],
+    ['Малое ненулевое значение', 'При 0 < value < ~6% включается сливер — минимальная видимая ширина заливки, равная высоте трека.', () => makePbar({ tone: 'accent', value: 2, label: 'Заголовок' })],
+    ['Длинный заголовок', 'Заголовок обрезается многоточием; значение не переносится и не обрезается никогда.', () => makePbar({ tone: 'accent', value: 50, label: 'Очень длинное название показателя, которое не помещается целиком', valueFormat: 'fraction' })],
+    ['Плавающее значение на границе', 'При value → 0% или 100% метка клампится внутри трека и не вылезает за его пределы.', () => {
+      const wrap = document.createElement('div'); wrap.style.cssText = 'display:flex; flex-direction:column; gap:26px;';
+      wrap.appendChild(makePbar({ tone: 'system', value: 0, floating: true }));
+      wrap.appendChild(makePbar({ tone: 'system', value: 100, floating: true }));
+      return wrap;
+    }],
+  ];
+  cases.forEach(([title, desc, build]) => {
+    const card = document.createElement('div'); card.className = 'cc-card';
+    const t = document.createElement('div'); t.className = 'ct'; t.textContent = title;
+    const d = document.createElement('div'); d.className = 'cd'; d.textContent = desc;
+    const body = document.createElement('div'); body.style.maxWidth = '100%';
+    body.appendChild(build());
+    card.appendChild(t); card.appendChild(d); card.appendChild(body);
+    g.appendChild(card);
+  });
+  positionFloatingMarkers(g);
+})();
+
+/* ---------- TYPOGRAPHY REFERENCE ---------- */
+(function () {
+  const rows = [
+    ['Заголовок', 'Заголовок', '--type-body-s', 'SB Sans Text', '14 / 20', 'pbar__label'],
+    ['Значение', '50/100', '--type-body-s-strong', 'SB Sans Text', '14 / 20', 'pbar__value'],
+    ['Хелпер', 'Пояснение', '--type-body-xs', 'SB Sans Text', '12 / 16', 'ds-helper ds-helper--left'],
+  ];
+  const tb = document.querySelector('#typo-table tbody');
+  tb.innerHTML = rows.map(([part, sample, tok, font, sl, cls]) => `
+    <tr>
+      <td>${part}</td>
+      <td><span class="${cls}" style="display:inline;">${sample}</span></td>
+      <td class="rt-tok"><code>${tok}</code></td>
+      <td>${font}</td>
+      <td class="rt-num">${sl}</td>
+    </tr>`).join('');
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function () {
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue) {
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r, g, b, a = 1, m = v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m) { r = +m[1]*255; g = +m[2]*255; b = +m[3]*255; if (m[4] !== undefined) a = +m[4]; }
+    else { const n = v.match(/[\d.]+/g); if (!n) return cssValue; r = +n[0]; g = +n[1]; b = +n[2]; if (n[3] !== undefined) a = +n[3]; }
+    const hx = n => Math.round(n).toString(16).padStart(2, '0').toUpperCase();
+    let s = '#' + hx(r) + hx(g) + hx(b); if (a < 1) s += ' · ' + Math.round(a * 100) + '%'; return s;
+  }
+  const groups = [
+    { name: 'Трек', rows: [
+      ['Фон — все тона', '--border-light'],
+    ]},
+    { name: 'Заливка — тон', rows: [
+      ['Accent', '--primary'],
+      ['Success', '--st-green'],
+      ['Warning', '--st-orange'],
+      ['Error', '--st-red'],
+      ['Info', '--st-lblue'],
+      ['System', '--st-system'],
+    ]},
+    { name: 'Текст', rows: [
+      ['Заголовок', '--text-secondary'],
+      ['Значение / метка', '--text-primary'],
+      ['Хелпер', '--text-inactive'],
+    ]},
+  ];
+  const root = document.getElementById('color-ref');
+  root.innerHTML = groups.map(g => `
+    <section class="cref-group">
+      <h3>${g.name}</h3>
+      <div class="cref-rows">
+        ${g.rows.map(([role, tok]) => `
+          <div class="cref-row">
+            <div class="cref-sw"><div class="cf" style="background:var(${tok});"></div></div>
+            <div class="cref-meta"><p class="role">${role}</p><p class="tname">${tok}</p></div>
+            <div class="cref-hex">${resolveHex('var(' + tok + ')')}</div>
+          </div>`).join('')}
+      </div>
+    </section>`).join('');
+  probe.remove();
+})();
+
+/* ---------- DEV: redline measured from live component ---------- */
+(function () {
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;width:400px;';
+  document.body.appendChild(host);
+  const s = makePbar({ tone: 'accent', size: 's', value: 50, label: 'X', helper: 'Y' });
+  const m = makePbar({ tone: 'accent', size: 'm', value: 50, label: 'X', helper: 'Y' });
+  const l = makePbar({ tone: 'accent', size: 'l', value: 50, label: 'X', helper: 'Y' });
+  const indet = makePbar({ tone: 'accent', size: 'm', indeterminate: true });
+  host.append(s, m, l, indet);
+
+  const px = v => { const n = parseFloat(v); return Number.isNaN(n) ? v : (Math.round(n * 10) / 10) + ' px'; };
+  const trackS = getComputedStyle(s.querySelector('.pbar__track'));
+  const trackM = getComputedStyle(m.querySelector('.pbar__track'));
+  const trackL = getComputedStyle(l.querySelector('.pbar__track'));
+  const headM = getComputedStyle(m.querySelector('.pbar__head'));
+  const rootM = getComputedStyle(m);
+  const indetFill = getComputedStyle(indet.querySelector('.pbar__fill'));
+
+  const D = {
+    hS: px(trackS.height), hM: px(trackM.height), hL: px(trackL.height),
+    radius: trackM.borderRadius,
+    gapHeadTrack: px(rootM.rowGap),
+    gapTrackHelper: px(rootM.rowGap),
+    headGap: px(headM.columnGap),
+    indetWidth: indetFill.width,
+    indetDuration: getComputedStyle(indet.querySelector('.pbar__fill')).animationDuration,
+  };
+  host.remove();
+
+  const sizeRows = [
+    ['Высота трека / заливки — S', D.hS, '<code>.pbar--s .pbar__track</code>'],
+    ['Высота трека / заливки — M', D.hM, '<code>.pbar .pbar__track</code>'],
+    ['Высота трека / заливки — L', D.hL, '<code>.pbar--l .pbar__track</code>'],
+    ['Радиус трека / заливки', D.radius, '<code>--radius-pill</code>'],
+    ['Зазор заголовок ↔ трек / трек ↔ хелпер', D.gapHeadTrack, '<code>.pbar</code> row-gap'],
+    ['Зазор заголовок ↔ значение', D.headGap, '<code>.pbar__head</code> column-gap'],
+  ];
+  const sizeTb = document.querySelector('#size-table');
+  if (sizeTb) sizeTb.innerHTML = sizeRows.map(([p, v, src]) => `<div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.7fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${p}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${v}</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">${src}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
+
+  const devRows = [
+    ['Высота трека — S / M / L', D.hS + ' / ' + D.hM + ' / ' + D.hL],
+    ['Радиус трека и заливки', D.radius],
+    ['Зазор заголовок ↔ трек ↔ хелпер', D.gapHeadTrack],
+    ['Зазор заголовок ↔ значение', D.headGap],
+    ['Ширина сегмента Indeterminate', D.indetWidth],
+    ['Длительность цикла Indeterminate', D.indetDuration],
+    ['Сливер: порог значения', '< 6% от max'],
+    ['Сливер: минимальная ширина', 'равна высоте трека выбранного размера'],
+  ];
+  const devTb = document.querySelector('#dev-spec-table');
+  if (devTb) devTb.innerHTML = devRows.map(([p, v]) => `<div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${p}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${v}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
+})();
+
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function () {
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try { await navigator.clipboard.writeText(text); }
+      catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Формат значения': { label: 'Показывать проценты', on: 'percent' }, 'Заголовок': 'Показывать заголовок', 'Значение в заголовке': 'Показывать значение в заголовке', 'Хелпер': 'Показывать хелпер', 'Плавающее значение': 'Плавающее значение', 'Неопределённый': 'Неопределённый', 'Авто-тон по порогам': 'Авто-тон по порогам' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- определённый режим -->
+<div class="pbar pbar--accent" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" aria-label="Label">
+  <div class="pbar__head">
+    <span class="pbar__label">Label</span>
+    <span class="pbar__value">50/100</span>
+  </div>
+  <div class="pbar__track"><div class="pbar__fill" style="width:50%"></div></div>
+  <span class="ds-helper ds-helper--left pbar__helper">Helper</span>
+</div>
+
+<!-- неопределённый: aria-valuenow не указывается -->
+<div class="pbar pbar--accent pbar--indeterminate" role="progressbar" aria-valuetext="Загрузка">
+  <div class="pbar__track"><div class="pbar__fill"></div></div>
+</div>
+
+<!-- плавающее значение: метка — потомок заливки, позиция в px через JS -->
+<div class="pbar pbar--system pbar--floating" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" aria-label="Вероятность сделки">
+  <div class="pbar__track">
+    <div class="pbar__fill" style="width:85%"><span class="pbar__marker">85%</span></div>
+  </div>
+  <span class="ds-helper ds-helper--left pbar__helper">Вероятность сделки</span>
+</div>
+
+<!-- … полная анатомия: см. страницу компонента --></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function makePbar(o) {
+  // o: { tone, size:'s'|'m'|'l', value, valueFormat:'percent'|'fraction', showValue?, floating?, indeterminate?, label?, helper? }
+  // .pbar(.pbar--<tone>)(.pbar--s|--m|--l) → .pbar__head (подпись + значение) + .pbar__track > .pbar__fill
+  // floating — значение в отдельном блоке; indeterminate — бесконечный трек; autoTone — по порогам
+}
+function pbarAutoTone(value, max) { /* акцент по порогам */ }</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — ProgressBar
+   ---------------------------------------------------------------------
+   Линейный индикатор прогресса: заполнение трека отражает долю значения
+   от максимума. Определённый (значение известно) и неопределённый
+   (длительность неизвестна) режимы; шесть тональных вариантов на локальных
+   статусных токенах; три размера трека.
+
+   Requires: typography.css, colors.css, radius.css, label-helper.css (для .ds-helper)
+   ========================================================================= */
+
+.pbar {
+  --pbar-h: 6px;
+  --pbar-track: var(--border-light);
+  --pbar-fill: var(--primary);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---------- sizes ---------- *
+   Высота трека — прямыми свойствами на потомках (не через --pbar-h в
+   модификаторе). m = дефолт .pbar (6px), отдельных правил не требует. */
+.pbar--s .pbar__track { height: 4px; }
+.pbar--l .pbar__track { height: 8px; }
+.pbar--s .pbar__fill--sliver { min-width: 4px; }
+.pbar--l .pbar__fill--sliver { min-width: 8px; }
+.pbar--s .pbar__marker { top: calc(-1 * (4px + 16px)); }
+.pbar--l .pbar__marker { top: calc(-1 * (8px + 16px)); }
+
+/* ---------- tones (fill color; track остаётся нейтральным) ---------- *
+   Цвет заливки — прямо на .pbar__fill; для indeterminate — per-tone градиент
+   (accent = primary = дефолт, его indeterminate покрывает базовое правило). */
+.pbar--accent  .pbar__fill { background: var(--primary); }
+.pbar--success .pbar__fill { background: var(--st-green); }
+.pbar--info    .pbar__fill { background: var(--st-lblue); }
+.pbar--warning .pbar__fill { background: var(--st-orange); }
+.pbar--error   .pbar__fill { background: var(--st-red); }
+.pbar--system  .pbar__fill { background: var(--st-system); }
+.pbar--success.pbar--indeterminate .pbar__fill { background: linear-gradient(90deg, transparent, var(--st-green) 35%, var(--st-green) 65%, transparent); }
+.pbar--info.pbar--indeterminate .pbar__fill    { background: linear-gradient(90deg, transparent, var(--st-lblue) 35%, var(--st-lblue) 65%, transparent); }
+.pbar--warning.pbar--indeterminate .pbar__fill { background: linear-gradient(90deg, transparent, var(--st-orange) 35%, var(--st-orange) 65%, transparent); }
+.pbar--error.pbar--indeterminate .pbar__fill   { background: linear-gradient(90deg, transparent, var(--st-red) 35%, var(--st-red) 65%, transparent); }
+.pbar--system.pbar--indeterminate .pbar__fill  { background: linear-gradient(90deg, transparent, var(--st-system) 35%, var(--st-system) 65%, transparent); }
+
+/* ---------- head row: label + value ---------- */
+.pbar__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pbar__label {
+  min-width: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pbar__value {
+  flex: none;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- track + fill ---------- */
+.pbar__track {
+  position: relative;
+  width: 100%;
+  height: var(--pbar-h);
+  border-radius: var(--radius-pill);
+  background: var(--pbar-track);
+  overflow: hidden;
+}
+.pbar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--pbar-fill);
+  transition: width .3s ease;
+}
+/* сливер: гарантирует видимую полоску при очень малых ненулевых значениях —
+   применяется явно (не на 0%, см. «Для разработчиков» → поведение) */
+.pbar__fill--sliver { min-width: var(--pbar-h); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pbar__fill { transition: none; }
+}
+
+.pbar__helper { margin-top: -2px; }
+
+/* ---------- indeterminate ---------- */
+.pbar--indeterminate .pbar__fill {
+  width: 40%;
+  left: -40%;
+  right: auto;
+  background: linear-gradient(90deg, transparent, var(--pbar-fill) 35%, var(--pbar-fill) 65%, transparent);
+  animation: pbar-indeterminate 1.6s ease-in-out infinite;
+}
+@keyframes pbar-indeterminate {
+  0%   { left: -40%; }
+  60%  { left: 100%; }
+  100% { left: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pbar--indeterminate .pbar__fill { animation-duration: 3.2s; }
+}
+
+/* ---------- floating value marker (composition: значение над краем заливки) ---------- */
+.pbar--floating .pbar__track { overflow: visible; margin-top: 22px; }
+.pbar__marker {
+  position: absolute;
+  top: calc(-1 * (var(--pbar-h) + 16px));
+  width: max-content;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ---------- stacked / multi-value (композиция — Предложение) ---------- */
+.pbar__track--stack { display: flex; }
+.pbar__seg-stack { height: 100%; }
+
+/* ---------- compact (composition: без head/helper — таблицы, списки) ---------- */
+.pbar--compact { gap: 0; }</script>
+</body>
+</html>

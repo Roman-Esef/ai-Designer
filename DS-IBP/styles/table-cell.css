@@ -1,0 +1,454 @@
+/* =========================================================================
+   TableCell + TableHeader — ячейка таблицы и ячейка шапки.
+   Организм-компонент подкачки таблицы. Только токены ДС (var(--*)).
+   Высота строки фиксирована (48px) и растёт только если ячейка явно
+   разрешает перенос текста (см. .tc--wrap) — плотностей строки нет.
+   ========================================================================= */
+
+/* ------------------------------------------------------------------ */
+/*  БАЗА                                                                */
+/* ------------------------------------------------------------------ */
+.tc,
+.th {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  min-height: 48px;
+  min-width: 0;
+  padding: 6px 16px;
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  background: var(--bgtable);
+  border-bottom: 1px solid var(--border-light);
+  transition: background-color .12s ease;
+}
+
+/* --- выравнивание --- */
+.tc--right  { justify-content: flex-end;  text-align: right;  }
+.tc--center { justify-content: center;    text-align: center; } /* служебное: checkbox/iconbuttons/кнопки; не выбирается для текста в конструкторе */
+
+/* --- фоновые тона (колонки) --- */
+.tc--accent { background: var(--bgtable-accent); }
+.tc--pinned { background: var(--bgtable-pinned); }
+
+/* --- интерактивные состояния — свойство СТРОКИ, не ячейки ---------------- */
+/* Hover/focus/selected красят ВСЕ ячейки строки, включая ячейки-разделители:
+   состояние живёт на строке (.tbl__row / <tr>), ячейка его лишь наследует.
+   Классы .tc--hover/--focus/--selected сохранены для одиночных примеров;
+   реальная строка несёт aria-selected="true" (RulesAudit W1). */
+.tbl__row:hover > .tc,
+.tbl__row--hover > .tc,
+.tc--hover                    { background: var(--bgtable-row-hover); }
+.tbl__row:hover > .tc--accent,
+.tbl__row--hover > .tc--accent,
+.tc--accent.tc--hover         { background: var(--bgtable-accent-hover); }
+.tbl__row:hover > .tc--pinned,
+.tbl__row--hover > .tc--pinned,
+.tc--pinned.tc--hover         { background: var(--bgtable-pinned-hover); }
+
+.tbl__row:focus-within > .tc,
+.tbl__row--focus > .tc,
+.tc--focus,
+.tc:focus-within              { background: var(--bgtable-row-focus); }
+.tbl__row:focus-within > .tc--accent,
+.tbl__row--focus > .tc--accent,
+.tc--accent.tc--focus         { background: var(--bgtable-accent-focus); }
+.tbl__row:focus-within > .tc--pinned,
+.tbl__row--focus > .tc--pinned,
+.tc--pinned.tc--focus         { background: var(--bgtable-pinned-focus); }
+
+/* фокус клавиатурой на самой ячейке — обводка-инсет */
+.tc:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+.tbl__row--selected > .tc,
+.tbl__row[aria-selected="true"] > .tc,
+.tc--selected                 { background: var(--primary-bg); }
+/* форс-состояние строки сильнее наведения: строка в фокусе остаётся в фокусе */
+.tbl__row--focus:hover > .tc  { background: var(--bgtable-row-focus); }
+.tbl__row--selected:hover > .tc,
+.tbl__row--selected.tbl__row--hover > .tc,
+.tbl__row[aria-selected="true"]:hover > .tc,
+.tc--selected.tc--hover       { background: color-mix(in srgb, var(--c-emerald-500) 10%, transparent); }
+
+/* --- error --- */
+/* Состояния disabled у таблицы нет: строку/ячейку недоступной не делаем. */
+.tc--error       { color: var(--error); }
+.tc--error-bg    { background: var(--error-bg-light); }
+.tc--error .tc__prefix,
+.tc--error .tc__postfix { color: var(--error); }
+
+/* ------------------------------------------------------------------ */
+/*  ЗНАЧЕНИЕ ЯЧЕЙКИ                                                     */
+/* ------------------------------------------------------------------ */
+/* строка "префикс · значение · постфикс · иконка", может быть внутри .tc__body */
+.tc__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.tc--right .tc__row  { justify-content: flex-end; }
+
+.tc__text {
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  min-width: 0;
+}
+
+.tc__prefix,
+.tc__postfix {
+  font: var(--type-body-s);
+  color: var(--text-inactive);
+  flex: none;
+  white-space: nowrap;
+}
+
+/* усечение в одну строку + троеточие (полное значение — в Tooltip).
+   flex: 0 1 auto — текст занимает ровно свою ширину и сжимается только при
+   недостатке места, поэтому постфикс и иконка идут СРАЗУ после текста,
+   а не прижимаются к правому краю ячейки. */
+.tc__text--truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* режим переноса — усечение выключено, ячейка растёт по высоте */
+.tc--wrap { align-items: flex-start; padding-top: 8px; padding-bottom: 8px; }
+.tc--wrap .tc__text { white-space: normal; overflow: visible; text-overflow: clip; }
+.tc--wrap .tc__row   { align-items: flex-start; }
+
+/* числа: правое выравнивание + табулярные (моноширинные) цифры.
+   Одного класса достаточно — .tc--right добавлять не нужно. */
+.tc--numbers { justify-content: flex-end; text-align: right; }
+.tc--numbers .tc__row,
+.tc--numbers .tc__body  { justify-content: flex-end; align-items: flex-end; }
+.tc--numbers .tc__row,
+.tc--numbers .tc__text { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* пустое значение «—» */
+.tc__empty { color: var(--text-inactive); font: var(--type-body-s); }
+
+/* вторая строка (subtext) — опциональна для любого типа контента */
+.tc__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.tc__subtext {
+  font: var(--type-body-xs);
+  color: var(--text-secondary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* иконка рядом со значением (любой глиф, не только предупреждение):
+   .tc__icon — после значения, .tc__icon--lead — перед префиксом */
+.tc__icon {
+  flex: none;
+  display: inline-flex;
+  color: var(--text-secondary);
+}
+.tc__icon :is(svg,[data-icon]){ display: block; width: 16px; height: 16px; }.tc__icon--lead { order: -1; }
+.tc__icon--warning { color: var(--warning); }
+.tc__icon--error   { color: var(--error); }
+.tc__icon--success { color: var(--success); }
+
+/* ------------------------------------------------------------------ */
+/*  TREE NODE — раскрытие вложенности                                  */
+/* ------------------------------------------------------------------ */
+.tc--tree { padding-left: calc(16px + 20px * var(--tc-level, 0)); }
+.tc__twisty {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-s);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color .12s ease, transform .15s ease;
+}
+.tc__twisty:hover { background: var(--c-swamp-100); color: var(--text-primary); }
+.tc__twisty:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.tc__twisty :is(svg,[data-icon]){ display: block; width: 16px; height: 16px; }.tc__twisty[aria-expanded="true"] { transform: rotate(90deg); }
+/* лист дерева без раскрытия — резервируем место под твисти */
+.tc__twisty--leaf { visibility: hidden; }
+
+/* ------------------------------------------------------------------ */
+/*  КОНТРОЛЫ ВНУТРИ ЯЧЕЙКИ                                              */
+/* ------------------------------------------------------------------ */
+/* группы кнопок / чипов */
+.tc__controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tc--center .tc__controls { justify-content: center; width: 100%; }
+
+/* HiddenActions — действия появляются по наведению/фокусу на строку */
+.tc__hidden {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .12s ease;
+}
+.tbl__row:hover .tc__hidden,
+.tbl__row--hover .tc__hidden,
+.tbl__row--focus .tc__hidden,
+.tbl__row:focus-within .tc__hidden,
+.tc--hover .tc__hidden,
+.tc--focus .tc__hidden,
+.tc:hover .tc__hidden,
+.tc:focus-within .tc__hidden { opacity: 1; visibility: visible; }
+
+/* разделитель начала/конца строки — фиксированный отступ 8px, всегда первая
+   и последняя ячейка строки, никогда не выбирается как тип контента.
+   Это обычная ячейка без содержимого: фон, бордер и все состояния (hover /
+   selected / accent / pinned / disabled / error) наследуются как у .tc/.th —
+   переопределяется только ширина и паддинг. */
+.tc--separator,
+.th--separator {
+  padding: 0;
+  gap: 0;
+}
+/* разделителю доступны ТОЛЬКО состояния строки (hover/focus/selected/фон
+   колонки) — контентных признаков у него быть не может */
+.tc--separator::before { content: none; }
+.tc--separator .tc__skeleton { display: none; }
+
+/* ------------------------------------------------------------------ */
+/*  РЕДАКТИРУЕМЫЕ ЯЧЕЙКИ (Input Text / Date / Autocomplete)            */
+/*  Собственного поля у ячейки НЕТ — используется компонент Input       */
+/*  размера S (.inp.inp--s, «Table Edit»): те же рамки, радиусы,        */
+/*  состояния и действия. Ячейка лишь снимает заливку и рамку в покое.  */
+/* ------------------------------------------------------------------ */
+.tc--input { padding: 4px 8px; }
+.tc--input .inp { width: 100%; min-width: 0; }
+.tc--input .inp:not(.inp--error):not(.inp--warning) .inp__field {
+  background: transparent;
+  border-color: transparent;
+}
+.tc--input .inp__field { transition: border-color .12s ease, background-color .12s ease; }
+/* в покое поле сливается со строкой, по наведению — проявляется как поле */
+.tbl__row:hover .tc--input .inp:not(.inp--error):not(.inp--warning) .inp__field,
+.tbl__row--hover .tc--input .inp:not(.inp--error):not(.inp--warning) .inp__field,
+.tc--hover .inp:not(.inp--error):not(.inp--warning) .inp__field,
+.tc--input:hover .inp:not(.inp--error):not(.inp--warning) .inp__field { background: var(--bg-tile); border-color: var(--border-primary); }
+/* рамку и фон фокуса даёт сам Input (--primary, 2px) */
+
+/* действия поля (календарь, шеврон, очистка) видны только когда строка/ячейка
+   в фокусе — в покое ячейка показывает одно значение */
+.tc--input .inp__acts { opacity: 0; transition: opacity .12s ease; }
+.tbl__row--focus .tc--input .inp__acts,
+.tbl__row:focus-within .tc--input .inp__acts,
+.tc--focus .inp__acts,
+.tc--input .inp__field:focus-within .inp__acts { opacity: 1; }
+/* в таблице иконки действий 16px (в обычном Input S — 18px) */
+.tc--input .inp__act { width: 16px; height: 16px; }
+
+/* выпадающий список Autocomplete позиционируется от поля ячейки */
+.tc--input .inp { position: relative; }
+.tc--input .ddl--floating { top: calc(100% + 4px); left: 0; min-width: 100%; }
+
+/* чекбокс/радио внутри ячейки — компонент ДС без текстового слота */
+.tc .cb, .th .cb { gap: 0; }
+
+/* ------------------------------------------------------------------ */
+/*  ПРИЗНАК ОТРЕДАКТИРОВАННОЙ ЯЧЕЙКИ (EditMark) — верхний правый угол   */
+/* ------------------------------------------------------------------ */
+.tc--edited::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 7px 7px 0;
+  border-color: transparent var(--chart-orange) transparent transparent;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ */
+/*  SKELETON (загрузка)                                                */
+/* ------------------------------------------------------------------ */
+.tc--skeleton .tc__text,
+.tc--skeleton .tc__prefix,
+.tc--skeleton .tc__postfix { visibility: hidden; }
+/* плейсхолдер — общий компонент Skeleton, .sk-line--caption (styles/skeleton.css) */
+.tc--numbers .sk-line { margin-left: auto; }
+
+/* ================================================================== */
+/*  ШАПКА  .th                                                         */
+/* ================================================================== */
+.th {
+  gap: 6px;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  user-select: none;
+}
+.th--right  { justify-content: flex-end;  text-align: right;  }
+/* закреплённая колонка — фон Pinned и у шапки */
+.th--pinned { background: var(--bgtable-pinned); }
+.th--pinned:hover { background: var(--bgtable-pinned-hover); }
+.th--center { justify-content: center; }
+.th__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.th__icon { flex: none; display: inline-flex; color: var(--text-secondary); }
+.th__icon :is(svg,[data-icon]){ display: block; width: 18px; height: 18px; }
+/* --- инструменты шапки: сортировка и закрепление колонки ---------------- */
+/* Обе кнопки — IconButton ДС, тон neutral, размер S (.ibtn.ibtn--neutral.ibtn--s).
+   Глифы сортировки: arrow-up-down (не выбрана) · arrow-narrow-down (от большего
+   к меньшему) · arrow-narrow-up (от меньшего к большему).
+   Глифы закрепления: pin (не закреплено) · pin-filled (закреплено). */
+.th__tools { display: flex; align-items: center; gap: 6px; flex: none; }
+/* колонка выбора: чекбокс шапки стоит ровно по центру колонки — над чекбоксами
+   строк. Инструменты шапки (закрепление, сортировка) выводятся из потока и
+   прижимаются к правому краю, а колонка не сужается ниже порога, на котором
+   помещаются и чекбокс, и обе иконки. */
+.th--center:has(.th__tools) .th__tools { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); margin-left: 0; }
+/* Порог ширины колонки выбора: 8 (край) + 38 (иконки) + 6 + 20 (чекбокс) + 6 + 38 + 8,
+   зеркально — бокс стоит по центру, инструменты его не перекрывают.
+   Класс ставится на ВСЕ ячейки колонки (и шапку, и строки), иначе строки
+   окажутся уже шапки и чекбоксы разъедутся по горизонтали. */
+.th--select, .tc--select { min-width: 124px; }
+.th:not(.th--right):not(.th--center) .th__tools { margin-left: auto; }
+
+/* активная сортировка и закрепление — Active · secondary-dark */
+.th--sorted .th__sort,
+.th--pinned .th__pin { color: var(--secondary-dark); }
+/* по наведению на шапку сортировка темнеет */
+.th:hover .th__sort,
+.th--hover .th__sort { color: var(--secondary-dark); }
+
+/* иконка закрепления появляется по наведению на шапку; закреплённая — видна
+   всегда. Если сортировки у колонки нет, закрепление занимает её место. */
+.th__pin { opacity: 0; transition: opacity .12s ease, color .12s ease; }
+.th:hover .th__pin,
+.th--hover .th__pin,
+.th:focus-within .th__pin,
+.th--pinned .th__pin { opacity: 1; }
+
+/* --- изменение ширины колонки ------------------------------------------ */
+/* Ручка на правой границе шапки: зона захвата 9px без видимой графики,
+   по наведению и во время перетаскивания — вертикальная линия.
+   Ширина колонки не опускается ниже порога --tbl-col-min (по умолчанию 96px). */
+.th__resize {
+  position: absolute;
+  top: 0; right: -4px;
+  width: 9px; height: 100%;
+  z-index: 4;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; border: none; background: transparent;
+  cursor: col-resize;
+  touch-action: none;
+}
+.th__resize::after {
+  content: "";
+  width: 2px; height: 20px;
+  border-radius: 1px;
+  background: transparent;
+  transition: background .12s ease;
+}
+.th__resize:hover::after,
+.th__resize:focus-visible::after,
+.th--resizing .th__resize::after { background: var(--secondary-dark); }
+.th__resize:focus-visible { outline: none; }
+
+/* --- порядок колонок: перетаскивание шапки ------------------------------ */
+/* Колонку берут за подпись шапки. Пока идёт перенос, вся колонка приглушена,
+   а место вставки показывает вертикальная линия через всю таблицу. */
+.th--movable .th__label { cursor: grab; }
+.tbl--reordering .th--movable .th__label { cursor: grabbing; }
+.th--dragging,
+.tc--dragging { opacity: .4; }
+.tbl--resizing,
+.tbl--reordering { user-select: none; }
+.tbl--resizing .th__label { cursor: col-resize; }
+
+/* линия-указатель (граница при изменении ширины, место вставки при переносе) */
+.tbl__guide {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: var(--primary);
+  pointer-events: none;
+  z-index: 6;
+  display: none;
+}
+.tbl--resizing .tbl__guide,
+.tbl--reordering .tbl__guide { display: block; }
+
+/* действие в шапке (кебаб) — по наведению */
+.th__action {
+  flex: none;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity .12s ease;
+}
+.th:hover .th__action,
+.th:focus-within .th__action { opacity: 1; }
+
+/* ================================================================== */
+/*  РАЗМЕТКА ТАБЛИЦЫ (утилита для демо/экранов)                        */
+/*  Сетка на CSS grid: строки = ячейки, колонки = столбцы             */
+/*  Первая и последняя колонка каждой строки — Separator 8px          */
+/* ================================================================== */
+.tbl {
+  position: relative;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--bg-tile);
+}
+.tbl__row { display: grid; }
+.tbl__row:last-child .tc { border-bottom: none; }
+
+/* закреплённая колонка не уезжает при горизонтальном скролле таблицы:
+   .tbl--scroll — прокручиваемый контейнер, .tc--pinned/.th--pinned — sticky */
+.tbl--scroll { overflow-x: auto; }
+.tbl--scroll .tc--pinned,
+.tbl--scroll .th--pinned {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  box-shadow: 1px 0 0 var(--border-light);
+}
+
+/* ================================================================== */
+/* динамика: спарклайн в ячейке — компонент Chart (type:'spark'),      */
+/* геометрию слота задаёт таблица, а не график                        */
+/* ================================================================== */
+.tc__spark {
+  display: block;
+  flex: none;
+  width: var(--tc-spark-w, 72px);
+  height: 24px;
+}
+.tc--numbers .tc__spark { margin-left: auto; }

@@ -1,0 +1,133 @@
+/* ============================================================
+   DS NAV — общая левая навигация дизайн-системы
+   Подключается на всех страницах вместе с ds-nav.js
+   ============================================================ */
+
+:root { --ds-nav-w: 276px; }
+
+/* сдвигаем контент страницы вправо под фиксированную панель */
+body.ds-has-nav { padding-left: var(--ds-nav-w); }
+
+/* ---------- каркас панели ---------- */
+.ds-nav {
+  position: fixed; top: 0; left: 0; z-index: 50;
+  width: var(--ds-nav-w); height: 100vh;
+  display: flex; flex-direction: column;
+  background: var(--bg-tile);
+  border-right: 1px solid var(--border-light);
+  font-family: var(--font-text), system-ui, sans-serif;
+}
+
+/* шапка панели — бренд */
+.ds-nav a, .ds-nav__link { text-decoration: none; }
+
+.ds-nav__brand {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--text-primary);   /* иначе ссылка-бренд браузерно-синяя (E3) */
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border-light);
+  flex: none;
+}
+.ds-nav__logo {
+  width: 34px; height: 34px; flex: none; border-radius: var(--radius-control);
+  display: grid; place-items: center;
+  background: var(--primary-bg, color-mix(in srgb, var(--primary) 10%, #fff));
+  overflow: hidden;
+}
+.ds-nav__logo img { width: 26px; height: 26px; display: block; }
+.ds-nav__brandtext { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ds-nav__title { font: var(--type-body-m-strong); color: var(--text-primary); }
+.ds-nav__sub { font: var(--type-body-xs); color: var(--text-inactive); }
+
+/* прокручиваемое тело */
+.ds-nav__scroll {
+  flex: 1; overflow-y: auto; overscroll-behavior: contain;
+  padding: 14px 12px 28px;
+}
+.ds-nav__scroll::-webkit-scrollbar { width: 8px; }
+.ds-nav__scroll::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 8px; }
+
+/* ---------- категория верхнего уровня ---------- */
+.ds-nav__cat { margin-top: 6px; }
+.ds-nav__cat:first-child { margin-top: 0; }
+.ds-nav__cat-label {
+  font: var(--type-button-xs); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--text-inactive);
+  padding: 14px 14px 8px;
+}
+
+/* подгруппа (атомы / молекулы / организмы) */
+.ds-nav__group-label {
+  font: var(--type-body-xs); font-weight: 600;
+  color: var(--text-secondary);
+  padding: 12px 14px 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.ds-nav__group-label .ds-nav__count {
+  font-weight: 400; color: var(--text-inactive);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- ссылка ---------- */
+.ds-nav__link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; border-radius: var(--radius-control);
+  font: var(--type-body-m); color: var(--text-primary);
+  cursor: pointer; transition: background .12s ease, color .12s ease;
+  position: relative;
+}
+.ds-nav__link:hover { background: var(--bgtable-row-hover); color: var(--text-primary); }
+
+.ds-nav__dot { width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--border-primary); transition: background .12s ease; }
+.ds-nav__link:hover .ds-nav__dot { background: var(--text-secondary); }
+
+.ds-nav__link.is-active {
+  background: var(--primary-bg); color: var(--primary-dark); font-weight: 600;
+}
+.ds-nav__link.is-active .ds-nav__dot { background: var(--primary); }
+.ds-nav__link.is-active::before {
+  content: ""; position: absolute; left: 2px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 18px; border-radius: 3px; background: var(--primary);
+}
+
+/* «скоро» — заглушка для будущих страниц */
+.ds-nav__link.is-soon { color: var(--text-inactive); cursor: default; }
+.ds-nav__link.is-soon:hover { background: transparent; color: var(--text-inactive); }
+.ds-nav__link.is-soon .ds-nav__dot { background: var(--border-light); }
+.ds-nav__soon-badge {
+  margin-left: auto; font: var(--type-body-xs); font-weight: 600;
+  color: var(--text-primary); background: var(--tertiary);
+  padding: 2px 7px; border-radius: 999px; letter-spacing: .02em;
+}
+
+/* ---------- мобильный режим ---------- */
+.ds-nav__toggle {
+  position: fixed; top: 16px; left: 16px; z-index: 60;
+  width: 44px; height: 44px; border-radius: var(--radius-xl);
+  display: none; align-items: center; justify-content: center;
+  background: var(--bg-tile); border: 1px solid var(--border-light);
+  color: var(--text-primary); cursor: pointer;
+  box-shadow: 0 4px 14px rgba(40,50,55,.10);
+}
+.ds-nav__toggle svg { width: 22px; height: 22px; }
+.ds-nav__backdrop {
+  position: fixed; inset: 0; z-index: 49;
+  background: rgba(40,50,55,.34); opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+}
+
+@media (max-width: 1024px) {
+  body.ds-has-nav { padding-left: 0; }
+  .ds-nav {
+    transform: translateX(-100%); transition: transform .24s ease;
+    box-shadow: 0 0 40px rgba(40,50,55,.16);
+  }
+  .ds-nav__toggle { display: flex; }
+  body.ds-nav-open .ds-nav { transform: translateX(0); }
+  body.ds-nav-open .ds-nav__backdrop { opacity: 1; pointer-events: auto; }
+}
+
+@media print {
+  .ds-nav, .ds-nav__toggle, .ds-nav__backdrop { display: none !important; }
+  body.ds-has-nav { padding-left: 0 !important; }
+}

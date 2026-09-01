@@ -1,0 +1,1462 @@
+<!-- @dsCard group="Components" name="Tile" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tile — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/chip.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/divider.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/read-only-field.css">
+<link rel="stylesheet" href="../../styles/alert.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/tile.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<style>
+
+a{color:var(--link);} a:hover{color:var(--link-dark);}
+
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:82ch;text-wrap:pretty;}
+
+.subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:32px 0 14px;}
+
+.disclaimer{border:1px solid var(--warning);background:var(--warning-bg);border-radius:14px;padding:22px 26px;}
+.disclaimer p.disclaimer__title{font:var(--type-h4-strong);color:var(--warning-dark,var(--text-primary));margin:0 0 10px;}
+.disclaimer p{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 6px;max-width:88ch;text-wrap:pretty;}
+.disclaimer p:last-child{margin-bottom:0;}
+/* playground: демо — в верхнюю панель сплиттера, контролы — во вкладку «Конструктор» */
+.pg__stage{flex:1;min-height:0;width:100%;display:flex;align-items:stretch;padding:24px 26px;min-width:0;}
+.pg__stagebox{width:100%;display:flex;flex-direction:column;min-width:0;}
+.ctl{display:flex;flex-direction:column;gap:10px;}
+.ctl.is-off{display:none;}
+.toggles>.is-off{display:none;}
+.ctl>.lbl{font:600 11px/1 var(--font-text),sans-serif;color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+.pg-stage-grid{flex:1;display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-content:center;background:var(--bg-page);border:1px solid var(--border-light);border-radius:12px;padding:28px;min-height:260px;}
+.ws-cap{font:var(--type-body-xs);color:var(--text-inactive);margin:12px 0 0;text-wrap:pretty;}
+/* demo content inside tiles */
+.tl-fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.tl-fieldgrid>.rof{min-width:0;}
+.tl-field{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.tl-field__label{font:var(--type-body-xs);color:var(--text-inactive);}
+.tl-field__value{font:var(--type-body-m-strong);color:var(--text-primary);}
+.tl-field__value .u{color:var(--text-inactive);font-weight:400;}
+/* anatomy */
+.anat{display:grid;grid-template-columns:1fr 340px;gap:40px;align-items:start;}
+@media(max-width:860px){.anat{grid-template-columns:1fr;}}
+.anat__stage{background:color-mix(in srgb,var(--primary) 5%,#fff);border:1px solid var(--border-light);border-radius:14px;padding:44px 40px;display:flex;justify-content:center;}
+.anat-dia{position:relative;width:100%;max-width:440px;}
+.mk{position:absolute;width:24px;height:24px;border-radius:50%;background:var(--text-primary);color:#fff;font:700 12px/24px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5;pointer-events:none;}
+.anat__legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;}
+.anat__legend li{display:flex;gap:12px;align-items:flex-start;}
+.anat__legend li .n{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font:700 12px/24px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;}
+/* sizes rail */
+.size-row{display:grid;grid-template-columns:120px 1fr;gap:20px;align-items:center;padding:22px 0;border-bottom:1px solid var(--border-light);}
+.size-tag{font:var(--type-body-s-strong);color:var(--text-primary);}
+.colspan{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;}
+.colspan .cs{height:34px;border-radius:6px;background:var(--c-swamp-100,var(--primary-bg));border:1px solid var(--border-light);}
+.colspan .cs--fill{background:var(--primary-bg);border-color:var(--primary);display:flex;align-items:center;justify-content:center;font:var(--type-body-xs);color:var(--primary-dark,var(--primary));font-weight:600;}
+/* content guide */
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.guide{grid-template-columns:1fr;}}
+.guide-card{border-radius:12px;overflow:hidden;border:1px solid var(--border-light);background:var(--bg-tile);}
+.guide-card__tag{font:var(--type-body-s-strong);padding:12px 18px 0;}
+.guide-card__body{padding:14px 18px 18px;font:var(--type-body-s);color:var(--text-secondary);}
+/* states / variants grid */
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:820px){.mini-grid{grid-template-columns:1fr;}}
+.mini{display:flex;flex-direction:column;gap:12px;}
+.mini__cap{font:var(--type-body-xs);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+.mini__cap b{color:var(--text-secondary);}
+.stagebg{background:var(--bg-page);border:1px solid var(--border-light);border-radius:12px;padding:24px;}
+/* page example */
+.page-ex{background:var(--bg-page);border:1px solid var(--border-light);border-radius:14px;padding:24px;overflow:hidden;}
+.page-ex__crumbs{font:var(--type-body-xs);color:var(--text-inactive);margin:0 0 6px;}
+.page-ex__title{font:var(--type-h4-strong);color:var(--text-primary);margin:0 0 18px;}
+.page-ex__row{display:grid;gap:16px;grid-template-columns:repeat(12,1fr);}
+.page-ex__row+.page-ex__row{margin-top:16px;}
+/* colors */
+@media(max-width:700px){.cref{grid-template-columns:1fr;}}
+
+.cref-group>h3{font:var(--type-body-m-strong);margin:0;padding:14px 18px;border-bottom:1px solid var(--border-light);color:var(--text-primary);}
+.cref-row{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border-light);font:var(--type-body-s);color:var(--text-secondary);}
+/* ref table */
+.ref-table th,.ref-table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--border-light);font:var(--type-body-m);color:var(--text-primary);vertical-align:middle;}
+.rl-sample{position:absolute;top:-9999px;left:0;width:520px;}
+/* code blocks */
+
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Tile">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage">
+          <div class="pg__stagebox">
+            <div class="pg-stage-grid">
+              <div id="demo-tile-wrap" style="grid-column:span 6;">
+                <div id="demo-tile"></div>
+              </div>
+            </div>
+            <p class="ws-cap">Ширина тайла привязана к колонкам контентной области (3–12). Контент здесь — типовой пример: наполнение всегда индивидуально под задачу тайла.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+  <a class="crumb" href="../../index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Обзор компонентов
+  </a>
+  <div class="meta">
+    <span>Версия <b>1.010</b></span>
+    <span>Обновлено <b>30.08.2026</b></span>
+    <span>CSS <b>styles/tile.css</b></span>
+    <span>Зависимости <b>icon-button, button, link, chip, badge, alert, divider, read-only-field, table-cell</b></span>
+  </div>
+  <div class="eyebrow">Дизайн-система · Организмы</div>
+  <h1>Tile</h1>
+  <p class="lead">Один из основных компонентов интерфейса — тайл на рабочей области страницы. Состоит из TileHeader и контентной области; наполнение контента индивидуально под задачу и тип тайла.</p>
+</header>
+
+<!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#demo-tile),
+     контролы — во вкладку «Конструктор» нижней панели (см. в конце) -->
+
+<!-- 2. ИСПОЛЬЗОВАНИЕ -->
+<section class="section" id="usage" data-screen-label="Использование">
+  <h2>Использование</h2>
+  <p class="desc">Tile — основной тайл рабочей области страницы: группирует связанные данные и действия по объекту (сделка, продукт, инструмент, контрагент). Описаны общие правила построения; для каждого конкретного тайла в проекте заводится локальный компонент, разработанный по этим правилам.</p>
+
+  <div class="disclaimer" role="note">
+    <p class="disclaimer__title"><b>Дисклеймер</b></p>
+    <p>Описаны общие правила построения и использования тайла.</p>
+    <p>Для каждого конкретного тайла в проекте заводится локальный компонент, разработанный по правилам этой страницы.</p>
+    <p>Контент в контентной области отличается в зависимости от типа и задачи тайла и может быть любым.</p>
+  </div>
+
+  <div class="subsec">
+    <h3>Когда использовать</h3>
+    <ul class="bullets">
+      <li>Для группировки связанных полей и действий по объекту на рабочей области страницы.</li>
+      <li>Когда блоку нужен заголовок, опциональный статус (чипы/бейдж) и локальные действия в шапке.</li>
+      <li>Когда блок раскрывается/сворачивается — вариант <b>AccordionTile</b>.</li>
+      <li>Когда заголовок не нужен и блок целиком состоит из контента — вариант <b>TileHeadless</b>.</li>
+    </ul>
+  </div>
+
+  <div class="subsec">
+    <h3>Когда не использовать</h3>
+    <ul class="bullets">
+      <li>Внутри модальных окон — там используется <b>Card</b> (собственная система отступов, состояния перетаскивания/выбора).</li>
+      <li>Для отдельного объекта в списке или строке — это <b>Entity</b>, а не тайл.</li>
+      <li>Как контейнер-обёртку без содержательного заголовка и контента — тайл не декоративен.</li>
+    </ul>
+  </div>
+
+  <div class="subsec">
+    <h3>Tile · TileHeadless · Card</h3>
+    <p class="desc tight">Три родственных тайла с общим TileHeader, но разной областью применения и системой отступов.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 130px 1.3fr 1fr 1.1fr 1.9fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Компонент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Где</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Хэдер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Отступы контента</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Состояния</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 130px 1.3fr 1fr 1.1fr 1.9fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text"><b>Tile</b></span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">рабочая область страницы</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">TileHeader M</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">10 / 20 / 24 / 20</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">нет</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 130px 1.3fr 1fr 1.1fr 1.9fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text"><b>TileHeadless</b></span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">рабочая область страницы</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">нет</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">20 / 20 / 32 / 20</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">нет</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 130px 1.3fr 1fr 1.1fr 1.9fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text"><b>Card</b></span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">модальные окна</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">TileHeader Card</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">8 / 16 / 20 / 16</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Default / Hover / Active / Move / Disabled</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. АНАТОМИЯ -->
+<section class="section" id="anatomy" data-screen-label="Анатомия">
+  <h2>Анатомия</h2>
+  <p class="desc">Тайл состоит из TileHeader и контентной области; хэдер размещается над контентом вплотную, без отступа. Опционально между ними вставляется Alert.</p>
+  <div class="anat">
+    <div class="anat__stage">
+      <div class="anat-dia">
+        <div class="tile" id="anat-tile">
+          <div class="tile__header">
+            <div class="tile__header-main">
+              <div class="tile__title-row">
+                <h4 class="tile__title">Проектное финансирование</h4>
+              </div>
+              <div class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="check-circle-filled"></i></span>Нерезидент</div>
+              <div class="tile__chiplist">
+                <span class="chip chip--xs"><span class="chip__label">Погашен</span></span>
+              </div>
+            </div>
+            <div class="tile__actions">
+              <button class="ibtn ibtn--neutral ibtn--m" aria-label="Документы"><i data-icon="document-check"></i></button>
+              <button class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+            </div>
+          </div>
+          <div class="tile__alert">
+            <div class="alert alert--warning alert--m" data-alert-tone="warning" role="status">
+              <span class="alert__icon" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
+              <div class="alert__body"><p class="alert__text">Функционал в разработке</p></div>
+            </div>
+          </div>
+          <div class="tile__body">
+            <div class="tl-fieldgrid">
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Объём по продукту, млн ед.</span></span><div class="rof__row"><span class="rof__value">17 560</span><span class="rof__affix">RUB</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Валовая маржа, %</span></span><div class="rof__row"><span class="rof__value">3</span></div></div>
+            </div>
+          </div>
+        </div>
+        <span class="mk" style="left:0;top:20px;">1</span>
+        <span class="mk" style="left:0;top:118px;">2</span>
+        <span class="mk" style="right:0;left:auto;top:20px;transform:translate(50%,-50%);">3</span>
+        <span class="mk" style="right:0;left:auto;bottom:44px;top:auto;transform:translate(50%,50%);">4</span>
+      </div>
+    </div>
+    <ol class="anat__legend">
+      <li><span class="n">1</span><span><span class="k">TileHeader — Title</span><span class="d">H5 Strong. Опц. Addition: Link / Icon / Chip / Badge.</span></span></li>
+      <li><span class="n">2</span><span><span class="k">Subtitle + Chiplist</span><span class="d">Subtitle — Body XS с опц. иконкой; ниже — ряд чипов (маркеры).</span></span></li>
+      <li><span class="n">3</span><span><span class="k">Actions</span><span class="d">Трейлинг: 1–3 действия — IconButton (размер M, 20×20) и/или Button в любом сочетании, зазор 8.</span></span></li>
+      <li><span class="n">4</span><span><span class="k">Alert-слот + контентная область</span><span class="d">Опц. полноширинный Alert, затем контент (индивидуальный).</span></span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 4. ВАРИАНТЫ -->
+<section class="section" id="variants" data-screen-label="Варианты">
+  <h2>Варианты</h2>
+  <p class="desc">Оси конфигурации тайла: наличие хэдера, разворачивание и вставка Alert. Состав самого хэдера (Title / Subtitle / Chiplist / Actions) настраивается независимо — см. Конструктор.</p>
+
+  <div class="subsec">
+    <h3>Обычный Tile</h3>
+    <p class="desc tight">TileHeader M + контентная область. Базовый вариант.</p>
+    <div class="stagebg">
+      <div class="tile" style="max-width:420px;">
+        <div class="tile__header">
+          <div class="tile__header-main">
+            <div class="tile__title-row"><h4 class="tile__title">Сроки сделки</h4></div>
+            <div class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="check-circle-filled"></i></span>Нерезидент</div>
+          </div>
+          <div class="tile__actions"><button class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button></div>
+        </div>
+        <div class="tile__body">
+          <div class="tl-fieldgrid">
+            <div class="rof"><span class="ds-label"><span class="ds-label__text">Дата начала</span></span><div class="rof__row"><span class="rof__value">12.09.2024</span></div></div>
+            <div class="rof"><span class="ds-label"><span class="ds-label__text">Дата погашения</span></span><div class="rof__row"><span class="rof__value">22.04.2027</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h3>AccordionTile</h3>
+    <p class="desc tight">Тайл, способный разворачиваться и сворачиваться. Полный коллапс — скрывается весь контент; частичный — часть контента остаётся видимой, сворачивается только вложенный блок.</p>
+    <div class="mini-grid">
+      <div class="mini">
+        <div class="mini__cap">Полный коллапс · <b>клик по шеврону</b></div>
+        <div class="stagebg">
+          <div class="tile tile--accordion" id="acc-full">
+            <div class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h4 class="tile__title">1. Кредит</h4><span class="chip chip--s"><span class="chip__label">Погашен</span></span></div>
+              </div>
+              <div class="tile__actions">
+                <button class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+                <button class="ibtn ibtn--neutral ibtn--m tile__toggle" aria-expanded="true" aria-controls="acc-full-body" aria-label="Свернуть"><span class="tile__chevron"><i data-icon="chevron-up"></i></span></button>
+              </div>
+            </div>
+            <div class="tile__collapsible" id="acc-full-body">
+              <div class="tile__body">
+                <div class="tl-fieldgrid">
+                  <div class="rof"><span class="ds-label"><span class="ds-label__text">Баланс</span></span><div class="rof__row"><span class="rof__value">—</span></div></div>
+                  <div class="rof"><span class="ds-label"><span class="ds-label__text">Тип отчётности</span></span><div class="rof__row"><span class="rof__value">Только МСФО</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini">
+        <div class="mini__cap">Частичный коллапс · <b>сводка остаётся</b></div>
+        <div class="stagebg">
+          <div class="tile tile--accordion" id="acc-part">
+            <div class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h4 class="tile__title">2. Акции</h4></div>
+                <div class="tile__subtitle">Корпоративный договор</div>
+              </div>
+              <div class="tile__actions">
+                <button class="ibtn ibtn--neutral ibtn--m tile__toggle" aria-expanded="true" aria-controls="acc-part-body" aria-label="Свернуть"><span class="tile__chevron"><i data-icon="chevron-up"></i></span></button>
+              </div>
+            </div>
+            <div class="tile__body">
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">1234-КД-1</span></span><div class="rof__row"><span class="rof__value">Корпоративный договор</span></div></div>
+            </div>
+            <div class="tile__collapsible" id="acc-part-body">
+              <div class="tile__body" style="padding-top:0;">
+                <hr class="dvd dvd--h" style="margin:0 0 12px;">
+                <div class="tl-fieldgrid">
+                  <div class="rof"><span class="ds-label"><span class="ds-label__text">Валюта расчётов</span></span><div class="rof__row"><span class="rof__value">RUB</span></div></div>
+                  <div class="rof"><span class="ds-label"><span class="ds-label__text">FV/AC</span></span><div class="rof__row"><span class="rof__value">MCDO и PCSV</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h3>TileHeadless</h3>
+    <p class="desc tight">Тайл без заголовка: только контентная область. Хэдера нет, состояний нет, отступы 20/20/32/20.</p>
+    <div class="stagebg">
+      <div class="tile tile--headless" style="max-width:420px;">
+        <div class="tile__body">
+          <div class="tl-fieldgrid">
+            <div class="rof"><span class="ds-label"><span class="ds-label__text">Баланс</span></span><div class="rof__row"><span class="rof__value">SBIL</span></div></div>
+            <div class="rof"><span class="ds-label"><span class="ds-label__text">Валюта</span></span><div class="rof__row"><span class="rof__value">RUB</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h3>С Alert-слотом</h3>
+    <p class="desc tight">Полноширинный Alert между хэдером и контентом — статус, требующий внимания. Тона: Warning, Info, Error. В Card Alert-слот не предполагается.</p>
+    <div class="stagebg" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px;">
+      <div class="tile" style="max-width:420px;">
+        <div class="tile__header">
+          <div class="tile__header-main"><div class="tile__title-row"><h4 class="tile__title">1. Кредит</h4></div></div>
+          <div class="tile__actions"><button class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button></div>
+        </div>
+        <div class="tile__alert">
+          <div class="alert alert--warning alert--m" data-alert-tone="warning" role="status">
+            <span class="alert__icon" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
+            <div class="alert__body"><p class="alert__text">Функционал в разработке</p></div>
+          </div>
+        </div>
+        <div class="tile__body">
+          <div class="rof"><span class="ds-label"><span class="ds-label__text">Контрагент</span></span><div class="rof__row"><span class="rof__value">—</span></div></div>
+        </div>
+      </div>
+      <div class="tile" style="max-width:420px;">
+        <div class="tile__header">
+          <div class="tile__header-main"><div class="tile__title-row"><h4 class="tile__title">2. Акции</h4></div></div>
+          <div class="tile__actions"><button class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button></div>
+        </div>
+        <div class="tile__alert">
+          <div class="alert alert--error alert--m" data-alert-tone="error" role="alert">
+            <span class="alert__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+            <div class="alert__body"><p class="alert__text">Не удалось загрузить данные</p></div>
+          </div>
+        </div>
+        <div class="tile__body">
+          <div class="rof"><span class="ds-label"><span class="ds-label__text">Контрагент</span></span><div class="rof__row"><span class="rof__value">—</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. РАЗМЕРЫ -->
+<section class="section" id="sizes" data-screen-label="Размеры">
+  <h2>Размеры</h2>
+  <p class="desc">Ширина тайла привязана к колонкам контентной области страницы и может занимать от 3 до 12 колонок. Высота в строке фиксированная — определяется тайлом с максимальным объёмом контента с учётом возможных алертов; при изменении состояния/наполнения высота может меняться.</p>
+  <div class="panel">
+    <div class="size-row">
+      <div class="size-tag">3 колонки<small>минимум</small></div>
+      <div class="colspan"><div class="cs cs--fill" style="grid-column:span 3;">3</div><div class="cs" style="grid-column:span 9;"></div></div>
+    </div>
+    <div class="size-row">
+      <div class="size-tag">6 колонок<small>½ ширины</small></div>
+      <div class="colspan"><div class="cs cs--fill" style="grid-column:span 6;">6</div><div class="cs" style="grid-column:span 6;"></div></div>
+    </div>
+    <div class="size-row">
+      <div class="size-tag">12 колонок<small>во всю ширину</small></div>
+      <div class="colspan"><div class="cs cs--fill" style="grid-column:span 12;">12</div></div>
+    </div>
+  </div>
+  <p class="ws-cap">Расстояние между колонками — 16px, между строками контента — 16 или 24px.</p>
+
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус не зависит от числа колонок, которые занимает тайл, и от высоты контента.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Тайл</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-m</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Alert внутри тайла</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+<!-- 6. КОНТЕНТ -->
+<section class="section" id="content" data-screen-label="Контент">
+  <h2>Контент</h2>
+  <p class="desc">Наполнение контентной области индивидуально под задачу тайла и может быть любым. Разрешённые элементы — текст, дивайдеры, ReadOnly-инпуты, кнопки, ссылки; в отдельных случаях внутри тайла размещаются плашки-аккордеоны.</p>
+
+  <div class="subsec">
+    <h3>Внутренние отступы и ритм</h3>
+    <ul class="bullets">
+      <li><b>Отступы контентной области</b> — 10 / 20 / 24 / 20 (top / right / bottom / left), где 10 сверху даёт паддинг хэдера снизу. TileHeadless — 20 / 20 / 32 / 20.</li>
+      <li><b>Расстояние между строками</b> — 16 или 24px.</li>
+      <li><b>Расстояние между колонками</b> — 16px.</li>
+      <li>TileHeader размещается над контентом вплотную, без отступа; Alert (если есть) — между ними полноширинным блоком.</li>
+    </ul>
+  </div>
+
+  <div class="subsec">
+    <h3>Правила наполнения</h3>
+    <div class="guide">
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag">Хорошо</div>
+        <div class="guide-card__body">Группировать поля в 2–3 колонки по 16px, длинные значения переносить или усекать с Tooltip, действия по строке — в ReadOnly-инпутах и ссылках.</div>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag">Плохо</div>
+        <div class="guide-card__body">Смешивать несвязанные данные в одном тайле, дублировать заголовок внутри контента, задавать произвольные отступы вне сетки 16/24.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ПОВЕДЕНИЕ -->
+<section class="section" id="behavior" data-screen-label="Поведение">
+  <h2>Поведение</h2>
+
+  <div class="subsec">
+    <h3>Сворачивание AccordionTile</h3>
+    <p class="desc tight">Клик по шеврону (IconButton в Actions) переключает состояние. Полный коллапс скрывает весь контент, частичный — оставляет заранее заданную сводку и сворачивает только вложенный блок. Шеврон поворачивается на 180°.</p>
+  </div>
+
+  <div class="subsec">
+    <h3>Высота в строке</h3>
+    <p class="desc tight">Высота тайла в строке одинаковая и выставляется по тайлу с наибольшим объёмом контента (с учётом возможных алертов). При изменении состояния или наполнения одного тайла высота всей строки может пересчитаться.</p>
+  </div>
+
+  <div class="subsec">
+    <h3>Адаптивность</h3>
+    <p class="desc tight">Ширина пересчитывается по сетке колонок контейнера. Длинный заголовок переходит на вторую строку и только затем усекается многоточием (<code class="tok">-webkit-line-clamp: 2</code> на <code class="tok">.tile__title</code>, см. «Для разработчиков»).</p>
+  </div>
+</section>
+
+<!-- 8. СОСТОЯНИЯ -->
+<section class="section" id="states" data-screen-label="Состояния">
+  <h2>Состояния</h2>
+  <p class="desc">Tile собственных состояний <b>не имеет</b> — нет hover / active / selected у самого тайла. Интерактивны только вложенные элементы: IconButton в хэдере, а также Button и Link в алертах и контентной области. Состояния перетаскивания/выбора есть только у родственного компонента Card.</p>
+  <div class="panel">
+    <ul class="bullets">
+      <li><b>IconButton в хэдере</b> — собственные состояния Default / Hover / Focus / Disabled (см. IconButton).</li>
+      <li><b>Button / Link в контенте и алертах</b> — состояния своих компонентов.</li>
+      <li><b>AccordionTile</b> — не состояние, а переключаемая конфигурация (collapsed / expanded) через <code class="tok">.tile--collapsed</code>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 9. ДОСТУПНОСТЬ -->
+<section class="section" id="a11y" data-screen-label="Доступность">
+  <h2>Доступность</h2>
+  <div class="panel">
+    <ul class="bullets">
+      <li><b>Заголовок тайла</b> — семантический heading (<code class="tok">h2</code>–<code class="tok">h4</code> по уровню страницы), а не просто жирный текст.</li>
+      <li><b>Иконка-предупреждение в тайтле</b> декоративна: <code class="tok">aria-hidden="true"</code>; смысл дублируется текстом Alert или чипа.</li>
+      <li><b>IconButton</b> без текста — обязателен <code class="tok">aria-label</code>.</li>
+      <li><b>Шеврон аккордеона</b> — <code class="tok">aria-expanded</code> на кнопке + <code class="tok">aria-controls</code> на сворачиваемый блок; сам блок при коллапсе скрыт (<code class="tok">display:none</code>), а не только визуально.</li>
+      <li><b>Alert-слот</b> — <code class="tok">role="status"</code>/<code class="tok">alert</code> по тону (см. Alert); озвучивается при появлении.</li>
+      <li><b>Усечённый заголовок</b> — полное значение доступно через Tooltip и <code class="tok">title</code>.</li>
+      <li><b>prefers-reduced-motion</b> — анимация поворота шеврона отключается.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 10. ТИПОГРАФИКА -->
+<section class="section" id="typography" data-screen-label="Типографика">
+  <h2>Типографика</h2>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Title (Tile M)</span></span></div>
+          <div class="tc"><code class="tok">--type-h5-strong</code></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Display</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Bold</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">18 / 24, SemiBold</span></span></div>
+          <div class="tc"><span style="font:var(--type-h5-strong)">Образец</span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Title (Card)</span></span></div>
+          <div class="tc"><code class="tok">--type-h6-strong</code></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Display</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Bold</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">16 / 20, SemiBold</span></span></div>
+          <div class="tc"><span style="font:var(--type-h6-strong)">Образец</span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Subtitle</span></span></div>
+          <div class="tc"><code class="tok">--type-body-xs</code></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">12 / 16, Regular</span></span></div>
+          <div class="tc"><span style="font:var(--type-body-xs)">Образец</span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Метка поля контента</span></span></div>
+          <div class="tc"><code class="tok">--type-body-xs</code></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">12 / 16, Regular</span></span></div>
+          <div class="tc"><span style="font:var(--type-body-xs)">Образец</span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Значение поля</span></span></div>
+          <div class="tc"><code class="tok">--type-body-m</code></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">16 / 20, Regular</span></span></div>
+          <div class="tc"><span style="font:var(--type-body-m)">Образец</span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+<!-- 11. ЦВЕТА -->
+<section class="section" id="colors" data-screen-label="Цвета">
+  <h2>Цвета</h2>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Контейнер</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Фон тайла</span></span></div>
+          <div class="tc"><code class="tok">--bg-tile</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--bg-tile)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Контейнер</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Бордер 1px</span></span></div>
+          <div class="tc"><code class="tok">--border-light</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--border-light)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#E1EDE7</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Title, значение</span></span></div>
+          <div class="tc"><code class="tok">--text-primary</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--text-primary)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Subtitle</span></span></div>
+          <div class="tc"><code class="tok">--text-secondary</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--text-secondary)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Метка поля</span></span></div>
+          <div class="tc"><code class="tok">--text-inactive</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--text-inactive)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Addition в тайтле</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Иконка-предупреждение</span></span></div>
+          <div class="tc"><code class="tok">--warning</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--warning)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#FFB300</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Addition в тайтле</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Иконка сабтайтла</span></span></div>
+          <div class="tc"><code class="tok">--success</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--success)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#7CB342</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Addition в тайтле</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Ссылка-Addition</span></span></div>
+          <div class="tc"><code class="tok">--link</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--link)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Alert-слот</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Фон (warning)</span></span></div>
+          <div class="tc"><code class="tok">--warning-bg</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--warning-bg)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#FFF8E1</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Alert-слот</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Фон (info)</span></span></div>
+          <div class="tc"><code class="tok">--info-bg</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);background:var(--info-bg)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#EAF8FE</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+<!-- 12. ДЛЯ РАЗРАБОТЧИКОВ -->
+<section class="section" id="dev" data-screen-label="Для разработчиков">
+  <h2>Для разработчиков</h2>
+  <p class="desc">Хендофф-пакет. Имена классов условны — важны сами элементы, их роли и состояния. Разработчики собирают компонент на React.</p>
+
+  <p class="subhead">Точные размеры (redline)</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr .8fr 1.4fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Свойство</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+        <div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+        <div class="th"><span class="th__label">Токен / описание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr .8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Радиус тайла</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text" id="rl-radius">—</span></span></div>
+        <div class="tc"><code class="tok">--radius-m</code> · 8px</div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr .8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Бордер</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text" id="rl-border">—</span></span></div>
+        <div class="tc">1px solid <code class="tok">--border-light</code></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr .8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Паддинг хэдера (top / side / bottom)</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text" id="rl-head">—</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">сверху 20, по бокам 20, снизу 10</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr .8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Заголовок — усечение</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">2 строки</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">на <code class="tok">.tile__title</code>: <code class="tok">display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden; text-overflow:ellipsis</code> (вместо однострочного <code class="tok">white-space:nowrap</code>); <code class="tok">.tile__title-row</code> — <code class="tok">align-items:flex-start</code>, чтобы Addition-слот вставал по верхней строке</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr .8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Паддинг контента</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text" id="rl-body">—</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">0 / 20 / 24 / 20 · зазор 10 сверху даёт паддинг хэдера</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr .8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Зазор строк контента</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text" id="rl-rowgap">—</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">16px (или 24)</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr .8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Зазор колонок контента</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text" id="rl-colgap">—</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">16px</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr .8fr 1.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Размер шрифта Title</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text" id="rl-title">—</span></span></div>
+        <div class="tc"><code class="tok">--type-h5-strong</code></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+  </div>
+  <div class="rl-sample" aria-hidden="true">
+    <div class="tile" id="rl-tile">
+      <div class="tile__header">
+        <div class="tile__header-main">
+          <div class="tile__title-row"><h4 class="tile__title" id="rl-title-el">Заголовок</h4></div>
+          <div class="tile__subtitle">Подзаголовок</div>
+        </div>
+      </div>
+      <div class="tile__body"><div class="tl-fieldgrid" id="rl-grid"><div class="tl-field"><span>A</span></div><div class="tl-field"><span>B</span></div></div></div>
+    </div>
+  </div>
+
+  <p class="subhead">Поведение (framework-agnostic)</p>
+  <div class="code-wrap">
+    <button class="copy-btn" data-copy="logic">Скопировать</button>
+    <code id="code-logic">// 1. Сворачивание AccordionTile
+//    toggle-кнопка переключает collapsed; блок .tile__collapsible
+//    скрывается через display:none (не только визуально).
+onToggle():
+  collapsed = !collapsed
+  tile.classList.toggle('tile--collapsed', collapsed)
+  toggleBtn.setAttribute('aria-expanded', String(!collapsed))
+  toggleBtn.setAttribute('aria-label', collapsed ? 'Развернуть' : 'Свернуть')
+
+// 2. Частичный vs полный коллапс
+//    Полный  — весь контент лежит внутри .tile__collapsible.
+//    Частичный — постоянная сводка вне .tile__collapsible,
+//    сворачивается только вложенный .tile__collapsible.
+
+// 3. Высота строки тайлов
+//    tiles в одной строке выравниваются по максимальной высоте
+//    (CSS Grid: align-items:stretch, либо расчёт max по данным).
+//    Пересчитывать при смене состояния/наполнения любого тайла.
+
+// 4. Ширина
+//    span = clamp(3, cols, 12) колонок сетки контейнера.
+
+// 5. Усечение Title
+//    если scrollWidth > clientWidth — показать Tooltip/title
+//    с полным значением.</code>
+  </div>
+
+  </section>
+
+  <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Экспорт/печать содержимого</b> — действие в <code class="tok">.tile__actions</code> для печати/экспорта данных тайла.</li>
+        <li><b>Единый паттерн пустого состояния</b> — заглушка, когда <code class="tok">.tile__body</code> не содержит данных.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+  <span>Дизайн-система · Tile</span>
+  <span>Основной тайл рабочей области — TileHeader + контентная область</span>
+</footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите тайл: тип (обычный / аккордеон / без хэдера), ширина по колонкам сетки, заголовок с дополнением, подзаголовок, чипы, трейлинг-действия (до 3) и алерт-слот. Демо обновляется наверху, панель настроек — две колонки.</p>
+              <div class="pg__controls">
+                <div class="ctl-col">
+                  <div class="ctl">
+                    <div class="lbl">Тип тайла</div>
+                    <div class="pg-select"><select id="ctl-type">
+                      <option value="normal" selected>Обычный</option>
+                      <option value="accordion">Аккордеон</option>
+                      <option value="headless">Без хэдера</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Ширина, колонок</div>
+                    <div class="pg-select"><select id="ctl-cols">
+                      <option value="3">3 колонки</option>
+                      <option value="4">4 колонки</option>
+                      <option value="6" selected>6 колонок</option>
+                      <option value="8">8 колонок</option>
+                      <option value="9">9 колонок</option>
+                      <option value="12">12 колонок</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="wrap-title">
+                    <div class="lbl">Заголовок</div>
+                    <div class="pg-text"><input id="ctl-title" type="text" placeholder="Проектное финансирование" maxlength="48"></div>
+                  </div>
+                  <div class="ctl" id="wrap-add">
+                    <div class="lbl">Addition к заголовку</div>
+                    <div class="pg-select"><select id="ctl-add">
+                      <option value="none" selected>Нет</option>
+                      <option value="link">Ссылка</option>
+                      <option value="icon">Иконка</option>
+                      <option value="chip">Чип</option>
+                      <option value="badge">Бейдж</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="wrap-actions">
+                    <div class="lbl">Actions (трейлинг)</div>
+                    <div class="pg-select"><select id="ctl-actions">
+                      <option value="none">Нет действий</option>
+                      <option value="one" selected>Одно действие</option>
+                      <option value="two">Два действия</option>
+                      <option value="three">Три действия</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="wrap-act1">
+                    <div class="lbl">Действие 1</div>
+                    <div class="pg-select"><select id="ctl-act1-kind">
+                      <option value="ibtn" selected>IconButton</option>
+                      <option value="btn">Кнопка</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="wrap-act1-icon">
+                    <div class="lbl">Иконка действия 1</div>
+                    <div class="pg-select"><select id="ctl-act1-icon">
+                      <option value="edit" selected>edit</option>
+                      <option value="document-check">document-check</option>
+                      <option value="copy">copy</option>
+                      <option value="download">download</option>
+                      <option value="attach">attach</option>
+                      <option value="calendar">calendar</option>
+                      <option value="archive">archive</option>
+                      <option value="bar-chart">bar-chart</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="wrap-act1-label">
+                    <div class="lbl">Название кнопки 1</div>
+                    <div class="pg-text"><input id="ctl-act1-label" type="text" placeholder="Применить" maxlength="24"></div>
+                  </div>
+                  <div class="ctl" id="wrap-act2">
+                    <div class="lbl">Действие 2</div>
+                    <div class="pg-select"><select id="ctl-act2-kind">
+                      <option value="ibtn" selected>IconButton</option>
+                      <option value="btn">Кнопка</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="wrap-act2-icon">
+                    <div class="lbl">Иконка действия 2</div>
+                    <div class="pg-select"><select id="ctl-act2-icon">
+                      <option value="edit">edit</option>
+                      <option value="document-check" selected>document-check</option>
+                      <option value="copy">copy</option>
+                      <option value="download">download</option>
+                      <option value="attach">attach</option>
+                      <option value="calendar">calendar</option>
+                      <option value="archive">archive</option>
+                      <option value="bar-chart">bar-chart</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="wrap-act2-label">
+                    <div class="lbl">Название кнопки 2</div>
+                    <div class="pg-text"><input id="ctl-act2-label" type="text" placeholder="Применить" maxlength="24"></div>
+                  </div>
+                  <div class="ctl" id="wrap-act3">
+                    <div class="lbl">Действие 3</div>
+                    <div class="pg-select"><select id="ctl-act3-kind">
+                      <option value="ibtn" selected>IconButton</option>
+                      <option value="btn">Кнопка</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="wrap-act3-icon">
+                    <div class="lbl">Иконка действия 3</div>
+                    <div class="pg-select"><select id="ctl-act3-icon">
+                      <option value="edit">edit</option>
+                      <option value="document-check">document-check</option>
+                      <option value="copy" selected>copy</option>
+                      <option value="download">download</option>
+                      <option value="attach">attach</option>
+                      <option value="calendar">calendar</option>
+                      <option value="archive">archive</option>
+                      <option value="bar-chart">bar-chart</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="wrap-act3-label">
+                    <div class="lbl">Название кнопки 3</div>
+                    <div class="pg-text"><input id="ctl-act3-label" type="text" placeholder="Применить" maxlength="24"></div>
+                  </div>
+                  <div class="ctl" id="wrap-alert">
+                    <div class="lbl">Alert-слот</div>
+                    <div class="pg-select"><select id="ctl-alert">
+                      <option value="none" selected>Нет</option>
+                      <option value="warning">Warning</option>
+                      <option value="info">Info</option>
+                      <option value="error">Error</option>
+                    </select></div>
+                  </div>
+                </div>
+                <div class="toggles">
+                  <label class="pg-toggle" id="wrap-sub"><input id="ctl-sub" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Subtitle с иконкой</span></label>
+                  <label class="pg-toggle" id="wrap-chips"><input id="ctl-chips" type="checkbox"><span class="pg-toggle__sw"></span><span>Ряд чипов</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка и исходники Tile: HTML — из спеки, CSS — styles/tile.css (полностью), JS — рантайм оживления аккордеона. Полный исходник демо — в инлайн-скрипте Tile.html.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main><!-- .page -->
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-tile.js"></script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html"><section class="tile">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Заголовок</h3><!-- Addition --></div>
+      <p class="tile__subtitle"><span class="tile__subtitle-icon">…</span>Нерезидент</p>
+      <div class="tile__chiplist">…Chip readonly XS…</div>
+    </div>
+    <div class="tile__actions"><button class="ibtn ibtn--neutral ibtn--m" aria-label="…">…</button></div>
+  </header>
+  <div class="tile__alert"><div class="alert alert--warning alert--m" role="status">…</div></div>  <!-- warning | info | error -->
+  <div class="tile__body">…контент индивидуальный; поля значений — ReadOnlyField (.rof)…</div>
+</section>
+<!-- headless: .tile.tile--headless > .tile__body (без хэдера) -->
+<!-- accordion: .tile.tile--accordion; toggle .tile__toggle (aria-expanded) над .tile__collapsible; свёрнуто — .tile--collapsed --></script>
+
+<script type="text/plain" id="src-code-js">/* Tile — статичная разметка; сворачивание аккордеона — рантайм ДС (scripts/ds-tile.js).
+   Демо страницы строит инлайн-функция buildTile() в Tile.html. */
+
+DSTile.wireAll(document);           // делегированно оживляет все .tile--accordion
+DSTile.toggle(tileEl, true);        // свернуть / развернуть программно
+
+// Рантайм переключает .tile--collapsed на корне, синхронизирует
+// aria-expanded и aria-label кнопки .tile__toggle, связывает её с
+// .tile__collapsible через aria-controls и шлёт событие 'tiletoggle' с { collapsed }.
+// Свёрнутое по умолчанию состояние — класс .tile--collapsed прямо в разметке.
+
+/* React API (предложение): TileProps — headless · accordion · collapsed ·
+   title · addition{link|icon|chip|badge} · subtitle · chips · actions[] ·
+   alert{tone} · children */</script>
+
+<script type="text/plain" id="src-code-css">/* ============================================================
+   Tile — основной компонент-плашка интерфейса.
+   Состав: TileHeader (размер M) + опц. Alert + Контентная область.
+   Радиус 8 (--radius-m) · бордер 1px solid --border-light.
+   Внутренние отступы контента: 0 / 20 / 24 / 20 (top/right/bottom/left);
+   зазор 10 от хэдера даёт паддинг TileHeader снизу.
+   Зазор строк 16 (или 24) · зазор колонок 16.
+   Собственных состояний нет — активны только вложенные IconButton /
+   Button / Link. Только токены ДС (var(--*)).
+   ============================================================ */
+
+.tile {
+  --tile-pad-x: 20px;
+  --tile-pad-bottom: 24px;
+  --tile-gap-row: 16px;
+  --tile-gap-col: 16px;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  align-self: stretch;              /* высота = высоте ряда grid/flex-контейнера (RulesAudit W2) */
+  background: var(--bg-tile);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-m);   /* 8 */
+}
+
+/* ------------------------------------------------------------
+   Раскладка нескольких тайлов — общие утилиты, чтобы экрану не
+   изобретать свою сетку заново (RulesAudit W2).
+
+   .tile-row — ряд: CSS Grid растягивает элементы ряда по высоте
+   САМ (align-items:stretch — поведение Grid по умолчанию, ничего
+   специально включать не нужно); align-self:stretch у .tile выше
+   даёт то же самое, даже если контейнер экрана переопределил
+   align-items:start — так поймали дефект на 02-Deal-v3 (высоты
+   214/186/242 в одном ряду). Колонки — свои под контент экрана:
+   ширина каждого тайла — style="grid-column:span N" (3–12 из 12).
+   Тайл один на весь ряд (span 12) высоту берёт по контенту —
+   это не особый случай, а естественное поведение Grid (тайл —
+   единственный элемент своего ряда, "тянуться к самому высокому
+   в ряду" равно "остаться собой").
+
+   .tile-stack — колонка/стопка тайлов (канбан: несколько .tile-stack
+   рядом, каждый — набор тайлов разной суммарной высоты). Сама
+   стопка — обычный grid-item (span N, align-self:stretch тянет её
+   по высоте ряда), но ВНУТРИ — flex-column: у flex-column ось
+   растяжения (align-self:stretch) — это ширина, не высота, поэтому
+   тайлы внутри стопки остаются каждый со своей высотой по контенту,
+   а не делят высоту стопки поровну. */
+.tile-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+/* .tile-group — группа рядов одной тайловой сетки. Ряды внутри группы
+   разделяются теми же 16px, что и тайлы внутри ряда: это продолжение
+   одной сетки, а не разные зоны экрана.
+   ВАЖНО: .screen__content — flex-колонка с gap 24px (--layout-block-gap),
+   поэтому зазор между рядами НЕЛЬЗЯ задавать margin'ом на .tile-row —
+   он сложится с gap контейнера и даст 40px. Группа решает это тем, что
+   является ОДНИМ ребёнком .screen__content: 24px остаётся только между
+   крупными зонами (PageHeader ↔ группа), а внутри группы работает 16px.
+   Зафиксировано 26.08.2026 после разбора DealPipelineCard. */
+.tile-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.tile-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  align-self: stretch;
+}
+
+/* ------------------------------------------------------------
+   TileHeader (размер M) — размещается над контентом.
+   Title: H5 Strong · Subtitle: Body XS · gap title↔subtitle↔chiplist 8px.
+   Паддинги хэдера: 20 сверху / 20 по бокам / 10 снизу.
+   ------------------------------------------------------------ */
+.tile__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px var(--tile-pad-x) 10px;
+}
+/* зазор хэдер↔контент (10) живёт в паддинге хэдера — контент сверху без паддинга */
+.tile__header-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tile__title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.tile__title {
+  margin: 0;
+  min-width: 0;
+  font: var(--type-h5-strong);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+/* Addition к тайтлу: Link / Icon / Chip / Badge — все inline после тайтла */
+.tile__title-add {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+.tile__title-add--icon {
+  width: 20px;
+  height: 20px;
+  color: var(--warning);
+}
+.tile__title-add--icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.tile__title-link {
+  flex: none;
+}
+
+/* Subtitle — Body XS, вторичный текст, опц. ведущая иконка */
+.tile__subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  font: var(--type-body-xs);
+  color: var(--text-secondary);
+}
+.tile__subtitle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--success);
+}
+
+/* Chiplist в хэдере — ряд чипов XS под тайтлом/сабтайтлом, зазор 4 */
+.tile__chiplist {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Actions — трейлинг-группа: 1..3 действия (IconButton и/или Button), зазор 8 */
+.tile__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+/* ------------------------------------------------------------
+   Alert-слот — опц., полноширинный, между хэдером и контентом.
+   Растягивается по ширине тайла (углы прямые, чтобы касаться бордера).
+   ------------------------------------------------------------ */
+.tile__alert {
+  margin-top: 0;
+}
+.tile__alert .alert {
+  border-radius: 0;
+}
+
+/* ------------------------------------------------------------
+   Контентная область. Контент индивидуален под задачу тайла:
+   текст, дивайдеры, ReadOnly-поля, кнопки, ссылки, аккордеоны.
+   Отступы 10/20/24/20.
+   ------------------------------------------------------------ */
+.tile__body {
+  padding: 10px var(--tile-pad-x) var(--tile-pad-bottom);
+}
+
+/* сетки контента */
+.tile__grid {
+  display: grid;
+  gap: var(--tile-gap-row) var(--tile-gap-col);
+}
+.tile__grid--gap-24 {
+  row-gap: 24px;
+}
+/* Элемент на всю ширину сетки тайла — длинное «Описание», комментарий,
+   вложенный Alert: остаётся В сетке (тот же зазор и та же левая кромка,
+   что у полей), а не выносится соседним блоком со своими паддингами.
+   Добавлено 26.08.2026: на DealPipelineCard «Описание» вынесли из
+   .tile__grid отдельным блоком — поле разъехалось с сеткой по отступам. */
+.tile__grid > .tile__grid-full { grid-column: 1 / -1; }
+.tile__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tile-gap-row);
+}
+.tile__rows--gap-24 {
+  gap: 24px;
+}
+
+/* ------------------------------------------------------------
+   TileHeadless — тайл без заголовка.
+   Хэдера нет, состояний нет, отступы 20/20/32/20.
+   ------------------------------------------------------------ */
+.tile--headless > .tile__body {
+  padding: 20px 20px 32px;
+}
+
+/* ------------------------------------------------------------
+   AccordionTile — разворачивается/сворачивается.
+   Полный коллапс: весь контент в .tile__collapsible.
+   Частичный коллапс: часть контента видна всегда, сворачивается
+   только .tile__collapsible.
+   ------------------------------------------------------------ */
+.tile__chevron {
+  display: inline-flex;
+  transition: transform .18s ease;
+}
+.tile--collapsed .tile__chevron,
+.tile__toggle[aria-expanded="false"] .tile__chevron {
+  transform: rotate(-180deg);
+}
+/* .tile__collapsible — сворачивание чисто через display:none (см. .tile--collapsed
+   ниже), без анимации высоты (ds-tile.js её не делает) — поэтому здесь НЕТ
+   overflow:hidden: он не нужен для коллапса и лишь обрезал бы floating-контент
+   (Popover/RiskMetric) любого компонента, вложенного в аккордеон-тайл. */
+.tile--collapsed .tile__collapsible {
+  display: none;
+}
+/* частичный коллапс: сводка (.tile__body прямым потомком .tile, до
+   .tile__collapsible) держит малый зазор перед скрываемым контентом;
+   свёрнутый — сама становится нижним краем тайла, паддинг контентный (20) */
+.tile--accordion > .tile__body {
+  padding-bottom: 8px;
+}
+.tile--accordion.tile--collapsed > .tile__body {
+  padding-bottom: 20px;
+}
+/* полный коллапс: контента после хэдера нет вовсе (весь тайл__body внутри
+   .tile__collapsible) — нижним краем становится хэдер, паддинг тот же (20) */
+.tile--accordion.tile--collapsed > .tile__header:has(+ .tile__collapsible) {
+  padding-bottom: 20px;
+}
+/* свёрнутый аккордеон (полный и частичный коллапс — то же .tile--collapsed)
+   не должен нести нижний паддинг под скрытый контент */
+.tile--accordion.tile--collapsed > .tile__body {
+  padding-bottom: 20px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile__chevron { transition: none; }
+}</script>
+
+<script>
+/* ---- icon helper ---- */
+function getIcon(name, size){
+  size = size || 20;
+  if(!window.DS_ICONS) return '';
+  var raw = window.DS_ICONS[name] || ''; if(!raw) return '';
+  var d = document.createElement('div'); d.innerHTML = raw;
+  var s = d.firstElementChild; if(!s) return '';
+  s.setAttribute('width', size); s.setAttribute('height', size); s.setAttribute('aria-hidden','true');
+  return s.outerHTML;
+}
+function esc(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ---- constructor ---- */
+function buildTile(){
+  var type    = document.getElementById('ctl-type').value;
+  var cols    = document.getElementById('ctl-cols').value;
+  var title   = document.getElementById('ctl-title').value.trim() || 'Проектное финансирование';
+  var add     = document.getElementById('ctl-add').value;
+  var sub     = document.getElementById('ctl-sub').checked;
+  var chips   = document.getElementById('ctl-chips').checked;
+  var actions = document.getElementById('ctl-actions').value;
+  var alert   = document.getElementById('ctl-alert').value;
+
+  var headless = (type === 'headless');
+  /* hide header-only controls when headless */
+  ['wrap-title','wrap-add','wrap-sub','wrap-chips','wrap-actions','wrap-alert'].forEach(function(id){
+    document.getElementById(id).classList.toggle('is-off', headless);
+  });
+
+  /* per-action controls: показываем только актуальные */
+  var actCount = { none:0, one:1, two:2, three:3 }[actions] || 0;
+  var actKind = {};
+  [1,2,3].forEach(function(i){
+    var on = !headless && actCount >= i;
+    actKind[i] = document.getElementById('ctl-act' + i + '-kind').value;
+    document.getElementById('wrap-act' + i).classList.toggle('is-off', !on);
+    document.getElementById('wrap-act' + i + '-icon').classList.toggle('is-off', !on || actKind[i] !== 'ibtn');
+    document.getElementById('wrap-act' + i + '-label').classList.toggle('is-off', !on || actKind[i] !== 'btn');
+  });
+
+  /* width by columns */
+  document.getElementById('demo-tile-wrap').style.gridColumn = 'span ' + cols;
+
+  var cls = 'tile';
+  if (headless) cls += ' tile--headless';
+  if (type === 'accordion') cls += ' tile--accordion';
+
+  var host = document.getElementById('demo-tile');
+  host.className = cls;
+
+  /* ---- content (individual sample) ---- */
+  var content =
+    '<div class="tile__body"><div class="tl-fieldgrid">' +
+      '<div class="rof"><span class="ds-label"><span class="ds-label__text">Объём по продукту, млн ед.</span></span><div class="rof__row"><span class="rof__value">17 560</span><span class="rof__affix">RUB</span></div></div>' +
+      '<div class="rof"><span class="ds-label"><span class="ds-label__text">Валовая маржа, %</span></span><div class="rof__row"><span class="rof__value">3</span></div></div>' +
+    '</div></div>';
+
+  if (headless){
+    host.innerHTML = content;
+    return;
+  }
+
+  /* ---- title addition ---- */
+  var addHtml = '';
+  if (add === 'link') addHtml = '<a class="link link--accent link--s tile__title-link" href="#" onclick="return false">Заполнить</a>';
+  else if (add === 'icon') addHtml = '<span class="tile__title-add tile__title-add--icon" aria-hidden="true">' + getIcon('alert-triangle-filled',20) + '</span>';
+  else if (add === 'chip') addHtml = '<span class="chip chip--s"><span class="chip__label">Погашен</span></span>';
+  else if (add === 'badge') addHtml = '<span class="badge badge--s badge--neutral badge--text">9</span>';
+
+  var titleRow = '<div class="tile__title-row"><h3 class="tile__title">' + esc(title) + '</h3>' + addHtml + '</div>';
+  var subHtml = sub ? '<p class="tile__subtitle"><span class="tile__subtitle-icon">' + getIcon('check-circle-filled',16) + '</span>Нерезидент</p>' : '';
+  var chipsHtml = chips ? '<div class="tile__chiplist"><span class="chip chip--xs"><span class="chip__label">Погашен</span></span><span class="chip chip--xs"><span class="chip__label">Погашен</span></span></div>' : '';
+
+  /* ---- actions: 1..3 действия, каждое — IconButton или Button ---- */
+  var items = '';
+  for (var i = 1; i <= actCount; i++){
+    if (actKind[i] === 'btn'){
+      var lbl = document.getElementById('ctl-act' + i + '-label').value.trim() || 'Применить';
+      items += '<button class="btn btn--outline btn--xs"><span class="btn__label">' + esc(lbl) + '</span></button>';
+    } else {
+      var icn = document.getElementById('ctl-act' + i + '-icon').value;
+      items += '<button class="ibtn ibtn--neutral ibtn--m" aria-label="' + esc(icn) + '">' + getIcon(icn,20) + '</button>';
+    }
+  }
+  var actHtml = items ? '<div class="tile__actions">' + items + '</div>' : '';
+  /* accordion toggle always present in actions */
+  if (type === 'accordion'){
+    var toggle = '<button class="ibtn ibtn--neutral ibtn--m tile__toggle" aria-expanded="true" aria-controls="demo-acc" aria-label="Свернуть"><span class="tile__chevron">' + getIcon('chevron-up',20) + '</span></button>';
+    if (actHtml) actHtml = actHtml.replace('</div>', toggle + '</div>');
+    else actHtml = '<div class="tile__actions">' + toggle + '</div>';
+  }
+
+  var header = '<header class="tile__header"><div class="tile__header-main">' + titleRow + subHtml + chipsHtml + '</div>' + actHtml + '</header>';
+
+  /* ---- alert slot ---- */
+  var alertHtml = '';
+  if (alert === 'warning') alertHtml = '<div class="tile__alert"><div class="alert alert--warning alert--m" data-alert-tone="warning" role="status"><span class="alert__icon" aria-hidden="true">' + getIcon('alert-triangle-filled',18) + '</span><div class="alert__body"><p class="alert__text">Функционал в разработке</p></div></div></div>';
+  else if (alert === 'info') alertHtml = '<div class="tile__alert"><div class="alert alert--info alert--m" data-alert-tone="info" role="status"><span class="alert__icon" aria-hidden="true">' + getIcon('Info-circle-filled',18) + '</span><div class="alert__body"><p class="alert__text">Данные обновлены 12.07.2026</p></div></div></div>';
+  else if (alert === 'error') alertHtml = '<div class="tile__alert"><div class="alert alert--error alert--m" data-alert-tone="error" role="alert"><span class="alert__icon" aria-hidden="true">' + getIcon('alert-circle-filled',18) + '</span><div class="alert__body"><p class="alert__text">Не удалось загрузить данные</p></div></div></div>';
+
+  var body = (type === 'accordion')
+    ? '<div class="tile__collapsible" id="demo-acc">' + content + '</div>'
+    : content;
+
+  host.innerHTML = header + alertHtml + body;
+}
+
+['ctl-type','ctl-cols','ctl-title','ctl-add','ctl-sub','ctl-chips','ctl-actions','ctl-alert',
+ 'ctl-act1-kind','ctl-act1-icon','ctl-act1-label','ctl-act2-kind','ctl-act2-icon','ctl-act2-label','ctl-act3-kind','ctl-act3-icon','ctl-act3-label'].forEach(function(id){
+  var el = document.getElementById(id);
+  if (el){ el.addEventListener('change', buildTile); el.addEventListener('input', buildTile); }
+});
+buildTile();
+
+/* сворачивание аккордеона — рантайм ДС (scripts/ds-tile.js), делегированно */
+
+/* ---- redline ---- */
+function measureRedline(){
+  var e = document.getElementById('rl-tile'); if(!e) return;
+  var cs = getComputedStyle(e);
+  var head = getComputedStyle(e.querySelector('.tile__header'));
+  var main = getComputedStyle(e.querySelector('.tile__header-main'));
+  var body = getComputedStyle(e.querySelector('.tile__body'));
+  var grid = getComputedStyle(document.getElementById('rl-grid'));
+  var title = getComputedStyle(document.getElementById('rl-title-el'));
+  function set(id,v){ var n=document.getElementById(id); if(n) n.textContent=v; }
+  set('rl-radius', cs.borderTopLeftRadius);
+  set('rl-border', cs.borderTopWidth + ' solid');
+  set('rl-head', head.paddingTop + ' / ' + head.paddingLeft + ' / ' + head.paddingBottom);
+  set('rl-headgap', main.rowGap || main.gap);
+  set('rl-body', body.paddingTop + ' / ' + body.paddingRight + ' / ' + body.paddingBottom + ' / ' + body.paddingLeft);
+  set('rl-rowgap', grid.rowGap);
+  set('rl-colgap', grid.columnGap);
+  set('rl-title', title.fontSize + ' / ' + title.lineHeight);
+}
+setTimeout(measureRedline, 300);
+
+/* ---- copy buttons ---- */
+document.querySelectorAll('.copy-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var el = document.getElementById('code-' + btn.getAttribute('data-copy')); if(!el) return;
+    navigator.clipboard.writeText(el.textContent).then(function(){
+      btn.textContent='Скопировано ✓'; btn.classList.add('is-copied');
+      setTimeout(function(){ btn.textContent='Скопировать'; btn.classList.remove('is-copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

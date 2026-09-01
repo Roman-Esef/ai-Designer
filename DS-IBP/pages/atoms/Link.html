@@ -1,0 +1,1071 @@
+<!-- @dsCard group="Components" name="Link" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Link — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/context-menu.css">
+<link rel="stylesheet" href="../../styles/breadcrumbs.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:74ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:28px; }
+
+  
+
+  
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { display:flex; align-items:center; justify-content:center; max-width:420px; text-align:center; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* select control */
+
+  /* ---------- variant grid (matches master) ---------- */
+  .vgrid { display:grid; grid-template-columns: 130px repeat(2, 1fr); gap:22px 18px; align-items:center; }
+  .vgrid .ch { font: var(--type-body-s-strong); color: var(--text-secondary); }
+  .vgrid .rh { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .vgrid .cell { display:flex; }
+
+  /* ---------- states matrix ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .matrix { display:grid; gap:22px 18px; align-items:center; min-width:600px; }
+  .matrix .col-head { font: var(--type-body-s-strong); color: var(--text-secondary); }
+  .matrix .cell { display:flex; }
+
+  /* ---------- prose demo ---------- */
+  .prose { font: var(--type-body-m); color: var(--text-primary); max-width:62ch; line-height:1.6; }
+  .prose p { margin:0 0 14px; }
+  .prose p:last-child { margin-bottom:0; }
+
+  /* ---------- header / breadcrumb mock ---------- */
+  .header-mock { background: var(--bg-tile); border:1px solid var(--border-light); border-radius:12px; padding:16px 22px; }
+
+  /* ---------- truncation demo box ---------- */
+  .trunc-box { width:240px; border:1px dashed var(--border-primary); border-radius:8px; padding:12px 14px; }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:22px 20px; flex:1; font: var(--type-body-m); color: var(--text-primary); }
+  .guide-card__cap { padding:0 20px 20px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(260px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:56px 44px; display:flex; justify-content:center; align-items:center; min-height:150px; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary); }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+  /* ---------- developer handoff ---------- */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 34px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Link">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.007</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Link</h1>
+    <p class="lead">Текстовая ссылка для навигации внутри лайаута и модальных окон, а также в Хлебных крошках. Тоны Accent / Muted / Neutral, размеры M / S, состояния Default и Hover = Focus (подчёркивание) — кроме тона Neutral (Breadcrumbs_2): у него только состояние Default, ссылка не кликабельна. Цветовое решение едино для всех видов и размеров.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- WHEN TO USE -->
+  <section class="section" data-screen-label="WhenToUse">
+    <h2>Использование</h2>
+    <p class="desc tight">Используйте ссылку, когда нужно:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>перейти на другую страницу или экран — в лайауте, шапке, Хлебных крошках;</li>
+      <li>открыть документ, профиль или внешний ресурс прямо из текста.</li>
+    </ul>
+    <p class="desc">Ссылка ведёт к навигации, а <a class="link link--inline" href="../atoms/Buttons.html">Button</a> запускает действие (отправить, сохранить, удалить). Не оформляйте ссылку как кнопку и наоборот — например, действие «Отмена» в диалоге должно быть прозрачной кнопкой (Transparent Button), а не ссылкой.</p>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Ссылка — это текстовая метка, окрашенная в цвет тона. Подчёркивание работает как маркер интерактивности: у standalone-ссылки оно появляется на Hover / Focus, у инлайн-ссылки включено всегда. Опциональная иконка масштабируется относительно текста (1em). При навигации с клавиатуры добавляется обводка фокуса.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div class="anat__art" id="anat-art"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Текстовая метка</span><span class="d"> — цвет по тону; размер наследуется от токена (M / S) или окружающего текста</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Подчёркивание</span><span class="d"> — на Hover / Focus у standalone; у инлайн-ссылки включено всегда</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Иконка (опц.)</span><span class="d"> — 1em, слева (скачивание) или справа (внешняя ссылка)</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Focus = Hover</span><span class="d"> — клавиатурный фокус оформлен точно так же, как Hover — без отдельной обводки</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="LayoutLinks">
+    <h3>Ссылки лайаута и модалок</h3>
+    <p class="desc">Основной тип ссылок (тон <b>Accent</b>). Цветовое решение едино для всех видов и размеров. В покое — без подчёркивания, на Hover и Focus появляется подчёркивание.</p>
+    <div class="panel">
+      <div class="matrix" id="layout-matrix" style="grid-template-columns:130px repeat(2,1fr); min-width:auto;"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="StateTones">
+    <h3>Тона состояний</h3>
+    <p class="desc">Семантические тона <b>Info · Warning · Error · Success</b> — для ссылок внутри цветных Alert и SnackBar: цвет совпадает с тоном компонента. Hover — на ступень темнее (<code class="tok">--&lt;тон&gt;-dark</code>), Pressed — ещё темнее. Классы <code class="tok">.link--info</code> / <code class="tok">.link--warning</code> / <code class="tok">.link--error</code> / <code class="tok">.link--success</code>.</p>
+    <div class="panel"><div class="row" style="gap:36px; flex-wrap:wrap;">
+      <a class="link link--info link--m" href="#" onclick="event.preventDefault()">Info-ссылка</a>
+      <a class="link link--warning link--m" href="#" onclick="event.preventDefault()">Warning-ссылка</a>
+      <a class="link link--error link--m" href="#" onclick="event.preventDefault()">Error-ссылка</a>
+      <a class="link link--success link--m" href="#" onclick="event.preventDefault()">Success-ссылка</a>
+    </div></div>
+  </div>
+
+<div class="subsec" data-screen-label="Breadcrumbs">
+    <h3>Ссылки Хлебных крошек</h3>
+    <p class="desc">Ссылки используются в Хлебных крошках (шапка страницы). Есть два цветовых решения: <b>Breadcrumbs_1</b> (тон Muted — родительские страницы) — кликабельна, подчёркивается на Hover и Focus; и <b>Breadcrumbs_2</b> (тон Neutral — выделенная текущая страница) — не кликабельна, доступно только состояние Default, без подчёркивания. Полная спецификация компонента (анатомия, авто-схлопывание, доступность) — на странице <a class="link link--accent link--inline" href="../molecules/Breadcrumbs.html">Breadcrumbs</a>.</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="matrix" id="crumb-matrix" style="grid-template-columns:130px repeat(2,1fr); min-width:auto;"></div>
+    </div>
+
+    <p class="desc">Готовая цепочка крошек с разделителем «/». Текущая страница — не ссылка (<code class="tok">aria-current="page"</code>), родительские — ссылки тона Muted.</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="header-mock"><nav class="crumbs" id="crumbs-full" aria-label="Хлебные крошки"></nav></div>
+    </div>
+
+    <p class="desc">При длинной цепочке средние крошки сворачиваются в кнопку «…». Клик по ней открывает выпадающий список с названиями скрытых страниц — сами крошки не разворачиваются.</p>
+    <div class="panel">
+      <div class="header-mock"><nav class="crumbs" id="crumbs-collapsed" aria-label="Хлебные крошки"></nav></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Inline">
+    <h3>Ссылка внутри текста</h3>
+    <p class="desc">Инлайн-ссылка живёт в потоке текста и наследует его размер. Чтобы её можно было отличить не только по цвету, инлайн-ссылка <b>всегда подчёркнута</b> (мягким подчёркиванием), а на Hover подчёркивание становится насыщенным. Это требование доступности (WCAG 1.4.1).</p>
+    <div class="panel">
+      <div class="prose" id="inline-prose"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="IconExternal">
+    <h3>С иконкой и внешние ссылки</h3>
+    <p class="desc">Иконка может стоять слева (например, ссылка-скачивание) или справа. Внешняя ссылка ведёт на другой ресурс — она открывается в новой вкладке (<code class="tok">target="_blank"</code>, <code class="tok">rel="noopener"</code>) и помечается иконкой со стрелкой. Иконка масштабируется относительно текста (1em).</p>
+    <div class="panel"><div class="row" id="icon-row" style="gap:36px;"></div></div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Два размера, привязанных к токенам текста: <b>M</b> — <code class="tok">--type-body-m</code> (16/20), <b>S</b> — <code class="tok">--type-body-s</code> (14/16). Инлайн-ссылка наследует размер окружающего текста. Размер S также используется в таблицах — весь текстовый контент внутри таблицы набирается размером S.</p>
+    <div class="panel" style="margin-bottom:20px;"><div class="row" id="sizes-row" style="gap:40px;"></div></div>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.03fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.03fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code>--type-body-m</code></span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><a class="link link--accent link--m" href="#" data-fz="">Ссылка</a></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.03fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code>--type-body-s</code></span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><a class="link link--accent link--s" href="#" data-fz="">Ссылка</a></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Своей плашки у ссылки нет, поэтому радиус появляется только в форме фокус-обводки — одинаковый в M и S.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ссылка — M / S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фокус-обводка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xs</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Контент ссылки — её текст (и опциональная иконка). Текст должен считываться вне контекста:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>называйте цель перехода, а не механику: «Открыть договор», а не «нажмите здесь» или «подробнее»;</li>
+      <li>держите ссылку короткой (1–3 слова, где возможно); длинные названия переносятся или обрезаются многоточием (см. «Перенос и обрезка»);</li>
+      <li>у внешней ссылки поясните переход на другой ресурс — иконка-стрелка и <code class="tok">aria-label</code> «(открывается в новой вкладке)»;</li>
+      <li>регистр — как в окружающем интерфейсе (sentence case); точку в конце standalone-ссылки не ставим.</li>
+    </ul>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad-content"></span>Не так</div>
+        <div class="guide-card__body">Чтобы выгрузить отчёт, <a class="link link--accent link--inline" href="#" onclick="event.preventDefault()">нажмите здесь</a>.</div>
+        <p class="guide-card__cap">Текст ссылки не называет цель — вне предложения и в списке ссылок он бесполезен.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good-content"></span>Так</div>
+        <div class="guide-card__body">Выгрузите <a class="link link--accent link--inline" href="#" onclick="event.preventDefault()">отчёт за квартал</a>.</div>
+        <p class="guide-card__cap">Текст ссылки сам называет действие и объект — понятен без контекста.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="WrapTruncate">
+    <h3>Перенос и обрезка</h3>
+    <p class="desc">Длинная ссылка по умолчанию переносится по словам вместе с текстом. В узких контейнерах (ячейка таблицы, чип) ссылку можно обрезать многоточием — полное значение остаётся в <code class="tok">title</code> / тултипе.</p>
+    <div class="row" style="align-items:flex-start; gap:24px;">
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:14px;">Перенос по словам</p>
+        <div class="prose" style="max-width:240px;"><a class="link link--accent link--m" href="#" id="wrap-link">Очень длинное название документа, которое переносится на несколько строк</a></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:14px;">Обрезка многоточием</p>
+        <div class="trunc-box"><a class="link link--accent link--m link--truncate" href="#" title="Очень длинное название документа, которое не помещается" id="trunc-link">Очень длинное название документа, которое не помещается</a></div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Hover и Focus оформлены одинаково (подчёркивание) — как в спецификации. Дополнительно добавлены <b>Pressed</b> и <b>Disabled</b>, а на клавиатурный фокус показывается обводка для доступности. Тон <b>Neutral</b> (Breadcrumbs_2) не кликабелен — для него доступно только состояние Default.</p>
+    <div class="panel">
+      <div class="matrix-wrap"><div class="matrix" id="states-matrix"></div></div>
+    </div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="Accessibility">
+    <h2>Доступность</h2>
+    <p class="desc">Не полагайтесь только на цвет: смысл ссылки должен считываться и без него. В потоке текста ссылка всегда подчёркнута; standalone-ссылки подчёркиваются на Hover / Focus. Клавиатурный фокус оформлен точно так же, как Hover, без отдельной обводки — единое оформление для мыши и клавиатуры. Для внешних ссылок добавляйте подпись «открывается в новой вкладке» в <code class="tok">aria-label</code>.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad"></span>Не так</div>
+        <div class="guide-card__body" id="a11y-bad"></div>
+        <p class="guide-card__cap">Инлайн-ссылка различима только по цвету — её не видно при дальтонизме и в ч/б.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good"></span>Так</div>
+        <div class="guide-card__body" id="a11y-good"></div>
+        <p class="guide-card__cap">Подчёркивание делает ссылку различимой независимо от цвета.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Ссылка набирается гарнитурой <b>SB Sans Text</b>. Размер задаётся токеном текста; начертание — Regular.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.03fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.03fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.03fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены. Hover берёт затемнённый оттенок того же цвета.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.49fr 1.17fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.49fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent (лайаут / модалки)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--link</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--link)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.49fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent (лайаут / модалки)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover = Focus</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--link-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--link-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#007A6D</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.49fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent (лайаут / модалки)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Pressed</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-emerald-900</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-emerald-900)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00635A</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.49fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Breadcrumbs</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Breadcrumbs_1 · Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.49fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Breadcrumbs</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Breadcrumbs_1 · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.49fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Breadcrumbs</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Breadcrumbs_2 · Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.49fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Breadcrumbs</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текущая страница</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.49fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Breadcrumbs</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/link.css</code> и токены текста в <code class="tok">styles/typography.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.8fr 0.7fr 0.7fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">S</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/link.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Подчёркивание — маркер интерактивности (отдельного DOM-слоя нет):</span>
+<span class="tk-cm">//    standalone (link--m/s): в покое без подчёркивания;</span>
+<span class="tk-cm">//    :hover / :focus-visible / .is-hover / .is-focus → text-decoration: underline</span>
+<span class="tk-cm">//    inline (link--inline): подчёркнута ВСЕГДА — 45% currentColor,</span>
+<span class="tk-cm">//    на hover/focus подчёркивание → 100% currentColor</span>
+
+<span class="tk-cm">// 2. Цвет задаёт тон:</span>
+<span class="tk-cm">//    accent  → --link, hover/focus --link-dark, pressed --c-emerald-900</span>
+<span class="tk-cm">//    muted   → --text-inactive, hover --text-secondary (Breadcrumbs_1)</span>
+<span class="tk-cm">//    neutral → --text-primary (Breadcrumbs_2); только Default, не кликабельна (pointer-events: none)</span>
+
+<span class="tk-cm">// 3. Фокус = Hover: :focus-visible применяет ТЕ ЖЕ правила, что и :hover</span>
+<span class="tk-cm">//    (цвет + подчёркивание), без отдельной обводки — оформление одинаковое для мыши и клавиатуры</span>
+
+<span class="tk-cm">// 4. Disabled: aria-disabled="true" (или .link--disabled) →</span>
+<span class="tk-cm">//    цвет --text-inactive, pointer-events: none, подчёркивание снято</span>
+
+<span class="tk-cm">// 5. Внешняя ссылка: target="_blank" + rel="noopener";</span>
+<span class="tk-cm">//    aria-label дополняется «(открывается в новой вкладке)»; справа иконка-стрелка 1em</span>
+
+<span class="tk-cm">// 6. Обрезка: .link--truncate = inline-block + ellipsis; полное значение — в title/тултипе</span>
+
+<span class="tk-cm">// 7. Хлебные крошки: текущая страница — НЕ ссылка (span[aria-current=page]);</span>
+<span class="tk-cm">//    средние звенья схлопываются в кнопку «…», раскрывающую цепочку.</span>
+<span class="tk-cm">//    Форс-состояния .is-hover/.is-pressed/.is-focus — только для документации.</span>
+<span class="tk-cm">//    Полная спецификация компонента Хлебные крошки (авто-схлопывание по ширине,</span>
+<span class="tk-cm">//    обрезка текущей крошки, доступность) — см. Breadcrumbs.html</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функция <code class="tok">makeLink</code> в коде этой страницы).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Посещённое состояние</b> — визуальное отличие для уже открытых ссылок — актуально для длинных списков документов.</li>
+        <li><b>Ссылка со счётчиком</b> — например «Показать ещё (12)» — частый паттерн в таблицах и списках.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Link</span>
+    <span>Accent · Muted · Neutral — M / S</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите ссылку: переключайте тон, размер, состояние и модификаторы — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script>
+/* ---------- icons ---------- */
+const L = window.DS_ICONS || {};
+function ic(name){ return L[name] || '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>'; }
+const UI = {
+  bad:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  good: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+};
+
+/* ---------- Link factory ----------
+   o: { tone, size, state, inline, text, icon, external, href, frozen } */
+function makeLink(o = {}) {
+  const { tone='accent', size='m', state='default', inline=false, text='Link',
+          icon=null, external=false, href='#', frozen=true, label=null } = o;
+  const a = document.createElement('a');
+  a.href = href;
+  a.className = 'link link--' + tone;
+  if (!inline) a.classList.add('link--' + size);
+  if (inline) a.classList.add('link--inline');
+  if (icon || external) a.classList.add('link--with-icon');
+  if (state === 'disabled') { a.classList.add('link--disabled'); a.setAttribute('aria-disabled','true'); }
+  else if (state !== 'default') a.classList.add('is-' + state);
+
+  let inner = '';
+  if (icon) inner += '<span class="link__icon">' + ic(icon) + '</span>';
+  inner += '<span >' + text + '</span>';
+  if (external) {
+    inner += '<span class="link__icon">' + ic('link-external') + '</span>';
+    a.target = '_blank'; a.rel = 'noopener';
+    a.setAttribute('aria-label', (label||text) + ' (открывается в новой вкладке)');
+  } else if (label) {
+    a.setAttribute('aria-label', label);
+  }
+  a.innerHTML = inner;
+  if (frozen) a.addEventListener('click', e => e.preventDefault());
+  return a;
+}
+
+/* ---------- LAYOUT / MODAL MATRIX ---------- */
+(function(){
+  const m = document.getElementById('layout-matrix');
+  ['', 'M','S'].forEach((h,i)=>{ const d=document.createElement('div'); d.className= i===0?'rowname':'col-head'; d.textContent=h; m.appendChild(d); });
+  [['Default','default'],['Hover = Focus','hover']].forEach(([name,st])=>{
+    const rn=document.createElement('div'); rn.className='rowname'; rn.textContent=name; m.appendChild(rn);
+    ['m','s'].forEach(sz=>{ const c=document.createElement('div'); c.className='cell'; c.appendChild(makeLink({ tone:'accent', size:sz, state:st })); m.appendChild(c); });
+  });
+})();
+
+/* ---------- BREADCRUMB MATRIX ---------- */
+(function(){
+  const m = document.getElementById('crumb-matrix');
+  ['', 'Breadcrumbs_1','Breadcrumbs_2'].forEach((h,i)=>{ const d=document.createElement('div'); d.className= i===0?'rowname':'col-head'; d.textContent=h; m.appendChild(d); });
+
+  const dn=document.createElement('div'); dn.className='rowname'; dn.textContent='Default'; m.appendChild(dn);
+  ['muted','neutral'].forEach(tone=>{ const c=document.createElement('div'); c.className='cell'; c.appendChild(makeLink({ tone, size:'m', state:'default' })); m.appendChild(c); });
+
+  const hn=document.createElement('div'); hn.className='rowname'; hn.textContent='Hover = Focus'; m.appendChild(hn);
+  const muC=document.createElement('div'); muC.className='cell'; muC.appendChild(makeLink({ tone:'muted', size:'m', state:'hover' })); m.appendChild(muC);
+  const neC=document.createElement('div'); neC.className='cell'; neC.innerHTML='<span style="font: var(--type-body-m); color: var(--text-inactive);">— не кликабельна</span>'; m.appendChild(neC);
+})();
+
+/* интерактивная версия «…» — клик открывает контекстное меню со скрытыми страницами
+   (переиспользует .menu / .menu__item из styles/context-menu.css), крошки не разворачиваются.
+   Меню портируется в document.body (position:fixed) — полная логика в Breadcrumbs.html */
+function crumbMore(hidden){
+  const btn=document.createElement('button'); btn.type='button'; btn.className='crumbs__more'; btn.textContent='…';
+  btn.setAttribute('aria-haspopup','true'); btn.setAttribute('aria-expanded','false');
+  btn.setAttribute('aria-label','Показать промежуточные страницы: '+hidden.map(h=>h.text).join(', '));
+  let open=false, menu=null;
+  function place(){ const br=btn.getBoundingClientRect(); menu.style.left=Math.round(br.left)+'px'; menu.style.top=Math.round(br.bottom+6)+'px'; }
+  function close(){
+    if (!open) return;
+    open=false; btn.setAttribute('aria-expanded','false');
+    if (menu){ menu.remove(); menu=null; }
+    document.removeEventListener('pointerdown', onOutside, true);
+    document.removeEventListener('keydown', onEsc, true);
+    window.removeEventListener('scroll', place, true);
+    window.removeEventListener('resize', place);
+  }
+  function onOutside(e){ if (menu && !menu.contains(e.target) && e.target!==btn) close(); }
+  function onEsc(e){ if (e.key==='Escape'){ close(); btn.focus(); } }
+  btn.addEventListener('click', ()=>{
+    if (open){ close(); return; }
+    open=true; btn.setAttribute('aria-expanded','true');
+    menu=document.createElement('div'); menu.className='menu crumbs__popup'; menu.style.position='fixed'; menu.setAttribute('role','menu');
+    hidden.forEach(h=>{
+      const item=document.createElement('button'); item.type='button'; item.className='menu__item'; item.setAttribute('role','menuitem');
+      const label=document.createElement('span'); label.className='menu__item-label'; label.textContent=h.text;
+      item.appendChild(label); item.addEventListener('click', close);
+      menu.appendChild(item);
+    });
+    document.body.appendChild(menu); place();
+    document.addEventListener('pointerdown', onOutside, true);
+    document.addEventListener('keydown', onEsc, true);
+    window.addEventListener('scroll', place, true);
+    window.addEventListener('resize', place);
+  });
+  return btn;
+}
+/* ---------- FULL BREADCRUMBS (эталонная анатомия — полная спецификация в Breadcrumbs.html) ---------- */
+function buildCrumbs(host, items){
+  host.innerHTML='';
+  const ol = document.createElement('ol'); ol.className='crumbs'; host.appendChild(ol);
+  items.forEach((it,i)=>{
+    const li=document.createElement('li'); li.className='crumbs__item';
+    if (it.current){
+      li.classList.add('crumbs__item--current');
+      const cur=document.createElement('span'); cur.className='crumbs__current'; cur.setAttribute('aria-current','page'); cur.textContent=it.text; li.appendChild(cur);
+    } else if (it.more){
+      li.appendChild(crumbMore(it.hidden));
+    } else {
+      const a = makeLink({ tone:'muted', size:'m', text:it.text }); li.appendChild(a);
+    }
+    ol.appendChild(li);
+  });
+}
+(function(){
+  buildCrumbs(document.getElementById('crumbs-full'), [
+    { text:'Главная' }, { text:'Сделки' }, { text:'Договоры' }, { text:'Договор №4521', current:true },
+  ]);
+})();
+(function(){
+  const host = document.getElementById('crumbs-collapsed');
+  const full = [
+    { text:'Главная' }, { text:'Клиенты' }, { text:'ООО «Ромашка»' }, { text:'Сделки' }, { text:'Договоры' }, { text:'Договор №4521', current:true },
+  ];
+  const hidden = full.slice(1, full.length-2);
+  buildCrumbs(host, [ full[0], { more:true, hidden }, full[full.length-2], full[full.length-1] ]);
+})();
+/* полная логика авто-схлопывания по ширине, тултип на обрезанной текущей крошке — см. Breadcrumbs.html */
+
+/* ---------- SIZES ---------- */
+(function(){
+  const row = document.getElementById('sizes-row');
+  [['M','m'],['S','s']].forEach(([name,sz])=>{
+    const item=document.createElement('div'); item.style.cssText='display:flex; align-items:baseline; gap:12px;';
+    const tag=document.createElement('span'); tag.style.cssText='font:var(--type-body-s-strong); color:var(--text-secondary); width:24px;'; tag.textContent=name;
+    item.appendChild(tag);
+    item.appendChild(makeLink({ tone:'accent', size:sz, text:'Перейти к документу' }));
+    row.appendChild(item);
+  });
+})();
+
+/* ---------- STATES MATRIX ---------- */
+(function(){
+  const m = document.getElementById('states-matrix');
+  const cols = ['Default','Hover','Focus','Pressed','Disabled'];
+  m.style.gridTemplateColumns = '110px repeat('+cols.length+', 1fr)';
+  m.appendChild(Object.assign(document.createElement('div'),{className:'rowname'}));
+  cols.forEach(c=>{ const d=document.createElement('div'); d.className='col-head'; d.textContent=c; m.appendChild(d); });
+  [['Accent','accent'],['Muted','muted'],['Neutral','neutral']].forEach(([name,tone])=>{
+    const rn=document.createElement('div'); rn.className='rowname'; rn.textContent=name; m.appendChild(rn);
+    ['default','hover','focus','pressed','disabled'].forEach(st=>{
+      const c=document.createElement('div'); c.className='cell';
+      if (tone==='neutral' && st!=='default') {
+        c.innerHTML='<span style="font: var(--type-body-s); color: var(--text-inactive);">—</span>';
+      } else {
+        c.appendChild(makeLink({ tone, size:'m', state:st }));
+      }
+      m.appendChild(c);
+    });
+  });
+})();
+
+/* ---------- INLINE PROSE ---------- */
+(function(){
+  const p = document.getElementById('inline-prose');
+  p.innerHTML =
+    '<p>Договор переходит в статус «На подписании» автоматически. Подробнее о статусах сделки читайте в '+
+    '<a class="link link--accent link--inline" href="#">справочном разделе</a>, а параметры уведомлений можно изменить в '+
+    '<a class="link link--accent link--inline" href="#">настройках профиля</a>.</p>'+
+    '<p>Если документ потерялся, напишите в '+
+    '<a class="link link--accent link--inline" href="#">поддержку</a> — обычно отвечаем в течение часа.</p>';
+  p.querySelectorAll('a').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
+})();
+
+/* ---------- ICON / EXTERNAL ---------- */
+(function(){
+  const row = document.getElementById('icon-row');
+  row.appendChild(makeLink({ tone:'accent', size:'m', text:'Скачать PDF', icon:'download' }));
+  row.appendChild(makeLink({ tone:'accent', size:'m', text:'Открыть в реестре', external:true }));
+  row.appendChild(makeLink({ tone:'muted', size:'m', text:'Документация', external:true }));
+})();
+
+/* ---------- WRAP / TRUNCATE ---------- */
+['wrap-link','trunc-link'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click',e=>e.preventDefault()); });
+
+/* ---------- ACCESSIBILITY DO / DON'T ---------- */
+document.getElementById('ic-bad').innerHTML = UI.bad;
+document.getElementById('ic-good').innerHTML = UI.good;
+(function(){
+  const bad = document.getElementById('a11y-bad');
+  bad.innerHTML = 'Перейдите в <a class="link link--accent" href="#" style="text-decoration:none;">раздел отчётов</a>, чтобы выгрузить данные.';
+  const good = document.getElementById('a11y-good');
+  good.innerHTML = 'Перейдите в <a class="link link--accent link--inline" href="#">раздел отчётов</a>, чтобы выгрузить данные.';
+  document.querySelectorAll('#a11y-bad a, #a11y-good a').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
+})();
+
+/* ---------- TYPOGRAPHY TABLE ---------- */
+(function(){
+  const rows = [
+    ['M','Ссылка','--type-body-m','SB Sans Text','16 / 20','link--m'],
+    ['S','Ссылка','--type-body-s','SB Sans Text','14 / 16','link--s'],
+  ];
+  const tb = document.querySelector('#typo-table tbody');
+  tb.innerHTML = rows.map(([sz,sample,tok,font,sl,cls])=>`
+    <tr>
+      <td>${sz}</td>
+      <td><a class="link link--accent ${cls}" href="#" onclick="event.preventDefault()">${sample}</a></td>
+      <td class="rt-tok"><code>${tok}</code></td>
+      <td>${font}</td>
+      <td class="num">${sl}</td>
+    </tr>`).join('');
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function(){
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue){
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r,g,b,a=1, m=v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m){ r=+m[1]*255; g=+m[2]*255; b=+m[3]*255; if(m[4]!==undefined) a=+m[4]; }
+    else { const n=v.match(/[\d.]+/g); if(!n) return cssValue; r=+n[0]; g=+n[1]; b=+n[2]; if(n[3]!==undefined) a=+n[3]; }
+    const hx=n=>Math.round(n).toString(16).padStart(2,'0').toUpperCase();
+    let s='#'+hx(r)+hx(g)+hx(b); if(a<1) s+=' · '+Math.round(a*100)+'%'; return s;
+  }
+  const groups = [
+    { name:'Accent (лайаут / модалки)', rows:[
+      ['Default', '--link'],
+      ['Hover = Focus', '--link-dark'],
+      ['Pressed', '--c-emerald-900'],
+    ]},
+    { name:'Breadcrumbs', rows:[
+      ['Breadcrumbs_1 · Default', '--text-inactive'],
+      ['Breadcrumbs_1 · Hover', '--text-secondary'],
+      ['Breadcrumbs_2 · Default', '--text-primary'],
+      ['Текущая страница', '--text-primary'],
+      ['Disabled', '--text-inactive'],
+    ]},
+  ];
+  const root = document.getElementById('color-ref');
+  root.innerHTML = groups.map(g=>`
+    <section class="cref-group">
+      <h3>${g.name}</h3>
+      <div class="cref-rows">
+        ${g.rows.map(([role,tok])=>`
+          <div class="cref-row">
+            <div class="cref-sw"><div class="cf" style="background:var(${tok});"></div></div>
+            <div class="cref-meta"><p class="role">${role}</p><p class="tname">${tok}</p></div>
+            <div class="cref-hex">${resolveHex('var('+tok+')')}</div>
+          </div>`).join('')}
+      </div>
+    </section>`).join('');
+  probe.remove();
+})();
+
+/* ---------- PLAYGROUND ---------- */
+(function(){
+  const state = { tone:'accent', size:'m', state:'default', inline:false, icon:false, external:false };
+  const controls = document.getElementById('pg-controls');
+  const preview  = document.getElementById('pg-preview');
+  const codeEl   = document.getElementById('pg-code');
+
+  function select(label, options, getCur, onPick){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    options.forEach(([val,txt])=>{ const op=document.createElement('option'); op.value=val; op.textContent=txt; if(val===getCur()) op.selected=true; sel.appendChild(op); });
+    sel.addEventListener('change',()=>{ onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+    /* Бинарные опции — селекты: docs-split.js конвертирует их в свитчи ДС (урок Л4) */
+  function ctlToggle(label, key){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    [['no','Нет'],['yes','Да']].forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; if((v==='yes')===!!state[key]) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{
+      const nv = sel.value==='yes';
+      state[key]=nv;
+      // внешняя ссылка и иконка — взаимоисключаются (иконка своя у внешнего перехода)
+      if (nv && key==='external' && state.icon) { state.icon=false; if(iconSel) iconSel.value='no'; }
+      if (nv && key==='icon' && state.external) { state.external=false; if(externalSel) externalSel.value='no'; }
+      render();
+    });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  const stateCtl = select('Состояние',
+    [['default','Default'],['hover','Hover'],['focus','Focus'],['pressed','Pressed'],['disabled','Disabled']],
+    ()=>state.state, v=>state.state=v);
+  function syncStateAvailability(){
+    const isNeutral = state.tone === 'neutral';
+    stateCtl.classList.toggle('is-off', isNeutral);
+    if (isNeutral && state.state !== 'default') {
+      state.state = 'default';
+      const sel = stateCtl.querySelector('select'); if (sel) sel.value = 'default';
+    }
+  }
+
+  controls.appendChild(select('Тон',
+    [['accent','Accent'],['info','Info'],['warning','Warning'],['error','Error'],['success','Success'],['muted','Muted (Breadcrumbs_1)'],['neutral','Neutral (Breadcrumbs_2)']],
+    ()=>state.tone, v=>{ state.tone=v; syncStateAvailability(); }));
+  controls.appendChild(select('Размер', [['m','M'],['s','S']], ()=>state.size, v=>state.size=v));
+  controls.appendChild(stateCtl);
+  syncStateAvailability();
+
+  const iconSel = ctlToggle('Иконка слева','icon');
+  const externalSel = ctlToggle('Внешняя ссылка','external');
+  controls.appendChild(ctlToggle('Инлайн (в тексте)','inline'));
+  controls.appendChild(iconSel);
+  controls.appendChild(externalSel);
+
+  function render(){
+    const o = { tone:state.tone, size:state.size, state:state.state, inline:state.inline,
+                icon: state.icon ? 'download' : null, external: state.external, text:'Link', frozen:true };
+    preview.innerHTML='';
+    if (state.inline){
+      const wrap=document.createElement('div'); wrap.className='prose';
+      wrap.innerHTML = 'Текст параграфа со ссылкой ';
+      const lk = makeLink(o); wrap.appendChild(lk);
+      wrap.appendChild(document.createTextNode(' внутри предложения.'));
+      preview.appendChild(wrap);
+    } else {
+      preview.appendChild(makeLink(o));
+    }
+
+    const cls=['link','link--'+state.tone];
+    if (!state.inline) cls.push('link--'+state.size); else cls.push('link--inline');
+    if (state.icon || state.external) cls.push('link--with-icon');
+    if (state.state==='disabled') cls.push('link--disabled');
+    else if (['hover','focus','pressed'].includes(state.state)) cls.push('is-'+state.state);
+    codeEl.innerHTML = '<code>&lt;a class="'+cls.join(' ')+'" href="…"&gt;</code>';
+  }
+  render();
+})();
+
+/* ---------- ANATOMY ---------- */
+(function(){
+  const art = document.getElementById('anat-art');
+  if(!art) return;
+  const a = makeLink({ tone:'accent', size:'m', state:'focus', text:'Открыть в реестре', external:true, frozen:true });
+  a.style.transform = 'scale(2)';
+  art.appendChild(a);
+})();
+
+/* ---------- CONTENT DO / DON'T ICONS ---------- */
+(function(){
+  const b = document.getElementById('ic-bad-content'); if(b) b.innerHTML = UI.bad;
+  const g = document.getElementById('ic-good-content'); if(g) g.innerHTML = UI.good;
+})();
+
+/* ---------- DEV: redline measured from live component ---------- */
+(function(){
+  const tbody = document.querySelector('#dev-spec-table');
+  if(!tbody) return;
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  function measure(sz){
+    const a  = makeLink({ tone:'accent', size:sz, text:'Ссылка' });
+    const ai = makeLink({ tone:'accent', size:sz, text:'Скачать', icon:'download' });
+    host.appendChild(a); host.appendChild(ai);
+    const cs  = getComputedStyle(a);
+    const csi = getComputedStyle(ai);
+    return {
+      fz:     parseFloat(cs.fontSize),
+      lh:     parseFloat(cs.lineHeight),
+      icon:   parseFloat(getComputedStyle(ai.querySelector('.link__icon')).width),
+      gap:    csi.columnGap,
+      thick:  cs.textDecorationThickness,
+      offset: cs.textUnderlineOffset,
+      rad:    cs.borderTopLeftRadius,
+    };
+  }
+  const d = { m:measure('m'), s:measure('s') };
+  host.remove();
+  const r = n => Math.round(n*10)/10;
+  const px = v => { const n = parseFloat(v); return isNaN(n) ? v : r(n)+' px'; };
+  const rows = [
+    ['Размер / интерлиньяж', z => r(d[z].fz)+' / '+r(d[z].lh)+' px'],
+    ['Иконка (1em)', z => r(d[z].icon)+' px'],
+    ['Зазор текст ↔ иконка', z => px(d[z].gap)],
+    ['Толщина подчёркивания', z => px(d[z].thick)],
+    ['Отступ подчёркивания', z => px(d[z].offset)],
+    ['Радиус (базовый)', z => px(d[z].rad)],
+  ];
+  tbody.innerHTML = rows.map(([label, fn]) =>
+    `<div class="tbl__row" style="grid-template-columns:8px 1.8fr 0.7fr 0.7fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${label}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('m')}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('s')}</span></span></div><div class="tc tc--separator"></div></div>`
+  ).join('');
+})();
+
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Размер': 'S', 'Инлайн (в тексте)': 'Инлайн (в тексте)', 'Иконка слева': 'Показывать иконку слева', 'Внешняя ссылка': 'Внешняя ссылка' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- standalone-ссылка (лайаут / модалка), тон Accent -->
+<a class="link link--accent link--m" href="/deals/4521">Открыть договор</a>
+
+<!-- инлайн-ссылка в тексте: подчёркнута всегда -->
+… подробнее в <a class="link link--accent link--inline" href="/help">справке</a> …
+
+<!-- иконка слева (скачивание) -->
+<a class="link link--accent link--m link--with-icon" href="/report.pdf">
+  <span class="link__icon"><i data-icon="download"></i></span>
+  Скачать PDF
+</a>
+
+<!-- внешняя ссылка: новая вкладка + иконка-стрелка справа -->
+<a class="link link--accent link--m link--with-icon" href="https://…"
+   target="_blank" rel="noopener" aria-label="Открыть в реестре (открывается в новой вкладке)">
+  Открыть в реестре
+  <span class="link__icon"><i data-icon="link-external"></i></span>
+</a>
+
+<!-- хлебные крошки: родители — ссылки Muted, текущая — не ссылка; полная анатомия — см. Breadcrumbs.html -->
+<nav class="crumbs" aria-label="Хлебные крошки">
+  <li class="crumbs__item"><a class="link link--muted" href="/">Главная</a></li>
+  <!-- разделитель «/» — CSS ::after на .crumbs__item, не отдельный элемент -->
+  <li class="crumbs__item crumbs__item--current">
+    <span class="crumbs__current" aria-current="page">Договор №4521</span>
+  </li>
+</nav></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function makeLink(o) {
+  // o: { tone, size:'m'|'s', state, inline?, icon?, external?, text }
+  // a.link.link--<tone>.link--<size>(.link--inline)(.link--external)(.link--icon)
+  // inline — в потоке текста (.prose); external — диагональная стрелка (внешний переход)
+  // muted/neutral — Breadcrumbs_1/Breadcrumbs_2
+}</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Link
+   A text link for layout/modal navigation and breadcrumbs.
+   Tones:  accent (primary) · muted (Breadcrumbs_1) · neutral (Breadcrumbs_2)
+   Sizes:  m (Body M) · s (Body S)   — inline variant inherits text size
+   States: default · hover (=focus, underline) · pressed · disabled
+   Variants: inline (always underlined) · with-icon / external · truncate
+   Requires: typography.css, colors.css, radius.css
+   ========================================================================= */
+
+.link {
+  /* color comes from the tone; default = accent.
+     --link-fg* — инаследуемые токены темы (Alert/SnackBar переопределяют
+     их для вложенных ссылок). Дефолты (= accent) живут в корне
+     компонента (разрешёно), а не в :not()-правиле — элемент-level значения
+     идентичны прежнему дефолту. */
+  --link-fg:        var(--link);
+  --link-fg-hover:  var(--link-dark);
+  --link-fg-active: var(--c-emerald-900);
+  color: var(--link-fg, var(--link));
+  text-decoration: none;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  border-radius: var(--radius-xs); /* 4px — форма фокус-обводки */
+  -webkit-tap-highlight-color: transparent;
+  transition: color .15s ease, text-decoration-color .15s ease;
+}
+
+/* ---------- sizes (standalone links) -------------------------------------- */
+.link--m { font: var(--type-body-m); letter-spacing: 0; }
+.link--s { font: var(--type-body-s); letter-spacing: 0; }
+
+/* ---------- tones --------------------------------------------------------- *
+   Тон = цвет напрямую (не через --link-fg* в модификаторе). Префикс
+   .link.link--X — чтобы hover/active перебивали базовые :hover/:active независимо от порядка. */
+/* accent — layout & modal links (primary) */
+.link.link--accent  { color: var(--link); }
+.link.link--accent:hover, .link.link--accent.is-hover, .link.link--accent:focus-visible, .link.link--accent.is-focus { color: var(--link-dark); }
+.link.link--accent:active, .link.link--accent.is-pressed { color: var(--c-emerald-900); }
+/* muted — Breadcrumbs_1 (ancestor / secondary crumbs) */
+.link.link--muted   { color: var(--text-inactive); }
+.link.link--muted:hover, .link.link--muted.is-hover, .link.link--muted:focus-visible, .link.link--muted.is-focus { color: var(--text-secondary); }
+.link.link--muted:active, .link.link--muted.is-pressed { color: var(--text-primary); }
+/* neutral — Breadcrumbs_2 (emphasised crumb): non-interactive, Default only */
+.link.link--neutral {
+  color: var(--text-primary);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ---------- semantic state tones (Info · Warning · Error · Success) -------- *
+   Модификатор поверх ссылки — цвет в тон палитры Situative. Переиспользуются
+   в Alert и SnackBar: ссылка внутри плашки получает .link--<тон>, совпадающий
+   с тоном компонента (тот же приём, что и .btn--<тон>). Hover — *-dark,
+   pressed — на ступень темнее. */
+.link.link--info    { color: var(--info); }
+.link.link--info:hover, .link.link--info.is-hover, .link.link--info:focus-visible, .link.link--info.is-focus { color: var(--info-dark); }
+.link.link--info:active, .link.link--info.is-pressed { color: color-mix(in srgb, var(--info-dark) 80%, #000); }
+.link.link--warning { color: var(--warning); }
+.link.link--warning:hover, .link.link--warning.is-hover, .link.link--warning:focus-visible, .link.link--warning.is-focus { color: var(--warning-dark); }
+.link.link--warning:active, .link.link--warning.is-pressed { color: color-mix(in srgb, var(--warning-dark) 80%, #000); }
+.link.link--error   { color: var(--error); }
+.link.link--error:hover, .link.link--error.is-hover, .link.link--error:focus-visible, .link.link--error.is-focus { color: var(--error-dark); }
+.link.link--error:active, .link.link--error.is-pressed { color: color-mix(in srgb, var(--error-dark) 80%, #000); }
+.link.link--success { color: var(--success); }
+.link.link--success:hover, .link.link--success.is-hover, .link.link--success:focus-visible, .link.link--success.is-focus { color: var(--success-dark); }
+.link.link--success:active, .link.link--success.is-pressed { color: color-mix(in srgb, var(--success-dark) 80%, #000); }
+
+/* ---------- hover = focus (underline) ------------------------------------- */
+/* ---------- hover = focus (одинаковое оформление — единый визуал для мыши и клавиатуры, без отдельной обводки) ---- */
+.link:hover,
+.link.is-hover,
+.link:focus-visible,
+.link.is-focus {
+  color: var(--link-fg-hover);
+  text-decoration-line: underline;
+  outline: none;
+}
+
+/* ---------- pressed ------------------------------------------------------- */
+.link:active,
+.link.is-pressed {
+  color: var(--link-fg-active);
+  text-decoration-line: underline;
+}
+
+/* ---------- neutral override — no hover/focus/pressed visuals ------------- */
+.link--neutral:hover,
+.link--neutral.is-hover,
+.link--neutral:focus-visible,
+.link--neutral.is-focus,
+.link--neutral:active,
+.link--neutral.is-pressed {
+  color: var(--text-primary);
+  text-decoration-line: none;
+  outline: none;
+}
+
+/* ---------- disabled ------------------------------------------------------ */
+.link--disabled,
+.link[aria-disabled="true"] {
+  color: var(--text-inactive);
+  text-decoration: none;
+  pointer-events: none;
+  cursor: default;
+}
+
+/* ---------- inline (inside body text) ------------------------------------- */
+/* Inline links must be distinguishable without colour → always underlined. */
+.link--inline {
+  font: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+.link--inline:hover,
+.link--inline.is-hover,
+.link--inline:focus-visible { text-decoration-color: currentColor; }
+
+/* ---------- with icon / external ------------------------------------------ */
+.link--with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: baseline;
+}
+.link__icon { width: 1em; height: 1em; flex: none; display: block; }
+.link__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* ---------- truncation ---------------------------------------------------- */
+.link--truncate {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+/* =========================================================================
+   Breadcrumbs — вынесен в отдельный компонент, см. styles/breadcrumbs.css
+   и Breadcrumbs.html (полная спецификация: анатомия, авто-схлопывание,
+   обрезка текущей крошки, доступность). Здесь остаются только ссылки
+   Breadcrumbs_1 / Breadcrumbs_2 (тона .link--muted / .link--neutral выше).
+   ========================================================================= */</script>
+</body>
+</html>

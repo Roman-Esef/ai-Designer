@@ -1,0 +1,1039 @@
+<!-- @dsCard group="Components" name="IconButton" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IconButton — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/spinner.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:74ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:28px; }
+
+  
+
+  
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { display:flex; align-items:center; justify-content:center; }
+  .pg__stagebox.dark { background: var(--c-cgrey-800); border-radius:14px; padding:26px 34px; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* select control */
+
+  /* ---------- states matrix ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .matrix { display:grid; gap:24px 18px; align-items:center; min-width:560px; }
+  .matrix .col-head { font: var(--type-body-s-strong); color: var(--text-secondary); text-align:center; }
+  .matrix .cell { display:flex; justify-content:center; }
+
+  /* ---------- tone grid ---------- */
+  .tonegrid { display:grid; grid-template-columns: 130px repeat(3, 1fr); gap:24px 18px; align-items:center; }
+  .tonegrid .ch { font: var(--type-body-s-strong); color: var(--text-secondary); text-align:center; }
+  .tonegrid .rh { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .tonegrid .cell { display:flex; justify-content:center; }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(260px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:44px; display:flex; justify-content:center; }
+  .anat__art .layer-ring { position:absolute; inset:-1px; border:1px dashed color-mix(in srgb, var(--primary) 55%, transparent); border-radius:50%; }
+  .anat__art .target-ring { position:absolute; border:1px dashed color-mix(in srgb, var(--text-inactive) 80%, transparent); border-radius:10px; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary); }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+  /* ---------- input field demo ---------- */
+  .field { display:inline-flex; align-items:center; gap:6px; height:40px; padding:0 8px 0 12px; min-width:280px;
+    background: var(--bg-tile); border:1px solid var(--border-primary); border-radius:10px; }
+  .field:focus-within { border-color: var(--primary); box-shadow:0 0 0 2px var(--primary-bg); }
+  .field .field__lead { color: var(--text-inactive); display:flex; }
+  .field .field__lead svg { width:20px; height:20px; }
+  .field input { flex:1; border:none; outline:none; background:transparent; font: var(--type-body-m); color: var(--text-primary); min-width:0; }
+  .field input::placeholder { color: var(--text-inactive); }
+
+  /* ---------- toolbar demo ---------- */
+  .toolbar { display:inline-flex; align-items:center; gap:2px; padding:6px; background: var(--bg-tile); border:1px solid var(--border-light); border-radius:12px; }
+  .toolbar .sep { width:1px; align-self:stretch; background: var(--border-light); margin:0 6px; }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:22px 20px; flex:1; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .guide-card__cap { padding:0 20px 20px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+  .ref-table .ic-cell { display:flex; align-items:center; }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw.alpha::before { content:""; position:absolute; inset:0; z-index:0;
+    background-image:
+      linear-gradient(45deg,#d9e0e0 25%,transparent 25%),linear-gradient(-45deg,#d9e0e0 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#d9e0e0 75%),linear-gradient(-45deg,transparent 75%,#d9e0e0 75%);
+    background-size:8px 8px; background-position:0 0,0 4px,4px -4px,-4px 0; }
+  .cref-sw .cf { position:absolute; inset:0; z-index:1; }
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 30px; }
+  .code-panel__name { font: var(--type-body-s-strong); color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; }
+
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="IconButton">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.010</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>IconButton</h1>
+    <p class="lead">Безрамочная кнопка с одной иконкой и круглым стейт-слоем (риплом). Цвет рипла соответствует цвету иконки. Тоны Neutral / Primary / Danger / Contrast, размеры L / M / S, состояния Default / Hover / Pressed / Focus / Disabled / Loading, режим-переключатель и встроенный вариант для полей ввода.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- WHEN TO USE -->
+  <section class="section" data-screen-label="WhenToUse">
+    <h2>Использование</h2>
+    <p class="desc tight">IconButton подходит, когда:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>действие очевидно из иконки и не требует подписи — закрыть, удалить, редактировать, открыть меню;</li>
+      <li>места мало: тулбары, заголовки карточек, строки таблиц, поля ввода;</li>
+      <li>нужно собрать ряд однотипных действий, не перегружая интерфейс текстом.</li>
+    </ul>
+    <p class="desc">Если действие основное или его смысл не считывается с иконки — используйте обычную <a class="inl" href="../atoms/Buttons.html">Button</a> с текстом. Иконка без подписи всегда должна сопровождаться <code class="tok">aria-label</code> и, как правило, <a class="inl" href="../molecules/Tooltip.html">Tooltip</a>.</p>
+  
+<div class="subsec" data-screen-label="Toolbar">
+    <h3>В тулбаре</h3>
+    <p class="desc">Типовой паттерн: ряд IconButton одного тона и размера, сгруппированный с разделителями. Деструктивное действие выделяется тоном Danger.</p>
+    <div class="panel">
+      <div class="toolbar" id="toolbar"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Компонент состоит из иконки и круглого стейт-слоя вокруг неё. Стейт-слой появляется на Hover / Pressed и заполняет всю область компонента; его цвет — это полупрозрачный оттенок цвета иконки. Кликабельная область равна размеру компонента.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage">
+          <div class="anat__art" id="anat-art"></div>
+        </div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Иконка</span><span class="d"> — задаёт тон; размер привязан к размеру кнопки</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Стейт-слой (рипл)</span><span class="d"> — круг, оттенок цвета иконки, виден на Hover / Pressed</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Область клика</span><span class="d"> — равна размеру компонента (L 40 · M 32 · S 24)</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Tones">
+    <h3>Тоны</h3>
+    <p class="desc">Тон задаёт цвет иконки, а стейт-слой автоматически берёт полупрозрачный оттенок этого же цвета. <b>Neutral</b> — нейтральные действия, иконка <code class="tok">--secondary</code> (Active · Secondary, Emerald_200); <b>Primary</b> — акцентные (<code class="tok">--primary</code>); <b>Danger</b> — деструктивные, например удалить (<code class="tok">--error</code>); <b>Contrast</b> — для тёмных поверхностей (<code class="tok">--text-on-dark</code>).</p>
+    <div class="panel">
+      <div class="tonegrid" id="tonegrid"></div>
+    </div>
+    <div class="panel" style="margin-top:20px; background:var(--c-cgrey-800); border-color:var(--c-cgrey-800);">
+      <div class="row" id="contrast-row" style="gap:20px;"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Toggle">
+    <h3>Режим-переключатель</h3>
+    <p class="desc">IconButton может работать как переключатель (toggle): нажатие фиксирует состояние Selected. В выбранном состоянии иконка окрашивается в Primary и остаётся лёгкий стейт-слой; чаще всего контурная иконка заменяется на залитую. Подходит для «в избранное», «закрепить», «показать пароль». Нажмите на пример:</p>
+    <div class="panel">
+      <div class="row" id="toggle-row" style="gap:36px;"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Embedded">
+    <h3>Встроенный вариант (поля и тулбары)</h3>
+    <p class="desc">В полях ввода и плотных тулбарах круглый стейт-слой избыточен. Встроенный вариант (<code class="tok">ibtn--embedded</code>) убирает рипл: в покое иконка нейтральная, на Hover она окрашивается в Primary. Это и есть состояние «Hover (Input)». Наведите на иконку очистки:</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="row" id="field-row" style="gap:28px;"></div>
+    </div>
+    <p class="desc">Сравнение поведения на Hover — обычный (со стейт-слоем) и встроенный (смена цвета):</p>
+    <div class="panel">
+      <div class="tonegrid" id="embed-compare" style="grid-template-columns:130px repeat(2,1fr);"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Badge">
+    <h3>С бейджем</h3>
+    <p class="desc">IconButton может нести индикатор-<a class="inl" href="../atoms/Badge.html">Badge</a> — счётчик непрочитанного или точку-индикатор. Бейдж прижимается к правому верхнему углу компонента (верхняя и правая грани касаются граней рамки, не выходя за неё) и не перехватывает клики. Счётчик — не более двух символов: при значении больше 99 показываем «9+».</p>
+    <div class="panel">
+      <div class="row" id="badge-row" style="gap:32px;"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc tight">Три размера. Размер кнопки в лейауте = размеру иконки; стейт-слой больше и выходит за габарит на hover.<br>
+      <b>L&nbsp;— 24</b> · самостоятельные действия, тулбары &nbsp;·&nbsp; <b>M&nbsp;— 20</b> · карточки, шапки, действия в Alert &nbsp;·&nbsp; <b>S&nbsp;— 16</b> · таблицы, поля ввода.</p>
+    <div class="panel" style="margin-bottom:20px;"><div class="row" id="sizes-row" style="gap:40px;"></div></div>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Кнопка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Иконка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Стейт-слой</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Скругление (square)</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24 × 24</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">40 (круг)</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">20 × 20</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">20</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">32 (круг)</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">16 × 16</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">16</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24 (круг)</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">6</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Скругление относится к стейт-слою — сама иконка фона не имеет. По умолчанию слой круглый; варианты <code class="tok">.ibtn--square</code> и <code class="tok">.ibtn--embedded</code> берут радиус контрола своего размера.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L / M / S — круглая, по умолчанию</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L — square, embedded</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M — square, embedded</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S — square, embedded</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">У IconButton нет видимого текста — контент компонента это иконка и её текстовое описание:</p>
+    <ul class="bullets">
+      <li>иконка — только из <a class="inl" href="../foundations/Icons.html">библиотеки ДС</a> (24×24, заливка <code class="tok">currentColor</code>); метафора должна быть общепринятой: корзина — удалить, карандаш — редактировать;</li>
+      <li><code class="tok">aria-label</code> — глагол действия, 1–3 слова: «Удалить», «Скачать PDF»; не название иконки («Корзина»);</li>
+      <li>текст <a class="inl" href="../molecules/Tooltip.html">Tooltip</a> совпадает с aria-label;</li>
+      <li>в режиме-переключателе подпись отражает текущее состояние: «В избранное» ↔ «В избранном».</li>
+    </ul>
+  
+<div class="subsec" data-screen-label="Iconography">
+    <h3>Иконография</h3>
+    <p class="desc">Иконки берутся из библиотеки ДС (24×24, заливка <code class="tok">currentColor</code>) и масштабируются под размер кнопки. Никаких эмодзи или юникод-символов.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.8fr 0.8fr 2.2fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер кнопки</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Размер иконки</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образцы</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="icon-table"></div></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- BEHAVIOR -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Независимость режима-переключателя и блокировка в Loading.</p>
+
+<div class="subsec" data-screen-label="ToggleLogic">
+    <h3>Режим-переключатель</h3>
+    <p class="desc">В отличие от ButtonGroup Toggle, где сегменты одной группы могут быть взаимоисключающими, отдельный IconButton в режиме toggle всегда переключается независимо от других кнопок рядом — своё Selected не влияет на соседние IconButton, даже если они выглядят как ряд (например, панель инструментов). Если нужна взаимоисключающая группа — используйте ButtonGroup Toggle или SegmentControl.</p>
+  </div>
+
+<div class="subsec" data-screen-label="LoadingLock">
+    <h3>Loading блокирует повторный клик</h3>
+    <p class="desc">Пока идёт процесс, кнопка недоступна для повторного нажатия (<code class="tok">pointer-events: none</code>) — это предотвращает повторный запуск того же действия до получения ответа. Иконка временно скрыта под спиннером и возвращается по завершении.</p>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Интерактивные состояния по горизонтали, размеры по вертикали. К исходной матрице Default / Hover / Disabled добавлены <b>Pressed</b>, <b>Focus</b> и <b>Loading</b>.</p>
+    <div class="panel">
+      <div class="matrix-wrap"><div class="matrix" id="matrix"></div></div>
+    </div>
+  </section>
+
+  <!-- ACCESSIBILITY / HIT AREA -->
+  <section class="section" data-screen-label="Accessibility">
+    <h2>Доступность</h2>
+    <p class="desc">У иконки нет видимого текста, поэтому каждому IconButton обязателен <code class="tok">aria-label</code>, описывающий действие, и, как правило, <a class="inl" href="../molecules/Tooltip.html">Tooltip</a> по наведению. Управление с клавиатуры: <b>Tab</b> ставит фокус, <b>Space</b> / <b>Enter</b> активируют, фокус показывается обводкой <code class="tok">--primary</code>.</p>
+    <p class="desc">Минимальная рекомендованная область нажатия — 44×44px. Стейт-слой (зона клика) больше иконки (40 / 32 / 24), но всё равно меньше 44px, поэтому в тач-сценариях либо берите размер L, либо ещё расширяйте кликабельную зону невидимым отступом, оставляя видимый стейт-слой прежним.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad"></span>Не так</div>
+        <div class="guide-card__body" id="a11y-bad"></div>
+        <p class="guide-card__cap">Иконка без подписи и без aria-label / тултипа — пользователь не понимает действие.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good"></span>Так</div>
+        <div class="guide-card__body" id="a11y-good"></div>
+        <p class="guide-card__cap">aria-label + тултип раскрывают значение; область нажатия не меньше 44px.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY (STUB) -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Не применимо: компонент не содержит текста.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 2.97fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.97fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Не применимо — компонент не содержит собственного текста</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены. Стейт-слой — это <code class="tok">color-mix</code> цвета иконки (<code class="tok">currentColor</code>) с прозрачным: 12% на Hover, 22% на Pressed.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка (тон)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Neutral</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#B8D6D3</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка (тон)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Primary</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка (тон)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Danger</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка (тон)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Contrast</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка (тон)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стейт-слой (рипл)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover · Neutral 12%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">color-mix(in</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стейт-слой (рипл)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Pressed · Neutral 22%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">color-mix(in</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стейт-слой (рипл)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover · Primary 12%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">color-mix(in</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стейт-слой (рипл)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover · Danger 12%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">color-mix(in</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.44fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стейт-слой (рипл)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Selected · Primary 12%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">color-mix(in</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая верстает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/icon-button.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:36px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.6fr 0.6fr 0.6fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">L</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">S</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/icon-button.css</code>
+      <code class="tok">styles/badge.css (если нужен бейдж)</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Стейт-слой — псевдоэлемент ::before, не влияет на размер кнопки:</span>
+<span class="tk-cm">//    background = color-mix(currentColor 12%, transparent) на :hover</span>
+<span class="tk-cm">//    background = color-mix(currentColor 22%, transparent) на :active</span>
+<span class="tk-cm">//    цвет рипла всегда следует за цветом иконки (тоном)</span>
+
+<span class="tk-cm">// 2. Toggle (режим-переключатель):</span>
+<span class="tk-cm">//    click → selected = !selected</span>
+<span class="tk-cm">//    aria-pressed = selected; тон neutral → primary;</span>
+<span class="tk-cm">//    контурная иконка заменяется на залитую; aria-label отражает состояние</span>
+<span class="tk-cm">// React: состав рендерится декларативно:</span>
+glyph = selected ? iconSelected : icon
+
+<span class="tk-cm">// 3. Loading: иконка заменяется на .spin (размер = размеру иконки);</span>
+<span class="tk-cm">//    .ibtn--loading даёт pointer-events: none; добавить aria-busy="true"</span>
+
+<span class="tk-cm">// 4. Embedded (поля ввода): стейт-слоя нет, hover меняет цвет иконки</span>
+<span class="tk-cm">//    text-inactive → primary (на :active → primary-dark)</span>
+
+<span class="tk-cm">// 5. Зона клика: стейт-слой (::before) больше иконки и с pointer-events:auto</span>
+<span class="tk-cm">//    ловит клики; размер кнопки в лейауте = размеру иконки</span>
+
+<span class="tk-cm">// 6. Состояния hover/pressed — чистый CSS (:hover/:active);</span>
+<span class="tk-cm">//    классы .is-hover/.is-pressed/.is-focus — только для спецификаций в документации</span>
+
+<span class="tk-cm">// 7. Badge (.ibtn__badge): правый верхний угол рамки, top:0/right:0 —</span>
+<span class="tk-cm">//    верхняя и правая грани заподлицо с рамкой, бейдж не выходит за габарит;</span>
+<span class="tk-cm">//    pointer-events:none. Counter — не более 2 символов: value > 99 → «9+»</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который нужно реализовать поверх вашего стека (рабочий референс на vanilla JS — функция <code class="tok">makeIB</code> в коде этой страницы).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Группа IconButton</b> — сращенный по аналогии с ButtonGroup вариант — тулбар иконок с общей рамкой.</li>
+        <li><b>Долгое нажатие</b> — контекстное меню по long-press на мобильных устройствах.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · IconButton</span>
+    <span>Neutral · Primary · Danger · Contrast — L / M / S</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите IconButton: переключайте тон, размер, иконку, состояние, форму и модификаторы — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script>
+/* ---------- icons from DS library ---------- */
+const L = window.DS_ICONS || {};
+function ic(name){ return L[name] || ('<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>'); }
+const UI = {
+  bad:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  good: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+};
+
+/* ---------- IconButton factory ----------
+   o: { tone, size, icon, state, shape, embedded, selected, loading, label, badge, frozen } */
+function makeIB(o = {}) {
+  const { tone='neutral', size='m', icon='edit', state='default', shape='circle',
+          embedded=false, selected=false, loading=false, label='Действие',
+          badge=null, frozen=false } = o;
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'ibtn ibtn--' + tone + ' ibtn--' + size;
+  if (shape === 'square') b.classList.add('ibtn--square');
+  if (embedded) b.classList.add('ibtn--embedded');
+  if (selected) b.classList.add('ibtn--selected');
+  if (loading)  b.classList.add('ibtn--loading');
+  if (state === 'disabled') b.disabled = true;
+  else if (!loading && state !== 'default') b.classList.add('is-' + state);  // is-hover / is-pressed / is-focus
+  b.setAttribute('aria-label', label);
+  if (selected) b.setAttribute('aria-pressed', 'true');
+
+  if (loading) b.innerHTML = '<span class="spin spin--current"></span>';
+  else b.innerHTML = ic(icon);
+
+  if (badge) {
+    const bd = document.createElement('span');
+    bd.className = 'ibtn__badge';
+    bd.innerHTML = badge;
+    b.appendChild(bd);
+  }
+  if (frozen) b.addEventListener('click', e => e.preventDefault());
+  return b;
+}
+
+/* ---------- ANATOMY ---------- */
+(function(){
+  const art = document.getElementById('anat-art');
+  const b = makeIB({ tone:'primary', size:'l', icon:'edit', state:'hover', frozen:true });
+  b.style.transform = 'scale(2.4)';
+  art.appendChild(b);
+  const ring = document.createElement('div'); ring.className='target-ring';
+  ring.style.cssText = 'inset:-30px; border-radius:14px;';
+  art.appendChild(ring);
+})();
+
+/* ---------- SIZES ---------- */
+(function(){
+  const wrap = document.getElementById('sizes-row');
+  [['L','l'],['M','m'],['S','s']].forEach(([name,sz])=>{
+    const item=document.createElement('div'); item.style.cssText='display:flex; flex-direction:column; align-items:center; gap:14px;';
+    item.appendChild(makeIB({ tone:'primary', size:sz, icon:'edit', state:'hover', frozen:true, label:'Редактировать' }));
+    const tag=document.createElement('div'); tag.style.cssText='font:var(--type-body-s-strong); color:var(--text-secondary);';
+    tag.textContent = name;
+    item.appendChild(tag); wrap.appendChild(item);
+  });
+})();
+
+/* ---------- TONES ---------- */
+(function(){
+  const g = document.getElementById('tonegrid');
+  ['', 'Default','Hover','Pressed'].forEach((h,i)=>{ const d=document.createElement('div'); d.className= i===0?'rh':'ch'; d.textContent=h; g.appendChild(d); });
+  const tones = [['Neutral','neutral','more-dots'],['Primary','primary','edit'],['Danger','danger','trash']];
+  tones.forEach(([name,tone,icon])=>{
+    const rh=document.createElement('div'); rh.className='rh'; rh.textContent=name; g.appendChild(rh);
+    ['default','hover','pressed'].forEach(st=>{
+      const cell=document.createElement('div'); cell.className='cell';
+      cell.appendChild(makeIB({ tone, size:'l', icon, state:st, frozen:true, label:name }));
+      g.appendChild(cell);
+    });
+  });
+  // contrast on dark
+  const cr = document.getElementById('contrast-row');
+  const cap = document.createElement('span'); cap.style.cssText='font:var(--type-body-s); color:var(--c-swamp-300); margin-right:8px;'; cap.textContent='Contrast на тёмной поверхности:';
+  cr.appendChild(cap);
+  ['default','hover','pressed'].forEach(st=>{
+    cr.appendChild(makeIB({ tone:'contrast', size:'l', icon:'settings', state:st, frozen:true, label:'Настройки' }));
+  });
+})();
+
+/* ---------- STATES MATRIX ---------- */
+(function(){
+  const m = document.getElementById('matrix');
+  const cols = ['Default','Hover','Pressed','Focus','Disabled','Loading'];
+  m.style.gridTemplateColumns = '70px repeat('+cols.length+', 1fr)';
+  m.appendChild(Object.assign(document.createElement('div'),{className:'col-head'}));
+  cols.forEach(c=>{ const d=document.createElement('div'); d.className='col-head'; d.textContent=c; m.appendChild(d); });
+  [['L','l'],['M','m'],['S','s']].forEach(([name,sz])=>{
+    const rn=document.createElement('div'); rn.className='rowname'; rn.textContent=name; m.appendChild(rn);
+    [['default'],['hover'],['pressed'],['focus'],['disabled'],['loading']].forEach(([st])=>{
+      const cell=document.createElement('div'); cell.className='cell';
+      const o={ tone:'neutral', size:sz, icon:'more-dots', frozen:true, label:'Ещё' };
+      if (st==='loading') o.loading=true; else o.state=st;
+      cell.appendChild(makeIB(o));
+      m.appendChild(cell);
+    });
+  });
+})();
+
+/* ---------- TOGGLE (interactive) ---------- */
+(function(){
+  const row = document.getElementById('toggle-row');
+  const defs = [
+    { off:'star', on:'star-filled', labelOff:'В избранное', labelOn:'В избранном', start:false },
+    { off:'bookmark-add', on:'bookmark-check-filled', labelOff:'Сохранить', labelOn:'Сохранено', start:true },
+    { off:'pin-menu', on:'unpin-menu', labelOff:'Закрепить', labelOn:'Открепить', start:false },
+  ];
+  defs.forEach(d=>{
+    let on = d.start;
+    const b = makeIB({ tone: on?'primary':'neutral', size:'l', icon: on?d.on:d.off, selected:on, label: on?d.labelOn:d.labelOff });
+    b.addEventListener('click', ()=>{
+      on = !on;
+      b.classList.toggle('ibtn--selected', on);
+      b.classList.toggle('ibtn--primary', on);
+      b.classList.toggle('ibtn--neutral', !on);
+      b.setAttribute('aria-pressed', String(on));
+      b.setAttribute('aria-label', on?d.labelOn:d.labelOff);
+      b.innerHTML = ic(on?d.on:d.off);
+    });
+    const item=document.createElement('div'); item.style.cssText='display:flex; flex-direction:column; align-items:center; gap:10px;';
+    const cap=document.createElement('span'); cap.style.cssText='font:var(--type-body-s); color:var(--text-secondary);'; cap.textContent=d.labelOff;
+    item.appendChild(b); item.appendChild(cap); row.appendChild(item);
+  });
+})();
+
+/* ---------- EMBEDDED / INPUT ---------- */
+(function(){
+  const row = document.getElementById('field-row');
+  // search field with embedded clear
+  [['Поиск по сделкам','search'],['Введите название','search']].forEach(([ph])=>{
+    const f = document.createElement('div'); f.className='field';
+    const lead=document.createElement('span'); lead.className='field__lead'; lead.innerHTML=ic('search');
+    const inp=document.createElement('input'); inp.type='text'; inp.value='Договор поставки'; inp.placeholder=ph;
+    const clear = makeIB({ tone:'neutral', size:'s', icon:'close', embedded:true, label:'Очистить' });
+    clear.addEventListener('click', ()=>{ inp.value=''; inp.focus(); });
+    f.appendChild(lead); f.appendChild(inp); f.appendChild(clear);
+    row.appendChild(f);
+  });
+
+  // hover comparison
+  const g = document.getElementById('embed-compare');
+  ['', 'Default','Hover'].forEach((h,i)=>{ const d=document.createElement('div'); d.className= i===0?'rh':'ch'; d.textContent=h; g.appendChild(d); });
+  [['Обычный', {}],['Встроенный', {embedded:true}]].forEach(([name,extra])=>{
+    const rh=document.createElement('div'); rh.className='rh'; rh.textContent=name; g.appendChild(rh);
+    ['default','hover'].forEach(st=>{
+      const cell=document.createElement('div'); cell.className='cell';
+      cell.appendChild(makeIB(Object.assign({ tone:'neutral', size:'m', icon:'close', state:st, frozen:true, label:'Закрыть' }, extra)));
+      g.appendChild(cell);
+    });
+  });
+})();
+
+/* ---------- BADGE ---------- */
+(function(){
+  const row = document.getElementById('badge-row');
+  const items = [
+    { icon:'Important-deals', badge:'<span class="badge badge--xs badge--accent">3</span>', label:'Сделки' },
+    { icon:'settings', badge:'<span class="badge badge--xs badge--error">12</span>', label:'Настройки' },
+    { icon:'document-unread', badge:'<span class="badge badge--xs badge--accent">9+</span>', label:'Уведомления (>99)' },
+    { icon:'activity-heart', badge:'<span class="badge badge--dot badge--success"></span>', label:'Активность' },
+  ];
+  items.forEach(it=>{
+    row.appendChild(makeIB({ tone:'neutral', size:'l', icon:it.icon, badge:it.badge, label:it.label }));
+  });
+})();
+
+/* ---------- TOOLBAR ---------- */
+(function(){
+  const tb = document.getElementById('toolbar');
+  ['edit','copy','download'].forEach(i=> tb.appendChild(makeIB({ tone:'neutral', size:'m', icon:i, label:i })));
+  const sep=document.createElement('span'); sep.className='sep'; tb.appendChild(sep);
+  tb.appendChild(makeIB({ tone:'neutral', size:'m', icon:'more-dots', label:'Ещё' }));
+  const sep2=document.createElement('span'); sep2.className='sep'; tb.appendChild(sep2);
+  tb.appendChild(makeIB({ tone:'danger', size:'m', icon:'trash', label:'Удалить' }));
+})();
+
+/* ---------- ACCESSIBILITY DO / DON'T ---------- */
+document.getElementById('ic-bad').innerHTML = UI.bad;
+document.getElementById('ic-good').innerHTML = UI.good;
+(function(){
+  // bad: no aria-label / no tooltip association (just an icon)
+  const bad = document.getElementById('a11y-bad');
+  const b1 = makeIB({ tone:'neutral', size:'l', icon:'more-dots', frozen:true });
+  b1.removeAttribute('aria-label');
+  bad.appendChild(b1);
+  const t1=document.createElement('span'); t1.style.cssText='font:var(--type-body-s); color:var(--text-inactive);'; t1.textContent='нет aria-label, нет тултипа';
+  bad.appendChild(t1);
+
+  // good: aria-label present + tooltip hint chip
+  const good = document.getElementById('a11y-good');
+  const b2 = makeIB({ tone:'neutral', size:'l', icon:'more-dots', frozen:true, label:'Другие действия' });
+  good.appendChild(b2);
+  const tip=document.createElement('span'); tip.style.cssText='font:var(--type-body-s); color:var(--text-secondary); background:var(--bg-hint); color:#fff; padding:5px 10px; border-radius:7px;'; tip.textContent='Другие действия';
+  good.appendChild(tip);
+})();
+
+/* ---------- ICONOGRAPHY TABLE ---------- */
+(function(){
+  const rows = [
+    ['L','24', ['edit','search','more-dots','trash','settings']],
+    ['M','20', ['edit','search','more-dots','trash','settings']],
+    ['S','16', ['edit','search','more-dots','trash','settings']],
+  ];
+  const tb = document.querySelector('#icon-table');
+  rows.forEach(([sz,ip,icons])=>{
+    const row=document.createElement('div'); row.className='tbl__row'; row.style.gridTemplateColumns='8px 0.8fr 0.8fr 2.2fr 8px';
+    const sep1=document.createElement('div'); sep1.className='tc tc--separator'; row.appendChild(sep1);
+    const c1=document.createElement('div'); c1.className='tc'; c1.innerHTML='<span class="tc__row"><span class="tc__text">'+sz+'</span></span>'; row.appendChild(c1);
+    const c2=document.createElement('div'); c2.className='tc tc--numbers'; c2.innerHTML='<span class="tc__row"><span class="tc__text">'+ip+' px</span></span>'; row.appendChild(c2);
+    const c3=document.createElement('div'); c3.className='tc';
+    const cell=document.createElement('div'); cell.className='ic-cell'; cell.style.gap='10px';
+    icons.forEach(name=> cell.appendChild(makeIB({ tone:'neutral', size:sz.toLowerCase(), icon:name, frozen:true, label:name })));
+    c3.appendChild(cell); row.appendChild(c3);
+    const sep2=document.createElement('div'); sep2.className='tc tc--separator'; row.appendChild(sep2);
+    tb.appendChild(row);
+  });
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function(){
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue){
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r,g,b,a=1, m=v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m){ r=+m[1]*255; g=+m[2]*255; b=+m[3]*255; if(m[4]!==undefined) a=+m[4]; }
+    else { const n=v.match(/[\d.]+/g); if(!n) return cssValue; r=+n[0]; g=+n[1]; b=+n[2]; if(n[3]!==undefined) a=+n[3]; }
+    const hx=n=>Math.round(n).toString(16).padStart(2,'0').toUpperCase();
+    let s='#'+hx(r)+hx(g)+hx(b); if(a<1) s+=' · '+Math.round(a*100)+'%'; return s;
+  }
+  const groups = [
+    { name:'Иконка (тон)', rows:[
+      ['Neutral',  '--secondary', false],
+      ['Primary',  '--primary', false],
+      ['Danger',   '--error', false],
+      ['Contrast', '--text-on-dark', false],
+      ['Disabled', '--text-inactive', false],
+    ]},
+    { name:'Стейт-слой (рипл)', rows:[
+      ['Hover · Neutral 12%',  'color-mix(in srgb, var(--secondary) 12%, transparent)', true],
+      ['Pressed · Neutral 22%','color-mix(in srgb, var(--secondary) 22%, transparent)', true],
+      ['Hover · Primary 12%',  'color-mix(in srgb, var(--primary) 12%, transparent)', true],
+      ['Hover · Danger 12%',   'color-mix(in srgb, var(--error) 12%, transparent)', true],
+      ['Selected · Primary 12%','color-mix(in srgb, var(--primary) 12%, transparent)', true],
+    ]},
+  ];
+  const root = document.getElementById('color-ref');
+  root.innerHTML = groups.map(g=>`
+    <section class="cref-group">
+      <h3>${g.name}</h3>
+      <div class="cref-rows">
+        ${g.rows.map(([role,val,alpha])=>{
+          const isVar = val.startsWith('--');
+          const bg = isVar ? 'var('+val+')' : val;
+          const tname = isVar ? val : 'color-mix';
+          return `
+          <div class="cref-row">
+            <div class="cref-sw${alpha?' alpha':''}"><div class="cf" style="background:${bg};"></div></div>
+            <div class="cref-meta"><p class="role">${role}</p><p class="tname">${tname}</p></div>
+            <div class="cref-hex">${resolveHex(bg)}</div>
+          </div>`;}).join('')}
+      </div>
+    </section>`).join('');
+  probe.remove();
+})();
+
+/* ---------- PLAYGROUND ---------- */
+(function(){
+  const state = {
+    tone:'primary', size:'l', icon:'edit', state:'default', shape:'circle',
+    embedded:false, selected:false, loading:false, badge:false,
+  };
+  const controls = document.getElementById('pg-controls');
+  const preview  = document.getElementById('pg-preview');
+  const codeEl   = document.getElementById('pg-code');
+
+    function select(label, options, getCur, onPick){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    options.forEach(([val,txt])=>{ const op=document.createElement('option'); op.value=val; op.textContent=txt; if(val===getCur()) op.selected=true; sel.appendChild(op); });
+    sel.addEventListener('change',()=>{ onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+    /* Бинарные опции — селекты: docs-split.js конвертирует их в свитчи ДС (урок Л4) */
+  function ctlToggle(label, key){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    [['no','Нет'],['yes','Да']].forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; if((v==='yes')===!!state[key]) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{ state[key]=sel.value==='yes'; render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  controls.appendChild(select('Тон',
+    [['neutral','Neutral'],['primary','Primary'],['danger','Danger'],['contrast','Contrast']],
+    ()=>state.tone, v=>state.tone=v));
+  controls.appendChild(select('Размер', [['l','L'],['m','M'],['s','S']], ()=>state.size, v=>state.size=v));
+  controls.appendChild(select('Иконка',
+    [['edit','Edit'],['more-dots','More'],['search','Search'],['close','Close'],['trash','Trash'],['settings','Settings'],['download','Download'],['star','Star']],
+    ()=>state.icon, v=>state.icon=v));
+  controls.appendChild(select('Состояние',
+    [['default','Default'],['hover','Hover'],['pressed','Pressed'],['focus','Focus'],['disabled','Disabled'],['loading','Loading']],
+    ()=>state.state, v=>state.state=v));
+  controls.appendChild(select('Форма', [['circle','Круг'],['square','Квадрат']], ()=>state.shape, v=>state.shape=v));
+
+  controls.appendChild(ctlToggle('Встроенный (input)','embedded'));
+  controls.appendChild(ctlToggle('Выбран (toggle)','selected'));
+  controls.appendChild(ctlToggle('Бейдж','badge'));
+
+  function render(){
+    const onDark = state.tone==='contrast';
+    const o = {
+      tone: state.tone, size: state.size, icon: state.icon, shape: state.shape,
+      embedded: state.embedded, selected: state.selected, label: state.icon, frozen:true,
+    };
+    if (state.state==='loading') o.loading=true; else o.state=state.state;
+    if (state.badge) o.badge = '<span class="badge badge--xs badge--accent">5</span>';
+
+    preview.innerHTML='';
+    const box = document.getElementById('pg-preview');
+    box.classList.toggle('dark', onDark);
+    box.appendChild(makeIB(o));
+
+    const cls=['ibtn','ibtn--'+state.tone,'ibtn--'+state.size];
+    if (state.shape==='square') cls.push('ibtn--square');
+    if (state.embedded) cls.push('ibtn--embedded');
+    if (state.selected) cls.push('ibtn--selected');
+    if (state.state==='loading') cls.push('ibtn--loading');
+    else if (['hover','pressed','focus'].includes(state.state)) cls.push('is-'+state.state);
+    let attrs=' aria-label="…"';
+    if (state.state==='disabled') attrs+=' disabled';
+    codeEl.innerHTML = '<code>&lt;button class="'+cls.join(' ')+'"'+attrs+'&gt;</code>';
+  }
+  render();
+})();
+
+/* ---------- DEV: redline measured from live component ---------- */
+(function(){
+  const tbody = document.querySelector('#dev-spec-table');
+  if(!tbody) return;
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  function measure(sz){
+    const b  = makeIB({ tone:'neutral', size:sz, icon:'edit' });
+    const sq = makeIB({ tone:'neutral', size:sz, icon:'edit', shape:'square' });
+    const ld = makeIB({ tone:'neutral', size:sz, loading:true });
+    host.appendChild(b); host.appendChild(sq); host.appendChild(ld);
+    const cs = getComputedStyle(b);
+    const ics = getComputedStyle(b.querySelector('svg'));
+    const sps = getComputedStyle(ld.querySelector('.spin'));
+    return {
+      w:    parseFloat(cs.width),
+      h:    parseFloat(cs.height),
+      icon: parseFloat(ics.width),
+      radC: cs.borderTopLeftRadius,
+      radS: getComputedStyle(sq).borderTopLeftRadius,
+      spin: parseFloat(sps.width),
+      spinB: parseFloat(sps.borderLeftWidth),
+    };
+  }
+  const d = { l:measure('l'), m:measure('m'), s:measure('s') };
+  host.remove();
+  const r = n => Math.round(n*10)/10;
+  const rows = [
+    ['Кнопка (Ш × В) = область клика', z => r(d[z].w)+' × '+r(d[z].h)+' px'],
+    ['Иконка', z => r(d[z].icon)+' px'],
+    ['Стейт-слой (круг)', z => r(d[z].w)+' px'],
+    ['Радиус · circle', z => d[z].radC],
+    ['Радиус · square', z => d[z].radS],
+    ['Спиннер (loading)', z => r(d[z].spin)+' px / кольцо '+r(d[z].spinB)+' px'],
+  ];
+  tbody.innerHTML = rows.map(([label, fn]) =>
+    `<div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.6fr 0.6fr 0.6fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${label}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('l')}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('m')}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('s')}</span></span></div><div class="tc tc--separator"></div></div>`
+  ).join('');
+})();
+
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Форма': 'Квадрат', 'Встроенный (input)': 'Встроенный (input)', 'Выбран (toggle)': 'Выбран', 'Бейдж': 'Показывать бейдж' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- базовый вариант: одна иконка, aria-label обязателен -->
+<button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать">
+  <i data-icon="edit"></i>          <!-- 24/20/16 px по размеру кнопки -->
+</button>
+
+<!-- toggle: aria-pressed + залитая иконка в selected -->
+<button type="button" class="ibtn ibtn--primary ibtn--l ibtn--selected" aria-pressed="true" aria-label="В избранном">
+  <i data-icon="star-filled"></i>
+</button>
+
+<!-- loading: спиннер вместо иконки, клики заблокированы -->
+<button type="button" class="ibtn ibtn--neutral ibtn--m ibtn--loading" aria-busy="true" aria-label="Ещё">
+  <span class="spin spin--current"></span>
+</button>
+
+<!-- с бейджем: Badge не перехватывает клики (pointer-events: none) -->
+<button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Сделки">
+  <i data-icon="folder"></i>
+  <span class="ibtn__badge"><span class="badge badge--xs badge--accent">3</span></span>
+</button></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function makeIB(o) {
+  // o: { tone:'neutral'|'primary'|'danger'|'contrast', size:'l'|'m'|'s', icon, shape:'circle'|'square', state, embedded?, selected?, badge? }
+  // button.ibtn.ibtn--<tone>.ibtn--<size>(.ibtn--square)(.ibtn--embedded)(.ibtn--selected) → <i data-icon> / спиннер при loading
+  // embedded — для ячеек таблиц/полей; selected — состояние «выбрано» (toggle)
+}</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — IconButton
+   Безрамочная кнопка-иконка. РАЗМЕР КОМПОНЕНТА В ЛЕЙАУТЕ = РАЗМЕР ИКОНКИ
+   (L 24 · M 20 · S 16). Круглый стейт-слой — это отдельный слой (::before),
+   который появляется на hover/pressed и ВЫХОДИТ ЗА ГРАНИЦЫ кнопки, никак не
+   влияя на её размер в потоке. Он же расширяет зону клика (pointer-events).
+   Tones:  neutral (--secondary) · primary · danger · contrast
+   States: default · hover · pressed · focus · selected · disabled · loading
+   Shape:  circle (default) · square
+   Variant: embedded (без стейт-слоя — для полей ввода/плотных тулбаров)
+   Requires: typography.css, colors.css
+   ========================================================================= */
+
+.ibtn {
+  /* layout box = размер иконки */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ibtn-size, 20px);
+  height: var(--ibtn-size, 20px);
+  padding: 0;
+  flex: none;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  user-select: none;
+  overflow: visible;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .15s ease;
+}
+
+/* иконка — поверх стейт-слоя; правило покрывает обе формы разметки:
+   вставленный <svg> и <i data-icon> (ds-icons.js) */
+.ibtn :is(svg,[data-icon]){ position: relative; z-index: 1; width: var(--ibtn-icon, 20px); height: var(--ibtn-icon, 20px); display: block; flex: none; }
+/* ---------- стейт-слой (::before) — больше кнопки, hover-only, оверфлоу ---- *
+   Размер слоя повторяет прежние габариты кнопки (L 40 · M 32 · S 24): визуально
+   рипл и зона клика те же, а в лейауте кнопка занимает ровно размер иконки. */
+.ibtn::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--ibtn-layer-w, 32px);
+  height: var(--ibtn-layer-w, 32px);
+  border-radius: var(--radius-circle);
+  background: transparent;
+  transition: background-color .15s ease;
+  pointer-events: auto;   /* стейт-слой ловит клики → зона клика больше иконки */
+  z-index: 0;
+}
+
+.ibtn:focus { outline: none; }
+.ibtn:focus-visible,
+.ibtn.is-focus { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ---------- sizes: box = иконка; слой = прежний габарит ------------------- */
+.ibtn--l { width: 24px; height: 24px; }
+.ibtn--m { width: 20px; height: 20px; }
+.ibtn--s { width: 16px; height: 16px; }
+.ibtn--l::before { width: 40px; height: 40px; }
+.ibtn--m::before { width: 32px; height: 32px; }
+.ibtn--s::before { width: 24px; height: 24px; }
+.ibtn--l :is(svg,[data-icon]), .ibtn--l .spin{ width: 24px; height: 24px; }
+.ibtn--m :is(svg,[data-icon]), .ibtn--m .spin{ width: 20px; height: 20px; }
+.ibtn--s :is(svg,[data-icon]), .ibtn--s .spin{ width: 16px; height: 16px; }
+/* square / embedded — стейт-слой со скруглением control вместо круга */
+.ibtn--l.ibtn--square::before, .ibtn--l.ibtn--embedded::before { border-radius: var(--radius-control); }
+.ibtn--m.ibtn--square::before, .ibtn--m.ibtn--embedded::before { border-radius: var(--radius-control); }
+.ibtn--s.ibtn--square::before, .ibtn--s.ibtn--embedded::before { border-radius: var(--radius-control-s); }
+
+/* ---------- tones (цвет иконки; стейт-слой миксуется из currentColor) ----- */
+.ibtn--neutral  { color: var(--secondary); }
+.ibtn--primary  { color: var(--primary); }
+.ibtn--danger   { color: var(--error); }
+.ibtn--contrast { color: var(--text-on-dark); }
+.ibtn:not([class*="ibtn--neutral"]):not([class*="ibtn--primary"]):not([class*="ibtn--danger"]):not([class*="ibtn--contrast"]) {
+  color: var(--secondary);
+}
+
+/* ---------- интерактивные состояния — фон на стейт-слое (::before) --------- */
+.ibtn:hover::before,
+.ibtn.is-hover::before   { background: color-mix(in srgb, currentColor 12%, transparent); }
+.ibtn:active::before,
+.ibtn.is-pressed::before { background: color-mix(in srgb, currentColor 22%, transparent); }
+.ibtn--contrast:hover::before,   .ibtn--contrast.is-hover::before   { background: color-mix(in srgb, #fff 18%, transparent); }
+.ibtn--contrast:active::before,  .ibtn--contrast.is-pressed::before { background: color-mix(in srgb, #fff 30%, transparent); }
+
+/* ---------- selected (toggle on) ------------------------------------------
+   Класс .ibtn--selected — форс-состояние витрины; реальный toggle несёт
+   aria-pressed="true" на самой кнопке (RulesAudit W1). */
+.ibtn:is(.ibtn--selected,[aria-pressed="true"]) { color: var(--primary); }
+.ibtn:is(.ibtn--selected,[aria-pressed="true"])::before { background: color-mix(in srgb, var(--primary) 12%, transparent); }
+.ibtn:is(.ibtn--selected,[aria-pressed="true"]):hover::before,
+.ibtn:is(.ibtn--selected,[aria-pressed="true"]).is-hover::before { background: color-mix(in srgb, var(--primary) 20%, transparent); }
+
+/* ---------- variant: embedded (поля ввода / плотные тулбары) -------------- */
+/* Стейт-слоя нет; на hover иконка перекрашивается в primary. */
+.ibtn--embedded { color: var(--text-inactive); }
+.ibtn--embedded::before { display: none; }
+.ibtn--embedded:hover,
+.ibtn--embedded.is-hover { color: var(--primary); }
+.ibtn--embedded:active,
+.ibtn--embedded.is-pressed { color: var(--primary-dark); }
+
+/* ---------- disabled ------------------------------------------------------- */
+.ibtn:disabled,
+.ibtn--disabled {
+  color: var(--text-inactive);
+  cursor: default;
+  pointer-events: none;
+}
+.ibtn:disabled::before,
+.ibtn--disabled::before { background: transparent; }
+
+/* ---------- loading -------------------------------------------------------- */
+/* Индикатор — общий Spinner: <span class="spin spin--current">, размер — правила выше. */
+.ibtn--loading { pointer-events: none; }
+.ibtn .spin { position: relative; z-index: 1; }
+
+/* ---------- badge slot ----------------------------------------------------- */
+/* Бейдж прижат к правому верхнему углу иконки (= габарит кнопки), не выходит
+   за него; счётчик ≤ 2 символов, при значении >99 — «9+». */
+.ibtn__badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+}</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!-- @dsCard group="Foundations" name="Иллюстрации" viewport="1440x1400" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Иллюстрации — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/illustration.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/input-pages.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-toc.css">
+<style>
+  .illugrid { display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:14px; }
+  .illucard {
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    padding:18px 14px 16px; border:1px solid var(--border-light); border-radius: var(--radius-l);
+    background: var(--bg-tile); cursor:pointer; font:inherit; color:inherit; text-align:center;
+    transition: border-color .12s ease, box-shadow .12s ease;
+  }
+  .illucard:hover { border-color: var(--border-primary); box-shadow: var(--elevation-2); }
+  .illucard__img { display:flex; align-items:center; justify-content:center; width:100%; height:96px; }
+  .illucard__img img { max-width:100%; max-height:100%; object-fit:contain; }
+  .illucard__name { font: var(--type-body-s-strong); }
+  .illucard__key { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color: var(--text-secondary); }
+
+  .illucard--lg .illucard__img { height:140px; }
+
+  .bgpreview { display:flex; align-items:flex-end; gap:24px; flex-wrap:wrap; }
+  .bgpreview__frame {
+    width:320px; height:233px; border-radius: var(--radius-l); overflow:hidden;
+    border:1px solid var(--border-light); background: var(--bg-tile);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .bgpreview__frame img { width:100%; height:100%; object-fit:cover; }
+
+  .toast {
+    position: fixed; left:50%; bottom:34px; transform: translate(-50%, 20px);
+    background: var(--text-primary); color:#fff; font: var(--type-body-s-strong);
+    padding:12px 18px; border-radius: var(--radius-l); z-index:50;
+    opacity:0; pointer-events:none; transition: opacity .16s ease, transform .16s ease;
+    display:flex; align-items:center; gap:9px;
+  }
+  .toast.show { opacity:1; transform: translate(-50%, 0); }
+  .toast code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color: var(--primary-light, #58DCCC); }
+</style>
+</head>
+<body>
+<main class="page" data-screen-label="Illustrations">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.003</b></span><span>Обновлено: <b>25.07.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Основы</p>
+    <h1>Иллюстрации</h1>
+    <p class="lead">Библиотека продуктовых иллюстраций: тайловые (для навигационных плиток <a class="inl" href="../molecules/NavTile.html">NavTile</a> и дашбордов), иллюстрации состояний (ошибки, пустые экраны) и фоновая декоративная иллюстрация. Как на странице <a class="inl" href="Icons.html">Иконки</a> — клик по карточке копирует имя.</p>
+  </header>
+
+  <!-- SLOT -->
+  <section class="section" data-screen-label="Slot">
+    <h2>Слот иллюстрации</h2>
+    <p class="desc">Иллюстрация вставляется через слот <code class="tok">.illu</code> с именем в <code class="tok">data-illu</code>. Скрипт <code class="tok">ds-illustrations.js</code> подставляет реальный SVG из <code class="tok">assets/illustrations/</code> в тот же слот.</p>
+    <div class="panel">
+      <div style="display:flex; gap:28px; flex-wrap:wrap; align-items:flex-end;">
+        <div><span class="illu" data-illu="deals" aria-hidden="true"></span><p class="desc tight" style="margin:10px 0 0; font-size:13px;">96×96 — дефолт (NavTile)</p></div>
+        <div><span class="illu" data-illu="empty-folder" style="width:140px; height:140px;" aria-hidden="true"></span><p class="desc tight" style="margin:10px 0 0; font-size:13px;">140×140 — пустые состояния</p></div>
+        <div><span class="illu" data-illu="reports-1-c" style="width:64px; height:64px;" aria-hidden="true"></span><p class="desc tight" style="margin:10px 0 0; font-size:13px;">64×64 — компакт</p></div>
+        <div><span class="illu" data-illu="not-in-library" aria-hidden="true"></span><p class="desc tight" style="margin:10px 0 0; font-size:13px;">имени нет в библиотеке — заглушка</p></div>
+      </div>
+    </div>
+    <div class="subsec">
+      <h3>Правила</h3>
+      <ul class="bullets">
+        <li>слот квадратный, SVG внутри масштабируется через <code class="tok">object-fit: contain</code> — не обрезается; исходные пропорции тайловых файлов 195×140, у крупных (состояния) — почти квадратные;</li>
+        <li>иллюстрации декоративны — слот всегда с <code class="tok">aria-hidden="true"</code>;</li>
+        <li>имена — латиница в kebab-case, см. полный список ниже; неизвестное имя рисует штриховую заглушку с этим именем;</li>
+        <li>цвета внутри SVG — фиксированная палитра библиотеки, перекраска через currentColor не применяется (в отличие от иконок).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TILE LIBRARY -->
+  <section class="section" data-screen-label="Tiles">
+    <h2>Тайловые иллюстрации</h2>
+    <p class="desc">195×140, для NavTile и карточек дашборда. 32 штук.</p>
+    <div class="panel">
+      <div class="illugrid" id="tile-grid">
+        <button class="illucard" data-name="deals" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/deals.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Сделки</span>
+          <code class="illucard__key">deals</code>
+        </button>
+        <button class="illucard" data-name="booked-deals" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/booked-deals.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Забронированные сделки</span>
+          <code class="illucard__key">booked-deals</code>
+        </button>
+        <button class="illucard" data-name="calclate-fv" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/calclate-fv.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Расчёт FV</span>
+          <code class="illucard__key">calclate-fv</code>
+        </button>
+        <button class="illucard" data-name="cash-flow" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/cash-flow.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Денежный поток</span>
+          <code class="illucard__key">cash-flow</code>
+        </button>
+        <button class="illucard" data-name="ckp-pipeline" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/ckp-pipeline.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Пайплайн ЦКП</span>
+          <code class="illucard__key">ckp-pipeline</code>
+        </button>
+        <button class="illucard" data-name="clients" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/clients.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Клиенты</span>
+          <code class="illucard__key">clients</code>
+        </button>
+        <button class="illucard" data-name="corporate-transactions" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/corporate-transactions.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Корпоративные сделки</span>
+          <code class="illucard__key">corporate-transactions</code>
+        </button>
+        <button class="illucard" data-name="current-depo" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/current-depo.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Текущие депозиты</span>
+          <code class="illucard__key">current-depo</code>
+        </button>
+        <button class="illucard" data-name="dcm-pipeline" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/dcm-pipeline.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">DCM: пайплайн</span>
+          <code class="illucard__key">dcm-pipeline</code>
+        </button>
+        <button class="illucard" data-name="dcm-potentials" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/dcm-potentials.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">DCM: потенциал</span>
+          <code class="illucard__key">dcm-potentials</code>
+        </button>
+        <button class="illucard" data-name="ecm-pipeline" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/ecm-pipeline.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">ECM: пайплайн</span>
+          <code class="illucard__key">ecm-pipeline</code>
+        </button>
+        <button class="illucard" data-name="empty-check" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/empty-check.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Пусто: проверка</span>
+          <code class="illucard__key">empty-check</code>
+        </button>
+        <button class="illucard" data-name="empty-folder" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/empty-folder.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Пустая папка</span>
+          <code class="illucard__key">empty-folder</code>
+        </button>
+        <button class="illucard" data-name="empty-loading" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/empty-loading.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Загрузка</span>
+          <code class="illucard__key">empty-loading</code>
+        </button>
+        <button class="illucard" data-name="important-deals" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/important-deals.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Важные сделки</span>
+          <code class="illucard__key">important-deals</code>
+        </button>
+        <button class="illucard" data-name="important-leads" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/important-leads.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Важные лиды</span>
+          <code class="illucard__key">important-leads</code>
+        </button>
+        <button class="illucard" data-name="kpki-cal" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/kpki-cal.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Календарь КПЭ</span>
+          <code class="illucard__key">kpki-cal</code>
+        </button>
+        <button class="illucard" data-name="mna-pipeline" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/mna-pipeline.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">M&A: пайплайн</span>
+          <code class="illucard__key">mna-pipeline</code>
+        </button>
+        <button class="illucard" data-name="payment-ib" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/payment-ib.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Платежи IB</span>
+          <code class="illucard__key">payment-ib</code>
+        </button>
+        <button class="illucard" data-name="pipeline" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/pipeline.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Пайплайн</span>
+          <code class="illucard__key">pipeline</code>
+        </button>
+        <button class="illucard" data-name="possible-deals" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/possible-deals.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Возможные сделки</span>
+          <code class="illucard__key">possible-deals</code>
+        </button>
+        <button class="illucard" data-name="possible-leads" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/possible-leads.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Возможные лиды</span>
+          <code class="illucard__key">possible-leads</code>
+        </button>
+        <button class="illucard" data-name="potentials-rd" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/potentials-rd.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Потенциал R&D</span>
+          <code class="illucard__key">potentials-rd</code>
+        </button>
+        <button class="illucard" data-name="qliksense-reports" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/qliksense-reports.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Отчёты QlikSense</span>
+          <code class="illucard__key">qliksense-reports</code>
+        </button>
+        <button class="illucard" data-name="registry" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/registry.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Реестр</span>
+          <code class="illucard__key">registry</code>
+        </button>
+        <button class="illucard" data-name="reports-1-c" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/reports-1-c.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Отчёты 1С</span>
+          <code class="illucard__key">reports-1-c</code>
+        </button>
+        <button class="illucard" data-name="reserve" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/reserve.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Резервы</span>
+          <code class="illucard__key">reserve</code>
+        </button>
+        <button class="illucard" data-name="rwa" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/rwa.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">RWA</span>
+          <code class="illucard__key">rwa</code>
+        </button>
+        <button class="illucard" data-name="sales-company" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/sales-company.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Продажи компании</span>
+          <code class="illucard__key">sales-company</code>
+        </button>
+        <button class="illucard" data-name="sales-projects" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/sales-projects.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Проекты продаж</span>
+          <code class="illucard__key">sales-projects</code>
+        </button>
+        <button class="illucard" data-name="settings" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/settings.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Настройки</span>
+          <code class="illucard__key">settings</code>
+        </button>
+        <button class="illucard" data-name="tasks" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/tasks.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Задачи</span>
+          <code class="illucard__key">tasks</code>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATE LIBRARY -->
+  <section class="section" data-screen-label="States">
+    <h2>Иллюстрации состояний</h2>
+    <p class="desc">Крупные иллюстрации для полноэкранных ошибок и недоступности сервиса.</p>
+    <div class="panel">
+      <div class="illugrid" id="state-grid">
+        <button class="illucard" data-name="error-page-not-found" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/error-page-not-found.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">404 — страница не найдена</span>
+          <code class="illucard__key">error-page-not-found</code>
+        </button>
+        <button class="illucard" data-name="error-page-not-found-light" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/error-page-not-found-light.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">404 — светлая тема</span>
+          <code class="illucard__key">error-page-not-found-light</code>
+        </button>
+        <button class="illucard" data-name="error-page-unavailable" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/error-page-unavailable.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Страница недоступна</span>
+          <code class="illucard__key">error-page-unavailable</code>
+        </button>
+        <button class="illucard" data-name="error-server-unavailable" type="button">
+          <span class="illucard__img"><img src="../../assets/illustrations/error-server-unavailable.svg" alt="" draggable="false"></span>
+          <span class="illucard__name">Сервер недоступен</span>
+          <code class="illucard__key">error-server-unavailable</code>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- BACKGROUND -->
+  <section class="section" data-screen-label="Background">
+    <h2>Фоновая иллюстрация</h2>
+    <p class="desc">Декоративный фон 1066×777 — используется как <code class="tok">background-image</code> на весь блок (не через слот <code class="tok">.illu</code>, у него другие пропорции и назначение).</p>
+    <div class="panel">
+      <div class="bgpreview">
+        <div class="bgpreview__frame"><img src="../../assets/illustrations/background-illustration.svg" alt=""></div>
+        <p class="desc tight" style="max-width:360px;">Пример: <code class="tok">background-illustration.svg</code>, растягивается через <code class="tok">background-size: cover</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Иллюстрации</span>
+    <span>slot .illu · data-illu · assets/illustrations/*.svg</span>
+  </footer>
+</main>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+  <span>Скопировано: <code id="toast-name"></code></span>
+</div>
+
+<script>
+const toast = document.getElementById('toast');
+const toastName = document.getElementById('toast-name');
+let toastTimer;
+function copyName(name) {
+  const done = () => {
+    toastName.textContent = name;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(name).then(done).catch(done);
+  } else { done(); }
+}
+document.querySelectorAll('.illucard').forEach(card => {
+  card.addEventListener('click', () => copyName(card.dataset.name));
+});
+</script>
+<script src="../../scripts/ds-illustrations.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-toc.js"></script>
+</body>
+</html>

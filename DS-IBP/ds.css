@@ -1,0 +1,67 @@
+/* ============================================================
+   IBP DS — единая точка подключения стилей для экранов.
+   На странице-экране достаточно одного линка:
+   <link rel="stylesheet" href="ds.css">
+   (страницы-документация компонентов подключают styles/* точечно)
+   ============================================================ */
+
+/* Фундамент */
+@import url("styles/typography.css");
+@import url("styles/colors.css");
+@import url("styles/radius.css");
+@import url("styles/spacing.css");
+@import url("styles/layout.css");
+@import url("styles/shadow.css");
+@import url("styles/illustration.css");
+
+/* Атомы */
+@import url("styles/button.css");
+@import url("styles/icon-button.css");
+@import url("styles/button-group.css");
+@import url("styles/link.css");
+@import url("styles/checkbox.css");
+@import url("styles/radio.css");
+@import url("styles/switch.css");
+@import url("styles/chip.css");
+@import url("styles/badge.css");
+@import url("styles/progress-bar.css");
+@import url("styles/spinner.css");
+@import url("styles/skeleton.css");
+@import url("styles/avatar.css");
+@import url("styles/divider.css");
+@import url("styles/label-helper.css");
+
+/* Молекулы */
+@import url("styles/segment-control.css");
+@import url("styles/tab.css");
+@import url("styles/breadcrumbs.css");
+@import url("styles/tooltip.css");
+@import url("styles/toast.css");
+@import url("styles/context-menu.css");
+@import url("styles/dropdown-list.css");
+@import url("styles/read-only-field.css");
+@import url("styles/riskmetric.css");
+@import url("styles/pagination.css");
+@import url("styles/splitter.css");
+@import url("styles/input.css");
+@import url("styles/input-range.css");
+@import url("styles/datepicker.css");
+@import url("styles/nav-tile.css");
+@import url("styles/empty-state.css");
+
+/* Организмы */
+@import url("styles/modal.css");
+@import url("styles/nav-panel.css");
+@import url("styles/page-header.css");
+@import url("styles/popover.css");
+@import url("styles/snackbar.css");
+@import url("styles/entity.css");
+@import url("styles/table.css");
+@import url("styles/table-cell.css");
+@import url("styles/table-filter.css");
+@import url("styles/allocation-bar.css");
+@import url("styles/chart.css");
+@import url("styles/tile.css");
+
+/* Компоненты подкачки */
+@import url("styles/alert.css");

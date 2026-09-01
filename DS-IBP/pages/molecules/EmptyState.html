@@ -1,0 +1,619 @@
+<!-- @dsCard group="Components" name="EmptyState" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmptyState — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/illustration.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/empty-state.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<style>
+  .badge-proposal { display:inline-block; font: var(--type-button-xs); letter-spacing:.06em; text-transform:uppercase; color: var(--text-secondary); background: var(--c-cgrey-100); border:1px solid var(--border-light); padding:3px 9px; border-radius:999px; margin-left:12px; vertical-align:middle; }
+
+  /* ---------- демо-стадия (docs-split) ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:32px; display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:440px; }
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(280px,1fr) minmax(240px,340px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:36px 28px; display:flex; justify-content:center; width:100%; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+
+  /* ---------- layout-only helpers (раскладка, не токены) ---------- */
+  .demo-grid { display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; }
+  .es-frame { min-width:280px; }
+</style>
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="EmptyState">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.001</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>EmptyState</h1>
+    <p class="lead">Иллюстрация, заголовок, текст и опциональные действия — для пустого списка/таблицы, отсутствия результатов поиска, первого входа без данных и полноэкранных ошибок. Показывает, что произошло, и что можно сделать дальше.</p>
+  </header>
+
+  <!-- WHEN TO USE -->
+  <section class="section" data-screen-label="WhenToUse">
+    <h2>Использование</h2>
+    <p class="desc tight">Используйте EmptyState, когда:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>список/таблица не содержит строк — после применения фильтра, поиска без результатов или до того, как в разделе появятся первые данные;</li>
+      <li>запрос данных завершился ошибкой (сервер недоступен) и нужно показать это на весь экран/раздел, а не всплывающим сообщением;</li>
+      <li>нужно не просто сообщить «пусто», а подсказать следующее действие — сбросить фильтр, создать первую запись, повторить запрос.</li>
+    </ul>
+    <p class="desc">Не используйте EmptyState для короткой паузы загрузки — там <a class="inl" href="../atoms/Spinner.html">Spinner</a> (пауза без известной структуры) или <a class="inl" href="../atoms/Skeleton.html">Skeleton</a> (структура уже известна). Не используйте для одного пустого поля — в <a class="inl" href="../organisms/Entity.html">Entity</a> и <a class="inl" href="../molecules/ReadOnlyField.html">ReadOnlyField</a> отсутствие значения решается тире «—» на месте поля. Для системной строки внутри выпадающего списка (нет опций после фильтра) — компактное состояние <code class="tok">.ddl__state--empty</code> в <a class="inl" href="DropdownList.html">DropdownList</a>, не полноразмерный EmptyState: там нет места для иллюстрации 96px.</p>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Четыре части, только заголовок обязателен. Порядок фиксирован: иллюстрация → заголовок → текст → действия.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div id="anat-diagram" style="width:100%; max-width:320px;"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="k">Иллюстрация</span><span class="d"> — слот <code class="tok">.illu</code> из библиотеки, декоративна</span></li>
+          <li><span class="n"></span><span class="k">Заголовок</span><span class="d"> — одна строка, что произошло</span></li>
+          <li><span class="n"></span><span class="k">Текст</span><span class="d"> — опционален, 1–2 строки, почему и что делать дальше</span></li>
+          <li><span class="n"></span><span class="k">Действия</span><span class="d"> — опциональны, до двух кнопок: основное действие первым</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+
+    <div class="subsec" data-screen-label="Size">
+      <h3>Размер</h3>
+      <p class="desc">M — по умолчанию, встроен в существующий контейнер (пустая таблица, тайл, страница раздела). L — полноэкранное состояние: отдельная страница-заглушка (404/500).</p>
+      <div class="panel"><div class="demo-grid" id="var-size"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Surface">
+      <h3>Поверхность</h3>
+      <p class="desc">Обычная — без своей рамки, наследует фон и границы контейнера, в который встроен. <code class="tok">.es--card</code> — своя рамка и фон, когда компонент стоит отдельно (не внутри уже оформленной Table/Tile).</p>
+      <div class="panel"><div class="demo-grid" id="var-surface"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Actions">
+      <h3>Действия</h3>
+      <p class="desc">Без кнопок — чисто информационное состояние. Одна кнопка — основное действие. Две — основное и второстепенное, основное слева.</p>
+      <div class="panel"><div class="demo-grid" id="var-actions"></div></div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Размер иллюстрации, шрифты и внутренние отступы меняются вместе, единым шагом — выбрать их по отдельности нельзя.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" id="size-table" style="border:none;border-radius:0;"></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус есть только у карточного варианта; inline-вариант рисуется на фоне родителя и своей плашки не имеет.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Вариант Card</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-card</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Вариант Inline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <ul class="bullets">
+      <li>Заголовок — короткий, одна строка, называет ситуацию («Нет сделок», «Страница не найдена»), без «к сожалению» и извинений.</li>
+      <li>Текст — 1–2 предложения: почему пусто и что можно сделать. Не повторяет заголовок другими словами.</li>
+      <li>Основное действие — глагол в повелительном наклонении («Сбросить фильтры», «Повторить»), формулируется как выход из ситуации, а не декоративная кнопка.</li>
+      <li>Не более двух кнопок — при большем числе действий часть уходит в контекст страницы (тулбар), а не в EmptyState.</li>
+      <li>Иллюстрация должна соответствовать сути состояния: карточку «нет результатов поиска» не иллюстрировать глифом «всё выполнено», а сетевую ошибку — не иллюстрировать пустой папкой.</li>
+    </ul>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Сам компонент статичен. Правила касаются момента, когда он появляется или сменяется контентом.</p>
+    <ul class="bullets">
+      <li>EmptyState не анимирован и не запрашивает данные сам — он рендерится, когда запрос уже завершился и в ответе нет строк (или запрос завершился ошибкой).</li>
+      <li>Пока идёт сам запрос — <a class="inl" href="../atoms/Spinner.html">Spinner</a>/<a class="inl" href="../atoms/Skeleton.html">Skeleton</a> в том же месте; переключение между ними и EmptyState — целиком, не переход с анимацией между состояниями.</li>
+      <li>Если EmptyState появляется в ответ на действие пользователя (применил фильтр, изменил поиск) — родительский контейнер несёт <code class="tok">role="status" aria-live="polite"</code> на момент подстановки, чтобы переход был озвучен один раз.</li>
+      <li>Действие в EmptyState должно вести к разблокировке (сброс фильтра, повтор запроса, переход к созданию записи) — это часть контракта компонента, не декоративная кнопка.</li>
+    </ul>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc tight">Одно статическое состояние — показан, пока нет данных для отображения. Соседние состояния того же места в интерфейсе принадлежат другим компонентам, не модификаторам EmptyState:</p>
+    <ul class="bullets">
+      <li><b>Загрузка</b> — <a class="inl" href="../atoms/Spinner.html">Spinner</a> или <a class="inl" href="../atoms/Skeleton.html">Skeleton</a>, не EmptyState.</li>
+      <li><b>Есть данные</b> — реальный контент занимает то же место, EmptyState убирается из DOM целиком.</li>
+      <li><b>Ошибка запроса</b> — EmptyState с иллюстрацией из набора «состояния» и действием «Повторить» — тот же компонент, другая иллюстрация и текст.</li>
+    </ul>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="Accessibility">
+    <h2>Доступность</h2>
+    <ul class="bullets">
+      <li><code class="tok">.es__illu</code> несёт <code class="tok">aria-hidden="true"</code> — иллюстрация декоративна, смысл целиком в заголовке и тексте.</li>
+      <li>Заголовок и текст — обычные <code class="tok">&lt;p&gt;</code>, не заголовки <code class="tok">&lt;hN&gt;</code>: компонент встречается на любом уровне вложенности страницы и не должен навязывать свою позицию в её иерархии заголовков.</li>
+      <li>Если EmptyState подставляется асинхронно (результат поиска/фильтра) — <code class="tok">role="status" aria-live="polite"</code> на контейнере-родителе (см. «Поведение»), не на самом <code class="tok">.es</code>.</li>
+      <li>Кнопки действий — обычные <code class="tok">.btn</code>, полностью доступны с клавиатуры без дополнительной разметки.</li>
+    </ul>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">M — заголовок <code class="tok">--type-body-l-strong</code> (18/24, SB Sans Text), текст <code class="tok">--type-body-m</code> (16/20). L — заголовок <code class="tok">--type-h4-strong</code> (22/24, SB Sans Display), текст <code class="tok">--type-body-l</code> (18/24, SB Sans Text).</p>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент не тонируется — один нейтральный набор для любой ситуации, включая ошибки: тон сообщает иллюстрация и текст, не цвет заголовка.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" id="color-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
+    </div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры и поведение как алгоритм — не привязан к стеку.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/empty-state.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" id="dev-spec-table" style="border:none;border-radius:0;"></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/illustration.css</code>
+      <code class="tok">styles/button.css</code>
+      <code class="tok">styles/empty-state.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+    <div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Рендерить EmptyState только после того, как запрос завершился и в ответе</span>
+<span class="tk-cm">//    нет строк (или запрос завершился ошибкой) — не как промежуточное состояние.</span>
+
+<span class="tk-cm">// 2. Иллюстрация — декоративный слот .illu, aria-hidden="true"; имя передаётся</span>
+<span class="tk-cm">//    data-illu, сам SVG подставляет отдельный рантайм иллюстраций (ds-illustrations.js).</span>
+
+<span class="tk-cm">// 3. Если появление вызвано действием пользователя (фильтр/поиск) — на контейнере,</span>
+<span class="tk-cm">//    ЗАМЕНЯЕМОМ на EmptyState (не на самом .es), выставить role="status" aria-live="polite"</span>
+<span class="tk-cm">//    на момент подстановки, чтобы screen reader объявил переход один раз.</span>
+
+<span class="tk-cm">// 4. Не более двух действий; порядок — основное действие первым (слева).</span>
+<span class="tk-cm">//    Обработчик основного действия обязан вести к разблокировке: сброс фильтра,</span>
+<span class="tk-cm">//    повтор запроса или переход к созданию записи — не быть no-op.</span>
+
+<span class="tk-cm">// 5. .es--card — только когда компонент не встроен в уже оформленный контейнер</span>
+<span class="tk-cm">//    (Table/Tile/страница); внутри такого контейнера — базовый .es без --card,</span>
+<span class="tk-cm">//    иначе получится рамка в рамке.</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм поверх вашего стека (рабочий референс на vanilla JS — функция <code class="tok">esBuild</code> в коде этой страницы).</p>
+  </section>
+
+  <!-- BACKLOG -->
+  <section class="section" data-screen-label="Proposals">
+    <h2>Бэклог<span class="badge-proposal">Предложение</span></h2>
+    <p class="desc">Компонент закрывает основной сценарий. Смежная работа, не входящая в эту версию:</p>
+    <ul class="bullets">
+      <li><b>Компактный вариант без иллюстрации</b> — для узких контейнеров (панель фильтра, боковая колонка), где 96px иллюстрация не помещается. Не реализован — нужен реальный кейс, чтобы не угадывать пропорции.</li>
+      <li><b>Консолидация системных «нет результатов»</b> в DropdownList/InputAutocomplete/TableFilter поверх этого компонента — сейчас у каждого своя мини-реализация (<code class="tok">.ddl__state--empty</code>). Рассмотреть при экстракции рантайма этих компонентов (Фаза 3), не раньше.</li>
+    </ul>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · EmptyState</span>
+    <span>Размер M/L · Обычная/Карточка · Действий 0/1/2</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите состояние: размер, поверхность, иллюстрация, текст и действия — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/empty-state.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script>
+function dsTbl(headers, rows, widths) {
+  const w = widths || headers.map(() => '1fr');
+  const grid = ['8px', ...w, '8px'].join(' ');
+  const thCells = headers.map(h => '<div class="th"><span class="th__label">' + h + '</span></div>').join('');
+  const head = '<div class="tbl__row" style="grid-template-columns:' + grid + ';"><div class="th th--separator"></div>' + thCells + '<div class="th th--separator"></div></div>';
+  const body = rows.map(r => {
+    const cells = r.map((c) => {
+      const numeric = c && c.numeric;
+      const text = c && typeof c === 'object' ? c.html : c;
+      return '<div class="tc' + (numeric ? ' tc--numbers' : '') + '"><span class="tc__row"><span class="tc__text">' + text + '</span></span></div>';
+    }).join('');
+    return '<div class="tbl__row" style="grid-template-columns:' + grid + ';"><div class="tc tc--separator"></div>' + cells + '<div class="tc tc--separator"></div></div>';
+  }).join('');
+  return head + body;
+}
+
+/* ================= EmptyState factory ================= */
+const ES_COPY = {
+  'empty-folder': { title: 'Нет сделок', text: 'По заданным фильтрам сделки не найдены. Попробуйте изменить условия поиска.', primary: 'Сбросить фильтры', secondary: 'Завести сделку' },
+  'empty-check': { title: 'Все задачи выполнены', text: 'На сегодня для вас нет активных поручений.', primary: 'Обновить', secondary: 'К дашборду' },
+  'error-page-not-found': { title: 'Страница не найдена', text: 'Возможно, ссылка устарела или адрес введён с ошибкой.', primary: 'На главную', secondary: 'Назад' },
+  'error-page-unavailable': { title: 'Раздел временно недоступен', text: 'Мы уже занимаемся восстановлением. Попробуйте зайти позже.', primary: 'Повторить', secondary: 'Написать в поддержку' },
+  'error-server-unavailable': { title: 'Сервер не отвечает', text: 'Проверьте соединение с сетью и повторите попытку.', primary: 'Повторить попытку', secondary: 'Написать в поддержку' },
+};
+function esBuild(o = {}) {
+  const { size = 'm', card = false, illu = 'empty-folder', showText = true, actions = 1 } = o;
+  const c = ES_COPY[illu] || ES_COPY['empty-folder'];
+  const el = document.createElement('div');
+  el.className = 'es es--' + size + (card ? ' es--card' : '');
+  el.innerHTML =
+    '<span class="illu es__illu" data-illu="' + illu + '" aria-hidden="true"></span>' +
+    '<div class="es__body"><p class="es__title">' + c.title + '</p>' +
+    (showText ? '<p class="es__text">' + c.text + '</p>' : '') + '</div>' +
+    (actions > 0 ? '<div class="es__actions">' +
+      '<button type="button" class="btn btn--accent btn--m"><span class="btn__label">' + c.primary + '</span></button>' +
+      (actions > 1 ? '<button type="button" class="btn btn--transparent btn--m"><span class="btn__label">' + c.secondary + '</span></button>' : '') +
+      '</div>' : '');
+  return el;
+}
+function esCode(o = {}) {
+  const { size = 'm', card = false, illu = 'empty-folder', showText = true, actions = 1 } = o;
+  const c = ES_COPY[illu] || ES_COPY['empty-folder'];
+  let s = '<div class="es es--' + size + (card ? ' es--card' : '') + '">\n';
+  s += '  <span class="illu es__illu" data-illu="' + illu + '" aria-hidden="true"></span>\n';
+  s += '  <div class="es__body">\n    <p class="es__title">' + c.title + '</p>\n';
+  if (showText) s += '    <p class="es__text">' + c.text + '</p>\n';
+  s += '  </div>\n';
+  if (actions > 0) {
+    s += '  <div class="es__actions">\n    <button class="btn btn--accent btn--m">' + c.primary + '</button>\n';
+    if (actions > 1) s += '    <button class="btn btn--transparent btn--m">' + c.secondary + '</button>\n';
+    s += '  </div>\n';
+  }
+  s += '</div>';
+  return s;
+}
+function renderIllu() { if (window.DSIllustrations) window.DSIllustrations.render(); }
+
+/* ---------- PLAYGROUND ---------- */
+(function () {
+  const state = { size: 'm', card: 'plain', illu: 'empty-folder', text: 'on', actions: '1' };
+  const controls = document.getElementById('pg-controls');
+  const preview = document.getElementById('pg-preview');
+  const codeEl = document.getElementById('pg-code');
+
+  function select(label, options, getCur, onPick) {
+    const wrap = document.createElement('div'); wrap.className = 'ctl';
+    const l = document.createElement('div'); l.className = 'lbl'; l.textContent = label; wrap.appendChild(l);
+    const box = document.createElement('div'); box.className = 'pg-select';
+    const sel = document.createElement('select');
+    options.forEach(([val, txt]) => { const op = document.createElement('option'); op.value = val; op.textContent = txt; if (val === getCur()) op.selected = true; sel.appendChild(op); });
+    sel.addEventListener('change', () => { onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  controls.appendChild(select('Размер', [['m', 'M'], ['l', 'L']], () => state.size, v => state.size = v));
+  controls.appendChild(select('Поверхность', [['plain', 'Обычная'], ['card', 'Карточка']], () => state.card, v => state.card = v));
+  controls.appendChild(select('Иллюстрация',
+    [['empty-folder', 'Нет данных'], ['empty-check', 'Всё сделано'], ['error-page-not-found', '404 — не найдено'], ['error-page-unavailable', 'Раздел недоступен'], ['error-server-unavailable', 'Сервер не отвечает']],
+    () => state.illu, v => state.illu = v));
+  controls.appendChild(select('Текст', [['on', 'Показывать'], ['off', 'Скрыть']], () => state.text, v => state.text = v));
+  controls.appendChild(select('Действия', [['0', 'Без кнопок'], ['1', 'Одна кнопка'], ['2', 'Две кнопки']], () => state.actions, v => state.actions = v));
+
+  function render() {
+    const o = { size: state.size, card: state.card === 'card', illu: state.illu, showText: state.text === 'on', actions: +state.actions };
+    preview.innerHTML = '';
+    preview.appendChild(esBuild(o));
+    renderIllu();
+    codeEl.innerHTML = '<code>' + esCode(o).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code>';
+  }
+  render();
+})();
+
+/* ---------- ANATOMY DIAGRAM ---------- */
+(function () {
+  document.getElementById('anat-diagram').appendChild(esBuild({ size: 'm', illu: 'empty-folder', actions: 2 }));
+  renderIllu();
+})();
+
+/* ---------- VARIANTS: Size ---------- */
+(function () {
+  const host = document.getElementById('var-size');
+  [['M — по умолчанию', esBuild({ size: 'm', illu: 'empty-folder', actions: 1 })],
+   ['L — полноэкранное', esBuild({ size: 'l', illu: 'error-page-not-found', actions: 1 })]]
+    .forEach(([cap, node]) => {
+      const wrap = document.createElement('div'); wrap.className = 'use-block es-frame';
+      const stage = document.createElement('div'); stage.style.padding = '8px'; stage.appendChild(node);
+      const capEl = document.createElement('p'); capEl.className = 'use-block__cap'; capEl.textContent = cap;
+      wrap.append(stage, capEl); host.appendChild(wrap);
+    });
+  renderIllu();
+})();
+
+/* ---------- VARIANTS: Surface ---------- */
+(function () {
+  const host = document.getElementById('var-surface');
+  [['Обычная — наследует контейнер', esBuild({ size: 'm', illu: 'empty-check', actions: 1 })],
+   ['.es--card — своя рамка и фон', esBuild({ size: 'm', card: true, illu: 'empty-check', actions: 1 })]]
+    .forEach(([cap, node]) => {
+      const wrap = document.createElement('div'); wrap.className = 'use-block es-frame';
+      const stage = document.createElement('div'); stage.style.padding = '8px'; stage.appendChild(node);
+      const capEl = document.createElement('p'); capEl.className = 'use-block__cap'; capEl.textContent = cap;
+      wrap.append(stage, capEl); host.appendChild(wrap);
+    });
+  renderIllu();
+})();
+
+/* ---------- VARIANTS: Actions ---------- */
+(function () {
+  const host = document.getElementById('var-actions');
+  [['Без кнопок', esBuild({ size: 'm', illu: 'empty-check', actions: 0 })],
+   ['Одна кнопка', esBuild({ size: 'm', illu: 'empty-folder', actions: 1 })],
+   ['Две кнопки', esBuild({ size: 'm', illu: 'error-server-unavailable', actions: 2 })]]
+    .forEach(([cap, node]) => {
+      const wrap = document.createElement('div'); wrap.className = 'use-block es-frame';
+      const stage = document.createElement('div'); stage.style.padding = '8px'; stage.appendChild(node);
+      const capEl = document.createElement('p'); capEl.className = 'use-block__cap'; capEl.textContent = cap;
+      wrap.append(stage, capEl); host.appendChild(wrap);
+    });
+  renderIllu();
+})();
+
+/* ---------- SIZE TABLE ---------- */
+(function () {
+  const rows = [
+    ['M', '96 × 96', '18/24 Text Strong', '16/20 Text', '360px', '48 / 24'],
+    ['L', '160 × 160', '22/24 Display Strong', '18/24 Text', '420px', '80 / 24'],
+  ];
+  document.getElementById('size-table').innerHTML = dsTbl(
+    ['Размер', 'Иллюстрация', 'Заголовок', 'Текст', 'Макс. ширина текста', 'Паддинг'],
+    rows.map(([n, i, t, x, w, p]) => ['<b>' + n + '</b>', { html: i, numeric: true }, t, x, { html: w, numeric: true }, { html: p, numeric: true }]),
+    ['0.6fr', '1fr', '1.3fr', '1fr', '1fr', '0.9fr']);
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function () {
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue) {
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r, g, b, a = 1, m = v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m) { r = +m[1]*255; g = +m[2]*255; b = +m[3]*255; if (m[4] !== undefined) a = +m[4]; }
+    else { const n = v.match(/[\d.]+/g); if (!n) return cssValue; r = +n[0]; g = +n[1]; b = +n[2]; if (n[3] !== undefined) a = +n[3]; }
+    const hx = n => Math.round(n).toString(16).padStart(2, '0').toUpperCase();
+    let s = '#' + hx(r) + hx(g) + hx(b); if (a < 1) s += ' · ' + Math.round(a * 100) + '%'; return s;
+  }
+  const rows = [
+    ['Текст', 'Заголовок', '--text-primary'],
+    ['Текст', 'Текст', '--text-secondary'],
+    ['Поверхность .es--card', 'Фон', '--bg-tile'],
+    ['Поверхность .es--card', 'Рамка', '--border-light'],
+  ];
+  document.getElementById('color-table').innerHTML = dsTbl(
+    ['Раздел', 'Роль', 'Токен', 'Образец', 'Hex'],
+    rows.map(([section, role, tok]) => [section, role,
+      '<code class="tok">' + tok + '</code>',
+      '<span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(' + tok + ')"></span>',
+      resolveHex('var(' + tok + ')')]),
+    ['0.8fr', '1.2fr', '1.2fr', '0.7fr', '0.9fr']);
+  probe.remove();
+})();
+
+/* ---------- DEV: redline measured from live component ---------- */
+(function () {
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  const m = esBuild({ size: 'm', illu: 'empty-folder', actions: 1 });
+  const l = esBuild({ size: 'l', illu: 'error-page-not-found', actions: 1 });
+  const cardEl = esBuild({ size: 'm', card: true, illu: 'empty-check', actions: 0 });
+  host.append(m, l, cardEl);
+
+  const px = v => { const n = parseFloat(v); return Number.isNaN(n) ? v : Math.round(n) + 'px'; };
+  const pxPair = (a, b) => px(a) + ' × ' + px(b);
+  const pxList = v => v.split(' ').map(px).join(' ');
+  const illuOf = el => el.querySelector('.es__illu');
+  const titleOf = el => el.querySelector('.es__title');
+  const textOf = el => el.querySelector('.es__text');
+
+  const D = {
+    illuM: pxPair(getComputedStyle(illuOf(m)).width, getComputedStyle(illuOf(m)).height),
+    illuL: pxPair(getComputedStyle(illuOf(l)).width, getComputedStyle(illuOf(l)).height),
+    titleM: px(getComputedStyle(titleOf(m)).fontSize) + '/' + px(getComputedStyle(titleOf(m)).lineHeight),
+    titleL: px(getComputedStyle(titleOf(l)).fontSize) + '/' + px(getComputedStyle(titleOf(l)).lineHeight),
+    textM: px(getComputedStyle(textOf(m)).fontSize) + '/' + px(getComputedStyle(textOf(m)).lineHeight),
+    textL: px(getComputedStyle(textOf(l)).fontSize) + '/' + px(getComputedStyle(textOf(l)).lineHeight),
+    gapM: px(getComputedStyle(m).rowGap || getComputedStyle(m).gap),
+    gapL: px(getComputedStyle(l).rowGap || getComputedStyle(l).gap),
+    padM: pxList(getComputedStyle(m).padding),
+    padL: pxList(getComputedStyle(l).padding),
+    cardRadius: px(getComputedStyle(cardEl).borderRadius),
+    cardBorder: px(getComputedStyle(cardEl).borderWidth) + ' ' + getComputedStyle(cardEl).borderStyle,
+  };
+  host.remove();
+
+  const devRows = [
+    ['Иллюстрация — M / L', D.illuM + ' / ' + D.illuL],
+    ['Заголовок — M / L', D.titleM + ' / ' + D.titleL],
+    ['Текст — M / L', D.textM + ' / ' + D.textL],
+    ['Зазор (gap) — M / L', D.gapM + ' / ' + D.gapL],
+    ['Паддинг — M / L', D.padM + ' / ' + D.padL],
+    ['Радиус / рамка .es--card', D.cardRadius + ' / ' + D.cardBorder],
+  ];
+  document.getElementById('dev-spec-table').innerHTML = dsTbl(['Параметр', 'Значение'], devRows.map(([p, v]) => [p, { html: v, numeric: true }]), ['1.6fr', '1.4fr']);
+})();
+
+/* ---------- DEV: copy-to-clipboard ---------- */
+(function () {
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try { await navigator.clipboard.writeText(text); }
+      catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-illustrations.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Размер': 'L — полноэкранный', 'Поверхность': 'Карточка', 'Текст': { label: 'Показывать текст', on: 'on' } };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><div class="es es--m">
+  <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+  <div class="es__body">
+    <p class="es__title">Нет сделок</p>
+    <p class="es__text">По заданным фильтрам сделки не найдены. Попробуйте изменить условия поиска.</p>
+  </div>
+  <div class="es__actions">
+    <button class="btn btn--accent btn--m"><span class="btn__label">Сбросить фильтры</span></button>
+    <button class="btn btn--transparent btn--m"><span class="btn__label">Завести сделку</span></button>
+  </div>
+</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+// Сборка: esBuild({ size: 'm'|'l', card, illu, showText, actions: 0|1|2 }) → .es.es--<size>
+//  .es__illu — data-illu + aria-hidden (SVG подставляет ds-illustrations.js);
+//  .es__body → .es__title / .es__text; .es__actions — кнопки Button M.
+// Рендерить только после завершения запроса (не как промежуточное состояние);
+// во время запроса — Spinner/Skeleton, не EmptyState.</script>
+<script type="text/plain" id="src-code-css">/* EmptyState — иллюстрация + заголовок + текст + опциональные действия: пустой
+   список/таблица после фильтра, нет результатов поиска, первый вход без данных,
+   полноэкранная ошибка (404/500/недоступность). Не для короткой паузы загрузки —
+   там Spinner/Skeleton. Токены — colors.css, radius.css, typography.css.
+   Иллюстрация — .illu из illustration.css (собственная палитра, не тонируется). */
+.es { display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; }
+.es__body { display: flex; flex-direction: column; }
+.es__title { margin: 0; color: var(--text-primary); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.es__text { margin: 0; color: var(--text-secondary); text-wrap: pretty; overflow-wrap: break-word; }
+.es__actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+/* ---------- размер M (по умолчанию для встроенного использования: пустая
+   таблица/тайл/страница) ---------- */
+.es--m { gap: 20px; padding: 48px 24px; }
+.es--m .es__illu { width: 96px; height: 96px; }
+.es--m .es__body { gap: 8px; max-width: 360px; }
+.es--m .es__title { font: var(--type-body-l-strong); }
+.es--m .es__text { font: var(--type-body-m); }
+.es--m .es__actions { margin-top: 4px; }
+
+/* ---------- размер L — полноэкранное состояние (404/500, отдельная страница) ---------- */
+.es--l { gap: 24px; padding: 80px 24px; }
+.es--l .es__illu { width: 160px; height: 160px; }
+.es--l .es__body { gap: 10px; max-width: 420px; }
+.es--l .es__title { font: var(--type-h4-strong); }
+.es--l .es__text { font: var(--type-body-l); }
+.es--l .es__actions { margin-top: 6px; }
+
+/* ---------- поверхность-карточка: своя рамка/фон, когда компонент стоит
+   отдельно, а не встроен в уже оформленный контейнер (Table/Tile/страница) ---------- */
+.es--card { background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-card); }</script>
+</body>
+</html>

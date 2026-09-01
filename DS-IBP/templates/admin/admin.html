@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!-- Панель управления продукта. Не редактируется руками: registry.json генерирует
+     scripts/ds-registry.js (см. шапку файла), эта страница только читает и рисует его.
+     Копия в проект продукта — путь к ds.css поменять на _ds/<папка ДС>/ds.css. -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Панель управления</title>
+<link rel="stylesheet" href="../../ds.css">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--font-text),system-ui,sans-serif;color:var(--text-primary);background:var(--bg-page)}
+.page{max-width:1320px;margin:0 auto;padding:48px 32px 120px;display:flex;flex-direction:column;gap:40px}
+.head h1{margin:0 0 6px;font:var(--type-h3-strong)}
+.head .meta{font:var(--type-body-xs);color:var(--text-inactive);display:flex;gap:20px;flex-wrap:wrap;margin:0}
+.empty{padding:40px;text-align:center;color:var(--text-secondary);font:var(--type-body-m);border:1px dashed var(--border-light);border-radius:var(--radius-m)}
+.sec h2{margin:0 0 4px;font:var(--type-h4-strong)}
+.sec .hint{margin:0 0 16px;font:var(--type-body-s);color:var(--text-secondary)}
+.panel{padding:0;overflow:hidden;border:1px solid var(--border-light);border-radius:var(--radius-m);background:var(--bg-tile)}
+.lvl{display:inline-flex;align-items:center;gap:6px;font:var(--type-body-xs-strong)}
+.lvl i{width:8px;height:8px;border-radius:999px;flex:none}
+.lvl--blocker i{background:var(--error)}
+.lvl--warn i{background:var(--warning)}
+.lvl--info i{background:var(--info)}
+.mism{display:flex;flex-direction:column;gap:1px;background:var(--border-light);border:1px solid var(--border-light);border-radius:var(--radius-m);overflow:hidden}
+.mism__row{display:grid;grid-template-columns:120px 1fr auto;gap:16px;padding:12px 16px;background:var(--bg-tile);align-items:center}
+.mism__msg{font:var(--type-body-s)}
+.mism__path{font:var(--type-body-xs);color:var(--text-secondary);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.count{font:var(--type-body-xs);color:var(--text-secondary)}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="head">
+    <h1>Панель управления</h1>
+    <p class="meta" id="metaLine">Загрузка registry.json…</p>
+  </header>
+  <div id="root"></div>
+</main>
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script>
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const row = (cells, tag) => `<div class="tbl__row" style="grid-template-columns:8px ${cells.map(() => '1fr').join(' ')} 8px">` +
+  `<div class="${tag}${tag === 'th' ? ' th--separator' : ' tc--separator'}"></div>` +
+  cells.map((c) => `<div class="${tag} ${tag === 'th' ? '' : 'tc--wrap'}"><span class="${tag === 'th' ? 'th__label' : 'tc__row'}">${tag === 'th' ? c : `<span class="tc__text">${c}</span>`}</span></div>`).join('') +
+  `<div class="${tag}${tag === 'th' ? ' th--separator' : ' tc--separator'}"></div></div>`;
+const table = (heads, rows) => rows.length
+  ? `<div class="tbl">${row(heads, 'th')}${rows.map((r) => row(r, 'tc')).join('')}</div>`
+  : '<p class="empty">Пока пусто</p>';
+const LEVEL_LABEL = { blocker: 'Блокер', warn: 'Внимание', info: 'Инфо' };
+
+async function main() {
+  let reg;
+  try {
+    const res = await fetch('./registry.json');
+    if (!res.ok) throw new Error(res.status);
+    reg = await res.json();
+  } catch (e) {
+    document.getElementById('metaLine').textContent = 'registry.json не найден или повреждён';
+    document.getElementById('root').innerHTML = '<p class="empty">Сгенерируйте реестр: scripts/ds-registry.js → registry.json (см. README рядом с этим файлом).</p>';
+    return;
+  }
+  document.getElementById('metaLine').innerHTML =
+    `<span>Сформирован: <b>${esc(new Date(reg.generatedAt).toLocaleString('ru-RU'))}</b></span>` +
+    `<span>Версия правил при проверке: <b>${esc(reg.rulesVersionChecked || '—')}</b></span>` +
+    `<span>Экранов: <b>${reg.screens.length}</b></span><span>Компонентов: <b>${reg.components.length}</b></span>`;
+
+  const sections = [];
+
+  sections.push(`<section class="sec"><h2>Экраны</h2><p class="hint">Из ${esc(reg.screensDir)}/*.md</p><div class="panel">` +
+    table(['ID', 'Название', 'Статус', 'Каркас', 'Версия', 'Обновлено', 'Компонентов'],
+      reg.screens.map((s) => [esc(s.id), esc(s.title), esc(s.status), esc(s.template), esc(s.version), esc(s.updated), String(s.components.length)])) +
+    '</div></section>');
+
+  sections.push(`<section class="sec"><h2>Компоненты</h2><p class="hint">Из ${esc(reg.componentsDir)}/*/*.md</p><div class="panel">` +
+    table(['Имя', 'Категория', 'Версия', 'Правила', 'Назначение', 'Экранов'],
+      reg.components.map((c) => [esc(c.name), esc(c.category), esc(c.version), esc(c.rulesVersion), esc(c.purpose), String(c.usedOn.length)])) +
+    '</div></section>');
+
+  const reqRows = Object.keys(reg.requirements).sort().map((id) => {
+    const r = reg.requirements[id];
+    return [esc(id), r.fileExists === null ? '—' : (r.fileExists ? 'да' : 'нет файла'), String(r.screens.length), String(r.components.length)];
+  });
+  sections.push(`<section class="sec"><h2>Требования</h2><p class="hint">Обратная связь: что затрагивает БТ</p><div class="panel">` +
+    table(['БТ', 'Файл есть', 'Экранов', 'Компонентов'], reqRows) + '</div></section>');
+
+  const order = { blocker: 0, warn: 1, info: 2 };
+  const mism = [...reg.mismatches].sort((a, b) => order[a.level] - order[b.level]);
+  sections.push(`<section class="sec"><h2>Расхождения</h2><p class="hint count">${mism.length ? mism.length + ' пунктов' : 'Не найдено'}</p>` +
+    (mism.length ? `<div class="mism">${mism.map((m) => `<div class="mism__row"><span class="lvl lvl--${m.level}"><i></i>${LEVEL_LABEL[m.level]}</span><span class="mism__msg">${esc(m.message)}</span><span class="mism__path">${esc(m.path)}</span></div>`).join('')}</div>` : '') +
+    '</section>');
+
+  document.getElementById('root').innerHTML = `<div style="display:flex;flex-direction:column;gap:40px">${sections.join('')}</div>`;
+}
+main();
+</script>
+</body>
+</html>

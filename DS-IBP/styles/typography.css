@@ -1,0 +1,138 @@
+/* =========================================================================
+   Design System — Typography Foundation
+   SB Sans Display · SB Sans Text · SB Sans Screen
+   ========================================================================= */
+
+/* ---------- Font faces ---------------------------------------------------- */
+/* Оптическая нормализация метрик заголовочного семейства (05.08.2026).
+   У SB Sans Display hhea/OS2-метрики несимметричны относительно визуального
+   блока (cap-height ↔ descender): при align-items:center заголовок вставал
+   на 4% em выше оптического центра строки. ascent-override/descent-override
+   совмещают центр content-area с серединой cap-height↔descender.
+   Сумма ascent+descent сохранена, поэтому line-height:normal и высоты строк
+   не меняются — двигается только положение глифов внутри строки.
+   SB Sans Text и SB Sans Screen оставлены с исходными метриками. */
+
+@font-face {
+  font-family: "SB Sans Display";
+  src: url("../fonts/SBSansDisplay-Light.otf") format("opentype");
+  ascent-override: 80%;
+  descent-override: 29%;
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SB Sans Display";
+  src: url("../fonts/SBSansDisplay-Regular.otf") format("opentype");
+  ascent-override: 80%;
+  descent-override: 29%;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SB Sans Display";
+  src: url("../fonts/SBSansDisplay-SemiBold.otf") format("opentype");
+  ascent-override: 80%;
+  descent-override: 29%;
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SB Sans Text";
+  src: url("../fonts/SBSansText-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SB Sans Text";
+  src: url("../fonts/SBSansText-Semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SB Sans Screen";
+  src: url("../fonts/SBSansScreen.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- Design tokens ------------------------------------------------- */
+
+:root {
+  /* Font families */
+  --font-display: "SB Sans Display", system-ui, sans-serif;
+  --font-text: "SB Sans Text", system-ui, sans-serif;
+  --font-screen: "SB Sans Screen", system-ui, sans-serif;
+
+  /* Weights */
+  --weight-light: 300; /* @kind other */
+  --weight-regular: 400; /* @kind other */
+  --weight-semibold: 600; /* @kind other */
+
+  /* ---- Type ramp: each token = font / weight / size / line-height ---- */
+
+  /* Headings — SB Sans Display */
+  --type-h1:        var(--weight-light)    52px/68px var(--font-display);
+  --type-h2:        var(--weight-light)    42px/52px var(--font-display);
+  --type-h3-strong: var(--weight-semibold) 28px/32px var(--font-display);
+  --type-h3:        var(--weight-regular)  28px/32px var(--font-display);
+  --type-h4-strong: var(--weight-semibold) 22px/24px var(--font-display);
+  --type-h4:        var(--weight-regular)  22px/24px var(--font-display);
+  --type-h5-strong: var(--weight-semibold) 18px/24px var(--font-display);
+  --type-h5:        var(--weight-regular)  18px/24px var(--font-display);
+  --type-h6-strong: var(--weight-semibold) 16px/20px var(--font-display);
+  --type-h6:        var(--weight-regular)  16px/20px var(--font-display);
+
+  /* Body — SB Sans Text */
+  --type-body-xl:        var(--weight-regular)  24px/32px var(--font-text);
+  --type-body-xl-strong: var(--weight-semibold) 24px/32px var(--font-text);
+  --type-body-l:         var(--weight-regular)  18px/24px var(--font-text);
+  --type-body-l-strong:  var(--weight-semibold) 18px/24px var(--font-text);
+  --type-body-m:         var(--weight-regular)  16px/20px var(--font-text);
+  --type-body-m-strong:  var(--weight-semibold) 16px/20px var(--font-text);
+  --type-body-s:         var(--weight-regular)  14px/16px var(--font-text);
+  --type-body-s-strong:  var(--weight-semibold) 14px/16px var(--font-text);
+  --type-body-xs:        var(--weight-regular)  12px/16px var(--font-text);
+
+  /* Buttons — SB Sans Screen */
+  --type-button-m:  var(--weight-regular) 16px/24px var(--font-screen);
+  --type-button-s:  var(--weight-regular) 14px/20px var(--font-screen);
+  --type-button-xs: var(--weight-regular) 12px/16px var(--font-screen);
+}
+
+/* ---------- Utility classes ---------------------------------------------- */
+/* `font:` shorthand sets family/weight/size/line-height in one shot.
+   letter-spacing is 0 across the whole system. */
+
+.ds-h1        { font: var(--type-h1);        letter-spacing: 0; margin: 0; }
+.ds-h2        { font: var(--type-h2);        letter-spacing: 0; margin: 0; }
+.ds-h3-strong { font: var(--type-h3-strong); letter-spacing: 0; margin: 0; }
+.ds-h3        { font: var(--type-h3);        letter-spacing: 0; margin: 0; }
+.ds-h4-strong { font: var(--type-h4-strong); letter-spacing: 0; margin: 0; }
+.ds-h4        { font: var(--type-h4);        letter-spacing: 0; margin: 0; }
+.ds-h5-strong { font: var(--type-h5-strong); letter-spacing: 0; margin: 0; }
+.ds-h5        { font: var(--type-h5);        letter-spacing: 0; margin: 0; }
+.ds-h6-strong { font: var(--type-h6-strong); letter-spacing: 0; margin: 0; }
+.ds-h6        { font: var(--type-h6);        letter-spacing: 0; margin: 0; }
+
+.ds-body-xl        { font: var(--type-body-xl);        letter-spacing: 0; margin: 0; }
+.ds-body-xl-strong { font: var(--type-body-xl-strong); letter-spacing: 0; margin: 0; }
+.ds-body-l         { font: var(--type-body-l);         letter-spacing: 0; margin: 0; }
+.ds-body-l-strong  { font: var(--type-body-l-strong);  letter-spacing: 0; margin: 0; }
+.ds-body-m         { font: var(--type-body-m);         letter-spacing: 0; margin: 0; }
+.ds-body-m-strong  { font: var(--type-body-m-strong);  letter-spacing: 0; margin: 0; }
+.ds-body-s         { font: var(--type-body-s);         letter-spacing: 0; margin: 0; }
+.ds-body-s-strong  { font: var(--type-body-s-strong);  letter-spacing: 0; margin: 0; }
+.ds-body-xs        { font: var(--type-body-xs);        letter-spacing: 0; margin: 0; }
+
+.ds-button-m  { font: var(--type-button-m);  letter-spacing: 0; margin: 0; }
+.ds-button-s  { font: var(--type-button-s);  letter-spacing: 0; margin: 0; }
+.ds-button-xs { font: var(--type-button-xs); letter-spacing: 0; margin: 0; }

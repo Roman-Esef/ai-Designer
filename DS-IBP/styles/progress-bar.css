@@ -1,0 +1,132 @@
+/* =========================================================================
+   Design System — ProgressBar
+   ---------------------------------------------------------------------
+   Линейный индикатор прогресса: заполнение трека отражает долю значения
+   от максимума. Определённый (значение известно) и неопределённый
+   (длительность неизвестна) режимы; шесть тональных вариантов на локальных
+   статусных токенах; три размера трека.
+
+   Requires: typography.css, colors.css, radius.css, label-helper.css (для .ds-helper)
+   ========================================================================= */
+
+.pbar {
+  --pbar-h: 6px;
+  --pbar-track: var(--border-light);
+  --pbar-fill: var(--primary);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---------- sizes ---------- *
+   Высота трека — прямыми свойствами на потомках (не через --pbar-h в
+   модификаторе). m = дефолт .pbar (6px), отдельных правил не требует. */
+.pbar--s .pbar__track { height: 4px; }
+.pbar--l .pbar__track { height: 8px; }
+.pbar--s .pbar__fill--sliver { min-width: 4px; }
+.pbar--l .pbar__fill--sliver { min-width: 8px; }
+.pbar--s .pbar__marker { top: calc(-1 * (4px + 16px)); }
+.pbar--l .pbar__marker { top: calc(-1 * (8px + 16px)); }
+
+/* ---------- tones (fill color; track остаётся нейтральным) ---------- *
+   Цвет заливки — прямо на .pbar__fill; для indeterminate — per-tone градиент
+   (accent = primary = дефолт, его indeterminate покрывает базовое правило). */
+.pbar--accent  .pbar__fill { background: var(--primary); }
+.pbar--success .pbar__fill { background: var(--st-green); }
+.pbar--info    .pbar__fill { background: var(--st-lblue); }
+.pbar--warning .pbar__fill { background: var(--st-orange); }
+.pbar--error   .pbar__fill { background: var(--st-red); }
+.pbar--system  .pbar__fill { background: var(--st-system); }
+.pbar--success.pbar--indeterminate .pbar__fill { background: linear-gradient(90deg, transparent, var(--st-green) 35%, var(--st-green) 65%, transparent); }
+.pbar--info.pbar--indeterminate .pbar__fill    { background: linear-gradient(90deg, transparent, var(--st-lblue) 35%, var(--st-lblue) 65%, transparent); }
+.pbar--warning.pbar--indeterminate .pbar__fill { background: linear-gradient(90deg, transparent, var(--st-orange) 35%, var(--st-orange) 65%, transparent); }
+.pbar--error.pbar--indeterminate .pbar__fill   { background: linear-gradient(90deg, transparent, var(--st-red) 35%, var(--st-red) 65%, transparent); }
+.pbar--system.pbar--indeterminate .pbar__fill  { background: linear-gradient(90deg, transparent, var(--st-system) 35%, var(--st-system) 65%, transparent); }
+
+/* ---------- head row: label + value ---------- */
+.pbar__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pbar__label {
+  min-width: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pbar__value {
+  flex: none;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- track + fill ---------- */
+.pbar__track {
+  position: relative;
+  width: 100%;
+  height: var(--pbar-h);
+  border-radius: var(--radius-pill);
+  background: var(--pbar-track);
+  overflow: hidden;
+}
+.pbar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--pbar-fill);
+  transition: width .3s ease;
+}
+/* сливер: гарантирует видимую полоску при очень малых ненулевых значениях —
+   применяется явно (не на 0%, см. «Для разработчиков» → поведение) */
+.pbar__fill--sliver { min-width: var(--pbar-h); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pbar__fill { transition: none; }
+}
+
+.pbar__helper { margin-top: -2px; }
+
+/* ---------- indeterminate ---------- */
+.pbar--indeterminate .pbar__fill {
+  width: 40%;
+  left: -40%;
+  right: auto;
+  background: linear-gradient(90deg, transparent, var(--pbar-fill) 35%, var(--pbar-fill) 65%, transparent);
+  animation: pbar-indeterminate 1.6s ease-in-out infinite;
+}
+@keyframes pbar-indeterminate {
+  0%   { left: -40%; }
+  60%  { left: 100%; }
+  100% { left: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pbar--indeterminate .pbar__fill { animation-duration: 3.2s; }
+}
+
+/* ---------- floating value marker (composition: значение над краем заливки) ---------- */
+.pbar--floating .pbar__track { overflow: visible; margin-top: 22px; }
+.pbar__marker {
+  position: absolute;
+  top: calc(-1 * (var(--pbar-h) + 16px));
+  width: max-content;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ---------- stacked / multi-value (композиция — Предложение) ---------- */
+.pbar__track--stack { display: flex; }
+.pbar__seg-stack { height: 100%; }
+
+/* ---------- compact (composition: без head/helper — таблицы, списки) ---------- */
+.pbar--compact { gap: 0; }
