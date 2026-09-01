@@ -37,8 +37,8 @@ purpose: Манифест спек компонентов. Читай нужну
 | LabelHelper | specs/LabelHelper.md | styles/label-helper.css | checkbox, radio, switch | 1.004 |
 | Link | specs/Link.md | styles/link.css | breadcrumbs | 1.007 |
 | Modal | specs/Modal.md | styles/modal.css | button, icon-button, label-helper, checkbox | 1.005 |
-| NavPanel | specs/NavPanel.md | styles/nav-panel.css | icon-button, badge, avatar | 1.010 |
-| NavTile | specs/NavTile.md | styles/nav-tile.css | illustration, link | 1.006 |
+| NavPanel | specs/NavPanel.md | styles/nav-panel.css | icon-button, badge, avatar | 1.011 |
+| NavTile | specs/NavTile.md | styles/nav-tile.css | illustration, link | 1.007 |
 | PageHeader | specs/PageHeader.md | styles/page-header.css | button, icon-button, chip, badge, context-menu, tooltip, breadcrumbs | 1.007 |
 | Pagination | specs/Pagination.md | styles/pagination.css | dropdown-list, checkbox, label-helper, button, splitter | 1.008 |
 | Popover | specs/Popover.md | styles/popover.css | button, icon-button, link, chip, label-helper | 1.005 |

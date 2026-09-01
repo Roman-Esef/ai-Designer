@@ -25,6 +25,9 @@
 <link rel="stylesheet" href="../../styles/docs-split.css">
 <style>
 [data-screen-label="NavTile"] .demo-grid{grid-template-columns:repeat(auto-fill,minmax(460px,1fr))}
+/* каталог тайлов (из ibp-home.js): заголовок группы */
+.cat-head { font: var(--type-h5-strong); color: var(--text-primary); margin: 28px 0 12px; }
+.cat-head:first-child { margin-top: 0; }
 /* демо-стадия (docs-split): растяжение на ширину панели демо;
    padding/фон/min-height — из input-pages.css */
 .pg__stage { flex:1; width:100%; }
@@ -56,7 +59,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.007</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.007</b></span><span>Обновлено: <b>01.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>NavTile</h1>
     <p class="lead">Навигационная плитка главной страницы платформы: иллюстрация, название раздела и краткое описание. Клик по плитке — переход на страницу раздела. Вариант со ссылками добавляет быстрые переходы к подразделам. Иллюстрации — из библиотеки <a class="inl" href="../foundations/Illustrations.html">Иллюстрации</a>. Не путать с дашбордом: NavTile не показывает данные и графики — только вход в раздел.</p>
@@ -118,8 +121,14 @@
 
     <div class="subsec" data-screen-label="VarLinks">
       <h3>Со ссылками</h3>
-      <p class="desc">Контейнер — <code class="tok">&lt;div class="ntile ntile--links"&gt;</code>, НЕ ссылка (вложение <code class="tok">&lt;a&gt;</code> в <code class="tok">&lt;a&gt;</code> недопустимо). На страницу раздела ведёт название-ссылка; ниже — до 4 ссылок на подразделы, прижаты к низу плитки. Hover-подъём у контейнера отсутствует — реагируют только ссылки.</p>
+      <p class="desc">Контейнер — <code class="tok">&lt;div class="ntile"&gt;</code> (вариант задаётся составом: `.ntile__title-link` + `.ntile__links`), НЕ ссылка (вложение <code class="tok">&lt;a&gt;</code> в <code class="tok">&lt;a&gt;</code> недопустимо). На страницу раздела ведёт название-ссылка; ниже — до 4 ссылок на подразделы, идут сразу за описанием. Hover-подъём у контейнера отсутствует — реагируют только ссылки.</p>
       <div class="panel"><div class="demo-grid" id="var-links"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="VarCatalog">
+      <h3>Каталог тайлов</h3>
+      <p class="desc">Полный список тайлов главной страницы по группам — единый источник <code class="tok">scripts/ibp-home.js</code> (<code class="tok">window.IBPHome</code>). Сборщик экрана берёт тайлы отсюда; изменение в одном месте подхватывается всеми экранами главной. Пункты меню без тайла («Поиск клиентов в ЕПК») в каталоге не отображаются.</p>
+      <div id="catalog-demo"></div>
     </div>
   </section>
 
@@ -220,7 +229,7 @@
       </div>
       <pre><code id="code-js"><span class="tk-cm">// 1. Вариант выбирается по наличию ссылок подразделов:</span>
 <span class="tk-cm">//    links.length == 0 → корень &lt;a class="ntile" href=раздел&gt; (вся плитка — ссылка);</span>
-<span class="tk-cm">//    links.length &gt; 0  → корень &lt;div class="ntile ntile--links"&gt;,</span>
+    <span class="tk-cm">//    links.length &gt; 0  →  корень &lt;div class="ntile"&gt; (состав: .ntile__title-link + .ntile__links),</span>
 <span class="tk-cm">//    href раздела уходит на обёртку названия .ntile__title-link.</span>
 <span class="tk-cm">//    Вкладывать &lt;a&gt; в &lt;a&gt; нельзя — поэтому контейнер меняет тег.</span>
 
@@ -292,6 +301,7 @@
 </main>
 
 <script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ibp-home.js"></script>
 <script src="../../scripts/ds-illustrations.js"></script>
 <script src="../../scripts/ds-nav.js"></script>
 <script src="../../scripts/ds-splitter.js"></script>
@@ -315,8 +325,8 @@
   <a class="ntile__title-link" href="/reports"><h3 class="ntile__title">Отчётность</h3></a>
   <p class="ntile__desc">Формы, выгрузки и регламентные отчёты</p>
   <nav class="ntile__links" aria-label="Подразделы">
-    <a class="link link--accent link--s" href="/reports/reg">Регламентные</a>
-    <a class="link link--accent link--s" href="/reports/export">Выгрузки</a>
+    <a class="link link--accent link--m" href="/reports/reg">Регламентные</a>
+    <a class="link link--accent link--m" href="/reports/export">Выгрузки</a>
   </nav>
 </div>
 

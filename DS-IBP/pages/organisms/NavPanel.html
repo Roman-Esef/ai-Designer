@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="../../styles/avatar.css">
 <link rel="stylesheet" href="../../styles/nav-panel.css">
 <link rel="stylesheet" href="../../styles/context-menu.css">
+<link rel="stylesheet" href="../../styles/modal.css">
 <link rel="stylesheet" href="../../styles/ds-docs.css">
 <link rel="stylesheet" href="../../styles/table-cell.css">
 <style>
@@ -39,14 +40,6 @@
 /* ---------- playground: демо — в верхнюю панель, контролы — во вкладку «Конструктор» ---------- */
 .pg__stage { flex:1; min-height:0; width:100%; padding:32px; position:relative; overflow:auto; background: var(--bg-page); }
   .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
-  .toggle { display:flex; align-items:center; gap:10px; cursor:pointer; }
-  .toggle input { position:absolute; opacity:0; width:0; height:0; }
-  .toggle__track { width:38px; height:22px; border-radius:999px; background:var(--st-disabled-midlight, #c9d2d2); position:relative; transition:background-color .15s; flex:none; }
-  .toggle__track::after { content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--bg-tile); transition:transform .15s; box-shadow:var(--elevation-1); }
-  .toggle input:checked + .toggle__track { background:var(--primary); }
-  .toggle input:checked + .toggle__track::after { transform:translateX(16px); }
-  .toggle input:focus-visible + .toggle__track { outline:2px solid var(--primary); outline-offset:2px; }
-  .toggle__label { font: var(--type-body-m); color: var(--text-primary); }
 
   /* ---------- nav frame ---------- */
   .nav-frame { display:inline-flex; align-items:stretch; }
@@ -185,7 +178,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.010</b></span><span>Обновлено: <b>01.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.011</b></span><span>Обновлено: <b>01.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>NavPanel · Панель навигации</h1>
     <p class="lead">Главная навигация приложения в левой части каждой страницы. Отображает все разделы продукта, сгруппированные по подразделениям и типам. Один компонент — три режима: свёрнутый <b>Rail</b>, развёрнутый-оверлей <b>Drawer</b> и закреплённый <b>Fixed</b>.</p>
@@ -216,7 +209,7 @@
         <div class="guide-card good">
           <div class="guide-card__bar"></div>
           <div class="guide-card__tag"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Так</div>
-          <div class="guide-card__body">Разделы сгруппированы в блоки с заголовком (Origination, Pipeline, Отчеты). Заголовок блока виден в Drawer/Fixed и заменяется короткой чертой в Rail.</div>
+          <div class="guide-card__body">Разделы сгруппированы в блоки с заголовком (Origination, Pipeline, Отчёты). Заголовок блока виден в Drawer/Fixed и заменяется короткой чертой в Rail.</div>
           <p class="guide-card__cap">Блоки помогают ориентироваться в длинном списке из десятков пунктов.</p>
         </div>
         <div class="guide-card bad">
@@ -295,7 +288,7 @@
       <ul class="rules">
         <li><b>Подпись пункта</b> — короткое существительное или название раздела; длинная подпись усекается многоточием, полный текст — тултипом (в Rail подпись всегда во всплывающем тултипе).</li>
         <li><b>Иконка</b> — глиф 24×24 из раздела <a class="inl" href="../foundations/Icons.html">Icons</a> (Menu). У каждого пункта своя иконка — именно она опознаёт раздел в Rail.</li>
-        <li><b>Заголовок блока</b> — название подразделения или типа (Origination, Pipeline, Отчеты); в Rail заменяется короткой чертой-разделителем.</li>
+        <li><b>Заголовок блока</b> — название подразделения или типа (Origination, Pipeline, Отчёты); в Rail заменяется короткой чертой-разделителем.</li>
         <li><b>Badge</b> — только целое число сущностей; опционален. Пустой или декоративный бейдж не допускается.</li>
         <li><b>Профиль в футере</b> — ФИО (одна строка с усечением), должность и организация с признаком «+N» дополнительных.</li>
       </ul>
@@ -500,7 +493,9 @@
 </main>
 
 <script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ibp-home.js"></script>
 <script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-modal.js"></script>
 <script src="../../scripts/ds-nav-panel.js"></script>
 <script src="../../scripts/nav-panel.page.js"></script>
 <script src="../../scripts/ds-nav.js"></script>
@@ -508,6 +503,9 @@
 <script src="../../scripts/ds-tabs.js"></script>
 <script src="../../scripts/tbl-resize.js"></script>
 <script src="../../scripts/docs-split.js"></script>
+
+<!-- статичные подписи свитчей конструктора (бинарные селекты → pg-toggle) -->
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Бейджи': 'Показывать бейджи', 'Заблокированный пункт': 'Показывать заблокированный пункт' };</script>
 
 <!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
 <script type="text/plain" id="src-code-html"><nav class="nav nav--drawer" aria-label="Главное меню">
@@ -529,11 +527,11 @@
       <span class="av av--circular av--m"><span class="av__text">АП</span></span>
       <span class="nav__user-text">
         <span class="nav__user-name">Александров Петр Константинович</span>
-        <span class="nav__user-role">Консультант-аналитик ДИД</span>
+        <span class="nav__user-role">Финансист ДИД</span><!-- должность — заглушка, меняется по роли -->
         <span class="nav__user-org">SMB Недвижимость +2</span>
       </span>
     </a>
-    <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    <button class="ibtn ibtn--neutral ibtn--m nav__logout" data-modal="nav-role-modal" aria-label="Сменить роль / выйти"><i data-icon="logout"></i></button>
   </div>
 </nav>
 <!-- Rail: nav--rail (подписи → тултип, бейдж на угол иконки, футер = только аватар).
@@ -810,5 +808,22 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
 
 .nav--rail .nav__user-text,
 .nav--rail .nav__logout { display: none; }</script>
+
+<!-- Модалка ролей: открывается кнопкой «выход» в футере панели (data-modal
+     на .nav__logout). Роль определяет состав групп меню и тайлов главной. -->
+<div class="modal-scrim" id="nav-role-modal" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="nav-role-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="nav-role-title">Сменить роль</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" data-modal-close aria-label="Закрыть"><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <p class="desc tight">Роль определяет состав групп меню навигации и тайлов главной страницы. Переключение меняет набор и там, и там.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
+        <button type="button" class="btn btn--outline btn--m" data-role="Финансист ДИД" data-modal-close><span class="btn__label">Финансист ДИД</span></button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

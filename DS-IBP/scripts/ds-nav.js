@@ -90,6 +90,7 @@
       cat: 'Правила и паттерны',
       items: [
         { label: 'Локальные компоненты',  href: 'pages/patterns/LocalComponents.html' },
+        { label: 'Главная страница · роли', href: 'pages/patterns/HomeRoles.html' },
         { label: 'Редполитика',           soon: true },
         { label: 'Тон оф войс',           soon: true },
         { label: 'Паттерны интерфейса',   soon: true }
