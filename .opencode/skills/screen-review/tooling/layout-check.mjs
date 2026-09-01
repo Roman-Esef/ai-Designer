@@ -314,6 +314,32 @@ function checkMechanics(html, icons) {
     warn(`Б17 pbar--floating на строках ${floats.join(', ')} — контекст не похож на «вероятность/скор» (проверить)`);
   }
 
+  /* Б21 селекторы «тег+класс компонента» в <style> перебивают состояния
+     (урок Л23: button.<класс>{background:none} побеждает .класс--selected) */
+  const styleText = (html.match(/<style[\s>][\s\S]*?<\/style>/g) || []).join('\n');
+  const tagClsSel = [...styleText.matchAll(/(?:^|\n)\s*(?:button|a|input)\.[a-z0-9_-]+\s*\{/g)]
+    .map((m) => m[0].replace(/\s*\{\s*$/, '').trim());
+  ok(tagClsSel.length === 0,
+    tagClsSel.length ? `Б21 селекторы тег+класс компонента в <style>: ${[...new Set(tagClsSel)].join(', ')} (перебивают состояния — ds-rules §4)` : 'Б21 нет button./a./input. селекторов в <style> (состояния не перебиты)');
+
+  /* Б22 сброс body margin (урок Л26: без него UA-дефолт 8px → рамка по периметру
+     и горизонтальный скролл; экран обязан собираться из шаблона с body-reset) */
+  const bodyReset = /body\s*\{[^}]*margin\s*:\s*0/.test(html);
+  ok(bodyReset, bodyReset ? 'Б22 body { margin: 0 } сброшен' : 'Б22 нет сброса body { margin: 0 } (UA-дефолт 8px → рамка и скролл)');
+
+  /* Б23 классы документационного слоя на экране мертвы (урок Л27: их даёт
+     только ds-docs.css, а экран подключает ds.css). Проверка по точным
+     токенам класса, чтобы не цеплять tc--numbers и т.п. */
+  const docTokens = ['desc', 'tight', 'panel', 'masthead', 'lead', 'eyebrow', 'claim', 'note', 'bullets', 'rules', 'guide', 'subhead'];
+  const usedDoc = [];
+  for (const m of html.matchAll(/class="([^"]+)"/g)) {
+    for (const tok of m[1].split(/\s+/)) {
+      if (docTokens.includes(tok) && !usedDoc.includes(tok)) usedDoc.push(tok);
+    }
+  }
+  ok(usedDoc.length === 0,
+    usedDoc.length ? `Б23 док-классы на экране (нет в ds.css): ${usedDoc.join(', ')}` : 'Б23 нет классов документационного слоя');
+
   return res;
 }
 

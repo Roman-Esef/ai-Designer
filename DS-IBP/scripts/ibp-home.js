@@ -47,11 +47,11 @@
       { id: 'cf-sbi', label: 'CF СБИ', icon: 'cash-flow',
         tile: { title: 'CF СБИ', desc: 'Плановые платежи по сделкам ГК СБИ', illu: 'cash-flow' } },
       { id: 'corporate-requests', label: 'Корпоративные запросы', icon: 'corporate-transactions',
-        tile: { title: 'Корпоративные запросы', desc: 'Реестр запросов / Реестр входящих писем', illu: 'corporate-transactions' } }
+        tile: { title: 'Корпоративные запросы', desc: '', illu: 'corporate-transactions', links: ['Реестр запросов', 'Реестр входящих писем'] } }
     ] },
     { id: 'reports', label: 'Отчёты', items: [
       { id: 'reports-1c', label: 'Отчёты 1C/Navision', icon: 'reports-1-c',
-        tile: { title: 'Отчёты 1C/Navision', desc: 'Доходы/расходы сделок СБИ', illu: 'reports-1-c' } },
+        tile: { title: 'Отчёты 1C/Navision', desc: '', illu: 'reports-1-c', links: ['Доходы/Расходы сделок СБИ', 'Резервы', 'Сверка с данными 1С'] } },
       { id: 'statements-registry', label: 'Реестр выписок', icon: 'registry',
         tile: { title: 'Реестр выписок', desc: 'Обработка фактических платежей по сделкам ДИД', illu: 'registry' } },
       { id: 'reserve-calculation', label: 'Расчет резерва', icon: 'reserve',
