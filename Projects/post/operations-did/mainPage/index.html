@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!-- FIDELITY-GATE: N/A · нет исходного макета · 01.09.2026 -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Главная — IBP</title>
+<link rel="stylesheet" href="../../../../DS-IBP/ds.css">
+<style>
+  /* ---------- главная страница: только раскладка на токенах ---------- */
+  .screen { background: var(--bg-page); }
+  .screen__content { container: screen / inline-size; }
+
+  /* фоновая иллюстрация — только на главной (background-illustration, cover) */
+  .home-wrap { position: relative; min-height: calc(100vh - 44px); }
+  .home-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("../../../../DS-IBP/assets/illustrations/background-illustration.svg") center/cover no-repeat;
+    opacity: .3;
+    pointer-events: none;
+  }
+
+  /* 12-колоночная сетка: группа = колонка 3, 4 в ряд, перенос на следующий ряд */
+  .home-groups {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .home-group {
+    grid-column: span 3;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+  .home-group__head {
+    font: var(--type-h5-strong);
+    color: var(--text-primary);
+    margin: 0;
+  }
+  /* перестроение на узкой рабочей области */
+  @container screen (max-width: 1500px) { .home-group { grid-column: span 6; } }
+  @container screen (max-width: 900px)  { .home-group { grid-column: span 12; } }
+</style>
+</head>
+<body>
+<div class="nav-layout">
+  <!-- меню строится экранным скриптом из ibp-home.js по выбранной роли -->
+  <nav class="nav nav--drawer" id="nav" aria-label="Главное меню"></nav>
+
+  <div class="screen">
+    <nav class="crumbs" aria-label="Хлебные крошки">
+      <li class="crumbs__item"><a class="link link--muted" href="#">Главная</a></li>
+    </nav>
+    <main class="screen__content">
+      <div class="home-wrap">
+        <!-- тайлы строятся экранным скриптом из ibp-home.js по роли -->
+        <div class="home-groups" id="home-groups"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- модалка смены роли (триггер — кнопка выхода в футере панели) -->
+<div class="modal-scrim" id="role-modal" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="role-modal-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="role-modal-title">Сменить роль</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" data-modal-close aria-label="Закрыть"><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <p class="desc tight">Роль определяет состав групп меню навигации и тайлов главной страницы.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
+        <button type="button" class="btn btn--outline btn--m" data-role="Финансист ДИД" data-modal-close><span class="btn__label">Финансист ДИД</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../../../DS-IBP/scripts/ds.js"></script>
+<script src="../../../../DS-IBP/scripts/ibp-home.js"></script>
+<script>
+/* экранный скрипт: меню панели и тайлы главной строятся из единого каталога
+   ibp-home.js (window.IBPHome) по выбранной роли; переключение роли — модалкой */
+(function () {
+  'use strict';
+  var role = window.IBPHome.defaultRole;
+
+  function ic(name) { return '<i data-icon="' + name + '"></i>'; }
+
+  function itemHTML(it) {
+    var badge = it.badge
+      ? '<span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">' + it.badge + '</span></span>'
+      : '';
+    return '<a class="nav__item" href="#"><span class="nav__ico">' + ic(it.icon) + '</span>'
+      + '<span class="nav__label">' + it.label + '</span>' + badge + '</a>';
+  }
+
+  function buildNav() {
+    var nav = document.getElementById('nav');
+    var s = '<div class="nav__top">'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Свернуть меню">' + ic('left-menu') + '</button>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель">' + ic('pin-menu') + '</button>'
+      + '</div>';
+    s += '<div class="nav__list">';
+    s += '<a class="nav__item nav__item--selected" href="#" aria-current="page"><span class="nav__ico">' + ic('main-page') + '</span><span class="nav__label">Главная</span></a>';
+    IBPHome.itemsFor(role).forEach(function (g, i) {
+      s += '<div class="nav__block' + (i === 0 ? ' nav__block--first' : '') + '">';
+      s += '<div class="nav__block-label">' + g.label + '</div>';
+      g.items.forEach(function (it) { s += itemHTML(it); });
+      s += '</div>';
+    });
+    s += '</div>';
+    s += '<div class="nav__footer">'
+      + '<a class="nav__user" href="#" aria-label="Открыть личный кабинет">'
+      + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
+      + '<span class="nav__user-text">'
+      + '<span class="nav__user-name">Александров Петр Константинович</span>'
+      + '<span class="nav__user-role">' + role + '</span>'
+      + '<span class="nav__user-org">SMB Недвижимость +2</span>'
+      + '</span></a>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" data-modal="role-modal" aria-label="Сменить роль / выйти">' + ic('logout') + '</button>'
+      + '</div>';
+    nav.innerHTML = s;
+    if (window.DSNavPanel) window.DSNavPanel.bind(nav);
+    if (window.DSModal) window.DSModal.bindAll(nav); /* data-modal на динамическом триггере */
+  }
+
+  function buildTiles() {
+    var host = document.getElementById('home-groups');
+    var html = '';
+    IBPHome.itemsFor(role).forEach(function (g) {
+      var tiles = g.items.filter(function (it) { return it.tile; });
+      if (!tiles.length) return;
+      html += '<section class="home-group">';
+      html += '<h2 class="home-group__head">' + g.label + '</h2>';
+      html += tiles.map(function (it) { return IBPHome.tileHTML(it); }).join('');
+      html += '</section>';
+    });
+    host.innerHTML = html;
+  }
+
+  function paintAll() {
+    if (window.dsIcons) window.dsIcons.apply(document);
+    if (window.DSIllustrations) window.DSIllustrations.render();
+  }
+
+  function setRole(r) {
+    if (!window.IBPHome.roles[r]) return;
+    role = r;
+    buildNav(); buildTiles(); paintAll();
+  }
+
+  document.querySelectorAll('#role-modal [data-role]').forEach(function (btn) {
+    btn.addEventListener('click', function () { setRole(btn.getAttribute('data-role')); });
+  });
+
+  buildNav(); buildTiles(); paintAll();
+})();
+</script>
+</body>
+</html>

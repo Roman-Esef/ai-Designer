@@ -195,7 +195,7 @@
       ['Мин. высота', cs.minHeight],
       ['Зазор между частями', cs.rowGap],
       ['Иллюстрация', getComputedStyle(illu).width + ' × ' + getComputedStyle(illu).height],
-      ['Название', getComputedStyle(title).fontSize + '/' + getComputedStyle(title).lineHeight + ' ' + getComputedStyle(title).fontWeight + ' (--type-h5-strong)'],
+      ['Название', getComputedStyle(title).fontSize + '/' + getComputedStyle(title).lineHeight + ' ' + getComputedStyle(title).fontWeight + ' (--type-h4-strong)'],
       ['Описание', getComputedStyle(desc).fontSize + '/' + getComputedStyle(desc).lineHeight + ' (--type-body-s)']
     ];
     document.body.removeChild(host);
@@ -222,6 +222,25 @@
     var a = e.target.closest('main a[href="#"]');
     if (a) e.preventDefault();
   });
+
+  /* ---------- Каталог тайлов (единый источник: scripts/ibp-home.js) ----------
+     Показывает все тайлы главной страницы по группам; пункты меню без тайла
+     (tile: null) не выводятся. Изменение каталога в ibp-home.js подхватывается
+     и страницей, и экранами главной. */
+  (function () {
+    var host = document.getElementById('catalog-demo');
+    if (!host || !window.IBPHome) return;
+    var html = '';
+    IBPHome.groups.forEach(function (g) {
+      var withTiles = g.items.filter(function (it) { return it.tile; });
+      if (!withTiles.length) return;
+      html += '<h4 class="cat-head">' + g.label + '</h4>';
+      html += '<div class="demo-grid">' + withTiles.map(function (it) {
+        return IBPHome.tileHTML(it);
+      }).join('') + '</div>';
+    });
+    host.innerHTML = html;
+  })();
 
   pgControls();
 })();

@@ -1,0 +1,182 @@
+<!-- @dsCard group="Правила и паттерны" name="Главная страница · роли" viewport="1440x900" subtitle="Роли → группы → тайлы и пункты меню" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Главная страница · роли — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-toc.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/nav-tile.css">
+<link rel="stylesheet" href="../../styles/nav-panel.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/avatar.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/breadcrumbs.css">
+<link rel="stylesheet" href="../../styles/illustration.css">
+<style>
+.page{max-width:1560px;margin:0 auto;padding:clamp(40px,7vw,96px) clamp(24px,4vw,56px) 140px}
+a{color:var(--link)}a:hover{color:var(--link-dark)}
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:92ch;text-wrap:pretty}
+.tbl{margin:0 0 28px}
+.role-block{margin:0 0 32px}
+.role-block__name{font:var(--type-h4-strong);color:var(--text-primary);margin:0 0 6px}
+.role-block__desc{font:var(--type-body-s);color:var(--text-secondary);margin:0 0 14px}
+/* живое переключение роли */
+.roles-demo{display:grid;grid-template-columns:minmax(280px,1fr) 2fr;gap:32px;align-items:start}
+@media (max-width:1100px){.roles-demo{grid-template-columns:1fr}}
+.role-switch{display:flex;flex-direction:column;gap:8px;align-self:start}
+.demo-menu{width:272px;border:1px solid var(--border-light);border-radius:12px;overflow:hidden}
+.demo-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:16px}
+.demo-cap{font:var(--type-body-s-strong);color:var(--text-primary);text-transform:uppercase;letter-spacing:.05em;font-size:11px;margin:0 0 10px}
+.demo-col{min-width:0}
+.demo-col h3{font:var(--type-body-m-strong);margin:0 0 14px;color:var(--text-primary)}
+</style>
+</head>
+<body>
+<main class="page">
+  <a class="crumb" href="../../index.html">← Дизайн-система</a>
+  <header class="masthead">
+    <p class="eyebrow">Правила и паттерны</p>
+    <h1>Главная страница · роли</h1>
+    <p class="meta"><span>Версия: <b>1.000</b></span><span>Обновлено: <b>01.09.2026</b></span></p>
+    <p class="lead">Единый каталог навигации и главной страницы — <code class="tok">scripts/ibp-home.js</code> (<code class="tok">window.IBPHome</code>): роли → группы → тайлы главной и пункты меню. Панель навигации, экран главной и каталог на странице NavTile строятся из этого каталога; изменение в одном месте подхватывается всеми.</p>
+  </header>
+
+  <section class="section" data-screen-label="Roles">
+    <h2>Роли и состав</h2>
+    <p class="desc">Для каждой роли — её группы с пунктами меню и соответствующими тайлами главной. Пункт без тайла (<code class="tok">tile: null</code>) — исключение («Поиск клиентов в ЕПК»). Полный экран роли: <a class="inl" href="../../../Projects/post/operations-did/mainPage/index.html">главная страница</a>.</p>
+    <div id="roles-map"></div>
+  </section>
+
+  <section class="section" data-screen-label="Demo">
+    <h2>Живое переключение роли</h2>
+    <p class="desc">Выбор роли перерисовывает меню панели и тайлы главной — тот же механизм, что на экране (кнопка «выход» в футере панели открывает модалку ролей).</p>
+    <div class="roles-demo">
+      <div>
+        <p class="demo-cap">Роли</p>
+        <div class="role-switch" id="role-switch"></div>
+      </div>
+      <div>
+        <div class="demo-col">
+          <h3>Меню навигации</h3>
+          <div class="demo-menu" id="demo-menu"></div>
+        </div>
+        <div class="demo-col" style="margin-top:24px;">
+          <h3>Тайлы главной</h3>
+          <div class="demo-tiles" id="demo-tiles"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Главная страница · роли</span>
+    <span>ibp-home.js · NavTile · NavPanel · Роли</span>
+  </footer>
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ibp-home.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-illustrations.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script>
+/* контроль ролей: маппинг + живое переключение из единого каталога ibp-home.js */
+(function () {
+  'use strict';
+  if (!window.IBPHome) return;
+  var H = window.IBPHome;
+  var current = H.defaultRole;
+
+  function ic(name) { return '<i data-icon="' + name + '"></i>'; }
+
+  /* ---------- таблица маппинга по ролям ---------- */
+  function mapTable(role) {
+    var s = '<div class="role-block">'
+      + '<p class="role-block__name">' + role + '</p>'
+      + '<p class="role-block__desc">Группы: ' + H.itemsFor(role).map(function (g) { return g.label; }).join(' · ') + '</p>'
+      + '<div class="tbl"><div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.8fr 1.6fr 8px;">'
+      + '<div class="th th--separator"></div><div class="th"><span class="th__label">Пункт меню</span></div>'
+      + '<div class="th"><span class="th__label">Иконка</span></div><div class="th"><span class="th__label">Тайл на главной</span></div>'
+      + '<div class="th th--separator"></div></div>';
+    H.itemsFor(role).forEach(function (g) {
+      g.items.forEach(function (it) {
+        var tileTxt = it.tile ? (it.tile.title + (it.tile.links ? ' (+' + it.tile.links.length + ' ссылки)' : '')) : '— нет тайла';
+        var iconTxt = it.tile ? '<code class="tok">' + it.tile.illu + '</code>' : '<code class="tok">' + it.icon + '</code>';
+        s += '<div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.8fr 1.6fr 8px;">'
+          + '<div class="tc tc--separator"></div>'
+          + '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tc__group">' + g.label + '</span> · ' + it.label + '</span></span></div>'
+          + '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">' + iconTxt + '</span></span></div>'
+          + '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">' + tileTxt + '</span></span></div>'
+          + '<div class="tc tc--separator"></div></div>';
+      });
+    });
+    s += '</div></div>';
+    return s;
+  }
+
+  /* ---------- меню (мини, как на панели) ---------- */
+  function demoMenu(role) {
+    var s = '<div class="nav nav--drawer" aria-hidden="true" style="box-shadow:none;border-radius:0">'
+      + '<div class="nav__list">'
+      + '<a class="nav__item nav__item--selected" href="#"><span class="nav__ico">' + ic('main-page') + '</span><span class="nav__label">Главная</span></a>';
+    H.itemsFor(role).forEach(function (g, i) {
+      s += '<div class="nav__block' + (i === 0 ? ' nav__block--first' : '') + '"><div class="nav__block-label">' + g.label + '</div>';
+      g.items.forEach(function (it) {
+        s += '<a class="nav__item" href="#"><span class="nav__ico">' + ic(it.icon) + '</span><span class="nav__label">' + it.label + '</span></a>';
+      });
+      s += '</div>';
+    });
+    s += '</div></div>';
+    return s;
+  }
+
+  function demoTiles(role) {
+    var s = '';
+    H.itemsFor(role).forEach(function (g) {
+      var tiles = g.items.filter(function (it) { return it.tile; });
+      if (!tiles.length) return;
+      s += '<h4 style="grid-column:1/-1;font:var(--type-h5-strong);margin:0;color:var(--text-primary)">' + g.label + '</h4>';
+      s += tiles.map(function (it) { return H.tileHTML(it); }).join('');
+    });
+    return s;
+  }
+
+  function paint() {
+    if (window.dsIcons) window.dsIcons.apply(document);
+    if (window.DSIllustrations) window.DSIllustrations.render();
+  }
+
+  function renderDemo() {
+    document.getElementById('demo-menu').innerHTML = demoMenu(current);
+    document.getElementById('demo-tiles').innerHTML = demoTiles(current);
+    paint();
+  }
+
+  /* ---------- сборка ---------- */
+  document.getElementById('roles-map').innerHTML = H.rolesList().map(mapTable).join('');
+  var sw = document.getElementById('role-switch');
+  sw.innerHTML = H.rolesList().map(function (r) {
+    return '<button type="button" class="btn btn--' + (r === current ? 'accent' : 'outline') + ' btn--m" data-role="' + r + '"><span class="btn__label">' + r + '</span></button>';
+  }).join('');
+  sw.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-role]');
+    if (!b || !H.roles[b.getAttribute('data-role')]) return;
+    current = b.getAttribute('data-role');
+    sw.innerHTML = H.rolesList().map(function (r) {
+      return '<button type="button" class="btn btn--' + (r === current ? 'accent' : 'outline') + ' btn--m" data-role="' + r + '"><span class="btn__label">' + r + '</span></button>';
+    }).join('');
+    renderDemo();
+  });
+  renderDemo();
+})();
+</script>
+</body>
+</html>

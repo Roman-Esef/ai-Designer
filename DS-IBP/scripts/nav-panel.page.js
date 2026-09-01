@@ -10,8 +10,12 @@
   function h(html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
   function paint(root) { if (window.dsIcons) window.dsIcons.apply(root); }
 
-  /* ---------------- данные меню ---------------- */
+  /* ---------------- данные меню ----------------
+     Первичный источник — единый каталог scripts/ibp-home.js (window.IBPHome):
+     меню рендерится по выбранной роли (itemsFor). BLOCKS ниже — фолбэк для
+     страниц, где ibp-home.js не подключён (бандл карточек). */
   var HOME = { icon: 'main-page', label: 'Главная', selected: true };
+  var CURRENT_ROLE = 'Финансист ДИД';
   var BLOCKS = [
     { label: 'Origination', items: [
       { icon: 'Important-deals', label: 'Обязательные сделки' },
@@ -36,16 +40,16 @@
       { icon: 'payments-ib', label: 'Реестр платежей IB' }
     ] },
     { label: 'Текущий портфель ДИД', items: [
-      { icon: 'current-depo', label: 'Текущий портфель ДИД' },
+      { icon: 'current-depo', label: 'Текущий портфель' },
       { icon: 'cash-flow', label: 'CF СБИ' },
       { icon: 'corporate-transactions', label: 'Корпоративные запросы' }
     ] },
-    { label: 'Отчеты', items: [
+    { label: 'Отчёты', items: [
       { icon: 'reports-1-c', label: 'Отчёты 1C/Navision' },
       { icon: 'registry', label: 'Реестр выписок' },
       { icon: 'reserve', label: 'Расчет резерва' },
       { icon: 'calclate-fv', label: 'Расчет FV' },
-      { icon: 'rwa', label: 'RWA', canDisable: true }
+      { icon: 'rwa', label: 'Отчёты для Рисков', canDisable: true }
     ] },
     { label: 'Клиенты и задачи', items: [
       { icon: 'factory-01', label: 'Клиенты' },
@@ -57,6 +61,17 @@
       { icon: 'admin-ckp', label: 'Администратор ЦКП' }
     ] }
   ];
+  /* группы меню текущей роли (или весь каталог-фолбэк) */
+  function menuGroups() {
+    if (window.IBPHome) return window.IBPHome.itemsFor(CURRENT_ROLE);
+    return BLOCKS;
+  }
+  /* переключение роли: меняет состав меню и перерисовывает демо (событие) */
+  function setRole(role) {
+    if (!window.IBPHome || !window.IBPHome.roles[role]) return;
+    CURRENT_ROLE = role;
+    document.dispatchEvent(new CustomEvent('ibp-role-change', { detail: { role: role } }));
+  }
 
   /* ---------------- сборка пункта ---------------- */
   function itemHTML(it, opts) {
@@ -99,10 +114,11 @@
       + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
       + '<span class="nav__user-text">'
       + '<span class="nav__user-name">Александров Петр Константинович</span>'
-      + '<span class="nav__user-role">Консультант-аналитик ДИД</span>'
+      /* должность — заглушка, меняется по роли (CURRENT_ROLE) */
+      + '<span class="nav__user-role">' + CURRENT_ROLE + '</span>'
       + '<span class="nav__user-org">SMB Недвижимость +2</span>'
       + '</span></a>'
-      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти">' + ic('logout') + '</button>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" data-modal="nav-role-modal" aria-label="Сменить роль / выйти">' + ic('logout') + '</button>'
       + '</div>';
   }
 
@@ -117,7 +133,7 @@
     // list
     s += '<div class="nav__list">';
     s += itemHTML(HOME, opts);
-    BLOCKS.forEach(function (b, i) {
+    menuGroups().forEach(function (b, i) {
       s += '<div class="nav__block' + (i === 0 ? ' nav__block--first' : '') + '">';
       s += '<div class="nav__block-label">' + b.label + '</div>';
       b.items.forEach(function (it) { s += itemHTML(it, opts); });
@@ -159,21 +175,29 @@
       + '<option value="drawer" selected>Drawer</option>'
       + '<option value="fixed">Fixed</option>'
       + '</select></div></div>'
-      + '<div class="ctl"><span class="lbl">Опции</span><div class="toggles">'
-      + '<label class="toggle"><input type="checkbox" id="pg-badges" checked><span class="toggle__track"></span><span class="toggle__label">Бейджи</span></label>'
-      + '<label class="toggle"><input type="checkbox" id="pg-disabled"><span class="toggle__track"></span><span class="toggle__label">Заблокированный пункт</span></label>'
-      + '</div></div>';
+      /* бинарные опции — бинарные селекты: docs-split.js конвертирует их
+         в свитчи pg-toggle (подпись статична, словарь DS_SPLIT_SWITCH_LABELS) */
+      + '<div class="ctl"><span class="lbl">Бейджи</span>'
+      + '<div class="pg-select"><select id="pg-badges">'
+      + '<option value="no">Нет</option><option value="yes" selected>Да</option>'
+      + '</select></div></div>'
+      + '<div class="ctl"><span class="lbl">Заблокированный пункт</span>'
+      + '<div class="pg-select"><select id="pg-disabled">'
+      + '<option value="no" selected>Нет</option><option value="yes">Да</option>'
+      + '</select></div></div>';
 
     var mode = controls.querySelector('#pg-mode');
     var badges = controls.querySelector('#pg-badges');
     var disabled = controls.querySelector('#pg-disabled');
 
     function render() {
-      var opts = { badges: badges.checked, disabled: disabled.checked };
+      var opts = { badges: badges.value === 'yes', disabled: disabled.value === 'yes' };
       stage.innerHTML = '';
       stage.appendChild(frame(mode.value, opts, 620));
       paint(stage);
       bindRailTooltips(stage);
+      /* триггер модалки ролей собирается динамически — байндим после сборки */
+      if (window.DSModal) window.DSModal.bindAll(stage);
       /* бургер и пин реально переключают режим — селект следует за панелью */
       var nav = stage.querySelector('.nav');
       if (nav) nav.addEventListener('ds-nav-mode', function (e) { mode.value = e.detail.mode; });
@@ -181,6 +205,8 @@
     mode.addEventListener('change', render);
     badges.addEventListener('change', render);
     disabled.addEventListener('change', render);
+    /* смена роли (модалка ролей) — перерисовка меню в плейграунде */
+    document.addEventListener('ibp-role-change', render);
     render();
   }
 
@@ -324,11 +350,13 @@
     s += topHTML('drawer');
     s += '<div class="nav__list">';
     s += itemHTML({ icon: HOME.icon, label: HOME.label }, opts);
-    BLOCKS.forEach(function (b, i) {
+    /* RND-демо вложенности — на ПОЛНОМ каталоге (Origination вне роли Финансист) */
+    (window.IBPHome ? IBPHome.groups : BLOCKS).forEach(function (b, i) {
       s += '<div class="nav__block' + (i === 0 ? ' nav__block--first' : '') + '">';
       s += '<div class="nav__block-label">' + b.label + '</div>';
       b.items.forEach(function (it) {
-        if (b === BLOCKS[0] && it === b.items[0]) { /* «Обязательные сделки» — родитель */
+        /* «Обязательные сделки» (первый пункт Origination) — родитель */
+        if ((b.id === 'origination' || b === BLOCKS[0]) && it === b.items[0]) {
           if (variant === 'dropdown') {
             /* флайаут: пункт без обёртки; меню кладётся наружу .nav (см. initRnd) */
             s += rndParentHTML('nav__item--fly', 'chevron-right', 'aria-haspopup="menu" aria-controls="rnd-flyout-1" aria-expanded="false"');
@@ -605,6 +633,10 @@
     else fn();
   }
   ready(function () {
+    /* модалка ролей: клик по роли — переключение (меню/футер перерисовываются) */
+    document.querySelectorAll('#nav-role-modal [data-role]').forEach(function (btn) {
+      btn.addEventListener('click', function () { setRole(btn.getAttribute('data-role')); });
+    });
     initPlayground();
     initAnatomy();
     initModes();
@@ -615,4 +647,5 @@
     initCopy();
     try { fillTables(measure()); } catch (e) { /* redline optional */ }
   });
+  window.NavPanelDemo = { setRole: setRole, currentRole: function () { return CURRENT_ROLE; } };
 })();
