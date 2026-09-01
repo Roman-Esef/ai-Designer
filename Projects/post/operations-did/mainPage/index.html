@@ -2,27 +2,28 @@
 <!-- FIDELITY-GATE: N/A · нет исходного макета · 01.09.2026 -->
 <html lang="ru">
 <head>
+<script>window.__DS_ROOT = '../../../../DS-IBP/';</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Главная — IBP</title>
 <link rel="stylesheet" href="../../../../DS-IBP/ds.css">
 <style>
   /* ---------- главная страница: только раскладка на токенах ---------- */
-  .screen { background: var(--bg-page); }
-  .screen__content { container: screen / inline-size; }
+  body { margin: 0; font-family: var(--font-text), system-ui, sans-serif; color: var(--text-primary); }
 
   /* фоновая иллюстрация — только на главной (background-illustration, cover) */
-  .home-wrap { position: relative; min-height: calc(100vh - 44px); }
+  .home-wrap { position: relative; min-height: calc(100vh - var(--layout-crumbs-h)); }
   .home-wrap::before {
     content: "";
     position: absolute;
     inset: 0;
     background: url("../../../../DS-IBP/assets/illustrations/background-illustration.svg") center/cover no-repeat;
-    opacity: .3;
+    opacity: .6;
     pointer-events: none;
   }
 
-  /* 12-колоночная сетка: группа = колонка 3, 4 в ряд, перенос на следующий ряд */
+  /* 12-колоночная сетка: группа = колонка 3, 4 в ряд, перенос на следующий ряд.
+     Тайлы внутри колонки тянутся на её ширину (не фикс. 442px компонента) */
   .home-groups {
     position: relative;
     display: grid;
@@ -37,13 +38,15 @@
     gap: 16px;
     min-width: 0;
   }
+  .home-group .ntile { width: auto; min-width: 0; }
   .home-group__head {
     font: var(--type-h5-strong);
     color: var(--text-primary);
     margin: 0;
   }
-  /* перестроение на узкой рабочей области */
-  @container screen (max-width: 1500px) { .home-group { grid-column: span 6; } }
+  /* перестроение: 4 колонки только при широкой рабочей области (rail-1920);
+     при закреплении панели (рабочая область уже) — 2 колонки, дальше 1 */
+  @container screen (max-width: 1700px) { .home-group { grid-column: span 6; } }
   @container screen (max-width: 900px)  { .home-group { grid-column: span 12; } }
 </style>
 </head>
@@ -54,7 +57,9 @@
 
   <div class="screen">
     <nav class="crumbs" aria-label="Хлебные крошки">
-      <li class="crumbs__item"><a class="link link--muted" href="#">Главная</a></li>
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Главная</span>
+      </li>
     </nav>
     <main class="screen__content">
       <div class="home-wrap">
@@ -73,7 +78,7 @@
       <button type="button" class="ibtn ibtn--neutral ibtn--l" data-modal-close aria-label="Закрыть"><i data-icon="close"></i></button>
     </header>
     <div class="modal__body">
-      <p class="desc tight">Роль определяет состав групп меню навигации и тайлов главной страницы.</p>
+      <p style="font:var(--type-body-m);color:var(--text-secondary);margin:0 0 16px;">Роль определяет состав групп меню навигации и тайлов главной страницы.</p>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
         <button type="button" class="btn btn--outline btn--m" data-role="Финансист ДИД" data-modal-close><span class="btn__label">Финансист ДИД</span></button>
       </div>
