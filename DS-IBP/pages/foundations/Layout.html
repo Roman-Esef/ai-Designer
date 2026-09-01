@@ -1,0 +1,450 @@
+<!-- @dsCard group="Foundations" name="Каркас экрана" viewport="1440x900" subtitle="Зоны страницы, поля, скролл" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Каркас экрана — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/spacing.css">
+<link rel="stylesheet" href="../../styles/layout.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/breadcrumbs.css">
+<link rel="stylesheet" href="../../styles/nav-panel.css">
+<link rel="stylesheet" href="../../styles/page-header.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+/* ---- демо-каркас: схема экрана в натуральную величину ---- */
+.lay-frame{--lay-frame-h:440px;position:relative;display:flex;align-items:stretch;height:var(--lay-frame-h);overflow:hidden;border:1px solid var(--border-light);border-radius:var(--radius-m);background:var(--bg-page)}
+/* в демо рабочая область ограничена рамкой, а не вьюпортом: min-height:100vh из
+   каркаса здесь гасим, иначе превью выше рамки и скролла нет */
+.lay-frame .screen{flex:1 1 auto;min-width:0;min-height:0;height:100%;overflow:auto}
+.lay-frame .screen > .crumbs{min-width:1080px}
+.lay-frame .screen__content{min-width:1080px}
+/* панель повторяет поведение NavPanel: не скроллится вместе со страницей
+   (в проде position:fixed, height:100vh), а внутренний список имеет свой скролл */
+.lay-nav{flex:none;width:56px;align-self:stretch;z-index:4;background:var(--bg-mainmenu);border-right:1px solid var(--border-light);display:flex;flex-direction:column;overflow:hidden}
+.lay-nav__top,.lay-nav__foot{flex:none;display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 0}
+.lay-nav__foot{border-top:1px solid var(--border-light)}
+.lay-nav__list{flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:thin;display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 0}
+.lay-nav__list::-webkit-scrollbar{width:6px}
+.lay-nav__list::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:999px}
+.lay-nav-fixed .lay-nav__top,.lay-nav-fixed .lay-nav__foot,.lay-nav-fixed .lay-nav__list{align-items:stretch;padding:12px}
+.lay-nav-fixed{width:272px}
+.lay-nav__dot{width:24px;height:24px;border-radius:var(--radius-xs);background:var(--c-cgrey-200);flex:none}
+.lay-nav__dot--wide{width:100%;height:32px;border-radius:var(--radius-s)}
+.lay-nav-fixed .lay-nav__dot{width:100%;height:32px;border-radius:var(--radius-s)}
+.lay-nav-fixed .lay-nav__top .lay-nav__dot,.lay-nav-fixed .lay-nav__foot .lay-nav__dot{width:100%}
+.lay-block{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-m)}
+.lay-tile{height:104px}
+.lay-phead{height:60px;background:transparent;border:none;display:flex;align-items:flex-end}
+.lay-phead span{font:var(--type-h4-strong);color:var(--text-primary)}
+.lay-rows{display:flex;flex-direction:column}
+.lay-rows div{height:36px;border-bottom:1px solid var(--border-light)}
+.lay-rows div:first-child{background:var(--bgtable-row-focus)}
+/* подсветка зон — как на разборе макета */
+.is-zones .crumbs{background:color-mix(in srgb, var(--error) 12%, transparent)}
+.is-zones .screen__content{position:relative}
+.is-zones .screen__content::before,.is-zones .screen__content::after{content:"";position:absolute;top:0;bottom:0;width:24px;background:color-mix(in srgb, var(--info) 22%, transparent)}
+.is-zones .screen__content::before{left:0}
+.is-zones .screen__content::after{right:0}
+.zone-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font:var(--type-body-s);color:var(--text-secondary)}
+.zone-legend span{display:inline-flex;align-items:center;gap:8px}
+.zone-legend i{width:14px;height:14px;border-radius:4px;flex:none}
+.dev-code{position:relative;background:var(--bgtable-row-focus);border:1px solid var(--border-light);border-radius:var(--radius-m);padding:16px;overflow:auto}
+.dev-code pre{margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:20px;color:var(--text-primary)}
+.dev-copy{position:absolute;top:10px;right:10px;font:var(--type-body-xs);color:var(--text-secondary);background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-xs);padding:4px 12px;cursor:pointer}
+.dev-copy:hover{color:var(--primary);border-color:var(--border-primary)}
+  .ctl .rng-row { display:flex; align-items:center; justify-content:space-between; }
+  .ctl .rng-row .val { font: var(--type-body-s-strong); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:32px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:14px; }
+</style>
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Layout">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage">
+        <div class="lay-frame is-zones" id="layFrame">
+          <div class="lay-nav" id="layNav"></div>
+          <div class="screen">
+            <nav class="crumbs" aria-label="Хлебные крошки" id="layCrumbs">
+              <li class="crumbs__item"><a class="link link--muted" href="#">Главная</a></li>
+              <li class="crumbs__item crumbs__item--current"><span class="crumbs__current" aria-current="page">Коды RWA</span></li>
+            </nav>
+            <div class="screen__content" id="layContent"></div>
+          </div>
+        </div>
+        <div class="zone-legend">
+          <span><i style="background:color-mix(in srgb, var(--error) 30%, transparent)"></i>зона крошек — 44 px</span>
+          <span><i style="background:color-mix(in srgb, var(--info) 40%, transparent)"></i>поля контентной области — 24 px</span>
+          <span><i style="background:var(--bg-mainmenu);border:1px solid var(--border-light)"></i>панель навигации — не скроллится со страницей, список внутри имеет свой скролл</span>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.007</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Основы</p>
+    <h1>Каркас экрана</h1>
+    <p class="lead">Любой экран продукта складывается из одних и тех же зон: панель навигации слева, рабочая область справа, внутри рабочей области зона хлебных крошек над контентной областью. Стартовая страница с навигационными тайлами, реестр с таблицей и карточка сущности отличаются только содержимым контентной области — зоны, поля и правила скролла у них одинаковые.</p>
+  </header>
+
+
+
+  
+
+  <!-- КОНСТРУКТОР -->
+  
+
+  <!-- ИСПОЛЬЗОВАНИЕ -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc">Каркас отвечает на вопрос «где что стоит», экран — на вопрос «что именно стоит». Все размеры зон заданы каркасом; экран не выбирает поля, высоту крошек и правила скролла заново.</p>
+    <h3>Когда применять</h3>
+    <ul class="rules" style="margin-bottom:32px">
+      <li><b>Любой экран внутри приложения</b> — стартовая страница, реестр, карточка сущности, форма, дашборд.</li>
+      <li><b>Прототип и проверочный экран</b> — та же обёртка, иначе проверка ничего не доказывает.</li>
+    </ul>
+    <h3>Когда не применять</h3>
+    <ul class="rules" style="margin-bottom:32px">
+      <li><b>Страницы вне приложения</b> — вход, ошибка доступа, техобслуживание: там нет ни панели навигации, ни крошек.</li>
+      <li><b>Встроенные фрагменты</b> — тело модального окна, поповер, панель-выдвижка: у них свои поля из компонентов.</li>
+    </ul>
+    <h3>Что решает экран, а что каркас</h3>
+    <div class="panel" style="padding:0;overflow:hidden"><div id="ownersTable"></div></div>
+  </section>
+
+  <!-- АНАТОМИЯ -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Две обёртки и три зоны. <code class="tok">.nav-layout</code> держит панель и рабочую область и сам резервирует отступ слева по режиму панели. <code class="tok">.screen</code> — рабочая область: колонка из зоны крошек и контентной области. Между панелью и рабочей областью отступа нет, между крошками и контентом — тоже.</p>
+    <div class="panel" style="padding:0;overflow:hidden"><div id="anatomyTable"></div></div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <h3>Режим панели навигации</h3>
+    <p class="desc">Три режима NavPanel меняют только отступ рабочей области слева, состав зон остаётся тем же. Отступ пересчитывается чистым CSS в <code class="tok">.nav-layout</code>, экран для этого ничего не пишет.</p>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:32px"><div id="modesTable"></div></div>
+    <h3>Тип контента</h3>
+    <p class="desc">Контентная область принимает три типовых наполнения. Поля 24px одинаковы для всех: таблица тоже стоит в полях, а не вплотную к краю. Полноэкранных режимов, снимающих боковые поля, в продукте нет.</p>
+    <ul class="rules">
+      <li><b>Тайлы</b> — сетка <code class="tok">.grid12</code>, группы навигационных тайлов по колонкам (стартовая страница).</li>
+      <li><b>Таблица</b> — реестр во всю ширину контентной области: заголовок, фильтр, таблица, пагинация.</li>
+      <li><b>Карточка сущности</b> — заголовок PageHeader и блоки-тайлы в сетке (карточка сделки, корпоративный запрос).</li>
+    </ul>
+  </section>
+
+  <!-- РАЗМЕРЫ -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Значения зон и полей. Единственная величина, которую экран может задать сам, — высота блоков внутри контентной области.</p>
+    <div class="panel" style="padding:0;overflow:hidden"><div id="sizesTable"></div></div>
+  </section>
+
+  <!-- КОНТЕНТ -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <h3>Порядок блоков</h3>
+    <p class="desc">Первый блок контентной области — заголовок страницы (PageHeader). Дальше блоки идут в один поток с зазором 24px; вложенная структура — сетка колонок. Последний блок заканчивается полем 24px — закреплённого снизу подвала действий в продукте нет, кнопки форм живут в своём блоке потока.</p>
+    <h3>Колоночная сетка</h3>
+    <p class="desc">Горизонтальную структуру задаёт сетка из основ — <a class="link link--accent" href="Spacing.html">Сетка и отступы</a>: 12 резиновых колонок, зазор 16px, поля внутри контентной области 0 (боковые 24px уже дал каркас). Каркас сетку не переопределяет и своих колонок не вводит.</p>
+    <div class="dev-code" style="margin-bottom:20px"><button class="dev-copy" data-copy="#gridSample">Копировать</button><pre id="gridSample">&lt;main class="screen__content"&gt;
+  &lt;header class="phead"&gt;…PageHeader…&lt;/header&gt;
+  &lt;div class="grid12"&gt;
+    &lt;section class="col-3"&gt;…&lt;/section&gt;
+    &lt;section class="col-9"&gt;…&lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;</pre></div>
+    <h3>Переполнение</h3>
+    <p class="desc">По вертикали контент растёт свободно — страница скроллится. По горизонтали контент в поля укладывается всегда: на узком окне блоки меняют число колонок и переходят один под другой, а не выходят за кромку.</p>
+    <p class="desc"><b>У экрана горизонтального скролла не бывает никогда.</b> Адаптивная вёрстка закладывается на этапе проектирования экрана — не постфактум, когда что-то уже не поместилось. Объект, вышедший за границу экрана вбок, — баг, а не крайний случай. Исключение — контейнер с собственным скроллом, заложенным осознанно: тело таблицы (шапка залипает, строки скроллятся по горизонтали при большом числе колонок) или отдельный тайл, у которого горизонтальный скролл — часть его внутренней раскладки (например строка тегов). Это скролл конкретного контейнера, не экрана: остальная страница остаётся неподвижной.</p>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <h3>Скролл</h3>
+    <p class="desc">Скроллится только контентная область. Панель навигации со страницей не скроллится: она фиксирована на всю высоту вьюпорта (<code class="tok">position: fixed; height: 100vh</code>), а её список пунктов имеет собственный внутренний скролл — длинное меню прокручивается независимо от контента, верхний блок и подвал панели остаются на месте. Зона крошек залипает у верхней кромки рабочей области (<code class="tok">position: sticky; top: 0</code>) и остаётся видимой на всей длине страницы.</p>
+    <h3>Адаптивность</h3>
+    <p class="desc">При уменьшении окна раскладка перестраивается по брейкпоинтам: блоки меняют число занимаемых колонок и переходят один под другой, экран остаётся собранным под меньшее разрешение. Горизонтального скролла у рабочей области нет — контент не выталкивается за кромку.</p>
+    <p class="desc">Точка отсчёта — ширина рабочей области, а не окна: закрепление панели навигации сужает контент на 216&nbsp;px, не меняя вьюпорт, и раскладка обязана отреагировать так же, как на уменьшение окна. Поэтому рабочая область объявлена контейнером (<code class="tok">container-name: screen</code>), а экран пишет свои шаги как <code class="tok">@container screen (max-width: …)</code>, не через <code class="tok">@media</code>.</p>
+    <p class="desc">Значения брейкпоинтов и правила перестроения для каждого типа контента — в бэклоге: до их фиксации экран описывает перестроение сам.</p>
+    <h3>Переключение режима панели</h3>
+    <p class="desc">Rail и Drawer занимают один и тот же отступ 56px: Drawer — оверлей поверх контента. Fixed увеличивает отступ до 272px, контент ужимается. Пересчёт — чистый CSS в NavPanel, анимаций каркас не добавляет.</p>
+  </section>
+
+  <!-- СОСТОЯНИЯ -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Не применимо: каркас статичен. Состояния принадлежат вложенным компонентам — панели навигации, крошкам, таблицам и тайлам.</p>
+  </section>
+
+  <!-- ДОСТУПНОСТЬ -->
+  <section class="section" data-screen-label="Accessibility">
+    <h2>Доступность</h2>
+    <p class="desc">Каркас задаёт ориентиры страницы, по которым скринридер строит навигацию.</p>
+    <ul class="rules">
+      <li><b>Панель навигации</b> — <code class="tok">&lt;nav aria-label="Главное меню"&gt;</code>, текущий пункт <code class="tok">aria-current="page"</code>.</li>
+      <li><b>Крошки</b> — <code class="tok">&lt;nav aria-label="Хлебные крошки"&gt;</code>, текущая страница не ссылка.</li>
+      <li><b>Контентная область</b> — <code class="tok">&lt;main&gt;</code>, один на страницу; заголовок страницы внутри неё — <code class="tok">h1</code>.</li>
+      <li><b>Порядок DOM</b> совпадает с порядком чтения: панель → крошки → контент. Визуальные сдвиги делаются полями, не переупорядочиванием.</li>
+    </ul>
+  </section>
+
+  <!-- ТИПОГРАФИКА -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Не применимо: каркас собственного текста не содержит. Единственный текст в его зонах — крошки (Body S, 14/16) — принадлежит компоненту Breadcrumbs.</p>
+  </section>
+
+  <!-- ЦВЕТА -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Каркас использует только фоновые токены: рабочая область и зона крошек — фон страницы, поверхности контента — фон тайла.</p>
+    <div class="panel" style="padding:0;overflow:hidden"><div id="colorsTable"></div></div>
+  </section>
+
+  <!-- ДЛЯ РАЗРАБОТЧИКОВ -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc tight">Значения считаны с живого каркаса (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/layout.css</code>, <code class="tok">styles/breadcrumbs.css</code>, <code class="tok">styles/nav-panel.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:34px"><div id="redlineTable"></div></div>
+    <h3>Разметка каркаса</h3>
+    <div class="dev-code" style="margin-bottom:34px"><button class="dev-copy" data-copy="#devMarkup">Копировать</button><pre id="devMarkup">&lt;div class="nav-layout"&gt;
+  &lt;nav class="nav nav--rail" aria-label="Главное меню"&gt;…NavPanel…&lt;/nav&gt;
+  &lt;div class="screen"&gt;
+    &lt;nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs&gt;
+      &lt;li class="crumbs__item"&gt;&lt;a class="link link--muted" href="/"&gt;Главная&lt;/a&gt;&lt;/li&gt;
+      &lt;li class="crumbs__item crumbs__item--current"&gt;
+        &lt;span class="crumbs__current" aria-current="page"&gt;Коды RWA&lt;/span&gt;
+      &lt;/li&gt;
+    &lt;/nav&gt;
+    &lt;main class="screen__content"&gt;
+      &lt;header class="phead"&gt;…PageHeader…&lt;/header&gt;
+      &lt;div class="grid12"&gt;&lt;section class="col-3"&gt;…&lt;/section&gt;&lt;/div&gt;
+    &lt;/main&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre></div>
+    <h3>Поведение · псевдокод (framework-agnostic)</h3>
+    <div class="dev-code"><button class="dev-copy" data-copy="#devPseudo">Копировать</button><pre id="devPseudo">// 1. Каркас: обёртка (панель + рабочая область). Отступ рабочей области слева
+//    равен ширине панели в текущем режиме: rail и drawer — 56, fixed — 272.
+//    Drawer — оверлей: отступ не меняется, панель всплывает поверх контента.
+
+// 2. Рабочая область — колонка: зона крошек, затем контентная область.
+//    Отступов между зонами нет. На узком окне раскладка перестраивается по
+//    брейкпоинтам: блоки меняют число занимаемых колонок и переходят один под
+//    другой; горизонтального скролла у рабочей области нет.
+
+// 2b. Панель навигации не участвует в скролле страницы: закреплена на всю высоту
+//    вьюпорта. Прокручивается только её список пунктов; верхний блок и подвал
+//    панели неподвижны.
+
+// 3. Зона крошек: высота 44 (16 сверху + строка 16 + 12 снизу), поля по бокам 24.
+//    Липнет к верхней кромке при скролле; фон — фон страницы, чтобы контент
+//    не просвечивал под ней. Нет родителей у страницы — зоны нет вовсе.
+
+// 4. Контентная область: поля 24 слева и справа, 24 снизу, сверху 0.
+//    Блоки идут в поток с зазором 24. Первый блок — заголовок страницы.
+
+// 4b. Шаги перестроения считаются от ширины рабочей области, не от окна:
+//    закрепление панели сужает контент, вьюпорт при этом не меняется.
+//    Рабочая область — размерный контейнер; экран объявляет свои шаги
+//    относительно него.
+
+// 5. Горизонтальная структура блоков — 12 колонок с зазором 16, поля внутри
+//    контентной области 0 (боковые поля уже дал каркас).</pre></div>
+  </section>
+
+  <!-- БЭКЛОГ -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Открытые вопросы каркаса — то, чего скрины разбора пока не показали.</p>
+    <ul class="bullets">
+      <li><b>Брейкпоинты.</b> Общие для ДС значения точек перестроения. Сейчас шаги задаёт каждый экран сам от ширины рабочей области (карточка сделки — 1560 / 1240 / 900&nbsp;px); нужен единый набор и правила, сколько колонок берут блоки на каждом шаге, что уходит под кат, что схлопывается.</li>
+      <li><b>Два уровня порога.</b> Базово порог задаётся на уровне экрана, но для экранов, где ширина контентной области меняется отдельно (растягиваемая правая панель), может понадобиться свой порог от ширины именно контентной области. Точная формулировка правила пока не зафиксирована. Закреплено уже сейчас: сужение от левой панели навигации учитывается всегда и на всех страницах — панель можно закрепить на любом экране, и рабочая область становится меньше на 216&nbsp;px.</li>
+      <li><b>Правый сайдбар.</b> Панель связанных сущностей или истории справа от контента: своя ширина, свои поля, поведение на узких брейкпоинтах.</li>
+      <li><b>Липкие элементы внутри контента.</b> Заголовок страницы и шапка таблицы при скролле: липнут ли они под зоной крошек и в каком порядке перекрываются.</li>
+    </ul>
+  </section>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Схема каркаса в натуральную величину: переключите режим панели и тип контента, включите подсветку зон. Зона крошек — реальный компонент Breadcrumbs, поля контентной области — реальные правила <code class="tok">.screen__content</code>; панель навигации в превью показана заглушкой нужной ширины, но повторяет её поведение: остаётся на месте при скролле контента, а список пунктов внутри скроллится сам.</p>
+              <div class="pg__controls">
+        <div class="ctl-col">
+        <div class="ctl">
+          <span class="lbl">Режим панели</span>
+          <div class="pg-select"><select id="pgNav"><option value="rail" selected>Rail — 56 px</option><option value="fixed">Fixed — 272 px</option></select></div>
+        </div>
+        <div class="ctl">
+          <span class="lbl">Контент</span>
+          <div class="pg-select"><select id="pgKind"><option value="tiles" selected>Тайлы</option><option value="table">Таблица</option><option value="entity">Карточка</option></select></div>
+        </div>
+        </div><!-- /ctl-col -->
+        <div class="toggles">
+          <label class="pg-toggle"><input type="checkbox" id="pgZones" checked><span class="pg-toggle__sw"></span>Показывать подсветку зон</label>
+          <label class="pg-toggle"><input type="checkbox" id="pgCrumbs" checked><span class="pg-toggle__sw"></span>Показывать зону крошек</label>
+        <div class="ctl">
+          <div class="rng-row"><span class="lbl">Ширина демо</span><span class="val" id="pgWVal">1080 px</span></div>
+          <input type="range" id="pgWidth" min="480" max="1800" step="20" value="1080">
+        </div>
+        </div>
+        <div class="readout">
+          <div class="r"><span class="k">Отступ под панель</span><span class="v" id="roNav">56 px</span></div>
+          <div class="r"><span class="k">Зона крошек</span><span class="v" id="roCrumbs">44 px</span></div>
+          <div class="r"><span class="k">Поля контента</span><span class="v" id="roPad">0 24px 24px</span></div>
+          <div class="r"><span class="k">Ритм блоков</span><span class="v" id="roGap">24 px</span></div>
+        </div>
+      </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/layout.page.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = {};</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><div class="nav-layout">
+  <nav class="nav nav--rail" aria-label="Главное меню">…</nav>
+  <div class="screen">
+    <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
+      <li class="crumbs__item"><a class="link link--muted" href="/">Главная</a></li>
+      <li class="crumbs__item crumbs__item--current"><span class="crumbs__current" aria-current="page">Коды RWA</span></li>
+    </nav>
+    <main class="screen__content">
+      <header class="phead">…PageHeader…</header>
+      <div class="grid12"><section class="col-3">…</section></div>
+    </main>
+  </div>
+</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/layout.page.js)
+// Зоны каркаса: панель навигации (rail 56 / fixed 272) + рабочая область
+// → .screen: крошки (.crumbs) + контентная область (.screen__content)
+// Конструктор: pgNav (rail/fixed), pgKind (tiles/table/entity), pgZones, pgCrumbs
+// → превью .lay-frame(.is-zones); сводка readout (roNav/roCrumbs/roPad/roGap).
+// Поля 0 24px 24px; ритм блоков 24px; панель фиксируется при скролле.</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Layout (Каркас экрана)
+   Каркас любого экрана продукта: панель навигации слева + рабочая область
+   справа. Рабочая область = зона хлебных крошек (44px, залипает сверху) и
+   контентная область (поля 24px слева/справа, 24px снизу).
+
+   Зоны:      NavPanel (`.nav-layout` / `.nav`, styles/nav-panel.css)
+              Крошки   (`.crumbs`, styles/breadcrumbs.css — свои поля 24px)
+              Контент  (`.screen__content`)
+   Инварианты: между панелью и рабочей областью отступа нет;
+              между крошками и контентом отступа нет;
+              контентная область резиновая, на узком окне раскладка перестраивается
+              по брейкпоинтам — горизонтального скролла нет.
+   Requires:  spacing.css (шкала и сетка .grid12/.col-N), colors.css,
+              nav-panel.css, breadcrumbs.css
+   ========================================================================= */
+
+:root {
+  --layout-pad-x:        var(--space-24); /* поля контентной области слева/справа */
+  --layout-pad-bottom:   var(--space-24); /* поле контентной области снизу       */
+  --layout-crumbs-h:     44px;            /* высота зоны крошек (16+16+12)       */
+  --layout-block-gap:    var(--space-24); /* вертикальный ритм блоков контента   */
+}
+
+/* ---------- рабочая область (всё правее панели навигации) ---------- */
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg-page);
+  /* Точка отсчёта для перестроения раскладки — ширина рабочей области, а не окна:
+     закрепление панели (56 → 272px) сужает контент, не меняя вьюпорт. Экран
+     пишет свои шаги как @container screen (max-width: …), см. Каркас экрана. */
+  container-type: inline-size;
+  container-name: screen;
+}
+
+/* зона крошек залипает у верхней кромки при скролле контента;
+   собственные поля 16/24/12 живут в компоненте (styles/breadcrumbs.css) */
+.screen > .crumbs {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--bg-page);
+  flex: none;
+}
+
+/* ---------- контентная область ---------- */
+.screen__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 var(--layout-pad-x) var(--layout-pad-bottom);
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-block-gap);
+}
+
+/* колоночная сетка — компонент Spacing (.grid12 + .col-N), здесь не дублируется:
+   <div class="grid12"><section class="col-3">…</section></div> */</script>
+</body>
+</html>

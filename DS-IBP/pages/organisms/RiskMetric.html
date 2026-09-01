@@ -1,0 +1,511 @@
+<!-- @dsCard group="Components" name="RiskMetric" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RiskMetric — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/divider.css">
+<link rel="stylesheet" href="../../styles/chip.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/skeleton.css">
+<link rel="stylesheet" href="../../styles/popover.css">
+  <link rel="stylesheet" href="../../styles/riskmetric.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:76ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:40px; }
+
+  
+
+  
+
+  /* ---------- playground: демо — в верхнюю панель, контролы — во вкладку «Конструктор» ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:40px 32px 56px; display:flex; align-items:flex-start; justify-content:safe center; position:relative; overflow:auto; background: var(--bg-page); }
+  /* подсказка конструктора — на всю ширину над колонками (её вешает riskmetric.page.js в #pg-controls) */
+  .docs-main .pg__controls > p { grid-column: 1 / -1; }
+
+  .ctl { display:flex; flex-direction:column; gap:8px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(320px,1fr) minmax(260px,380px); gap:44px; align-items:center; }
+  @media (max-width:820px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:44px; display:flex; justify-content:center; position:relative; overflow:visible; min-height:360px; }
+  .anat__stage .pop { box-shadow:0 10px 30px rgba(40,50,55,.14); }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary); }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+  /* ---------- sizes ---------- */
+
+  /* ---------- content variants table ---------- */
+  .content-table { width:100%; border-collapse:collapse; }
+  .content-table th, .content-table td { text-align:left; padding:13px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+  .content-table th { font: var(--type-body-s-strong); color: var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; font-size:12px; }
+  .content-table tr:last-child td { border-bottom:none; }
+  .content-table td.dsc { color: var(--text-secondary); font: var(--type-body-s); }
+
+  /* ---------- usage: contragent table mock ---------- */
+  .rm-usage-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:14px 4px; border-bottom:1px solid var(--border-light); }
+  .rm-usage-row:last-child { border-bottom:none; }
+  .rm-usage-row__name { font: var(--type-body-m); color: var(--text-primary); }
+  .rm-usage-row__metric { position:relative; flex:none; }
+
+  /* композиция поповера (.rm-body/.rm-block*/.rm-field*) вынесена в styles/riskmetric.css */
+
+  /* ---------- feeder blocks (standalone demo) ---------- */
+  .feeder-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:22px; align-items:start; }
+  .feeder-col__cap { font: var(--type-body-s-strong); color: var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; font-size:11px; margin:0 0 12px; }
+  .feeder-col__box { border:1px dashed var(--border-primary); border-radius:12px; padding:14px; }
+
+  /* ---------- states matrix 4×4 ---------- */
+  .rm-matrix { display:grid; grid-template-columns: 130px repeat(4, 1fr); gap:14px 10px; align-items:center; }
+  @media (max-width:760px){ .rm-matrix { grid-template-columns: 90px repeat(4, 1fr); } }
+  .rm-matrix__colhead { font: var(--type-body-s-strong); color: var(--text-secondary); text-align:center; padding-bottom:6px; border-bottom:1px solid var(--border-light); }
+  .rm-matrix__rowhead { font: var(--type-body-s-strong); color: var(--text-inactive); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; }
+  .rm-matrix__cell { display:flex; align-items:center; justify-content:center; min-height:40px; }
+  .rm-matrix__cell--span { grid-column: span 4; justify-content:flex-start; gap:14px; }
+  .rm-matrix__note { font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- states grid (loading/error) ---------- */
+  .states { display:grid; grid-template-columns: repeat(2, 1fr); gap:30px 26px; }
+  @media (max-width:760px){ .states { grid-template-columns: 1fr; } }
+  .state-cell { display:flex; flex-direction:column; gap:12px; align-items:flex-start; position:relative; }
+
+  .single-open-demo { display:flex; flex-direction:column; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:14px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:top; }
+  kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; color: var(--text-primary); background: var(--bgtable-row-focus); border:1px solid var(--border-primary); border-radius:var(--radius-xs); padding:1px 7px; }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- developer handoff ---------- */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 34px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+
+</style>
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="RiskMetric">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage" id="pg-stage"></div>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.006</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Организмы</p>
+    <h1>RiskMetric</h1>
+    <p class="lead">Компонент для обозначения уровня надёжности контрагентов: рейтинг (число) и зона проблемности (цвет). Собран из <a class="inl" href="../atoms/Chip.html">Chip</a> (ReadOnly, S, pill) и <a class="inl" href="Popover.html">Popover</a>. <b>Popover_RiskMetric — неотъемлемая часть компонента</b>, а не опциональная зависимость: клик по иконке-информеру всегда открывает карточку с деталями расчёта. Собственных состояний наведения или клика по самому чипу нет.</p>
+  </header>
+
+  <!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#pg-stage),
+       контролы — во вкладку «Конструктор» нижней панели (см. в конце) -->
+
+  <!-- 2. ИСПОЛЬЗОВАНИЕ -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">RiskMetric применяется в таблицах и списках контрагентов — компактная колонка с рейтингом и зоной, без необходимости открывать карточку контрагента для этих двух показателей. Клик по информеру раскрывает даты расчёта и текстовые риск-атрибуты, не уводя пользователя со страницы.</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div id="use-table"></div>
+    </div>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Popover_RiskMetric — неотъемлемая часть компонента.</b> Это <a class="inl" href="Popover.html">Popover</a> шириной <code class="tok">--pop-w-m</code> (320px): Header — заголовок «Рейтинг и зона проблемности» + ✕; Body — два серых блока подкачки (Зона / Рейтинг), каждый с датой расчёта, и два текстовых поля (Риск-сегмент, Риск-профиль). <b>Footer у RiskMetric нет</b> — контент только информационный, подтверждать нечего.</li>
+        <li><b>Одновременно открыт только один поповер</b> — как и в базовом Popover: открытие нового закрывает предыдущий (демо — раздел «Состояния»).</li>
+        <li>Компонент не диктует ширину колонки — чип растёт по контенту (число 1–2 цифры + иконка), высота фиксирована размером Chip S.</li>
+      </ul>
+    </div>
+  
+<div class="subsec" data-screen-label="FeederBlocks">
+    <h3>Компоненты подкачки поповера</h3>
+    <p class="desc tight">Body поповера собран из переиспользуемых блоков. Блок «Зона» и блок «Рейтинг» — серые контейнеры из двух строк (значение + дата расчёта); текстовые поля «Риск-сегмент» и «Риск-профиль» — простые label-значение. Ниже — все варианты наполнения.</p>
+    <div class="panel">
+      <div class="feeder-grid">
+        <div class="feeder-col">
+          <p class="feeder-col__cap">Блок «Зона» — 5 значений</p>
+          <div class="feeder-col__box" id="feeder-zone"></div>
+        </div>
+        <div class="feeder-col">
+          <p class="feeder-col__cap">Блок «Рейтинг» — есть / нет данных</p>
+          <div class="feeder-col__box" id="feeder-rate"></div>
+        </div>
+        <div class="feeder-col">
+          <p class="feeder-col__cap">Текстовые поля</p>
+          <div class="feeder-col__box" id="feeder-fields"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Чип не имеет собственных интерактивных состояний — единственный интерактивный элемент внутри него — кнопка-информер, открывающая Popover.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage" id="anat-stage"></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Chip</span><span class="d"> — ReadOnly, S, pill (chip--rounded). Метка — рейтинг (число) или «—». Тон заливки — по зоне: зелёная/watchlist — светлые, красная/чёрная — solid (белый текст); без зоны — Outline дефолтного цвета</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.chip__info</span><span class="d"> — кнопка-информер (не span, а настоящий &lt;button&gt;): открывает Popover. Отсутствует, если нет ни рейтинга, ни зоны</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Popover → Header</span><span class="d"> — заголовок «Рейтинг и зона проблемности» + ✕</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Popover → Body: блоки подкачки</span><span class="d"> — два серых блока «Зона проблемности» и «Рейтинг контрагента», у каждого строка «Дата расчета». Значение зоны окрашено цветом зоны</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Popover → Body: текстовые поля</span><span class="d"> — «Риск-сегмент» и «Риск-профиль», разделены отступом (без Divider). Footer отсутствует</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS (STUB) -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Не применимо: компонент существует в единственной конфигурации, отдельных вариантов нет.</p>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc tight">У компонента нет пропса размера — используется единственный фиксированный размер <b>Chip S</b> (24px), подобранный для плотных таблиц контрагентов. Ширина растёт по контенту: число (1–2 цифры) + иконка-информер 16px.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:260px; display:flex; align-items:center; justify-content:center;">
+        <div id="sizes-demo"></div>
+      </div>
+      <div class="panel" style="flex:2; min-width:300px; padding:8px 10px;">
+        <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-chip-table"></div></div>
+      </div>
+    </div>
+    <p class="dev-note">Popover_RiskMetric фиксирован на шаге <code class="tok">--pop-w-m</code> (320px) — стандартная ширина для заголовка и коротких строк данных; см. <a class="inl" href="Popover.html">шкалу размеров Popover</a>.</p>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Пропса размера у компонента нет: радиусы фиксированы и совпадают с радиусами Chip S и Popover.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Чип (Chip S)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поповер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-m</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Блок внутри поповера</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-m</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Число отвечает за рейтинг контрагента: целое от 1 до 26. Цвет отвечает за зону проблемности — четыре зоны риска, от зелёной до чёрной.</p>
+    <div class="panel" style="margin-bottom:20px; padding:8px 10px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 2.38fr 0.72fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Зона</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Код</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Тон чипа</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Пример</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 2.38fr 0.72fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зелёная</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">Green Zone</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">chip--success</code> · StGreen (светлая заливка)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="content-ex-green">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 2.38fr 0.72fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Watchlist</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">Watchlist</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">chip--warning</code> · StOrange (светлая заливка)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="content-ex-watchlist">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 2.38fr 0.72fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Красная</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">Red Zone</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">chip--error-solid</code> · StRed + белый текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="content-ex-red">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 2.38fr 0.72fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Чёрная</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">Black Zone</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">chip--dark-solid</code> · StGrey + белый текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="content-ex-black">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 2.38fr 0.72fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Нет данных</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">chip--outline</code> · StSystem (дефолтный бордер)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="content-ex-none">—</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Рейтинг</b> — целое число 1–26. Если данных нет — на месте числа длинное тире «—».</li>
+        <li><b>Зона</b> — если данных нет, чип не имеет заливки, только бордер дефолтного цвета (Outline, StSystem).</li>
+        <li><b>Ни рейтинга, ни зоны, но есть риск-сегмент и риск-профиль</b> — чип с дефолтным бордером и тире вместо числа, <b>информер остаётся</b>: в поповере зона, рейтинг и обе даты расчёта показаны прочерками, заполнены только риск-сегмент и риск-профиль.</li>
+        <li><b>Нет данных вообще</b> (ни зоны, ни рейтинга, ни риск-сегмента с профилем) — чип с дефолтным бордером и тире, <b>иконка-информер отсутствует</b>, поповер не открывается.</li>
+        <li><b>Нет риск-сегмента и профиля</b> при наличии зоны/рейтинга — поля остаются в поповере с прочерками, а не скрываются.</li>
+        <li><b>Даты расчёта</b> в Popover — формат ДД.ММ.ГГГГ, отдельно для зоны и для рейтинга (пересчитываются независимо).</li>
+        <li><b>Риск-сегмент и Риск-профиль</b> — свободный текст без ограничения символов; перенос по словам, лимита строк нет.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BEHAVIOR (STUB) -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Не применимо: специфического поведения (позиционирование, анимация, адаптивность) у компонента нет.</p>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc tight">Комбинации наличия данных, каждая — по четырём зонам. Rate, Details и None не зависят от зоны, поэтому показаны одной ячейкой.</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="rm-matrix" id="states-matrix"></div>
+    </div>
+
+    <p class="subhead">Один поповер одновременно</p>
+    <p class="desc tight">Откройте информер у второй строки — поповер первой закроется автоматически (правило унаследовано от Popover).</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="single-open-demo" id="single-open-demo"></div>
+    </div>
+
+    <p class="subhead">Загрузка и ошибка</p>
+    <p class="desc tight">Данные зоны/рейтинга могут ещё не быть загружены к моменту клика по информеру, либо запрос может завершиться ошибкой — Body переходит в состояние шиммера или <code class="tok">role="alert"</code>, Header (заголовок + ✕) остаётся на месте.</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="states" id="states-load-error"></div>
+    </div>
+
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Сам чип не в таб-порядке (не несёт собственного взаимодействия) и получает описательный <code class="tok">aria-label</code> («Риск-метрика. Рейтинг 26, зона проблемности — красная.») — этого достаточно для скрин-ридера, даже если визуально видна только цифра и иконка. Единственный фокусируемый элемент — кнопка-информер.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Клавиатура</p>
+        <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.13fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Tab</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Переводит фокус на кнопку-информер (если она есть) — сам чип и его текст из таб-порядка исключены</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Enter</kbd> / <kbd>Space</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Открывает Popover_RiskMetric, когда фокус на информере</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Esc</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Закрывает поповер, фокус возвращается на информер</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Tab</kbd> из поповера</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">С кнопки ✕ (единственный интерактивный элемент внутри) уводит дальше по странице и закрывает поповер — без focus trap, как у Popover</span></span></div><div class="tc tc--separator"></div></div></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:18px;">Скрин-ридер и цвет</p>
+        <ul class="bullets">
+          <li>Кнопка-информер — <code class="tok">aria-haspopup="dialog"</code>, <code class="tok">aria-expanded</code>, <code class="tok">aria-controls</code>;</li>
+          <li>заголовок Popover связан контейнером через <code class="tok">aria-labelledby</code>;</li>
+          <li>ошибка загрузки — <code class="tok">role="alert"</code>, загрузка — <code class="tok">aria-busy="true"</code> на Body;</li>
+          <li>зона никогда не кодируется только цветом — рядом всегда текстовое название («Зелёная», «Watchlist»…), и в чипе (число), и в Popover;</li>
+          <li>текст на зонах (*-dark токены) подобран для контраста AA на соответствующей заливке (*-light).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Весь текст поповера — гарнитура <b>SB Sans Text</b>; выделенное значение (рейтинг) — strong.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 2.07fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.07fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Значение строки (.rm-block__value)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.07fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Значение выделенное (Зона / Рейтинг)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m-strong)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.07fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Метка поля (.rm-field__label)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.07fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Значение поля (.rm-field__value)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Только токены Local (StGreen/StOrange/StRed/StGrey/StSystem, <code class="tok">colors.css</code>). Зелёная и Watchlist — светлая заливка (тон *-light + тёмный текст). Красная и чёрная — solid-заливка (базовый тон StRed/StGrey + белый текст <code class="tok">--c-mgrey-50</code>) для читаемости на насыщенном фоне. Без зоны — Outline (StSystem). Новых цветов не вводится.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зоны — светлая заливка (Зелёная / Watchlist)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Зеленая — фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-green-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-green-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #4CAF50</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зоны — светлая заливка (Зелёная / Watchlist)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Зеленая — текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-green-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-green-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#2E7D32</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зоны — светлая заливка (Зелёная / Watchlist)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Watchlist — фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-orange-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-orange-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #FFA000</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зоны — светлая заливка (Зелёная / Watchlist)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Watchlist — текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-orange-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-orange-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FF6F00</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зоны — solid-заливка (Красная / Чёрная)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Красная — фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-red</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-red)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#EF5350</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зоны — solid-заливка (Красная / Чёрная)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Чёрная — фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-grey</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-grey)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#333F48</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зоны — solid-заливка (Красная / Чёрная)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст и иконка (обе)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-mgrey-50</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-mgrey-50)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Нет зоны (Outline)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Border</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system-mid</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system-mid)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">56% #7A9994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Нет зоны (Outline)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Нет зоны (Outline)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#7A9994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Popover — поверхность и блок подкачки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон поповера</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-popup</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-popup)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Popover — поверхность и блок подкачки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон блока</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-cgrey-50</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-50)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FBFBFB</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Popover — поверхность и блок подкачки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Граница</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E1EDE7</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.43fr 1.35fr 1.22fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Popover — поверхность и блок подкачки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Радиус</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-popup</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки.</p>
+
+    <p class="subhead">Точные размеры (redline) <span class="req">— измерено на живом экземпляре через getComputedStyle</span></p>
+    <div class="row" style="margin-bottom:34px;">
+      <div class="panel" style="flex:1; min-width:280px; padding:8px 10px;">
+        <p class="desc tight" style="margin:6px 6px 14px;">Chip (S)</p>
+        <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-chip-table-dup"></div></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:280px; padding:8px 10px;">
+        <p class="desc tight" style="margin:6px 6px 14px;">Popover (w-m)</p>
+        <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-pop-table"></div></div>
+      </div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/chip.css</code>
+      <code class="tok">styles/popover.css</code>
+      <code class="tok">styles/divider.css</code>
+      <code class="tok">styles/icon-button.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Резолвинг вида чипа из данных:
+function resolveChip(rating, zone):
+  hasZone = zone != null
+  hasInfo = hasZone || rating != null
+  label = rating != null ? String(rating) : '—'
+  tone  = hasZone ? ZONE_TONE[zone] : null      // null → chip--outline; красная/чёрная → *-solid
+  return { label, tone, showInfoButton: hasInfo, rounded: true }</span>
+
+<span class="tk-cm">// 2. Открытие/позиционирование/single-open/Esc/клик-вне — не своя логика,
+//    а прямая привязка кнопки-информера к базовому рантайму Popover:
+bind(infoButton, { pop: popoverEl, placement: 'bottom', align: 'start' })
+//    Дальше всё как у обычного Popover: один открытый экземпляр на страницу,
+//    12-позиционный авто-flip, тени скролла, ✕/Esc/клик-вне/Tab-out.</span>
+
+<span class="tk-cm">// 3. Закрытие — 3 равнозначных способа (Footer с действиями отсутствует):
+//    ✕ / клик вне / Esc. Фокус при Esc возвращается на кнопку-информер.</span>
+
+<span class="tk-cm">// 4. Состояния Body — взаимоисключающие:
+//    loading  → aria-busy="true" + skeleton вместо блоков
+//    error    → role="alert" + сообщение, Header остаётся кликабельным (✕ работает)
+//    default  → rm-blocks: 2 × rm-block (Зона / Рейтинг со своей датой расчёта, зазор 8px)
+//               + 2 × rm-field (Риск-сегмент / Риск-профиль), зазор тела 16px, без Divider
+//    отсутствующие значения выводятся прочерком «—», поля не скрываются</span></code></pre>
+    </div>
+    <p class="dev-note">Рабочий референс на vanilla JS — рантайм <code class="tok">scripts/ds-riskmetric.js</code> (сборка Chip + Popover из <code class="tok">data-riskmetric</code>) поверх <code class="tok">scripts/ds-popover.js</code>.</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>История изменений рейтинга</b> — мини-график динамики зоны/рейтинга за период в теле поповера.</li>
+        <li><b>Сравнение с портфелем</b> — контекст «выше/ниже среднего» рядом со значением.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · RiskMetric</span>
+    <span>Chip (ReadOnly, S) + Popover (w-m) · 4 зоны · один открытый поповер одновременно</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите метрику: зона проблемности, рейтинг контрагента и состояние поповера. Кликните по иконке-информеру в превью, чтобы открыть Popover_RiskMetric. Демо обновляется наверху, панель настроек — две колонки.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка и исходники RiskMetric: HTML — из спеки, CSS — styles/riskmetric.css (полностью), JS — рантайм сборки. Демо страницы строит <code class="tok">scripts/riskmetric.page.js</code>.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-popover.js"></script>
+<script src="../../scripts/ds-riskmetric.js"></script>
+<script src="../../scripts/riskmetric.page.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+
+<!-- самодостаточные подписи свитчеров конструктора (общий слой docs-split.js) -->
+<script>
+window.DS_SPLIT_SWITCH_LABELS = {
+  'Риск-сегмент и профиль': 'Показывать риск-сегмент и профиль',
+};
+</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html"><span class="pop-anchor">
+  <span class="chip chip--s chip--error" aria-label="Риск-метрика. Рейтинг 26, зона проблемности — красная.">
+    <span class="chip__label">26</span>
+    <button type="button" class="chip__info" aria-haspopup="dialog" aria-expanded="false" aria-controls="rm-pop-1" aria-label="Показать детали риск-метрики"><i data-icon="info-circle"></i></button>
+  </span>
+  <div id="rm-pop-1" class="pop pop--w-m pop--bottom pop--start pop--floating" role="dialog" aria-modal="false" aria-labelledby="rm-pop-1-title">
+    <div class="pop__head">
+      <h3 class="pop__title" id="rm-pop-1-title">Рейтинг и зона проблемности</h3>
+      <span class="pop__close"><button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Закрыть"><i data-icon="close"></i></button></span>
+    </div>
+    <div class="pop__body">
+      <div class="rm-block"><div class="rm-block__row"><span class="rm-block__label">Зона проблемности</span><span class="rm-block__value rm-block__value--strong" style="color:var(--st-red-dark)">Красная</span></div><div class="rm-block__row"><span class="rm-block__label">Дата расчета</span><span class="rm-block__value">24.10.2025</span></div></div>
+      <div class="rm-block"><div class="rm-block__row"><span class="rm-block__label">Рейтинг контрагента</span><span class="rm-block__value rm-block__value--strong">26</span></div><div class="rm-block__row"><span class="rm-block__label">Дата расчета</span><span class="rm-block__value">24.10.2025</span></div></div>
+      <div class="rm-field"><p class="rm-field__label">Риск-сегмент</p><p class="rm-field__value">…</p></div>
+      <div class="rm-field"><p class="rm-field__label">Риск-профиль</p><p class="rm-field__value">Непроектный</p></div>
+    </div>
+  </div>
+</span></script>
+
+<script type="text/plain" id="src-code-js">/* RiskMetric — сборку Chip+Popover делает рантайм scripts/ds-riskmetric.js
+   (поверх scripts/ds-popover.js: позиционирование/open-close/single-open/Esc). */
+
+// Хук: пустой <span data-riskmetric data-risk="26" data-zone="red" …>
+// Рантайм строит чип + поповер; aria-label «Рейтинг N, зона — …» проставляется сам.
+// hasInfo = зона || рейтинг || риск-сегмент || риск-профиль — ничего из этого нет,
+// информера нет и поповер не открывается.
+// Тон чипа: ZONE_TONE[zone]; красная/чёрная → *-solid, иначе outline; rounded: true.
+// Тело поповера: loading (aria-busy + skeleton) | error (role="alert") |
+// default (rm-block×2 + rm-field×2, без Divider).
+
+/* React API (предложение): RiskMetricProps — rating · zone · riskSegment ·
+   riskProfile · ratingDate · zoneDate · popState{default|loading|error} */</script>
+
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   RISKMETRIC — композиция поповера риск-метрики
+   Вынесено из инлайн-<style> страницы-витрины (Фаза 3, шаг 3): те же классы
+   были скопированы в экран 02-Deal-v2, правка расходилась в двух местах.
+   Только на токенах ДС. Чип метрики — компонент Chip, здесь его нет.
+   ========================================================================= */
+.rm-body { gap: 16px; }
+.rm-blocks { display: flex; flex-direction: column; gap: 8px; }
+.rm-block { background: var(--bg-page); border-radius: var(--radius-m); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; margin: 0; }
+.rm-block__row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.rm-block__label { font: var(--type-body-s); color: var(--text-secondary); overflow-wrap: break-word; }
+.rm-block__value { font: var(--type-body-s); color: var(--text-primary); text-align: right; min-width: 0; flex: 1 1 auto; overflow-wrap: break-word; }
+.rm-block__value--strong { font: var(--type-body-m-strong); color: var(--text-primary); }
+.rm-field { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+.rm-field__label { margin: 0; font: var(--type-body-xs); color: var(--text-secondary); }
+.rm-field__value { margin: 0; font: var(--type-body-s); color: var(--text-primary); text-wrap: pretty; overflow-wrap: break-word; }</script>
+</body>
+</html>

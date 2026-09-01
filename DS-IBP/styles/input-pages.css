@@ -1,0 +1,105 @@
+/* ============================================================
+   INPUT PAGES — дифф поверх styles/ds-docs.css.
+   Страницы: InputText · InputDate · InputDateRange ·
+   InputAmountRange · InputAutocomplete · DatePicker · NavTile ·
+   Illustrations.
+   Общий хром документации переехал в ds-docs.css (волна 4E);
+   здесь остались только правила, уникальные для этих страниц.
+   ПОРЯДОК ПОДКЛЮЧЕНИЯ: ds-docs.css → input-pages.css → pg-kit.css.
+   Раскладку конструктора задаёт pg-kit.css — не дублировать.
+   ============================================================ */
+
+/* masthead */
+
+/* sections */
+
+.section > p.desc, .section .subsec > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin: 0 0 28px; max-width: 76ch; text-wrap: pretty; }
+.section > p.desc.tight, .section .subsec > p.desc.tight { margin-bottom: 20px; }
+
+.row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 40px; }
+
+/* playground */
+
+@media (max-width:820px){ .panel.pg { grid-template-columns: 1fr; } }
+
+/* сцена конструктора; --pg-stage-* поднимают её на страницах с открытым
+   поповером (список / календарь) — абсолютный слой не должен резаться
+   overflow:hidden панели, который держит скругление углов */
+.pg__stage { padding: 44px 40px var(--pg-stage-pb, 70px); display: flex; align-items: flex-start; justify-content: center; min-height: var(--pg-stage-minh, 340px); position: relative;
+  background:
+    linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+    repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+
+/* конвенция страниц с открытым списком (ср. DropdownList.html) */
+.pg__stage--pop { --pg-stage-pb: 150px; --pg-stage-minh: 460px; }
+
+.ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform: uppercase; letter-spacing: .05em; font-size: 11px; }
+
+.pg__code { margin-top: 4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+.pg-text input[type="text"] { width: 100%; height: 40px; padding: 0 14px; border: 1px solid var(--border-primary); border-radius: var(--radius-control); background: var(--bg-tile); color: var(--text-primary); font: var(--type-body-m); }
+.pg-text input[type="text"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+.toggle { display: inline-flex; align-items: center; gap: 11px; padding: 9px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-control); font: var(--type-body-m); color: var(--text-primary); cursor: pointer; user-select: none; background: var(--bg-tile); transition: .12s; }
+
+/* usage */
+.use-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+@media (max-width:900px){ .use-grid { grid-template-columns: 1fr; } }
+
+.use-block__stage { padding: 26px 24px 32px; background: var(--tertiary-light); position: relative; min-height: 140px; display: flex; justify-content: center; align-items: flex-start; }
+
+/* anatomy */
+.anat { display: grid; grid-template-columns: minmax(280px,1fr) minmax(240px,380px); gap: 44px; align-items: center; }
+@media (max-width:760px){ .anat { grid-template-columns: 1fr; } }
+.anat__stage { background: var(--tertiary-light); border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 44px; display: flex; justify-content: center; }
+.anat__legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; counter-reset: a; }
+.anat__legend li { display: flex; gap: 14px; align-items: flex-start; font: var(--type-body-m); color: var(--text-primary); }
+.anat__legend li .n { counter-increment: a; flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; font: var(--type-body-s-strong); display: flex; align-items: center; justify-content: center; }
+
+.anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+/* variants / sizes / states grids */
+.demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px 26px; }
+.demo-cell { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; min-width: 0; }
+.demo-cell > .th { font: var(--type-body-s-strong); color: var(--text-secondary); }
+.demo-cell > .sub { font: var(--type-body-xs); color: var(--text-inactive); margin: 0; max-width: 40ch; text-wrap: pretty; }
+.size-badge { font: var(--type-body-xs); color: var(--text-inactive); font-variant-numeric: tabular-nums; background: var(--bgtable-row-focus); padding: 2px 9px; border-radius: 999px; }
+
+/* table edit demo */
+.tbl-demo { border: 1px solid var(--border-light); border-radius: 12px; overflow: hidden; width: 100%; }
+.tbl-demo__row { display: grid; grid-template-columns: 8px 1.2fr 1fr 8px; align-items: center; min-height: 48px; border-bottom: 1px solid var(--border-light); background: var(--bg-tile); }
+.tbl-demo__row:last-child { border-bottom: none; }
+.tbl-demo__row--head { background: var(--bgtable-pinned, var(--tertiary-light)); font: var(--type-body-s); color: var(--text-secondary); }
+.tbl-demo__cell { padding: 6px 8px; min-width: 0; }
+
+/* reference tables */
+
+.ref-table th, .ref-table td { text-align: left; padding: 16px 16px; border-bottom: 1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align: middle; }
+
+kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--text-primary); background: var(--bgtable-row-focus); border: 1px solid var(--border-primary); border-bottom-width: 2px; border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+
+/* colors */
+
+@media (max-width:760px){ .color-ref { grid-template-columns: 1fr; } }
+
+.cref-group > h3 { font: var(--type-h5-strong); margin: 0; color: var(--text-primary); padding: 18px 22px; border-bottom: 1px solid var(--border-light); }
+
+.cref-row { display: grid; grid-template-columns: 36px 1fr auto; gap: 14px; align-items: center; padding: 9px 22px; }
+
+.cref-sw .cf { position: absolute; inset: 0; }
+
+/* developer handoff */
+.subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin: 0 0 16px; }
+.subhead.mt { margin-top: 34px; }
+
+.code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; letter-spacing: .02em; font-weight: 600; }
+
+/* длинные составные токены в первой колонке справочника переносятся,
+   иначе таблица растягивает страницу по горизонтали */
+.dev-table td:first-child code.tok,
+.ref-table td:first-child code.tok { white-space: normal; overflow-wrap: anywhere; }
+
+/* backlog */
+.backlog { margin-top: 76px; border: 1px dashed var(--border-primary); border-radius: 16px; padding: 28px 32px; }
+.backlog > h2 { font: var(--type-h4-strong); margin: 0 0 8px; color: var(--text-primary); }
+.backlog > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin: 0 0 18px; max-width: 76ch; }

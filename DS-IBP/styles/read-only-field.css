@@ -1,0 +1,152 @@
+/* =========================================================================
+   Design System — ReadOnlyField
+   Поле для отображения данных без возможности редактирования. Показывает
+   значение — текст, чипы или ссылку — с опциональными лейблом, хэлпером,
+   префиксом/постфиксом и иконками слева/справа. Не имеет собственного
+   контейнера (без рамки и фона) — это чистая пара «подпись → значение».
+
+   Types:    text · chips · link
+   Slots:    label ← .ds-label · icon-left (any icon, decorative) · prefix · value ·
+             postfix · icon-right (any icon; action: none/copy/tooltip) ·
+             helper ← .ds-helper
+   Options:  каждый слот включается независимо и сочетается в любой
+             комбинации (label/helper можно скрыть, иконки/аффиксы —
+             показать по одному или все сразу)
+   Value:    default · positive · negative · muted (Empty) ← proposed
+   Overflow: одна строка (ellipsis) · N строк (line-clamp) — обе с тултипом
+             на переполнении
+   Align:    left (по умолчанию) · right — для числовых/денежных значений
+   States:   default · empty ← proposed · loading (skeleton) ← proposed
+   Requires: typography.css, colors.css, radius.css, label-helper.css,
+             chip.css (type=chips), link.css (type=link),
+             tooltip.css (тултип переполнения / предупреждения / копирования)
+   ========================================================================= */
+
+.rof {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.rof--align-right { align-items: flex-end; }
+.rof--align-right .rof__row { justify-content: flex-end; }
+
+/* ---------- content row --------------------------------------------------- */
+.rof__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+}
+/* when value can wrap to several lines, icons/affixes pin to the first line */
+.rof__row--top { align-items: flex-start; }
+.rof__row--top .rof__icon { margin-top: 1px; }
+
+/* ---------- icons ---------------------------------------------------------- */
+.rof__icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-inactive);
+}
+.rof__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* copy / actionable icon — gets its own hit + hover state */
+.rof__icon--interactive {
+  cursor: pointer;
+  border-radius: var(--radius-circle);
+  transition: background-color .12s ease, color .12s ease;
+}
+.rof__icon--interactive:hover,
+.rof__icon--interactive:focus-visible {
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  color: var(--text-secondary);
+}
+.rof__icon--interactive:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.rof__icon--interactive.is-done { color: var(--success-dark); }
+
+/* informational icon (e.g. overdue / anomaly) — not clickable, shows tooltip */
+.rof__icon--warning { color: var(--warning); cursor: default; }
+
+/* ---------- prefix / postfix --------------------------------------------- */
+/* Kept short by design (~10-12 characters): a symbol or abbreviation, never
+   a full word/phrase. If misconfigured with a long string it truncates
+   instead of stretching the row — full text is available via hover tooltip
+   (wired in JS), same treatment as an overflowing value. */
+.rof__affix {
+  flex: none;
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-body-m);
+  color: var(--text-inactive);
+}
+
+/* ---------- value ------------------------------------------------------------ */
+.rof__value {
+  min-width: 0;
+  font: var(--type-body-m);
+}
+/* text/chips values (span/div) get the default body colour; an anchor value
+   (type=link) must keep the Link component's own accent/hover colours
+   instead — scoped by tag so specificity doesn't depend on stylesheet load
+   order, and left alone here so .link / .link:hover keep control. */
+span.rof__value,
+div.rof__value {
+  color: var(--text-primary);
+}
+a.rof__value.link { font: var(--type-body-m); }
+
+/* semantic colour — for signed deltas / rates (text values only) */
+span.rof__value.rof__value--positive,
+div.rof__value.rof__value--positive { color: var(--success-dark); }
+span.rof__value.rof__value--negative,
+div.rof__value.rof__value--negative { color: var(--error-dark); }
+/* Empty placeholder — PROPOSED */
+span.rof__value.rof__value--muted,
+div.rof__value.rof__value--muted { color: var(--text-inactive); }
+
+/* overflow: single line → ellipsis */
+.rof__value--clamp-1 {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* overflow: N lines → line-clamp (N supplied inline via --rof-clamp; default 2) */
+.rof__value--clamp-n {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--rof-clamp, 2);
+  overflow: hidden;
+  text-wrap: pretty;
+}
+
+/* chips value — reuses Chip (readonly, xs) inside a wrapping chiplist */
+.rof__value--chips { display: flex; min-width: 0; }
+.rof__value--chips .chiplist { row-gap: 6px; }
+
+/* ---------- helper alignment ------------------------------------------------- */
+.rof .ds-helper--right { text-align: right; }
+
+/* ---------- Empty state — PROPOSED -------------------------------------------- */
+.rof--empty .rof__value { color: var(--text-inactive); }
+
+/* ---------- Loading skeleton — PROPOSED ---------------------------------------- */
+/* Общий компонент Skeleton (.sk-line, styles/skeleton.css), локальной реализации нет. */
+
+/* =========================================================================
+   ROF-GRID — usage pattern for laying out several fields inside a card
+   (documentation-only helper class, ships alongside real product cards)
+   ========================================================================= */
+.rof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 24px;
+}

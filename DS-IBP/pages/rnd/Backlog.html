@@ -1,0 +1,162 @@
+<!-- @dsCard group="RND" name="Backlog" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Общий бэклог — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-toc.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+.page{max-width:1560px;margin:0 auto;padding:clamp(40px,7vw,96px) clamp(24px,4vw,56px) 140px;}
+a{color:var(--link);} a:hover{color:var(--link-dark);}
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:88ch;text-wrap:pretty;}
+.prio{display:inline-flex;align-items:center;justify-content:center;font:700 11px/1 var(--font-text),sans-serif;border-radius:6px;padding:4px 8px;letter-spacing:.02em;}
+.prio-P1{background:var(--error);color:var(--text-on-dark);}
+.prio-P2{background:var(--warning);color:var(--warning-dark);}
+.prio-P3{background:var(--c-cgrey-100);color:var(--text-secondary);}
+.area{display:inline-flex;font:600 11px/1 var(--font-text),sans-serif;border-radius:999px;padding:4px 8px;white-space:nowrap;background:var(--c-cgrey-50);color:var(--text-secondary);}
+.empty-log{font:var(--type-body-m);color:var(--text-inactive);padding:28px 14px;text-align:center;}
+</style>
+</head>
+<body>
+<main class="page">
+  <a class="crumb" href="../../index.html">← Дизайн-система</a>
+  <header class="masthead">
+    <p class="eyebrow">RND</p>
+    <h1>Общий бэклог</h1>
+    <p class="meta"><span>Версия: <b>1.001</b></span><span>Обновлено: <b>13.08.2026</b></span></p>
+    <p class="lead">Задачи на потом для всей дизайн-системы — то, что не относится к одному конкретному компоненту и не делается прямо сейчас. Добавляйте строки в таблицу ниже по мере появления идей и замечаний.</p>
+  </header>
+
+  <section class="section" data-screen-label="Бэклог">
+    <h2>Задачи</h2>
+    <p class="desc">Область — раздел ДС, к которому относится задача (Основы, Атомы, Молекулы, Организмы, Паттерны, сквозное). Приоритет — P1/P2/P3 или пусто, если не определён.</p>
+      <div class="tbl">
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Задача</span></div>
+          <div class="th"><span class="th__label">Область</span></div>
+          <div class="th th--center"><span class="th__label">Приор.</span></div>
+          <div class="th"><span class="th__label">Комментарий</span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Компонент Stepper (шаги заведения)</b></span></span></div>
+          <div class="tc"><span class="area">Молекулы</span></div>
+          <div class="tc tc--center"><span class="prio prio-P2">P2</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Вертикальный список шагов с состояниями (пройден / текущий / предстоит), связкой-линией и счётчиком внутри шага («Продукты ДИД (2 из 2)»). Встретился при сборке 02-Deal-v3 (плитка «Заведение сделки»), собран там локальной раскладкой .stp на токенах — до компонента повторное использование невозможно. Нужны: горизонтальный вариант, кликабельные шаги, ошибка на шаге</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Контраст тона neutral у IconButton</b></span></span></div>
+          <div class="tc"><span class="area">Атомы</span></div>
+          <div class="tc tc--center"><span class="prio prio-P2">P2</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">.ibtn--neutral и дефолтный тон указывают на --secondary (#B8D6D3): на белом 1.54:1 при минимуме 3:1 для нетекстового контрола (WCAG 1.4.11). Заметно там, где иконка — единственный способ вызвать действие (кебаб ContextMenu). Решено 11.08.2026 не трогать сейчас — вернуться при плановых правках ДС. Варианты: --text-secondary (4.2:1, нейтрально-серый) или --secondary-dark (3.2:1, эмеральд сохраняется)</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Переделать таблицы во всех документациях на таблицы из ДС</b></span></span></div>
+          <div class="tc"><span class="area">Сквозное</span></div>
+          <div class="tc tc--center"><span class="prio prio-P3">P3</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Документация переведена (07.08.2026): Backlog, SectionsAudit, Elevation, Radius, Typography — на .tbl. Осталось четыре мокапа экранов на нативной .dt: 01-Portfolio, 04-Metrics, 07-CashFlow, 08-Payments</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Проработать возможность добавлять задачи без чата</b></span></span></div>
+          <div class="tc"><span class="area">Сквозное</span></div>
+          <div class="tc tc--center"><span class="tc__empty">—</span></div>
+          <div class="tc tc--wrap"><span class="tc__empty">—</span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Собрать агента-ревизора распространения изменений</b></span></span></div>
+          <div class="tc"><span class="area">Сквозное</span></div>
+          <div class="tc tc--center"><span class="tc__empty">—</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Проверяет полноту раскатки правки токена/компонента; по триггеру «закончили» ищет места для раскатки новой сущности и сводит итоги итерации. Реализация: scripts/ds-ripple.js + skills/ds-ripple-check.md</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>FileUpload / Dropzone</b></span></span></div>
+          <div class="tc"><span class="area">Молекулы</span></div>
+          <div class="tc tc--center"><span class="prio prio-P3">P3</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Загрузка документов: drag&amp;drop, список файлов, прогресс, ошибки. Из аудита разделов (SectionsAudit, Фаза 2), 13.08.2026</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Slider</b></span></span></div>
+          <div class="tc"><span class="area">Атомы</span></div>
+          <div class="tc tc--center"><span class="prio prio-P3">P3</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Перетаскиваемый выбор значения/диапазона. InputAmountRange — это два поля, не ползунок. Из аудита разделов (SectionsAudit, Фаза 2), 13.08.2026</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Accordion (самостоятельный)</b></span></span></div>
+          <div class="tc"><span class="area">Молекулы</span></div>
+          <div class="tc tc--center"><span class="prio prio-P3">P3</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Сейчас разворачивание есть только как вариант Tile. Нужен независимый компонент-аккордеон. Из аудита разделов (SectionsAudit, Фаза 2), 13.08.2026</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Drawer / Sheet</b></span></span></div>
+          <div class="tc"><span class="area">Организмы</span></div>
+          <div class="tc tc--center"><span class="prio prio-P3">P3</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Боковая выезжающая панель для деталей/форм. Modal — по центру, NavPanel drawer — частный случай навигации. Из аудита разделов (SectionsAudit, Фаза 2), 13.08.2026</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>TimePicker</b></span></span></div>
+          <div class="tc"><span class="area">Молекулы</span></div>
+          <div class="tc tc--center"><span class="tc__empty">—</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Ввод времени. Уточнить у пользователя, нужен ли продукту. Из аудита разделов (SectionsAudit, Фаза 2), 13.08.2026</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>NumberStepper</b></span></span></div>
+          <div class="tc"><span class="area">Атомы</span></div>
+          <div class="tc tc--center"><span class="tc__empty">—</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Поле с кнопками +/−. Уточнить у пользователя — InputAmount закрывает большинство случаев. Из аудита разделов (SectionsAudit, Фаза 2), 13.08.2026</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Card (обобщённый)</b></span></span></div>
+          <div class="tc"><span class="area">Организмы</span></div>
+          <div class="tc tc--center"><span class="tc__empty">—</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">В чит-шите Card упоминается («в Card не бывает Alert»), но страницы нет. Уточнить у пользователя границу с Tile. Из аудита разделов (SectionsAudit, Фаза 2), 13.08.2026</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 2.2fr 132px 92px 3fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Motion / тайминги</b></span></span></div>
+          <div class="tc"><span class="area">Основы</span></div>
+          <div class="tc tc--center"><span class="tc__empty">—</span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Поведение компонентов ссылается на тайминги, но foundation-документа с токенами длительностей/easing нет. Уточнить у пользователя, нужен ли. Из аудита разделов (SectionsAudit, Фаза 2), 13.08.2026</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+  </section>
+</main>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-toc.js"></script>
+</body>
+</html>

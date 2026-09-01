@@ -1,0 +1,265 @@
+/* =========================================================================
+   Design System — Button
+   Types:  accent · outline · transparent
+   Sizes:  m (40) · s (32) · xs (24)
+   States: default · hover · active · disabled · loading
+   Text uses the Button M/S/XS typography tokens (SB Sans Screen).
+   Requires: typography.css, colors.css
+   ========================================================================= */
+
+:root {
+  /* derived button tints (from --primary) */
+  --btn-hover-bg:  color-mix(in srgb, var(--primary) 10%, #fff);
+  --btn-active-bg: color-mix(in srgb, var(--primary) 18%, #fff);
+  --btn-pale:      color-mix(in srgb, var(--primary) 45%, #fff);
+}
+
+.btn {
+  /* layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* высота/паддинги/gap задаются размерным классом .btn--m|--s|--xs (обязателен) */
+  border-radius: var(--radius-control);
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  min-width: 0; /* позволяет сжиматься до эллипсиса внутри flex-родителя (ButtonGroup fullwidth, тулбар) */
+
+  /* type — overridden per size below */
+  font: var(--type-button-m);
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* icons */
+.btn svg { flex: none; display: block; }
+.btn__label { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* ---------- sizes ---------------------------------------------------------- *
+   Размеры — прямыми свойствами (не через --btn-* в модификаторе), чтобы
+   компилятор чисто регистрировал токены. Иконка/спиннер/шеврон — per-size.
+   Шеврон: повышенная специфичность (.btn.btn--m ...), чтобы перебить
+   per-size `svg`-правило независимо от тега элемента (0,3,0 > 0,2,1). */
+.btn--m  { height: 40px; padding: 0 16px; gap: 8px; border-radius: var(--radius-control);   font: var(--type-button-m); }
+.btn--s  { height: 32px; padding: 0 12px; gap: 6px; border-radius: var(--radius-control);   font: var(--type-button-s); }
+.btn--xs { height: 24px; padding: 0 8px;  gap: 4px; border-radius: var(--radius-control-s); font: var(--type-button-xs); }
+/* сторона с иконкой/шевроном/спиннером у́же стороны с текстом (:first-child/:last-child,
+   кроме .btn__label); icon-only ниже переопределяет обе стороны симметрично */
+.btn--m:has(>:first-child:not(.btn__label))  { padding-left: 12px; }
+.btn--m:has(>:last-child:not(.btn__label))   { padding-right: 12px; }
+.btn--s:has(>:first-child:not(.btn__label))  { padding-left: 10px; }
+.btn--s:has(>:last-child:not(.btn__label))   { padding-right: 10px; }
+.btn--xs:has(>:first-child:not(.btn__label)) { padding-left: 6px; }
+.btn--xs:has(>:last-child:not(.btn__label))  { padding-right: 6px; }
+/* размер глифа задаёт слот и покрывает обе формы разметки — вставленный
+   <svg> и <i data-icon> (ds-icons.js). Менять одну на другую можно без правки CSS. */
+.btn--m :is(svg,[data-icon]){ width: 20px; height: 20px; }
+.btn--s :is(svg,[data-icon]){ width: 18px; height: 18px; }
+.btn--xs :is(svg,[data-icon]){ width: 16px; height: 16px; }
+.btn--m .spin  { width: 20px; height: 20px; }
+.btn--s .spin  { width: 18px; height: 18px; }
+.btn--xs .spin { width: 16px; height: 16px; }
+.btn.btn--m .btn__chevron  { width: calc(20px * .8); height: calc(20px * .8); }
+.btn.btn--s .btn__chevron  { width: calc(18px * .8); height: calc(18px * .8); }
+.btn.btn--xs .btn__chevron { width: calc(16px * .8); height: calc(16px * .8); }
+/* открытое меню — шеврон разворачивается на 180°: реагирует на aria-expanded,
+   который пишет рантайм (ds-menu.js/ds-popover.js), классов не нужно (RulesAudit W1) */
+.btn__chevron { transition: transform .15s ease; }
+.btn[aria-expanded="true"] .btn__chevron { transform: rotate(180deg); }
+
+/* icon-only: square-ish, padding per size (mirror --btn-iconpad) */
+.btn--icon-only { gap: 0; }
+.btn--m.btn--icon-only  { padding: 0 8px; }
+.btn--s.btn--icon-only  { padding: 0 6px; }
+.btn--xs.btn--icon-only { padding: 0 4px; }
+
+/* ---------- type: ACCENT --------------------------------------------------- */
+.btn--accent {
+  background: var(--primary);
+  color: var(--text-on-dark);
+  border-color: var(--primary);
+}
+.btn--accent svg { color: var(--text-on-dark); }
+.btn--accent:hover  { background: var(--primary-dark); border-color: var(--primary-dark); }
+.btn--accent:active { background: var(--btn-pale);     border-color: var(--btn-pale); }
+
+/* ---------- type: OUTLINE -------------------------------------------------- */
+.btn--outline {
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.btn--outline svg { color: var(--primary); }
+.btn--outline:hover  { background: var(--btn-hover-bg); }
+.btn--outline:active { background: var(--btn-active-bg); color: var(--btn-pale); border-color: var(--btn-pale); }
+.btn--outline:active svg { color: var(--btn-pale); }
+
+/* ---------- type: TRANSPARENT ---------------------------------------------- */
+.btn--transparent {
+  background: transparent;
+  color: var(--primary);
+  border-color: transparent;
+}
+.btn--transparent svg { color: var(--primary); }
+.btn--transparent:hover  { background: var(--btn-hover-bg); }
+.btn--transparent:active { background: var(--btn-active-bg); color: var(--btn-pale); }
+.btn--transparent:active svg { color: var(--btn-pale); }
+
+/* ---------- state: DISABLED ------------------------------------------------ */
+.btn:disabled,
+.btn--disabled { cursor: default; pointer-events: none; }
+
+.btn--accent:disabled,      .btn--accent.btn--disabled {
+  background: var(--disabled); border-color: var(--disabled); color: var(--text-on-dark);
+}
+.btn--accent:disabled svg,  .btn--accent.btn--disabled svg { color: var(--text-on-dark); }
+
+.btn--outline:disabled,     .btn--outline.btn--disabled {
+  background: transparent; border-color: var(--disabled); color: var(--text-inactive);
+}
+.btn--outline:disabled svg, .btn--outline.btn--disabled svg { color: var(--text-inactive); }
+
+.btn--transparent:disabled, .btn--transparent.btn--disabled {
+  background: transparent; color: var(--text-inactive);
+}
+.btn--transparent:disabled svg, .btn--transparent.btn--disabled svg { color: var(--text-inactive); }
+
+/* ---------- modifier: TONE (Error · Warning · Success · Info) -------------
+   Комбинируется с любым из трёх типов — меняет только цвет на токены тона
+   из палитры Situative, форма/размер/паддинги не трогаются. Используются
+   на Alert и SnackBar (см. alert.css/snackbar.css) и для деструктивных
+   действий (Error, диалог подтверждения удаления).
+   .btn--danger сохранён как алиас .btn--error для обратной совместимости
+   (Modal, TableFilter уже используют это имя). */
+.btn--error.btn--accent, .btn--danger.btn--accent {
+  background: var(--error); border-color: var(--error); color: var(--text-on-dark);
+}
+.btn--error.btn--accent svg, .btn--danger.btn--accent svg { color: var(--text-on-dark); }
+.btn--error.btn--accent:hover,  .btn--danger.btn--accent:hover  { background: var(--error-dark); border-color: var(--error-dark); }
+.btn--error.btn--accent:active, .btn--danger.btn--accent:active { background: var(--error-light); border-color: var(--error-light); }
+
+.btn--error.btn--outline, .btn--danger.btn--outline { color: var(--error); border-color: var(--error); }
+.btn--error.btn--outline svg, .btn--danger.btn--outline svg { color: var(--error); }
+.btn--error.btn--outline:hover,  .btn--danger.btn--outline:hover  { background: var(--error-bg-light); }
+.btn--error.btn--outline:active, .btn--danger.btn--outline:active { background: var(--error-bg); color: var(--error-dark); border-color: var(--error-dark); }
+.btn--error.btn--outline:active svg, .btn--danger.btn--outline:active svg { color: var(--error-dark); }
+
+.btn--error.btn--transparent, .btn--danger.btn--transparent { color: var(--error); }
+.btn--error.btn--transparent svg, .btn--danger.btn--transparent svg { color: var(--error); }
+.btn--error.btn--transparent:hover,  .btn--danger.btn--transparent:hover  { background: var(--error-bg-light); }
+.btn--error.btn--transparent:active, .btn--danger.btn--transparent:active { background: var(--error-bg); color: var(--error-dark); }
+.btn--error.btn--transparent:active svg, .btn--danger.btn--transparent:active svg { color: var(--error-dark); }
+
+/* Warning */
+.btn--warning.btn--accent { background: var(--warning); border-color: var(--warning); color: var(--text-on-dark); }
+.btn--warning.btn--accent svg { color: var(--text-on-dark); }
+.btn--warning.btn--accent:hover  { background: var(--warning-dark); border-color: var(--warning-dark); }
+.btn--warning.btn--accent:active { background: var(--warning-light); border-color: var(--warning-light); }
+
+.btn--warning.btn--outline { color: var(--warning); border-color: var(--warning); }
+.btn--warning.btn--outline svg { color: var(--warning); }
+.btn--warning.btn--outline:hover  { background: var(--warning-bg); }
+.btn--warning.btn--outline:active { background: color-mix(in srgb, var(--warning) 18%, var(--warning-bg)); color: var(--warning-dark); border-color: var(--warning-dark); }
+.btn--warning.btn--outline:active svg { color: var(--warning-dark); }
+
+.btn--warning.btn--transparent { color: var(--warning); }
+.btn--warning.btn--transparent svg { color: var(--warning); }
+.btn--warning.btn--transparent:hover  { background: var(--warning-bg); }
+.btn--warning.btn--transparent:active { background: color-mix(in srgb, var(--warning) 18%, var(--warning-bg)); color: var(--warning-dark); }
+.btn--warning.btn--transparent:active svg { color: var(--warning-dark); }
+
+/* Success */
+.btn--success.btn--accent { background: var(--success); border-color: var(--success); color: var(--text-on-dark); }
+.btn--success.btn--accent svg { color: var(--text-on-dark); }
+.btn--success.btn--accent:hover  { background: var(--success-dark); border-color: var(--success-dark); }
+.btn--success.btn--accent:active { background: var(--success-light); border-color: var(--success-light); }
+
+.btn--success.btn--outline { color: var(--success); border-color: var(--success); }
+.btn--success.btn--outline svg { color: var(--success); }
+.btn--success.btn--outline:hover  { background: var(--success-bg); }
+.btn--success.btn--outline:active { background: color-mix(in srgb, var(--success) 18%, var(--success-bg)); color: var(--success-dark); border-color: var(--success-dark); }
+.btn--success.btn--outline:active svg { color: var(--success-dark); }
+
+.btn--success.btn--transparent { color: var(--success); }
+.btn--success.btn--transparent svg { color: var(--success); }
+.btn--success.btn--transparent:hover  { background: var(--success-bg); }
+.btn--success.btn--transparent:active { background: color-mix(in srgb, var(--success) 18%, var(--success-bg)); color: var(--success-dark); }
+.btn--success.btn--transparent:active svg { color: var(--success-dark); }
+
+/* Info */
+.btn--info.btn--accent { background: var(--info); border-color: var(--info); color: var(--text-on-dark); }
+.btn--info.btn--accent svg { color: var(--text-on-dark); }
+.btn--info.btn--accent:hover  { background: var(--info-dark); border-color: var(--info-dark); }
+.btn--info.btn--accent:active { background: var(--info-light); border-color: var(--info-light); }
+
+.btn--info.btn--outline { color: var(--info); border-color: var(--info); }
+.btn--info.btn--outline svg { color: var(--info); }
+.btn--info.btn--outline:hover  { background: var(--info-bg); }
+.btn--info.btn--outline:active { background: color-mix(in srgb, var(--info) 18%, var(--info-bg)); color: var(--info-dark); border-color: var(--info-dark); }
+.btn--info.btn--outline:active svg { color: var(--info-dark); }
+
+.btn--info.btn--transparent { color: var(--info); }
+.btn--info.btn--transparent svg { color: var(--info); }
+.btn--info.btn--transparent:hover  { background: var(--info-bg); }
+.btn--info.btn--transparent:active { background: color-mix(in srgb, var(--info) 18%, var(--info-bg)); color: var(--info-dark); }
+.btn--info.btn--transparent:active svg { color: var(--info-dark); }
+
+/* forced states (документация) — Error/Danger */
+.btn--error.btn--accent.is-hover,  .btn--danger.btn--accent.is-hover  { background: var(--error-dark); border-color: var(--error-dark); }
+.btn--error.btn--accent.is-active, .btn--danger.btn--accent.is-active { background: var(--error-light); border-color: var(--error-light); }
+.btn--error.btn--outline.is-hover,  .btn--danger.btn--outline.is-hover  { background: var(--error-bg-light); }
+.btn--error.btn--outline.is-active, .btn--danger.btn--outline.is-active { background: var(--error-bg); color: var(--error-dark); border-color: var(--error-dark); }
+.btn--error.btn--transparent.is-hover,  .btn--danger.btn--transparent.is-hover  { background: var(--error-bg-light); }
+.btn--error.btn--transparent.is-active, .btn--danger.btn--transparent.is-active { background: var(--error-bg); color: var(--error-dark); }
+
+/* forced states — Warning/Success/Info */
+.btn--warning.btn--accent.is-hover  { background: var(--warning-dark); border-color: var(--warning-dark); }
+.btn--warning.btn--accent.is-active { background: var(--warning-light); border-color: var(--warning-light); }
+.btn--warning.btn--outline.is-hover  { background: var(--warning-bg); }
+.btn--warning.btn--outline.is-active { background: color-mix(in srgb, var(--warning) 18%, var(--warning-bg)); color: var(--warning-dark); border-color: var(--warning-dark); }
+.btn--warning.btn--transparent.is-hover  { background: var(--warning-bg); }
+.btn--warning.btn--transparent.is-active { background: color-mix(in srgb, var(--warning) 18%, var(--warning-bg)); color: var(--warning-dark); }
+
+.btn--success.btn--accent.is-hover  { background: var(--success-dark); border-color: var(--success-dark); }
+.btn--success.btn--accent.is-active { background: var(--success-light); border-color: var(--success-light); }
+.btn--success.btn--outline.is-hover  { background: var(--success-bg); }
+.btn--success.btn--outline.is-active { background: color-mix(in srgb, var(--success) 18%, var(--success-bg)); color: var(--success-dark); border-color: var(--success-dark); }
+.btn--success.btn--transparent.is-hover  { background: var(--success-bg); }
+.btn--success.btn--transparent.is-active { background: color-mix(in srgb, var(--success) 18%, var(--success-bg)); color: var(--success-dark); }
+
+.btn--info.btn--accent.is-hover  { background: var(--info-dark); border-color: var(--info-dark); }
+.btn--info.btn--accent.is-active { background: var(--info-light); border-color: var(--info-light); }
+.btn--info.btn--outline.is-hover  { background: var(--info-bg); }
+.btn--info.btn--outline.is-active { background: color-mix(in srgb, var(--info) 18%, var(--info-bg)); color: var(--info-dark); border-color: var(--info-dark); }
+.btn--info.btn--transparent.is-hover  { background: var(--info-bg); }
+.btn--info.btn--transparent.is-active { background: color-mix(in srgb, var(--info) 18%, var(--info-bg)); color: var(--info-dark); }
+
+/* ---------- modifier: FULLWIDTH -------------------------------------------- */
+.btn--fullwidth { width: 100%; }
+.btn--fullwidth.btn--icon-only { width: auto; }   /* icon-only never stretches */
+
+/* ---------- forced states (for documentation/specimens) -------------------- */
+.btn--accent.is-hover       { background: var(--primary-dark); border-color: var(--primary-dark); }
+.btn--accent.is-active      { background: var(--btn-pale); border-color: var(--btn-pale); }
+.btn--outline.is-hover      { background: var(--btn-hover-bg); }
+.btn--outline.is-active     { background: var(--btn-active-bg); color: var(--btn-pale); border-color: var(--btn-pale); }
+.btn--outline.is-active svg { color: var(--btn-pale); }
+.btn--transparent.is-hover  { background: var(--btn-hover-bg); }
+.btn--transparent.is-active { background: var(--btn-active-bg); color: var(--btn-pale); }
+.btn--transparent.is-active svg { color: var(--btn-pale); }
+
+/* ---------- state: LOADING ------------------------------------------------- */
+/* While loading the button is non-interactive (treated as disabled).
+   Индикатор — общий компонент Spinner (styles/spinner.css): <span class="spin spin--current">,
+   размер задают правила выше (.btn--m/s/xs .spin). */
+.btn--loading { pointer-events: none; }

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Витрина: &lt;Имя&gt;</title>
+<!-- путь до ДС: здесь — корень этой ДС; в проекте продукта заменить на путь до _ds/<папка ДС>/ds.css -->
+<link rel="stylesheet" href="../../ds.css">
+<link rel="stylesheet" href="./Component.css">
+<style>
+body{margin:0;background:var(--bg-page);font:var(--type-body-m);color:var(--text-primary)}
+.doc{max-width:1440px;margin:0 auto;padding:48px 32px 120px;display:flex;flex-direction:column;gap:40px}
+.doc__head h1{margin:0 0 8px;font:var(--type-h3-strong)}
+.doc__head p{margin:0;font:var(--type-body-m);color:var(--text-secondary);max-width:80ch}
+.case{display:flex;flex-direction:column;gap:12px}
+.case__label{font:var(--type-body-s-strong);color:var(--text-primary)}
+.case__hint{font:var(--type-body-s);color:var(--text-secondary)}
+.case__stage{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-m);padding:20px}
+/* вторая колонка — та же разметка в узкой ширине: перестроение проверяется здесь */
+.cases{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:32px;align-items:start}
+</style>
+</head>
+<body>
+<main class="doc">
+  <header class="doc__head">
+    <h1>&lt;Имя&gt;</h1>
+    <p>Витрина компонента: все состояния рядом на демо-данных из fixtures.json. Состояния, которого нет здесь, не существует — на экране оно всплывёт при первом тесте с реальными данными.</p>
+  </header>
+
+  <!-- по одному блоку .case на каждое состояние из паспорта.
+       Разметку внутри .case__stage брать из Component.html, меняя data-state и data-mode. -->
+
+  <section class="case">
+    <p class="case__label">Данные есть · только просмотр</p>
+    <p class="case__hint">Базовый вид. Он же эталонный снимок baseline.png</p>
+    <div class="cases">
+      <div class="case__stage"></div>
+      <div class="case__stage"></div>
+    </div>
+  </section>
+
+  <section class="case">
+    <p class="case__label">Данные есть · редактирование доступно</p>
+    <p class="case__hint">Точки входа в редактирование видны сразу, а не при наведении</p>
+    <div class="case__stage"></div>
+  </section>
+
+  <section class="case">
+    <p class="case__label">Заполнено частично</p>
+    <p class="case__hint">Незаполненные поля прочерком, порядок не сжимается</p>
+    <div class="case__stage"></div>
+  </section>
+
+  <section class="case">
+    <p class="case__label">Данных нет</p>
+    <p class="case__hint">Пустое состояние внутри компонента: причина + действие, если у роли есть право</p>
+    <div class="case__stage"></div>
+  </section>
+
+  <section class="case">
+    <p class="case__label">Загрузка</p>
+    <p class="case__hint">Скелетоны в габаритах итогового содержимого, каркас уже на месте</p>
+    <div class="case__stage"></div>
+  </section>
+
+  <section class="case">
+    <p class="case__label">Обновление</p>
+    <p class="case__hint">Прежние значения видны, индикация локальная</p>
+    <div class="case__stage"></div>
+  </section>
+
+  <section class="case">
+    <p class="case__label">Ошибка</p>
+    <p class="case__hint">Причина словами пользователя и повтор запроса; остальной экран работает</p>
+    <div class="case__stage"></div>
+  </section>
+
+  <section class="case">
+    <p class="case__label">Правка временно запрещена</p>
+    <p class="case__hint">Действие видно и выключено, причина — в подсказке</p>
+    <div class="case__stage"></div>
+  </section>
+
+  <!-- «Нет права видеть» в витрине не показывается: компонент на экране не появляется.
+       Правило фиксируется в паспорте. -->
+</main>
+<script src="../../scripts/ds.js"></script>
+</body>
+</html>

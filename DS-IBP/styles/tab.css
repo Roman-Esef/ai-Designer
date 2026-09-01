@@ -1,0 +1,330 @@
+/* =========================================================================
+   Design System — Tab
+   Инструмент переключения между разными вьюхами (вкладки).
+
+   Orientation: horizontal (horiz) · vertical (vert)
+   Sizes:       m (40) · s (32)
+   States:      default · hover (= focus, persists after click until pointer leaves) · selected · disabled
+   Slots:       leading icon (optional) · text · trailing badge / counter (optional)
+   Behaviour:   horiz tab подстраивается под контент, vert — под контейнер;
+                badge: на horiz прижат к тексту, на vert — к правому краю.
+   Requires:    typography.css, colors.css
+   ========================================================================= */
+
+/* ---------- group / tablist ----------------------------------------------- */
+.tabs {
+  --tab-indicator: var(--primary);          /* selected accent */
+  --tab-track: var(--border-light);          /* rail under/beside tabs */
+
+  display: flex;
+  position: relative;
+}
+
+/* horizontal: row of tabs, shared bottom rail */
+.tabs--horiz {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+  box-shadow: inset 0 -1px 0 0 var(--tab-track);   /* the rail */
+}
+.tabs--horiz.tabs--fill { width: 100%; }
+.tabs--horiz.tabs--fill .tab { flex: 1 1 0; justify-content: center; }
+
+/* vertical: column of tabs, shared left rail */
+.tabs--vert {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  box-shadow: inset 1px 0 0 0 var(--tab-track);
+}
+.tabs--vert .tab { width: 100%; }
+
+/* a group without a shared rail (standalone samples) */
+.tabs--bare { box-shadow: none; }
+
+/* horizontal overflow, pattern A → scroll the row, hide the scrollbar */
+.tabs-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tabs-scroll::-webkit-scrollbar { display: none; }
+.tabs-scroll .tabs--horiz { width: max-content; min-width: 100%; }
+
+/* wrapper adding prev/next arrow controls over a .tabs-scroll — arrows fade
+   in/out depending on whether there is more content to scroll to on that side */
+.tabs-scroll-wrap { position: relative; max-width: 100%; }
+.tabs-scroll__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-round);
+  background: var(--bg-tile);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(40, 50, 55, .16);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease, background-color .15s ease;
+  z-index: 5;
+  padding: 0;
+}
+.tabs-scroll__arrow.is-visible { opacity: 1; pointer-events: auto; }
+.tabs-scroll__arrow:hover { background: var(--primary-bg); }
+.tabs-scroll__arrow--left { left: -4px; }
+.tabs-scroll__arrow--right { right: -4px; }
+.tabs-scroll__arrow :is(svg,[data-icon]){ width: 16px; height: 16px; }
+
+/* horizontal overflow, pattern B → fit as many tabs as the container allows,
+   the rest collapse behind a "more" trigger that opens a dropdown menu */
+.tabs-overflow { position: relative; max-width: 100%; }
+.tabs-overflow .tabs--horiz { flex-wrap: nowrap; }
+.tabs-overflow .tab { flex: none; }
+
+.tab--more.is-menu-open { background: var(--primary-bg); color: var(--text-primary); }
+.tab--more.is-menu-open .tab__icon { color: var(--text-primary); }
+
+.tabs-overflow__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 6px;
+  background: var(--bg-tile);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-popup);
+  box-shadow: 0 10px 30px rgba(40, 50, 55, .16);
+}
+.tabs-overflow__menu.is-open { display: flex; }
+.tabs-overflow__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  margin: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text-primary);
+  font: var(--type-body-m);
+  letter-spacing: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .12s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.tabs-overflow__item:hover,
+.tabs-overflow__item:focus-visible { background: var(--primary-bg); outline: none; }
+.tabs-overflow__item[aria-checked="true"] { color: var(--primary); }
+.tabs-overflow__item .tab__icon { width: 20px; height: 20px; flex: none; color: var(--text-inactive); }
+.tabs-overflow__item[aria-checked="true"] .tab__icon { color: var(--primary); }
+.tabs-overflow__item .tab__label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tabs-overflow__item .tab__badge { flex: none; }
+
+/* =========================================================================
+   TAB — single item
+   ========================================================================= */
+.tab {
+  /* size tokens — overridden per size modifier */
+  --tab-h: 40px;
+  --tab-pad-x: 16px;
+  --tab-gap: 8px;
+  --tab-icon: 20px;
+  --tab-font: var(--type-body-m);
+  --tab-indicator-w: 2px;
+  --tab-badge-min: 20px;
+
+  /* colour tokens — default (unselected) */
+  --tab-text: var(--text-secondary);
+  --tab-fill: transparent;
+  --tab-mark: transparent;                   /* indicator colour */
+  --tab-icon-color: var(--text-secondary);
+
+  box-sizing: border-box;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tab-gap);
+  height: var(--tab-h);
+  padding: 0 var(--tab-pad-x);
+  border: 0;
+  margin: 0;
+  background: var(--tab-fill);
+  color: var(--tab-text);
+  font: var(--tab-font);
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color .15s ease, color .15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* text label — truncates with ellipsis when constrained */
+.tab__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* leading icon */
+.tab__icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tab-icon);
+  height: var(--tab-icon);
+  color: var(--tab-icon-color);
+}
+.tab__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* ---------- indicator (the moving accent bar) ----------------------------- */
+.tab::after {
+  content: "";
+  position: absolute;
+  background: var(--tab-mark);
+  border-radius: var(--radius-pill);
+  transition: background-color .15s ease;
+  pointer-events: none;
+}
+/* horiz: bar sits on the bottom rail, full tab width */
+.tabs--horiz .tab::after {
+  left: 0; right: 0; bottom: 0;
+  height: var(--tab-indicator-w);
+}
+/* vert: bar sits on the left rail, full tab height */
+.tabs--vert .tab::after {
+  left: 0; top: 0; bottom: 0;
+  width: var(--tab-indicator-w);
+}
+/* standalone tab (not in a .tabs group) — still draw its own indicator */
+.tab--standalone::after { content: ""; }
+
+/* =========================================================================
+   BADGE / counter slot
+   ========================================================================= */
+.tab__badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tab-badge-min);
+  height: var(--tab-badge-min);
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--st-system-midlight);     /* Swamp_400 32% — нейтральный счётчик */
+  color: var(--text-primary);
+  font: var(--weight-semibold) 11px/1 var(--font-text);
+  font-variant-numeric: tabular-nums;
+  transition: background-color .15s ease, color .15s ease;
+}
+.tab--s .tab__badge { font-size: 10px; }
+
+/* on vertical tabs the badge is pushed to the right edge */
+.tabs--vert .tab,
+.tab--vert {
+  justify-content: flex-start;
+}
+.tabs--vert .tab .tab__badge,
+.tab--vert .tab__badge {
+  margin-left: auto;
+}
+
+/* ---------- sizes --------------------------------------------------------- *
+   Size values assigned directly to properties (not via local --* overrides in
+   modifiers) so the DS compiler can register tokens cleanly. Slot dimensions
+   (icon / badge) get per-size descendant rules; indicator width is 2px for
+   both sizes = the root default, so no per-size indicator rule is needed. */
+.tab--m { height: 40px; padding: 0 16px; gap: 8px; font: var(--type-body-m); }
+.tab--m .tab__icon  { width: 20px; height: 20px; }
+.tab--m .tab__badge { min-width: 20px; height: 20px; }
+.tab--s { height: 32px; padding: 0 12px; gap: 6px; font: var(--type-body-s); }
+.tab--s .tab__icon  { width: 18px; height: 18px; }
+.tab--s .tab__badge { min-width: 16px; height: 16px; }
+
+/* ---------- горизонтальные паддинги по ориентации ---------------------------
+   Горизонтальный таб — 8px слева и справа: ряд табов должен читаться как ряд,
+   а не как набор далеко разнесённых кнопок. Вертикальный — 16px слева (текст
+   отбит от рейла) и 8px справа (бейдж прижат к краю). */
+.tabs--horiz .tab--m, .tab--horiz.tab--m,
+.tabs--horiz .tab--s, .tab--horiz.tab--s { padding: 0 8px; }
+.tabs--vert .tab--m, .tab--vert.tab--m,
+.tabs--vert .tab--s, .tab--vert.tab--s { padding: 0 8px 0 16px; }
+
+/* =========================================================================
+   STATES
+   ========================================================================= */
+
+/* hover = focus — единый стейт-слой заливки (Active · PrimaryBG), одинаковый
+   для unselected и selected табов. Клик не добавляет отдельного pressed-состояния —
+   после клика заливка держится как hover, пока курсор не покинет таб (нативное :hover). */
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])):hover,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-hover,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])):focus-visible,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-focus {
+  background: var(--primary-bg);              /* Active · PrimaryBG — Emerald_500 6% */
+  color: var(--text-primary);
+}
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])):hover .tab__icon,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-hover .tab__icon,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])):focus-visible .tab__icon,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-focus .tab__icon {
+  color: var(--text-primary);
+}
+.tab:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+
+/* ---------- selected -------------------------------------------------------
+   Класс .tab--selected — форс-состояние витрины; на реальном табе состояние
+   несёт role="tab" + aria-selected="true" (roving-tabindex, RulesAudit W1).
+   [aria-current="true"] — тот же вид для scroll-spy якорных «табов»
+   (TableFilter: вертикальная навигация по разделам модалки, не role=tab). */
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]) { color: var(--text-primary); }
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]) .tab__icon { color: var(--primary); }
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"])::after { background: var(--tab-indicator, var(--primary)); }
+/* selected hover / focus — тот же Active · PrimaryBG, что и у unselected; бейдж не перекрашивается */
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]):not(.tab:is(.tab--disabled,[aria-disabled="true"])):hover,
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]):not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-hover,
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]):not(.tab:is(.tab--disabled,[aria-disabled="true"])):focus-visible,
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]):not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-focus {
+  background: var(--primary-bg);               /* Active · PrimaryBG */
+  color: var(--text-primary);
+}
+
+/* ---------- disabled -------------------------------------------------------
+   Класс .tab--disabled — форс-состояние витрины; реальный таб отключается
+   aria-disabled="true" (не нативный disabled — таб остаётся частью roving
+   tabindex, RulesAudit W1). */
+.tab:is(.tab--disabled,[aria-disabled="true"]) {
+  color: var(--text-inactive);
+  background: transparent;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.tab:is(.tab--disabled,[aria-disabled="true"]) .tab__icon { color: var(--text-inactive); }
+.tab:is(.tab--disabled,[aria-disabled="true"]) .tab__badge {
+  background: var(--st-disabled-midlight);    /* CGrey 8% */
+  color: var(--text-inactive);
+}
+.tab:is(.tab--disabled,[aria-disabled="true"]):is(.tab--selected,[aria-selected="true"])::after {
+  background: var(--st-disabled);             /* faded accent */
+}
+
+/* a disabled tab whose text is truncated still shows its tooltip */
+.tab:is(.tab--disabled,[aria-disabled="true"]).tab--has-tooltip { pointer-events: auto; }

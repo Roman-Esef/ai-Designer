@@ -1,0 +1,803 @@
+<!-- @dsCard group="Components" name="SnackBar" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SnackBar — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/snackbar.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+a{color:var(--link);} a:hover{color:var(--link-dark);}
+
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:80ch;text-wrap:pretty;}
+
+.subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:32px 0 14px;}
+
+/* playground: демо — в верхнюю панель сплиттера, контролы — во вкладку «Конструктор» */
+.pg__stage{flex:1;min-height:0;width:100%;display:flex;align-items:stretch;padding:24px 26px;min-width:0;}
+.pg__stagebox{width:100%;display:flex;flex-direction:column;min-width:0;}
+.ctl{display:flex;flex-direction:column;gap:10px;}
+.ctl.is-off{display:none;}
+.toggles>.is-off{display:none;}
+.ctl>.lbl{font:600 11px/1 var(--font-text),sans-serif;color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+/* mock screen */
+.mock-screen{position:relative;border-radius:12px;border:1px solid var(--border-light);background:var(--bg-page);overflow:hidden;min-height:380px;display:flex;flex-direction:column;}
+.mock-topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:var(--bg-tile);border-bottom:1px solid var(--border-light);flex:none;}
+.mock-title{font:var(--type-body-m-strong);color:var(--text-primary);}
+.mock-time{font:var(--type-body-xs);color:var(--text-inactive);}
+.mock-body{flex:1;padding:14px;}
+.mock-rows{display:flex;flex-direction:column;gap:8px;}
+.mock-row{height:11px;border-radius:var(--radius-xs);background:color-mix(in srgb,var(--c-swamp-400) 13%,transparent);}
+.mock-row:nth-child(2){width:88%;}.mock-row:nth-child(3){width:72%;}.mock-row:nth-child(4){width:82%;}.mock-row:nth-child(5){width:66%;}.mock-row:nth-child(6){width:79%;}
+.snack-demo-layer{position:absolute;top:14px;right:14px;width:272px;display:flex;flex-direction:column;gap:10px;pointer-events:none;z-index:10;}
+.snack-demo-layer .snack{pointer-events:all;}
+.ws-cap{font:var(--type-body-xs);color:var(--text-inactive);margin:12px 0 0;text-wrap:pretty;}
+/* anatomy */
+.anat{display:grid;grid-template-columns:1fr 280px;gap:40px;align-items:start;}
+@media(max-width:760px){.anat{grid-template-columns:1fr;}}
+.anat__stage{background:color-mix(in srgb,var(--primary) 5%,#fff);border:1px solid var(--border-light);border-radius:14px;padding:50px 44px;display:flex;justify-content:center;}
+.anat-dia{position:relative;display:inline-block;}
+.anat-dia .snack{width:252px;}
+.mk{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--text-primary);color:#fff;font:700 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5;pointer-events:none;}
+.anat__legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;}
+.anat__legend li{display:flex;gap:12px;align-items:flex-start;}
+.anat__legend li .n{width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font:700 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;flex:none;margin-top:2px;}
+/* states */
+.states-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+@media(max-width:900px){.states-grid{grid-template-columns:repeat(2,1fr);}}
+.stg-label{font:var(--type-body-xs);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;text-align:center;margin-bottom:4px;}
+.states-sep{grid-column:1/-1;height:1px;background:var(--border-light);margin:4px 0;}
+.stack-demo{display:flex;flex-direction:column;gap:10px;max-width:320px;}
+/* ref table */
+.ref-table th,.ref-table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--border-light);font:var(--type-body-m);color:var(--text-primary);vertical-align:middle;}
+/* code blocks */
+/* guide */
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.guide{grid-template-columns:1fr;}}
+.guide-card{border-radius:12px;overflow:hidden;border:1px solid var(--border-light);background:var(--bg-tile);}
+.guide-card__tag{font:var(--type-body-s-strong);padding:12px 18px 0;}
+.guide-card__body{padding:20px 18px;display:flex;justify-content:center;}
+.guide-card__cap{padding:0 18px 16px;font:var(--type-body-xs);color:var(--text-inactive);}
+/* colors */
+@media(max-width:700px){.cref{grid-template-columns:1fr;}}
+
+.cref-group>h3{font:var(--type-body-m-strong);margin:0;padding:14px 18px;border-bottom:1px solid var(--border-light);color:var(--text-primary);}
+.cref-row{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border-light);font:var(--type-body-s);color:var(--text-secondary);}
+/* off-screen sample for redline */
+.rl-sample{position:absolute;top:-9999px;left:0;width:320px;}
+
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="SnackBar">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage">
+          <div class="pg__stagebox">
+            <div class="mock-screen" id="mock-screen">
+              <div class="mock-topbar">
+                <span class="mock-title">IBP — Сделки</span>
+                <span class="mock-time">10:34</span>
+              </div>
+              <div class="mock-body">
+                <div class="mock-rows">
+                  <div class="mock-row"></div>
+                  <div class="mock-row"></div>
+                  <div class="mock-row"></div>
+                  <div class="mock-row"></div>
+                  <div class="mock-row"></div>
+                  <div class="mock-row"></div>
+                </div>
+              </div>
+              <div class="snack-demo-layer" id="demo-layer" data-ds-snackbar aria-live="polite" aria-atomic="false"></div>
+            </div>
+            <p class="ws-cap">Нажмите «Показать снек» несколько раз — снеки укладываются в стек (до 5, затем «+N»). Hover — пауза авто-скрытия. Esc — закрыть верхний.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+  <a class="crumb" href="../../index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Обзор компонентов
+  </a>
+  <div class="meta">
+    <span>Версия <b>1.004</b></span>
+    <span>Обновлено <b>30.08.2026</b></span>
+    <span>CSS <b>styles/snackbar.css</b></span>
+    <span>Зависимости <b>button, link</b></span>
+  </div>
+  <div class="eyebrow">Дизайн-система · Организмы</div>
+  <h1>SnackBar</h1>
+  <p class="lead">Стек всплывающих уведомлений в правом верхнем углу экрана. Четыре тона: Info · Warning · Error · Success. Живёт поверх всех слоёв — модалок, тостбара и поповеров.</p>
+</header>
+
+<!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#demo-layer),
+     контролы — во вкладку «Конструктор» нижней панели (см. в конце) -->
+
+  <!-- 2. ИСПОЛЬЗОВАНИЕ -->
+<section class="section" id="usage" data-screen-label="Использование">
+  <h2>Использование</h2>
+  <p class="desc">SnackBar сообщает о событии, которое уже произошло. В отличие от Toast — всегда цветной, поддерживает действия, живёт поверх модалок.</p>
+  <div class="panel">
+    <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.86fr 1.93fr 2.7fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Компонент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Позиция</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Когда</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.86fr 1.93fr 2.7fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><b>SnackBar</b></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Правый верхний угол, поверх всего</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Событие произошло; может требовать реакции</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.86fr 1.93fr 2.7fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Toast</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Верхний центр, ниже SnackBar</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фоновый процесс запущен/завершён; реакция не нужна</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.86fr 1.93fr 2.7fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Modal</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Центр экрана с затемнением</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Нужно принудительное решение пользователя</span></span></div><div class="tc tc--separator"></div></div></div>
+    <p class="subhead">Слои (z-index)</p>
+    <ul class="bullets">
+      <li><b>ToastBar — 800</b>, верхний центр, фоновые процессы</li>
+      <li><b>Modal — 900</b>, центр с затемнением, блокирующие диалоги</li>
+      <li><b>SnackBar — 9900</b>, правый верхний угол, поверх модалок</li>
+      <li><b>ToastLoader — 9999</b>, поверх SnackBar, с затемнением страницы</li>
+    </ul>
+    <p class="subhead">Авто-скрытие</p>
+    <ul class="bullets">
+      <li>Снек <b>без кнопок</b> — скрывается через <b>5 с</b>. Hover или фокус ставят таймер на паузу.</li>
+      <li>Снек <b>с кнопками</b> — висит до ручного закрытия пользователем.</li>
+    </ul>
+  </div>
+</section>
+
+  <!-- 3. АНАТОМИЯ -->
+<section class="section" id="anatomy" data-screen-label="Анатомия">
+  <h2>Анатомия</h2>
+  <div class="anat">
+    <div class="anat__stage">
+      <div class="anat-dia">
+        <div class="snack snack--error" data-snack-tone="error">
+          <span class="snack__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+          <div class="snack__body">
+            <div class="snack__title">Ошибка</div>
+            <div class="snack__text">Плановая дата подписания находится в прошлом году. Измените сроки.</div>
+            <div class="snack__buttons">
+              <button type="button" class="btn btn--outline btn--xs btn--error"><span class="btn__label">Изменить</span></button>
+            </div>
+          </div>
+          <button type="button" class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+        </div>
+        <span class="mk" style="left:26px;top:22px;">1</span>
+        <span class="mk" style="left:60px;top:22px;">2</span>
+        <span class="mk" style="left:100px;top:50px;">3</span>
+        <span class="mk" style="left:80px;top:85px;">4</span>
+        <span class="mk" style="left:240px;top:22px;">5</span>
+      </div>
+    </div>
+    <ul class="anat__legend">
+      <li><span class="n">1</span><div><span class="k">Иконка тона</span><span class="d">20px, выровнена по первой строке заголовка; цвет — токен тона (<code class="tok">--error</code>, <code class="tok">--info</code>…)</span></div></li>
+      <li><span class="n">2</span><div><span class="k">Заголовок</span><span class="d">Body S (400), <code class="tok">--text-primary</code>; 1–3 слова, суть события</span></div></li>
+      <li><span class="n">3</span><div><span class="k">Текст</span><span class="d">Body XS, <code class="tok">--text-secondary</code>; опционален; подробности события</span></div></li>
+      <li><span class="n">4</span><div><span class="k">Кнопки действий</span><span class="d">Опциональны: Button xs outline/transparent или Link; цвет — тон снека</span></div></li>
+      <li><span class="n">5</span><div><span class="k">Закрыть</span><span class="d">Всегда присутствует; close 16px, цвет тона, opacity 0.65 → 1 при hover</span></div></li>
+    </ul>
+  </div>
+</section>
+
+  <!-- VARIANTS (STUB) -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Не применимо: компонент существует в единственной конфигурации, отдельных вариантов нет.</p>
+  </section>
+
+  <!-- 4. РАЗМЕРЫ -->
+<section class="section" id="sizes" data-screen-label="Размеры">
+  <h2>Размеры</h2>
+  <p class="desc">Значения измеряются из реально отрендеренного экземпляра через getComputedStyle.</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Свойство</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен / описание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ширина</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">320px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">фиксированная (.snackbar-layer)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Padding</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-padding">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14px top/bottom · 16px left · 12px right</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Border-radius</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-radius">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-card</code> → <code class="tok">--radius-2xl</code> (16px)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Box-shadow</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--elevation-2</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0 10px 30px rgba(40,50,55,.16)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Column-gap</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-colgap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Icon ↔ Body ↔ Close</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Body gap</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-bodygap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Title ↔ Text</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Buttons margin-top</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-btnmt">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Text ↔ Buttons</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Buttons gap</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-btngap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Между кнопками в ряду</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка тона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">20×20px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">align-items: start, margin-top 1px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка close</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16×16px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">в контейнере 20×20px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Gap стека</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">между карточками в .snackbar-layer</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.03fr 2.25fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Offset от краёв</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">24px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">top и right в .snackbar-layer</span></span></div><div class="tc tc--separator"></div></div></div>
+  </div>
+  <div class="rl-sample" aria-hidden="true">
+    <div class="snack snack--error" data-snack-tone="error" id="rl-snack">
+      <span class="snack__icon"><i data-icon="alert-circle-filled"></i></span>
+      <div class="snack__body">
+        <div class="snack__title">Ошибка</div>
+        <div class="snack__text">Текст</div>
+        <div class="snack__buttons"><button class="btn btn--outline btn--xs btn--error"><span class="btn__label">Действие</span></button></div>
+      </div>
+      <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Один размер. Радиус плашки карточный — 16px, крупнее, чем у Toast (8px).</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Плашка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-card</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Бейдж-счётчик в заголовке</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кнопка закрытия — стейт-слой</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xs</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- 5. КОНТЕНТ -->
+<section class="section" id="content" data-screen-label="Контент">
+  <h2>Контент</h2>
+  <p class="desc">Правила формулировок заголовка и текста снека.</p>
+  <div class="guide">
+    <div class="guide-card good">
+      <div class="guide-card__bar"></div>
+      <div class="guide-card__tag">✓ Правильно</div>
+      <div class="guide-card__body">
+        <div class="snack snack--error" data-snack-tone="error" style="width:100%;max-width:280px;">
+          <span class="snack__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+          <div class="snack__body"><div class="snack__title">Ошибка загрузки</div><div class="snack__text">Не удалось получить данные сделки. Попробуйте обновить страницу.</div></div>
+          <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+        </div>
+      </div>
+      <p class="guide-card__cap">Заголовок — 1–3 слова, суть события. Текст — одно-два предложения с деталями.</p>
+    </div>
+    <div class="guide-card bad">
+      <div class="guide-card__bar"></div>
+      <div class="guide-card__tag">✗ Неправильно</div>
+      <div class="guide-card__body">
+        <div class="snack snack--error" data-snack-tone="error" style="width:100%;max-width:280px;">
+          <span class="snack__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+          <div class="snack__body"><div class="snack__title">Произошла непредвиденная ошибка при попытке загрузить данные по текущей сделке из базы данных сервера</div></div>
+          <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+        </div>
+      </div>
+      <p class="guide-card__cap">Заголовок — не длинное предложение; для деталей — поле «Текст».</p>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:20px;">
+    <p class="subhead" style="margin-top:0;">Corner cases</p>
+    <ul class="bullets">
+      <li><b>Только заголовок без текста</b> — допустимо для коротких уведомлений («Сохранено», «Скопировано»).</li>
+      <li><b>Длинный текст</b> — переносится, ширина фиксирована. Если нужно >4 строк — вынести в модалку.</li>
+      <li><b>Две кнопки</b> — первая Outline (главное действие), вторая Transparent (второстепенное). Третья кнопка не допускается.</li>
+    </ul>
+  </div>
+</section>
+
+  <!-- BEHAVIOR (STUB) -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Стек, авто-скрытие и слои поверх интерфейса.</p>
+
+<div class="subsec" data-screen-label="Stack">
+    <h3>Стек и переполнение</h3>
+    <p class="desc">Снеки укладываются в стек в правом верхнем углу, новый — сверху. Одновременно показывается не более <b>пяти</b>; при превышении лишние сворачиваются в счётчик «+N» под видимыми карточками.</p>
+  </div>
+
+<div class="subsec" data-screen-label="AutoHide">
+    <h3>Авто-скрытие</h3>
+    <p class="desc">Снек без кнопок скрывается через <b>5&nbsp;секунд</b>; наведение курсора или фокус внутри него ставят таймер на паузу, а уход курсора/фокуса — возобновляют отсчёт заново. Снек с кнопками действий не скрывается автоматически — ждёт явного закрытия пользователем, чтобы не потерять решение, которое от него требуется.</p>
+  </div>
+
+<div class="subsec" data-screen-label="Layering">
+    <h3>Слои и совмещение с Toast</h3>
+    <p class="desc">SnackBar живёт поверх ToastBar/ToastLoader (правый верхний угол против верхнего центра) и не конкурирует с ними за место — оба стека могут быть на экране одновременно. Закрытие — фейд + сдвиг вправо (<code class="tok">translateX</code>), при <code class="tok">prefers-reduced-motion: reduce</code> заменяется на чистый фейд без сдвига.</p>
+  </div>
+  </section>
+
+  <!-- 6. СОСТОЯНИЯ -->
+<section class="section" id="states" data-screen-label="Состояния">
+  <h2>Состояния</h2>
+  <p class="desc">Четыре тона × два варианта наполнения.</p>
+  <div class="states-grid">
+    <div class="stg-label">Info</div>
+    <div class="stg-label">Warning</div>
+    <div class="stg-label">Error</div>
+    <div class="stg-label">Success</div>
+    <!-- row 1: title + text -->
+    <div class="snack snack--info" data-snack-tone="info" role="status">
+      <span class="snack__icon" aria-hidden="true"><i data-icon="Info-circle-filled"></i></span>
+      <div class="snack__body"><div class="snack__title">Информация</div><div class="snack__text">Плановая дата подписания находится в прошлом году.</div></div>
+      <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+    </div>
+    <div class="snack snack--warning" data-snack-tone="warning" role="alert">
+      <span class="snack__icon" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
+      <div class="snack__body"><div class="snack__title">Внимание</div><div class="snack__text">Плановая дата подписания находится в прошлом году.</div></div>
+      <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+    </div>
+    <div class="snack snack--error" data-snack-tone="error" role="alert">
+      <span class="snack__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+      <div class="snack__body"><div class="snack__title">Ошибка</div><div class="snack__text">Плановая дата подписания находится в прошлом году.</div></div>
+      <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+    </div>
+    <div class="snack snack--success" data-snack-tone="success" role="status">
+      <span class="snack__icon" aria-hidden="true"><i data-icon="check-circle-filled"></i></span>
+      <div class="snack__body"><div class="snack__title">Операция выполнена</div><div class="snack__text">Плановая дата подписания находится в прошлом году.</div></div>
+      <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+    </div>
+    <div class="states-sep"></div>
+    <!-- row 2: with buttons -->
+    <div class="snack snack--info" data-snack-tone="info" role="status">
+      <span class="snack__icon" aria-hidden="true"><i data-icon="Info-circle-filled"></i></span>
+      <div class="snack__body"><div class="snack__title">Информация</div><div class="snack__text">Плановая дата подписания в прошлом году.</div><div class="snack__buttons"><button class="btn btn--outline btn--xs btn--info"><span class="btn__label">Подробнее</span></button></div></div>
+      <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+    </div>
+    <div class="snack snack--warning" data-snack-tone="warning" role="alert">
+      <span class="snack__icon" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
+      <div class="snack__body"><div class="snack__title">Внимание</div><div class="snack__text">Плановая дата подписания в прошлом году.</div><div class="snack__buttons"><button class="btn btn--outline btn--xs btn--warning"><span class="btn__label">Изменить</span></button></div></div>
+      <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+    </div>
+    <div class="snack snack--error" data-snack-tone="error" role="alert">
+      <span class="snack__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+      <div class="snack__body"><div class="snack__title">Ошибка</div><div class="snack__text">Плановая дата подписания в прошлом году.</div><div class="snack__buttons"><button class="btn btn--outline btn--xs btn--error"><span class="btn__label">Изменить</span></button><button class="btn btn--transparent btn--xs btn--error"><span class="btn__label">Отмена</span></button></div></div>
+      <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+    </div>
+    <div class="snack snack--success" data-snack-tone="success" role="status">
+      <span class="snack__icon" aria-hidden="true"><i data-icon="check-circle-filled"></i></span>
+      <div class="snack__body"><div class="snack__title">Операция выполнена</div><div class="snack__text">Сделка успешно обновлена.</div><div class="snack__buttons"><a class="link link--success" href="#">Перейти к сделке</a></div></div>
+      <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+    </div>
+  </div>
+
+  <div style="margin-top:36px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
+    <div>
+      <p style="font:var(--type-body-s);color:var(--text-inactive);margin:0 0 10px;">Стек: 3 снека (новый — сверху)</p>
+      <div class="stack-demo">
+        <div class="snack snack--error" data-snack-tone="error" role="alert"><span class="snack__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span><div class="snack__body"><div class="snack__title">Ошибка</div><div class="snack__text">Сделка №3841 просрочена.</div></div><button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button></div>
+        <div class="snack snack--warning" data-snack-tone="warning" role="alert"><span class="snack__icon" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span><div class="snack__body"><div class="snack__title">Внимание</div><div class="snack__text">Требуется согласование.</div></div><button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button></div>
+        <div class="snack snack--info" data-snack-tone="info" role="status"><span class="snack__icon" aria-hidden="true"><i data-icon="Info-circle-filled"></i></span><div class="snack__body"><div class="snack__title">Информация</div><div class="snack__text">Обновлены данные контрагента.</div></div><button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button></div>
+      </div>
+    </div>
+    <div>
+      <p style="font:var(--type-body-s);color:var(--text-inactive);margin:0 0 10px;">Дедупликация — снек ×3</p>
+      <div class="snack snack--error" data-snack-tone="error" role="alert">
+        <span class="snack__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+        <div class="snack__body"><div class="snack__title">Ошибка <span class="snack__dupe">×3</span></div><div class="snack__text">Плановая дата подписания просрочена.</div></div>
+        <button class="snack__close" aria-label="Закрыть"><i data-icon="close"></i></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- 7. ДОСТУПНОСТЬ -->
+<section class="section" id="a11y" data-screen-label="Доступность">
+  <h2>Доступность</h2>
+  <div class="panel">
+    <ul class="bullets">
+      <li><b>role="alert" aria-live="assertive"</b> — на Error и Warning: скринридер озвучивает немедленно.</li>
+      <li><b>role="status" aria-live="polite"</b> — на Info и Success: объявление при паузе.</li>
+      <li><b>aria-label="Закрыть"</b> — обязателен на .snack__close (кнопка без текста).</li>
+      <li><b>Авто-скрытие и фокус</b> — снек с активным фокусом внутри не скрывается. После закрытия фокус возвращается к последнему активному элементу страницы.</li>
+      <li><b>Esc</b> — закрывает верхний снек в стеке.</li>
+      <li><b>Клавиатура</b> — кнопки снека входят в общий порядок Tab; фокус-обводка 2px solid <code class="tok">var(--primary)</code>, offset 2px.</li>
+      <li><b>prefers-reduced-motion</b> — анимации translateX заменяются на fade; спиннеры не используются.</li>
+    </ul>
+  </div>
+</section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Заголовок и текст набираются гарнитурой <b>SB Sans Text</b>; текст всегда на ступень мельче заголовка.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.76fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.76fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок (.snack__title)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.76fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст (.snack__text)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.76fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Счётчик дублей (.snack__dupe)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- 8. ЦВЕТА -->
+<section class="section" id="colors" data-screen-label="Цвета">
+  <h2>Цвета</h2>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон карточки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error-bg-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error-bg-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FCF1F1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка, close, кнопки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover кнопок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#D32F2F</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Warning</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон карточки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--warning-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--warning-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFF8E1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Warning</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка, close, кнопки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--warning</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--warning)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFB300</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Warning</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover кнопок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--warning-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--warning-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#C68400</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Info</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон карточки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--info-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--info-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#EAF8FE</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Info</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка, close, кнопки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--info</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--info)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#1E88E5</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Info</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover кнопок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--info-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--info-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#01579B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон карточки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--success-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--success-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E9F6DA</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка, close, кнопки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--success</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--success)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#7CB342</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover кнопок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--success-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--success-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#558B2F</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок (Body S)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.4fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст (Body XS)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- 9. ДЛЯ РАЗРАБОТЧИКОВ -->
+<section class="section" id="dev" data-screen-label="Для разработчиков">
+  <h2>Для разработчиков</h2>
+
+  <p class="subhead">Точные размеры (redline)</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Свойство</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен / описание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ширина</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">320px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">фиксированная</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Padding</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl2-padding">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">top 14 · right 12 · bottom 14 · left 16</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Border-radius</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl2-radius">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-card</code> (16px)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Column-gap</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl2-colgap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">icon ↔ body ↔ close</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Body gap</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl2-bodygap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">title ↔ text</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Buttons margin-top</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl2-btnmt">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">text ↔ buttons</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Buttons gap</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl2-btngap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">между кнопками</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка тона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">20×20px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">align-items start, margin-top 1px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка close</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16×16px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">в контейнере 20×20px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Gap стека</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">.snackbar-layer gap</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 1.4fr 2.21fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Offset от краёв</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">24px top / 24px right</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">.snackbar-layer position</span></span></div><div class="tc tc--separator"></div></div></div>
+  </div>
+
+  <p class="subhead">Поведение (псевдокод)</p>
+  <div class="code-wrap">
+    <button class="copy-btn" data-copy="logic">Скопировать</button>
+    <code id="code-logic">MAX = 5; AUTO_MS = 5000;
+stack = []; hiddenCount = 0;
+
+function push(snack):
+  key = tone + title + text
+  existing = stack.find(key)
+  if existing and dedup:
+    existing.count++; updateDupeEl(); restartTimer(); return
+
+  visibleCount = stack.filter(!hidden).length
+  if visibleCount >= MAX:
+    oldest = stack.filter(!hidden).last
+    oldest.hide(); hiddenCount++; updateOverflow()
+
+  stack.prepend(snack)  // новый — сверху
+  if !hasButtons: startTimer(snack, AUTO_MS)
+
+function startTimer(s): s.timer = setTimeout(() => dismiss(s.id), AUTO_MS)
+function clearTimer(s): clearTimeout(s.timer)
+
+// hover / focus pause
+snack.el.on('mouseenter focusin',  () => clearTimer(s))
+snack.el.on('mouseleave focusout', () => { if !hasButtons: startTimer(s) })
+
+// Esc — закрыть верхний
+document.on('keydown', e => { if e.key==='Escape': dismiss(stack[0].id) })
+
+// dismiss → анимация ухода → удаление → reveal следующего из скрытых
+function dismiss(id):
+  s = stack.find(id); clearTimer(s)
+  s.el.classList.add('snack--leave')
+  s.el.on('animationend', () => {
+    s.el.remove(); stack.remove(s)
+    if hiddenCount > 0: revealOldest(); hiddenCount--
+    updateOverflow()
+  }, { once: true })
+
+// Reduced motion: только fade (snk-fi / snk-fo), без translateX</code>
+  </div>
+
+  </section>
+
+      <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Группировка по типу</b> — сворачивание нескольких снеков одного тона в один со счётчиком (кроме дедупликации одинаковых).</li>
+        <li><b>Позиция снизу</b> — альтернативное размещение стека для мобильных макетов.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · SnackBar</span>
+    <span>Info · Warning · Error · Success — стек, дедупликация, авто-скрытие</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите снек: тон, кнопки, заголовок, текст и дедупликацию. Кнопка «Показать снек» пускает уведомление в демо-стек наверху — снеки укладываются в стек (до 5, затем «+N»), hover ставит авто-скрытие на паузу, Esc закрывает верхний.</p>
+              <div class="pg__controls">
+                <div class="ctl-col">
+                  <div class="ctl">
+                    <div class="lbl">Тон</div>
+                    <div class="pg-select"><select id="ctl-tone">
+                      <option value="error">Error</option>
+                      <option value="info">Info</option>
+                      <option value="warning">Warning</option>
+                      <option value="success">Success</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Кнопки</div>
+                    <div class="pg-select"><select id="ctl-btns">
+                      <option value="none">Нет</option>
+                      <option value="one">Одна</option>
+                      <option value="two">Две</option>
+                      <option value="link">Ссылка</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Заголовок</div>
+                    <div class="pg-text"><input id="ctl-title" type="text" placeholder="По тону" maxlength="60"></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Текст</div>
+                    <div class="pg-text"><input id="ctl-text" type="text" placeholder="Описание события" maxlength="120"></div>
+                  </div>
+                  <button class="btn btn--accent btn--s" id="btn-show" style="margin-top:4px;">Показать снек</button>
+                </div>
+                <div class="toggles">
+                  <label class="pg-toggle"><input id="ctl-dedup" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Схлопывать дубли ×N</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка и исходники SnackBar: HTML — из спеки, CSS — styles/snackbar.css (полностью), JS — рантайм стека. Демо страницы читает настройки конструктора и вызывает <code class="tok">DSSnack.show()</code>.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main><!-- .page -->
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-notify.js"></script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html"><div class="snackbar-layer" aria-label="Уведомления">
+  <div class="snack snack--error" role="alert" aria-live="assertive">
+    <span class="snack__icon" aria-hidden="true"><svg…></svg></span>
+    <div class="snack__body">
+      <div class="snack__title">Ошибка <span class="snack__dupe">×2</span></div>
+      <div class="snack__text">Плановая дата просрочена.</div>
+      <div class="snack__buttons">
+        <button type="button" class="btn btn--outline btn--xs btn--error">
+          <span class="btn__label">Изменить сроки</span>
+        </button>
+      </div>
+    </div>
+    <button type="button" class="snack__close" aria-label="Закрыть"><svg…></svg></button>
+  </div>
+  <!-- overflow при > 5 -->
+  <div class="snack-more">
+    Ещё <span class="snack-more__count">3</span> уведомл.
+    <div class="snack-more__actions">
+      <button class="snack-more__btn" aria-label="Развернуть"><svg…></svg></button>
+      <button class="snack-more__btn" aria-label="Закрыть все"><svg…></svg></button>
+    </div>
+  </div>
+</div></script>
+
+<script type="text/plain" id="src-code-js">/* SnackBar — слой создаёт сам рантайм (или берёт элемент с data-ds-snackbar).
+   Демо страницы читает настройки конструктора и вызывает DSSnack.show(). */
+
+DSSnack.show({ tone: 'error', title: 'Ошибка', text: 'Плановая дата просрочена.',
+               buttons: [{ label: 'Изменить сроки', onClick: () => … }] });
+
+// Стек: новый сверху, видимых ≤ 5, остальные — под плашкой «+N уведомл.».
+// Авто-скрытие 5с у снека без кнопок; hover и фокус ставят таймер на паузу.
+// Дедупликация: одинаковые тон+заголовок+текст схлопываются в ×N (dedup: false — отключить).
+// Esc закрывает верхний снек стека.
+// Live-region: error и warning — alert/assertive, info и success — status/polite.
+// API: DSSnack.show(opts) → id · dismiss(id) · dismissAll() · expand() · layer() · stack().
+
+/* React API (предложение): SnackProps — tone · title · text · buttons
+   [{label, variant, href, onClick}] · dedup · duration */</script>
+
+<script type="text/plain" id="src-code-css">/* ============================================================
+   SNACKBAR — стек уведомлений в правом верхнем углу экрана.
+   z-index 9900 — поверх Modal (900) и ToastBar (800),
+   ниже ToastLoader (9999).
+   Requires: typography.css, colors.css, radius.css, shadow.css, button.css
+   ============================================================ */
+
+/* --- фиксированный слой ----------------------------------------- */
+.snackbar-layer {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9900;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+/* --- карточка ---------------------------------------------------- */
+.snack {
+  width: 100%;
+  background: var(--bg-tile);
+  border-radius: var(--radius-card);
+  box-shadow: var(--elevation-2);
+  padding: 14px 12px 14px 16px;
+  display: grid;
+  grid-template-columns: 20px 1fr 20px;
+  column-gap: 10px;
+  align-items: start;
+  pointer-events: all;
+  animation: snack-in .2s ease both;
+}
+
+.snack--leave { animation: snack-out .2s ease forwards; }
+
+@keyframes snack-in  { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+@keyframes snack-out { to   { opacity: 0; transform: translateX(14px); } }
+
+/* --- тона -------------------------------------------------------- */
+.snack--info    { background: var(--info-bg); }
+.snack--warning { background: var(--warning-bg); }
+.snack--error   { background: var(--error-bg-light); }
+.snack--success { background: var(--success-bg); }
+
+/* --- иконка тона ------------------------------------------------- */
+.snack__icon {
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px; flex: none;
+}
+.snack__icon :is(svg,[data-icon]){ width: 20px; height: 20px; display: block; }
+.snack--info    .snack__icon { color: var(--info); }
+.snack--warning .snack__icon { color: var(--warning); }
+.snack--error   .snack__icon { color: var(--error); }
+.snack--success .snack__icon { color: var(--success); }
+
+/* --- тело -------------------------------------------------------- */
+.snack__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-top: 1px; }
+
+/* заголовок: Body S, --text-primary */
+.snack__title { font: var(--type-body-s); color: var(--text-primary); line-height: 1.4; }
+
+/* счётчик дублей ×N */
+.snack__dupe {
+  display: inline-flex; align-items: center; justify-content: center;
+  font: var(--type-body-xs); font-weight: 600; line-height: 1;
+  padding: 2px 6px; border-radius: var(--radius-pill); margin-left: 6px; vertical-align: middle;
+}
+.snack--info    .snack__dupe { color: var(--info-dark);    background: color-mix(in srgb, var(--info)    20%, transparent); }
+.snack--warning .snack__dupe { color: var(--warning-dark); background: color-mix(in srgb, var(--warning) 20%, transparent); }
+.snack--error   .snack__dupe { color: var(--error-dark);   background: color-mix(in srgb, var(--error)   20%, transparent); }
+.snack--success .snack__dupe { color: var(--success-dark); background: color-mix(in srgb, var(--success) 20%, transparent); }
+
+/* текст: Body XS, --text-secondary */
+.snack__text { font: var(--type-body-xs); color: var(--text-secondary); line-height: 1.5; text-wrap: pretty; }
+
+/* кнопки действий */
+.snack__buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+/* Кнопки и ссылки внутри снека красятся штатными тоновыми классами ДС:
+   .btn--<tone> и .link--<tone> (совпадают с тоном снека). Локальная подмена
+   --primary / --link-fg убрана — ре-скоупа переменных больше нет. */
+
+/* --- кнопка закрытия --------------------------------------------- */
+.snack__close {
+  appearance: none; border: none; background: none; padding: 2px;
+  cursor: pointer; border-radius: var(--radius-xs);
+  display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; flex: none; margin-top: 1px;
+  opacity: .65; transition: opacity .15s;
+}
+.snack__close :is(svg,[data-icon]){ width: 16px; height: 16px; display: block; }
+.snack__close:hover { opacity: 1; }
+.snack__close:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; opacity: 1; }
+.snack--info    .snack__close { color: var(--info); }
+.snack--warning .snack__close { color: var(--warning); }
+.snack--error   .snack__close { color: var(--error); }
+.snack--success .snack__close { color: var(--success); }
+
+/* --- overflow pill «+N» ------------------------------------------ */
+.snack-more {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 10px 10px 16px;
+  background: var(--bg-tile); border: 1px solid var(--border-light);
+  border-radius: var(--radius-card); box-shadow: var(--elevation-2);
+  font: var(--type-body-s); color: var(--text-secondary);
+  pointer-events: all; animation: snack-in .2s ease both;
+}
+.snack-more__count { font-weight: 600; color: var(--text-primary); }
+.snack-more__actions { display: flex; align-items: center; gap: 2px; }
+.snack-more__btn {
+  appearance: none; border: none; background: none; padding: 4px; cursor: pointer;
+  border-radius: var(--radius-xs); color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center; transition: color .12s;
+}
+.snack-more__btn :is(svg,[data-icon]){ width: 16px; height: 16px; }
+.snack-more__btn:hover { color: var(--text-primary); }
+.snack-more__btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* --- reduced motion ---------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .snack              { animation: snk-fi .15s ease both; }
+  .snack--leave       { animation: snk-fo .15s ease forwards; }
+  .snack-more         { animation: snk-fi .15s ease both; }
+}
+@keyframes snk-fi { from { opacity: 0; } to { opacity: 1; } }
+@keyframes snk-fo { to   { opacity: 0; } }</script>
+
+<script>
+/* ---- icon helper ---- */
+function getIcon(name, size) {
+  size = size || 20;
+  if (!window.DS_ICONS) return '';
+  var raw = window.DS_ICONS[name] || ''; if (!raw) return '';
+  var d = document.createElement('div'); d.innerHTML = raw;
+  var s = d.firstElementChild; if (!s) return '';
+  s.setAttribute('width', size); s.setAttribute('height', size); s.setAttribute('aria-hidden', 'true');
+  return s.outerHTML;
+}
+function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ---- tone data ---- */
+var ICONS  = { info:'Info-circle-filled', warning:'alert-triangle-filled', error:'alert-circle-filled', success:'check-circle-filled' };
+var TITLES = { info:'Информация', warning:'Внимание', error:'Ошибка', success:'Операция выполнена' };
+var TEXTS  = { info:'Плановая дата подписания находится в прошлом году.', warning:'Плановая дата подписания находится в прошлом году. Проверьте условия.', error:'Плановая дата подписания находится в прошлом году. Измените сроки или обновите статус сделки.', success:'Сделка успешно обновлена.' };
+var BTNLBL = { info:'Подробнее', warning:'Изменить', error:'Изменить сроки', success:'К сделке' };
+
+/* ---- демо: контролы Конструктора → рантайм ДС (scripts/ds-notify.js) ----
+   стек, дедупликация, переполнение «+N», авто-скрытие с паузой на hover/focus
+   и Esc живут в DSSnack; страница только читает настройки и вызывает show() */
+var BTNSETS = {
+  none: null,
+  one:  function(tone){ return [{ label: BTNLBL[tone] }]; },
+  two:  function(){ return [{ label: 'Изменить' }, { label: 'Отмена', variant: 'transparent' }]; },
+  link: function(){ return [{ label: 'Перейти к сделке', href: '#' }]; },
+};
+
+function showSnack() {
+  var tone    = document.getElementById('ctl-tone').value;
+  var btnType = document.getElementById('ctl-btns').value;
+  var mk      = BTNSETS[btnType];
+  window.DSSnack.show({
+    tone:  tone,
+    title: document.getElementById('ctl-title').value.trim() || TITLES[tone],
+    text:  document.getElementById('ctl-text').value.trim()  || TEXTS[tone],
+    buttons: mk ? mk(tone) : null,
+    dedup: document.getElementById('ctl-dedup').checked,
+  });
+}
+document.getElementById('btn-show').addEventListener('click', showSnack);
+
+/* ---- redline ---- */
+function measureRedline() {
+  var sn = document.getElementById('rl-snack'); if (!sn) return;
+  var cs = getComputedStyle(sn);
+  var body = sn.querySelector('.snack__body');
+  var btns = sn.querySelector('.snack__buttons');
+  function setEl(id, v) { var e=document.getElementById(id); if(e) e.textContent=v; }
+  var pad = cs.paddingTop+' '+cs.paddingRight+' '+cs.paddingBottom+' '+cs.paddingLeft;
+  setEl('rl-padding', pad);  setEl('rl2-padding', pad);
+  setEl('rl-radius',  cs.borderRadius); setEl('rl2-radius', cs.borderRadius);
+  setEl('rl-colgap',  cs.columnGap);    setEl('rl2-colgap',  cs.columnGap);
+  var bg = body ? getComputedStyle(body).gap : '—';
+  setEl('rl-bodygap', bg); setEl('rl2-bodygap', bg);
+  var bmt = btns ? getComputedStyle(btns).marginTop : '—';
+  setEl('rl-btnmt', bmt); setEl('rl2-btnmt', bmt);
+  var bgap = btns ? getComputedStyle(btns).gap : '—';
+  setEl('rl-btngap', bgap); setEl('rl2-btngap', bgap);
+}
+setTimeout(measureRedline, 300);
+
+/* ---- copy buttons ---- */
+document.querySelectorAll('.copy-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var el = document.getElementById('code-' + btn.getAttribute('data-copy')); if (!el) return;
+    navigator.clipboard.writeText(el.textContent).then(function() {
+      btn.textContent = 'Скопировано ✓'; btn.classList.add('is-copied');
+      setTimeout(function(){ btn.textContent = 'Скопировать'; btn.classList.remove('is-copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

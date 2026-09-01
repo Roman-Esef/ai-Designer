@@ -1,0 +1,194 @@
+/* =========================================================================
+   Design System — SegmentControl
+   Компактный контрол переключения одного значения из 2–6 взаимоисключающих
+   опций внутри общего трека (rail) с плавающим индикатором (thumb).
+
+   В отличие от Tab (навигация между вьюхами страницы, role=tablist) и
+   ButtonGroup--toggle (сегментированный выбор из отдельных Button),
+   SegmentControl — единый трек с общим фоном и одним "плавающим" индикатором
+   выбора; семантика — role="radiogroup" / role="radio" (взаимоисключающий
+   выбор значения параметра, а не переключение контента страницы).
+
+   Sizes:   m (40) · s (32) · xs (24)
+   States:  default · hover · selected · selected+hover · disabled (группа)
+   Slots:   leading icon (опционально) · label — либо icon-only ·
+            счётчик содержимого (Badge, вариант --text, без заливки)
+   Extras:  fullwidth (равная ширина сегментов), анимированный индикатор
+   Requires: typography.css, colors.css, radius.css
+   ========================================================================= */
+
+.segctrl {
+  /* size tokens — overridden per size modifier.
+     --seg-h — высота ВНУТРЕННЕГО сегмента, не всего контрола. Обводка трека
+     (padding трека) — часть компонента: полная высота контрола = --seg-h +
+     2*--seg-pad и обязана совпадать с высотой Button того же размера.
+     M: 34 + 2*3 = 40 · S: 28 + 2*2 = 32 · XS: 20 + 2*2 = 24 */
+  --seg-h: 34px;
+  --seg-pad: 3px;
+  --seg-gap: 2px;
+  --seg-px: 14px;
+  --seg-icon: 20px;
+  --seg-font: var(--type-button-m);
+  --seg-radius: var(--radius-m);
+  --seg-item-radius: calc(var(--radius-m) - 3px);
+
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  gap: var(--seg-gap);
+  /* translucent neutral fill (rather than a flat near-white tone) so the
+     track stays legible whether it sits on the page's off-white background,
+     a white card, or any other surface */
+  background: color-mix(in srgb, var(--c-swamp-400) 16%, transparent);
+  border-radius: var(--seg-radius);
+  padding: var(--seg-pad);
+  isolation: isolate;
+  box-sizing: border-box;
+}
+
+/* ---------- fullwidth / equal-width segments ------------------------------- */
+.segctrl--fullwidth { display: flex; width: 100%; }
+.segctrl--fullwidth .segctrl__item { flex: 1 1 0; }
+
+/* ---------- floating indicator (thumb) ------------------------------------- */
+.segctrl__thumb {
+  position: absolute;
+  top: var(--seg-pad);
+  bottom: var(--seg-pad);
+  left: 0;
+  width: 0;
+  background: var(--bg-tile);
+  border-radius: var(--seg-item-radius);
+  box-shadow: 0 1px 2px rgba(40, 50, 55, .10);
+  transform: translateX(0);
+  transition: transform .18s cubic-bezier(.4, 0, .2, 1), width .18s cubic-bezier(.4, 0, .2, 1), opacity .15s ease;
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.segctrl__thumb.is-visible { opacity: 1; }
+.segctrl--no-anim .segctrl__thumb { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .segctrl__thumb { transition: opacity .15s ease; }
+}
+
+/* ---------- segment item ---------------------------------------------------- */
+.segctrl__item {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--seg-h);
+  padding: 0 var(--seg-px);
+  border: 0;
+  margin: 0;
+  background: transparent;
+  border-radius: var(--seg-item-radius);
+  font: var(--seg-font);
+  letter-spacing: 0;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: color .15s ease, background-color .15s ease;
+}
+.segctrl__item :is(svg,[data-icon]){ flex: none; width: var(--seg-icon); height: var(--seg-icon); display: block; }
+
+/* icon-only segment — square-ish, needs an aria-label */
+.segctrl__item--icon-only { padding: 0 calc(var(--seg-px) - 4px); gap: 0; }
+/* …но если рядом с иконкой стоит счётчик — зазор тот же 6px, что и в варианте
+   с текстом, иначе цифра прилипает к глифу */
+.segctrl__item--icon-only:has(.badge) { gap: 6px; }
+
+/* text label — truncates with ellipsis when constrained (fullwidth narrow) */
+.segctrl__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+/* ---------- optional count slot ---------------------------------------------
+   Reuses the Badge component in its borderless `.badge--text` variant — a
+   filled badge would double up on the track's own fill and read as noisy;
+   the borderless counter stays legible while keeping the segment quiet. */
+.segctrl__item .badge--text { flex: none; }
+.segctrl--disabled .badge--text,
+.segctrl[aria-disabled="true"] .badge--text,
+.segctrl__item:disabled .badge--text,
+.segctrl__item[aria-disabled="true"] .badge--text { color: var(--st-disabled-dark); }
+
+/* thin divider between adjacent unselected, non-hovered segments —
+   hidden next to the selected segment or a hovered neighbour so it never
+   cuts across the floating thumb */
+.segctrl__item::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--seg-gap) / 2 - .5px);
+  top: 22%;
+  bottom: 22%;
+  width: 1px;
+  background: var(--border-primary);
+}
+/* the thumb is inserted as the track's first DOM child (so it can sit behind
+   every segment), which pushes the actual first segment to be the SECOND
+   child — :first-of-type (first .segctrl__item among sibling buttons,
+   ignoring the thumb div) is what correctly targets it, not :first-child */
+.segctrl__item:first-of-type::before { display: none; }
+.segctrl__item[aria-checked="true"]::before,
+.segctrl__item[aria-checked="true"] + .segctrl__item::before,
+.segctrl__item:hover::before,
+.segctrl__item.is-hover::before,
+.segctrl__item:hover + .segctrl__item::before,
+.segctrl__item.is-hover + .segctrl__item::before { opacity: 0; }
+
+/* ---------- states: hover (unselected only — selected is already marked) --- */
+.segctrl__item:not([aria-checked="true"]):hover,
+.segctrl__item:not([aria-checked="true"]).is-hover {
+  background: var(--primary-bg);
+  color: var(--text-primary);
+}
+
+/* ---------- states: selected ------------------------------------------------ */
+.segctrl__item[aria-checked="true"] { color: var(--primary); }
+
+.segctrl__item:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ---------- states: disabled ------------------------------------------------ */
+/* default rule — Disabled применяется на весь контрол целиком */
+.segctrl--disabled,
+.segctrl[aria-disabled="true"] {
+  background: var(--disabled-bg);
+  pointer-events: none;
+}
+.segctrl--disabled .segctrl__thumb,
+.segctrl[aria-disabled="true"] .segctrl__thumb { box-shadow: none; }
+.segctrl--disabled .segctrl__item,
+.segctrl[aria-disabled="true"] .segctrl__item { color: var(--st-disabled-dark); cursor: not-allowed; }
+
+/* edge case — точечное отключение одного сегмента, остальной контрол активен */
+.segctrl__item:disabled,
+.segctrl__item[aria-disabled="true"]:not([aria-checked="true"]) {
+  color: var(--st-disabled-dark);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.segctrl__item:disabled::before,
+.segctrl__item[aria-disabled="true"]::before { opacity: 0; }
+
+/* ---------- sizes ------------------------------------------------------------ *
+   Размеры — прямыми свойствами на конкретных потомках (не через --seg-* в
+   модификаторе), чтобы компилятор чисто регистрировал токены. Размер m =
+   дефолты .segctrl (отдельных правил не требует); gap = 2px для всех размеров,
+   поэтому seg-gap-потребители (.segctrl gap, ::before left) не переопределяются. */
+.segctrl--s { padding: 2px; border-radius: var(--radius-s); }
+.segctrl--s .segctrl__thumb { top: 2px; bottom: 2px; border-radius: calc(var(--radius-s) - 2px); }
+.segctrl--s .segctrl__item { height: 28px; padding: 0 11px; font: var(--type-button-s); border-radius: calc(var(--radius-s) - 2px); }
+.segctrl--s .segctrl__item--icon-only { padding: 0 calc(11px - 4px); }
+.segctrl--s .segctrl__item :is(svg,[data-icon]){ width: 18px; height: 18px; }
+
+.segctrl--xs { padding: 2px; border-radius: var(--radius-s); }
+.segctrl--xs .segctrl__thumb { top: 2px; bottom: 2px; border-radius: calc(var(--radius-s) - 2px); }
+.segctrl--xs .segctrl__item { height: 20px; padding: 0 8px; font: var(--type-button-xs); border-radius: calc(var(--radius-s) - 2px); }
+.segctrl--xs .segctrl__item--icon-only { padding: 0 calc(8px - 4px); }
+.segctrl--xs .segctrl__item :is(svg,[data-icon]){ width: 16px; height: 16px; }

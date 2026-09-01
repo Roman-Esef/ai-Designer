@@ -1,0 +1,600 @@
+<!-- @dsCard group="Components" name="InputText" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InputText — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/chip.css">
+<link rel="stylesheet" href="../../styles/tooltip.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/input.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/input-pages.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<style>
+  /* демо-стадия (docs-split): растяжение на ширину панели демо;
+     padding/фон/min-height — из input-pages.css */
+  .pg__stage { flex:1; width:100%; }
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="InputText">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage" id="pg-stage"></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.009</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>InputText</h1>
+    <p class="lead">Базовое поле ввода произвольного текста. Собирается из компонентов подкачки <a class="inl" href="../atoms/LabelHelper.html">LabelHelper</a> (метка и хелпер) и Input_Content (поле с рамкой: префикс / текст / постфикс, иконки и действия). На той же базе построены <a class="inl" href="InputDate.html">InputDate</a> и <a class="inl" href="InputAutocomplete.html">InputAutocomplete</a>, а также числовой вариант InputAmount.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc">InputText — поле для свободного текста: наименования, комментарии, реквизиты. Основной размер — M; размер S используется только внутри таблиц (Table Edit).</p>
+    <div class="panel">
+      <div class="use-grid">
+        <div class="use-block">
+          <div class="use-block__stage" id="use-form"></div>
+          <div class="use-block__cap">В форме — с меткой и хелпером; ширина поля задаётся сеткой формы.</div>
+        </div>
+        <div class="use-block">
+          <div class="use-block__stage" id="use-table"></div>
+          <div class="use-block__cap">Table Edit — размер S внутри ячейки таблицы, без метки и хелпера.</div>
+        </div>
+        <div class="use-block">
+          <div class="use-block__stage" id="use-amount"></div>
+          <div class="use-block__cap">InputAmount — числовой вариант с разрядами и постфиксом валюты.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsec" data-screen-label="WhenToUse">
+      <h3>Когда использовать</h3>
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li>ввод произвольного текста, который нельзя выбрать из перечня: наименование, комментарий, реквизит;</li>
+        <li>ввод чисел и сумм — вариант InputAmount (разряды, запятая, децималы);</li>
+        <li>редактирование значения прямо в ячейке таблицы — размер S (Table Edit).</li>
+      </ul>
+      <p class="desc">Если значение выбирается из справочника — возьмите <a class="inl" href="InputAutocomplete.html">InputAutocomplete</a> или <a class="inl" href="DropdownList.html">Select</a>. Для даты — <a class="inl" href="InputDate.html">InputDate</a>. Показ значения без редактирования — <a class="inl" href="ReadOnlyField.html">ReadOnlyField</a>.</p>
+    </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Поле состоит из метки, контейнера Input_Content с текстовым слоем и действиями, и хелпер-текста. Все части, кроме самого поля, опциональны.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage" id="anat-diagram"></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Label</span><span class="d"> — метка поля, компонент подкачки <code class="tok">.ds-label</code> (Body XS)</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Поле (Input_Content)</span><span class="d"> — рамка 1px, радиус 4px, высота 40px (M)</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Текстовый слой (Text_MASTER)</span><span class="d"> — иконка слева (любая, не привязана к конкретному глифу) · префикс · текст · постфикс</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Действия (Input_Action)</span><span class="d"> — иконка справа и крестик очистки (информер левее крестика)</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Helper</span><span class="d"> — подсказка под полем, <code class="tok">.ds-helper</code> (Body XS)</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации: наполнение текстового слоя, многострочный режим, числовой InputAmount и табличный Table Edit.</p>
+
+    <div class="subsec" data-screen-label="ContentVariants">
+      <h3>Текстовый слой</h3>
+      <p class="desc">Слой Text_MASTER комбинирует префикс, текст и постфикс с ведущей иконкой слева. Иконки — любые из библиотеки ДС, компонент не привязывается к конкретному глифу (в примерах — иллюстративные). Все элементы независимы; лишние не показываются.</p>
+      <div class="panel"><div class="demo-grid" id="var-content"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Multiline">
+      <h3>Многострочный</h3>
+      <p class="desc">Для длинного текста (комментарии, описания) поле растёт по высоте. Действия прижаты к верхней строке. Опционально пользователь может потянуть за правый нижний угол и изменить высоту вручную (resize по вертикали, как в других ДС).</p>
+      <div class="panel"><div class="demo-grid" id="var-multiline"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="InputAmount">
+      <h3>InputAmount</h3>
+      <p class="desc tight">Вариант для ввода числовых значений; полностью наследует стили InputText. Правила ввода:</p>
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li>вводятся только цифры, точка, запятая и минус — остальные знаки игнорируются;</li>
+        <li>точка при вводе заменяется на запятую;</li>
+        <li>целая часть разделяется на разряды по 3 знака;</li>
+        <li>по умолчанию после запятой два знака; длина децималов настраивается;</li>
+        <li>незначащие нули убираются при потере фокуса («01» → «1», «…,010» → «…,01»); запись «1,00» с двумя нулями допустима.</li>
+      </ul>
+      <div class="panel"><div class="demo-grid" id="var-amount"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Password">
+      <h3>Пароль</h3>
+      <p class="desc">Действие справа переключает видимость введённого значения — «показать/скрыть» вместо крестика очистки, крестика в этом варианте нет.</p>
+      <div class="panel"><div class="demo-grid" id="var-password"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="LengthLimit">
+      <h3>Ограничение длины</h3>
+      <p class="desc">При заданном максимуме символов под полем справа появляется счётчик «введено / максимум» (Body XS); если есть хелпер — счётчик делит с ним одну строку.</p>
+      <div class="panel"><div class="demo-grid" id="var-counter"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="TableEdit">
+      <h3>Table Edit</h3>
+      <p class="desc">Вариант поля в таблице: размер S, никогда не содержит метку и хелпер. В остальном полностью идентичен обычному полю — со всеми состояниями и видами контента.</p>
+      <div class="panel"><div id="var-table"></div></div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Два размера. M — основной размер поля в формах и фильтрах. S — только для вариантов, используемых в таблицах (Table Edit). Ширина поля задаётся контейнером.</p>
+    <div class="panel"><div class="demo-grid" id="sizes-demo"></div></div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус поля не зависит от размера — 4px в M и S. Поля ввода — единственная группа контролов на этом радиусе: у кнопок и чипов рядом 8 / 6px.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поле — M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-field</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поле — S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-field</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кнопка-действие в поле</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xs</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Textarea в resizable-варианте</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">наследует радиус поля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">inherit</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Правила текста в поле и вокруг него:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>метка — существительное без двоеточия: «ИНН контрагента», не «Введите ИНН:»;</li>
+      <li>плейсхолдер не дублирует метку — это формат или пример значения («Например, 7707083893»);</li>
+      <li>хелпер — короткое правило заполнения; в состоянии Error заменяется текстом ошибки;</li>
+      <li>префикс и постфикс — единицы и неизменяемые части значения (₽, %, «От»), не вводятся пользователем;</li>
+      <li>текст длиннее поля прокручивается внутри однострочного поля; для заведомо длинного текста берите многострочный вариант.</li>
+    </ul>
+    <div class="panel"><div class="demo-grid" id="content-demo"></div></div>
+  </section>
+
+  <!-- BEHAVIOR -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Плейсхолдер, очистка и адаптивность. Все примеры живые — печатайте в полях.</p>
+
+    <div class="subsec" data-screen-label="PlaceholderClear">
+      <h3>Плейсхолдер и очистка</h3>
+      <p class="desc">Пустое поле по умолчанию не отображает ничего; при необходимости в него помещается плейсхолдер. Плейсхолдер виден, пока поле не перейдёт в Focus и не начнётся ввод. Крестик появляется только у заполненного поля; если пользователь очистил поле — по потере фокуса оно возвращается в пустое состояние.</p>
+      <div class="panel"><div class="demo-grid" id="beh-live"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Adaptive">
+      <h3>Адаптивность</h3>
+      <p class="desc">Собственной ширины у поля нет — её задаёт контейнер (сетка формы, ячейка таблицы). Высота фиксирована по размеру; растёт только многострочный вариант.</p>
+    </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Восемь состояний, общих для всех типов поля (InputText, InputDate, InputAutocomplete). Текст ошибки или предупреждения по умолчанию не выносится в хелпер — хелпер остаётся правилом заполнения — и показывается только в тултипе в состояниях ErrorFocus и WarningFocus. Тултип не смещает хелпер: лежит поверх потока, z-index выше поля. Исключение из правила допустимо, если оно намеренно заложено при разработке.</p>
+    <div class="panel"><div class="demo-grid" id="states-demo"></div></div>
+
+    <div class="subsec" data-screen-label="FillStates">
+      <h3>Пусто · Плейсхолдер · Заполнено</h3>
+      <div class="panel"><div class="demo-grid" id="states-fill"></div></div>
+    </div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Метка связывается с контролом через <code class="tok">label[for]</code>, хелпер и текст ошибки — через <code class="tok">aria-describedby</code>. Ошибка помечается <code class="tok">aria-invalid="true"</code> и передаётся не только цветом: текст ошибки выводится в хелпере или тултипе. Крестик очистки — настоящая кнопка с <code class="tok">aria-label</code>.</p>
+    <div class="panel" style="max-width:640px;">
+      <p class="desc tight" style="margin-bottom:18px;">Клавиатура</p>
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 3.15fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Tab</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">фокус в поле; следующий Tab — на крестик очистки (если есть)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 3.15fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Esc</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">отменяет незафиксированный ввод (если реализовано формой)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 3.15fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Enter</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">подтверждает значение / отправляет форму</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Текст поля набирается гарнитурой <b>SB Sans Text</b>. Метка и хелпер — Body XS.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст поля · M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст поля · S (Table Edit)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Helper</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены. Рамка — <code class="tok">--border-primary</code>, фокус — <code class="tok">--primary</code>, ошибка — <code class="tok">--error</code>, предупреждение — <code class="tok">--warning</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поле</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон поля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-tile</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-tile)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поле</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Рамка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#B8CCCC</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поле</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Рамка · hover/focus</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поле</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Тень фокуса</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">3% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поле</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4% #324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Значение</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Плейсхолдер / префикс / постфикс</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Метка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Действия (иконки)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#B8D6D3</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Рамка · Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Рамка · Warning</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--warning</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--warning)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFB300</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.77fr 1.89fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Хелпер · Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/input.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.55fr 1.08fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">S (Table Edit)</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/label-helper.css</code>
+      <code class="tok">styles/input.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Крестик очистки: показывать только когда поле непустое и не disabled.</span>
+<span class="tk-cm">//    Клик → очистить значение, вернуть фокус в поле, вызвать onChange('').</span>
+
+<span class="tk-cm">// 2. Плейсхолдер: нативный placeholder; исчезает при вводе, а не при фокусе.</span>
+<span class="tk-cm">//    Очищенное поле по потере фокуса возвращается в пустое состояние.</span>
+
+<span class="tk-cm">// 3. Ошибка/предупреждение: тултип с текстом показывается при фокусе поля</span>
+<span class="tk-cm">//    (ErrorFocus / WarningFocus) и скрывается по потере фокуса.</span>
+
+<span class="tk-cm">// 4. InputAmount: фильтровать ввод [0-9.,-]; '.' → ','; группировать целую</span>
+<span class="tk-cm">//    часть по 3 знака; на blur — обрезать децималы и незначащие нули.</span>
+
+<span class="tk-cm">// 5. Многострочный: авторост textarea по scrollHeight до max-высоты,</span>
+<span class="tk-cm">//    дальше — внутренний скролл.</span></code></pre>
+    </div>
+
+    </section>
+
+  <!-- BACKLOG -->
+  <div class="backlog" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых нет в текущей документации; все собираются на существующих токенах:</p>
+    <ul class="bullets">
+      <li>маска ввода (телефон, счёт, ИНН) — как у InputDate, но с настраиваемым шаблоном;</li>
+      <li>required-метка — звёздочка <code class="tok">.ds-label__req</code> уже есть в LabelHelper.</li>
+    </ul>
+  </div>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · InputText</span>
+    <span>m / s · prefix / postfix / lead / action icon · clear / password / counter · error / warning / disabled · multiline / resizable · amount</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите поле: размер, состояние, наполнение текстового слоя (префикс, постфикс, иконка слева), действия и многострочный режим.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/input.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/input-kit.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/input-text.page.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Размер': 'S (Table Edit)', 'Label': 'Показывать метку', 'Helper': 'Показывать helper', 'Префикс': 'Показывать префикс', 'Постфикс': 'Показывать постфикс', 'Иконка слева': 'Показывать иконку слева', 'Иконка справа': 'Показывать иконку справа', 'Многострочный': 'Многострочный режим', 'Resize': 'Разрешить изменение размера' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><div class="inp">
+  <label class="ds-label" for="inn"><span class="ds-label__text">ИНН</span></label>
+  <div class="inp__field">
+    <span class="inp__lead">…search…</span>
+    <span class="inp__prefix">От</span>
+    <input class="inp__control" id="inn" aria-describedby="inn-h">
+    <span class="inp__postfix">₽</span>
+    <span class="inp__acts">
+      <button class="inp__act" aria-label="Очистить поле">…✕…</button>
+      <button class="inp__act inp__act--static" aria-label="Подсказка">…ⓘ…</button>
+    </span>
+  </div>
+  <span class="ds-helper ds-helper--left" id="inn-h">10 или 12 цифр</span>
+</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/input-text.page.js)
+// Поле строит общий рантайм: window.DSInputKit.makeInput({ … })
+const spec = {
+  label: 'ИНН', helper: '10 или 12 цифр',
+  size: 'm',                       // 'm' | 's' (Table Edit)
+  state: 'default',                // default/hover/focus/error/warning/disabled
+  value: 'Text', placeholder: null,
+  prefix: 'От', postfix: '₽', lead: false, informer: false,   // слои текстового поля
+  clear: true, multiline: false, resizable: false,
+  live: true, width: 280
+};
+// .inp → .inp__field → .inp__lead / .inp__prefix / .inp__control / .inp__postfix / .inp__acts</script>
+<script type="text/plain" id="src-code-css">/* ============================================================
+   INPUT — семейство полей ввода: InputText · InputDate · InputAutocomplete
+   Общий компонент подкачки Input_Content (поле с рамкой) + слои
+   Text_MASTER (prefix / text / postfix) и Input_Action (крестик,
+   информер, календарь, шеврон).
+   Зависимости: colors.css, typography.css, radius.css,
+   label-helper.css (метка/хелпер), chip.css (чипы автокомплита).
+   Размеры: M (базовый, 40px) · S (Table Edit, 32px).
+   ============================================================ */
+
+.inp {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 280px; /* дефолт для доков; в лайауте задаётся контейнером */
+  --inp-h: 40px;
+  --inp-px: 12px;
+  --inp-gap: 8px;
+  --inp-icon: 20px;
+  --inp-font: var(--type-body-m);
+}
+/* размер S (Table Edit) — прямыми свойствами на потомках (не через --inp-* в модификаторе) */
+.inp--s .inp__field { height: 32px; padding: 0 10px; gap: 6px; font: var(--type-body-s); }
+.inp--s.inp--multiline .inp__field { min-height: 32px; }
+.inp--s .inp__lead { width: 18px; height: 18px; }
+.inp--s .inp__act  { width: 18px; height: 18px; }
+.inp--fullwidth { width: 100%; }
+
+/* метка и хелпер — компоненты подкачки LabelHelper */
+.inp > .ds-label { margin-bottom: 4px; }
+.inp > .ds-helper { margin-top: 4px; }
+
+/* ---------- поле (Input_Content) ---------- */
+.inp__field {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box; /* 2px-бордер фокуса не меняет габариты поля */
+  gap: var(--inp-gap);
+  height: var(--inp-h);
+  padding: 0 var(--inp-px);
+  background: var(--bg-tile);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-field);
+  font: var(--inp-font);
+  color: var(--text-primary);
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+.inp__field:hover,
+.inp.is-hover .inp__field { border-color: var(--primary); }
+.inp__field:focus-within,
+.inp.is-focus .inp__field {
+  border-color: var(--primary);
+  border-width: 2px; /* фокус — бордер 2px (общий для всех состояний *-focus) */
+  box-shadow: 0 0 0 3px var(--primary-bg-light);
+}
+
+/* многострочный вариант (InputText) */
+.inp--multiline .inp__field {
+  height: auto;
+  min-height: var(--inp-h);
+  padding-top: 9px;
+  padding-bottom: 9px;
+  align-items: flex-start;
+}
+.inp--multiline .inp__acts { align-self: flex-start; }
+
+/* ---------- состояния ---------- */
+.inp--error .inp__field { border-color: var(--error); }
+.inp--error .inp__field:focus-within,
+.inp--error.is-focus .inp__field {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 8%, transparent);
+}
+.inp--warning .inp__field { border-color: var(--warning); }
+.inp--warning .inp__field:focus-within,
+.inp--warning.is-focus .inp__field {
+  border-color: var(--warning);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--warning) 10%, transparent);
+}
+.inp--disabled { pointer-events: none; }
+.inp--disabled .inp__field {
+  background: var(--st-disabled-light);
+  border-color: var(--border-light);
+  color: var(--text-inactive);
+}
+.inp--disabled .inp__lead,
+.inp--disabled .inp__prefix,
+.inp--disabled .inp__postfix,
+.inp--disabled .inp__summary,
+.inp--disabled .inp__act { color: var(--text-inactive); }
+.inp--disabled .inp__control { color: var(--text-inactive); }
+/* очистка недоступна и не показывается в Disabled — сброса значения быть не может */
+.inp--disabled .inp__act[aria-label="Очистить поле"],
+.inp--disabled .inp__act[aria-label="Очистить"] { display: none; }
+
+/* ---------- контейнер поля + оверлей тултипа ---------- */
+/* .inp__box оборачивает поле и служит якорем для тултипа ошибки/предупреждения. */
+.inp__box { position: relative; width: 100%; }
+/* ПРАВИЛО: тултип (*-focus) не смещает хелпер — лежит поверх потока,
+   z-index всегда выше поля и его компонентов. */
+.inp__box > .tip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+}
+
+/* ---------- текстовый слой (Text_MASTER) ---------- */
+.inp__lead {
+  flex: none;
+  width: var(--inp-icon);
+  height: var(--inp-icon);
+  color: var(--secondary); /* иконки в полях — Active · secondary */
+  display: inline-flex;
+}
+.inp__lead :is(svg,[data-icon]){ width: 100%; height: 100%; }
+
+.inp__prefix,
+.inp__postfix {
+  flex: none;
+  color: var(--text-inactive);
+  white-space: nowrap;
+}
+
+.inp__control {
+  flex: 1 1 60px;
+  min-width: 40px;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--text-primary);
+  outline: none;
+}
+.inp__control::placeholder { color: var(--text-inactive); opacity: 1; }
+textarea.inp__control { resize: none; line-height: 20px; }
+/* растягивание по вертикали — за угол в правом нижнем углу поля (стандартный resize-хват браузера) */
+.inp--resizable .inp__field { padding: 0; align-items: stretch; }
+.inp--resizable textarea.inp__control {
+  resize: vertical;
+  min-height: var(--inp-h);
+  padding: 9px var(--inp-px);
+  border-radius: inherit;
+}
+.inp--resizable .inp__field:has(.inp__acts) textarea.inp__control {
+  padding-right: calc(var(--inp-px) + var(--inp-icon) + var(--inp-gap));
+}
+.inp--resizable .inp__acts { position: absolute; top: 9px; right: var(--inp-px); }
+.inp--resizable .inp__box { position: relative; }
+
+/* ---------- хелпер + счётчик символов в одной строке (maxLength) ---------- */
+.inp__foot { display: flex; align-items: flex-start; gap: 12px; margin-top: 4px; }
+.inp__foot .ds-helper { flex: 1 1 auto; margin-top: 0; min-width: 0; }
+.inp__counter {
+  flex: none;
+  margin-left: auto;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.inp__counter--limit { color: var(--error); }
+.inp--disabled .inp__counter { color: var(--text-inactive); }
+
+/* сводка выбранного (InputAutocomplete): «Value 1, +4» */
+.inp__summary { flex: none; white-space: nowrap; color: var(--text-primary); }
+
+/* стек чипов внутри поля (InputAutocomplete · Chips) */
+.inp__chips {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+.inp__chips .chip { flex: none; }
+.inp__chips .chip:last-child { flex: 0 1 auto; min-width: 48px; }
+
+/* ---------- действия (Input_Action) ---------- */
+.inp__acts {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+.inp__act {
+  flex: none;
+  width: var(--inp-icon);
+  height: var(--inp-icon);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--secondary); /* иконки-действия в полях — Active · secondary */
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: color .15s ease;
+}
+.inp__act :is(svg,[data-icon]){ width: 100%; height: 100%; }.inp__act:hover { color: var(--secondary-dark); }
+.inp__act:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.inp__act--static { cursor: default; color: var(--secondary); }
+.inp__act--static:hover { color: var(--secondary); }
+.inp__act--chev { transition: color .15s ease, transform .15s ease; }
+.inp.is-open .inp__act--chev { transform: rotate(180deg); }
+
+/* ---------- внешний стек чипов (InputAutocomplete · Chips Ext) ---------- */
+.inp-ext {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}</script>
+</body>
+</html>

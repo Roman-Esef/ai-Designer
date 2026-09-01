@@ -1,0 +1,94 @@
+/* =========================================================================
+   Design System — Label & Helper  («компоненты подкачки»)
+   ---------------------------------------------------------------------
+   Вспомогательные текстовые слоты. Не являются самостоятельными
+   компонентами: не имеют собственного визуального контейнера и никогда
+   не выводятся на экран без родительского компонента.
+
+   Label   — используется в: InputText, InputAutocomplete, InputDate,
+             ReadOnlyField. Может содержать иконки информирования или
+             действий (редкий кейс).
+             Шрифт: Body XS · Цвет: Text-Secondary.
+
+   Helper  — используется в: Checkbox, Radiobutton, Switch, InputText,
+             InputAutocomplete, InputDate, ReadOnlyField.
+             Выравнивание left/right — по ориентации родителя.
+             Шрифт: Body XS · Цвет: Text-Inactive.
+             Состояние Error — цвет Error, опционально с иконкой
+             предупреждения (alert-triangle-filled) перед текстом.
+
+   Requires: typography.css, colors.css, icons-data.js (для иконки Error)
+   ========================================================================= */
+
+/* ---------- Label ---------- */
+.ds-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+  font: var(--type-body-xs);
+  color: var(--text-secondary);
+}
+/* выравнивание — всегда синхронизировано с Helper той же пары (см. правило
+   зависимости): left — по умолчанию, right — когда родитель выровнен по
+   правому краю (например, поле со значением, выровненным по правому краю). */
+.ds-label--right { justify-content: flex-end; }
+/* при выравнивании справа иконки (IconButton) идут слева от текста */
+.ds-label--right .ds-label__icons { order: -1; }
+.ds-label__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* дополнительные иконки (одна или две, любого назначения) — редкий кейс, справа от текста.
+   Каждая иконка — IconButton S neutral (см. IconButton); контейнер задаёт раскладку. */
+.ds-label__icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+/* IconButton S внутри Label ужимается до 16px (высота строки Body XS),
+   чтобы Label не вырастал до 24px — глиф остаётся 16px. */
+.ds-label__icons .ibtn--s { width: 16px; height: 16px; }
+
+/* обязательное поле — звёздочка сразу после текста */
+.ds-label__req { color: var(--error); margin-left: 2px; }
+
+.ds-label--disabled { color: var(--text-inactive); }
+
+/* ---------- Helper ---------- */
+.ds-helper {
+  display: block;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+  text-wrap: pretty;
+}
+/* выравнивание зависит от ориентации родителя: left — по умолчанию
+   (чекбокс/радио/свитч/поле), right — когда родитель выровнен по правому
+   краю (например, компактное числовое поле). */
+.ds-helper--left  { text-align: left; }
+.ds-helper--right { text-align: right; }
+
+.ds-helper--error    { color: var(--error); }
+.ds-helper--disabled { color: var(--text-inactive); }
+
+/* --- вариант с иконкой (используется в состоянии Error) --- */
+.ds-helper--with-icon {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.ds-helper--with-icon.ds-helper--right { justify-content: flex-end; }
+.ds-helper__icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: inherit;
+}
+.ds-helper__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.ds-helper__text { min-width: 0; }

@@ -1,0 +1,1035 @@
+<!-- @dsCard group="Components" name="ButtonGroup" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ButtonGroup — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/button-group.css">
+<link rel="stylesheet" href="../../styles/context-menu.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* breadcrumb back link */
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:74ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:28px; }
+  .row + .row { margin-top: 28px; }
+
+  .blk { display:flex; flex-direction:column; align-items:flex-start; gap:14px; }
+  .blk > .cap { font: var(--type-body-s); color: var(--text-inactive); margin:0; }
+  .blk > .cap b { font: var(--type-body-s-strong); color: var(--text-secondary); }
+
+  /* sub-heading inside a panel */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 30px; }
+
+  /* sizes matrix */
+  .size-grid { display:grid; grid-template-columns: 64px 1fr; gap:30px 28px; align-items:center; }
+  .size-grid .sz-tag { font: var(--type-body-s-strong); color: var(--text-primary); background: var(--tertiary); padding:8px 0; border-radius:8px; text-align:center; letter-spacing:.05em; }
+  .size-grid .sz-tag span { display:block; font: var(--type-body-xs); color: var(--text-inactive); margin-top:3px; font-weight:400; }
+
+  /* states matrix */
+  .matrix { display:grid; grid-template-columns: 140px repeat(3, 1fr); gap:18px 22px; align-items:center; }
+  .matrix .col-head { font: var(--type-body-m); color: var(--text-secondary); }
+  .matrix .grouphdr { grid-column:1 / -1; font: var(--type-h6-strong); color: var(--text-primary); margin-top:8px; }
+  .matrix .cell { display:flex; }
+
+  /* spec table */
+  .spec-table { width:100%; border-collapse:collapse; }
+  .spec-table th, .spec-table td { text-align:left; padding:14px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); }
+  .spec-table th { font: var(--type-body-s-strong); color: var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; font-size:12px; }
+  .spec-table td.num { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+  .spec-table tr:last-child td { border-bottom:none; }
+  .spec-table code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; color: var(--primary); }
+
+  /* do / don't */
+  .guide { display:grid; grid-template-columns: 1fr 1fr; gap:18px; }
+  @media (max-width:760px){ .guide { grid-template-columns:1fr; } }
+  .guide .g { background: var(--bg-tile); border:1px solid var(--border-light); border-radius:16px; padding:26px 28px; }
+  .guide .g .tag { display:inline-flex; align-items:center; gap:8px; font: var(--type-body-s-strong); padding:0 0 16px; }
+  .guide .g.do .tag { color: var(--success-dark); }
+  .guide .g.dont .tag { color: var(--error-dark); }
+  .guide .g .tag svg { width:18px; height:18px; }
+  .guide .g .demo { display:flex; align-items:center; gap:16px; flex-wrap:wrap; min-height:52px; padding-bottom:18px; border-bottom:1px solid var(--border-light); margin-bottom:18px; }
+  .guide .g p { font: var(--type-body-s); color: var(--text-secondary); margin:0; text-wrap:pretty; }
+
+  /* ---------- демо-стадия (docs-split) ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:520px; display:flex; align-items:center; justify-content:center; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+  .seg { display:inline-flex; background: var(--tertiary); border-radius:9px; padding:3px; gap:3px; }
+  .seg button { border:none; background:transparent; padding:7px 12px; border-radius:6px; font: var(--type-button-s); color: var(--text-secondary); cursor:pointer; transition:.12s; flex:1; }
+
+  .toggles { display:flex; flex-direction:column; gap:9px; }
+  .toggle { display:inline-flex; align-items:center; gap:11px; padding:9px 12px; border:1px solid var(--border-light); border-radius:9px; font: var(--type-body-m); color: var(--text-primary); cursor:pointer; user-select:none; background: var(--bg-tile); transition:.12s; }
+
+  .pg__code { margin-top:14px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- color reference ---------- */
+  
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- developer handoff ---------- */
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="ButtonGroup">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <a class="crumb" href="../../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Дизайн-система</a>
+    <div class="meta"><span>Версия: <b>1.004</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>ButtonGroup</h1>
+    <p class="lead">Объединяет связанные кнопки в единый визуальный блок с общим фоном или обводкой. Поддерживает 2–5 кнопок, типы Accent / Outline, все три размера, вариант Split&nbsp;Button и сегментированный выбор. Собирается из компонентов <b>Button</b> — кнопки наследуют свои свойства.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc">ButtonGroup группирует кнопки, связанные общим контекстом или относящиеся к одному объекту: переключение режимов отображения, набор действий над записью, парные действия «Применить / Отмена». Группа делает связь между кнопками явной и экономит горизонтальное пространство.</p>
+    <div class="panel"><div class="row" id="usage-row"></div></div>
+  
+<div class="subsec" data-screen-label="Guidelines">
+    <h3>Рекомендации</h3>
+    <p class="desc">Группируйте только связанные действия. Не смешивайте типы и размеры внутри одной группы.</p>
+    <div class="guide">
+      <div class="g do">
+        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Делайте</span>
+        <div class="demo" id="do-demo"></div>
+        <p>Один тип, один размер, 2–5 связанных действий. Disabled — на всю группу.</p>
+      </div>
+      <div class="g dont">
+        <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Не делайте</span>
+        <div class="demo" id="dont-demo"></div>
+        <p>Не смешивайте типы и размеры и не блокируйте отдельную кнопку внутри группы.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Собирается из компонентов <b>Button</b>, объединённых общим фоном (Accent) или обводкой (Outline). Соседние кнопки разделены вертикальной линией: у Accent — окрашенный шов, у Outline — общая обводка соседних кнопок. Внешние углы скруглены по радиусу кнопки, внутренние — прямые.</p>
+    <div class="panel">
+      <div class="row" style="gap:40px;">
+        <div class="blk"><p class="cap"><b>Accent</b> · общий фон, окрашенный шов</p><div id="anat-accent"></div></div>
+        <div class="blk"><p class="cap"><b>Outline</b> · общая обводка</p><div id="anat-outline"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Types">
+    <h3>Типы</h3>
+    <p class="desc">Группа может содержать от двух до пяти кнопок одного типа и размера.</p>
+    <div class="panel">
+      <p class="subhead">Количество — от 2 до 5</p>
+      <div class="row" id="count-row"></div>
+      <p class="subhead mt">Со сплошным фоном (Accent) или обводкой (Outline)</p>
+      <div class="row" id="fill-row"></div>
+      <p class="subhead mt">С текстом и/или иконками</p>
+      <div class="row" id="content-row"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="SplitButton">
+    <h3>Split Button</h3>
+    <p class="desc">Отдельный вариант группы из двух кнопок: текстовой и стрелки. Клик по текстовой кнопке выполняет действие по умолчанию, клик по стрелке открывает контекстное меню с другими доступными действиями. Нажмите, чтобы открыть.</p>
+    <div class="panel">
+      <div class="row" id="split-row"></div>
+      <p class="subhead mt">Левая кнопка — с иконкой или без неё</p>
+      <div class="row" id="split-icon-row"></div>
+      <p class="subhead mt">Позиционирование меню определяется на этапе проектирования — справа или слева</p>
+      <div class="row" id="split-menu-row"></div>
+    </div>
+  </div>
+  
+<div class="subsec" data-screen-label="Orientation">
+    <h3>Ориентация</h3>
+    <p class="desc">Помимо горизонтальной, группа поддерживает вертикальную раскладку — для компактных меню и боковых панелей, где действия выстраиваются в столбец. Скругление переносится на верхнюю и нижнюю кнопки, шов становится горизонтальным.</p>
+    <div class="panel"><div class="row" style="gap:40px; align-items:flex-start;" id="orient-row"></div></div>
+  </div>
+
+<div class="subsec" data-screen-label="Toggle">
+    <h3>Сегментированный выбор</h3>
+    <p class="desc">Группа может работать как переключатель: кнопки сохраняют выбранное состояние, выбранный сегмент заливается акцентным цветом. Поддерживается одиночный выбор (как радиокнопки — всегда выбран ровно один) и множественный (как чекбоксы). Управляется атрибутом <code class="tok">aria-pressed</code>. Попробуйте нажать.</p>
+    <div class="panel">
+      <div class="row" style="gap:44px;">
+        <div class="blk"><p class="cap"><b>Одиночный выбор</b> · режим отображения</p><div id="toggle-single"></div></div>
+        <div class="blk"><p class="cap"><b>Множественный выбор</b> · форматирование</p><div id="toggle-multi"></div></div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Fullwidth">
+    <h3>Fullwidth и равная ширина</h3>
+    <p class="desc">Группа со свойством Fullwidth заполняет контейнер целиком; кнопки получают равную ширину. Удобно для нижних панелей действий в модальных окнах и на мобильных макетах.</p>
+    <div class="panel">
+      <div style="max-width:520px; display:flex; flex-direction:column; gap:18px;" id="fw-row"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Все кнопки группы используют один размер, унаследованный от Button. Высота фиксирована, ширина зависит от контента.</p>
+    <div class="panel">
+      <div class="size-grid" id="size-grid"></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Spec">
+    <h3>Спецификация</h3>
+    <p class="desc">Геометрия наследуется от Button; группа управляет только скруглением внешних углов и швом между кнопками.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.49fr 0.99fr 1.58fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Источник</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 0.99fr 1.58fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Высота кнопки</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">40 / 32 / 24</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code>--btn-h</code> (M / S / XS)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 0.99fr 1.58fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Радиус внешних углов</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8 / 8 / 6</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code>--btn-radius</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 0.99fr 1.58fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Радиус внутренних углов</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">прямые</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 0.99fr 1.58fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Сдвиг соседних кнопок</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">−1</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">collapse общей обводки</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 0.99fr 1.58fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Толщина шва</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">1</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code>box-shadow inset</code> / border</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 0.99fr 1.58fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кол-во кнопок</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">2 – 5</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">правило компонента</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Скругляются только внешние углы группы, стыки между кнопками прямые. Значение берётся от размера кнопок. В вертикальной группе так же: скруглены верхние углы первой кнопки и нижние — последней.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M, S — внешние углы группы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS — внешние углы группы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Внутренние стыки кнопок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Единственная кнопка в группе</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px (M, S) / 6 px (XS)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control / --radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Текстовые правила наследуются от <a class="crumb" style="display:inline; margin:0; padding:0;" href="../atoms/Buttons.html">Button</a>, но внутри группы есть дополнительные ограничения:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>текст кнопки — короткий глагол в повелительном наклонении («Сохранить», «Неделя»), без точки в конце;</li>
+      <li>держите метки одного типа сопоставимыми по длине — сильно разные по ширине кнопки делают группу визуально неровной;</li>
+      <li>не смешивайте в одной группе кнопки с текстом и чисто icon-only — выбирайте один формат для всей группы;</li>
+      <li>у каждой icon-only кнопки в группе должен быть <code class="tok">aria-label</code>, описывающий действие;</li>
+      <li>в Split Button текстовая кнопка называет действие по умолчанию, пункты меню стрелки — альтернативные действия, связанные с тем же объектом.</li>
+    </ul>
+  </section>
+
+  <!-- BEHAVIOR -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Логика выбора в режиме Toggle.</p>
+
+<div class="subsec" data-screen-label="ToggleLogic">
+    <h3>Одиночный и множественный выбор</h3>
+    <p class="desc">В режиме Toggle группа работает по одной из двух схем: <b>одиночный выбор</b> (radio-like) — клик по кнопке снимает выбор со всех соседей и ставит только на неё, всегда ровно один нажатый сегмент; <b>множественный выбор</b> (checkbox-like) — каждая кнопка переключается независимо, допустимы любое число нажатых от нуля до всех. Схема задаётся на уровне группы, а не смешивается внутри одной группы.</p>
+  </div>
+  </section>
+
+  <!-- STATES & BEHAVIOR -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Кнопки внутри группы наследуют все свои свойства и ведут себя так же, как вне группы. Исключение — Outline: в группе у него <b>не меняется цвет обводки</b> на Hover / Active (иначе соседний шов «прыгал» бы).</p>
+    <div class="panel"><div class="matrix" id="states-matrix"></div></div>
+
+    <p class="subhead" style="margin:34px 0 16px;">Disabled — на всю группу целиком</p>
+    <p class="desc">Состояние Disabled распространяется на <b>всю группу</b>. В группе не может быть заблокирована только одна или часть кнопок — это нарушило бы единство блока.</p>
+    <div class="panel"><div class="row" id="disabled-row"></div></div>
+  </section>
+
+  <!-- ACCESSIBILITY (addon) -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Контейнер группы получает <code class="tok">role="group"</code> и осмысленный <code class="tok">aria-label</code> (например «Режим отображения»). В сегментированном выборе используется <code class="tok">aria-pressed</code> на кнопках; одиночный выбор удобно навигировать стрелками с roving&nbsp;tabindex. Split Button: текстовая кнопка — основное действие, у стрелки <code class="tok">aria-haspopup="menu"</code> и <code class="tok">aria-expanded</code>.</p>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Не применимо: группа не вводит собственной типографики — кнопки внутри используют токены компонента <a class="crumb" style="display:inline; margin:0; padding:0;" href="../atoms/Buttons.html">Button</a>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 2.97fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.97fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Не применимо — компонент не содержит собственного текста</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Группа наследует цвета от <a class="crumb" style="display:inline; margin:0; padding:0;" href="../atoms/Buttons.html">Button</a> и добавляет собственные токены только для шва между кнопками.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка (hover)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#007A6D</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Шов между кнопками</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--btng-divider-accent</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Шов (disabled)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--btng-divider-disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Обводка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка / обводка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--disabled)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#BEC5C8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст (Outline/Transparent)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Toggle (нажато)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.13fr 1.66fr 1.49fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Toggle (нажато)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/button-group.css</code> и <code class="tok">styles/button.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.55fr 0.55fr 0.55fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">S</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">XS</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/button.css</code>
+      <code class="tok">styles/button-group.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Кнопки внутри группы — обычные &lt;button&gt;, события click обрабатываются как обычно</span>
+
+<span class="tk-cm">// 2. Toggle / сегментированный выбор:</span>
+<span class="tk-cm">//    одиночный (radio-like) — клик по кнопке сбрасывает aria-pressed у всех соседей,</span>
+<span class="tk-cm">//    ставит true только нажатой; всегда ровно один выбранный</span>
+<span class="tk-cm">//    множественный (checkbox-like) — клик инвертирует только свой aria-pressed, независимо от соседей</span>
+
+<span class="tk-cm">// 3. Split Button:</span>
+<span class="tk-cm">//    клик по текстовой кнопке — выполняет действие по умолчанию напрямую</span>
+<span class="tk-cm">//    клик по стрелке — переключает aria-expanded и показывает/скрывает меню;</span>
+<span class="tk-cm">//    клик вне группы или Esc — закрывает меню</span>
+
+<span class="tk-cm">// 4. Disabled — только на всю группу целиком: класс .btn-group--disabled (pointer-events: none)</span>
+<span class="tk-cm">//    + aria-disabled="true" на контейнере; нельзя блокировать отдельную кнопку</span>
+
+<span class="tk-cm">// 5. Клавиатура: Tab переходит между кнопками внутри группы как обычные фокусируемые элементы</span>
+<span class="tk-cm">//    (без roving tabindex); :focus-visible — обычное поведение Button, поверх соседей (z-index)</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">makeGroup</code> / <code class="tok">makeSplit</code> в коде этой страницы).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Группа с бейджем</b> — счётчик на отдельной кнопке группы (например, число непрочитанных).</li>
+        <li><b>Адаптивное схлопывание</b> — при нехватке ширины лишние кнопки уходят в оверфлоу-меню.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · ButtonGroup</span>
+    <span>Accent · Outline — Split · Toggle · Vertical · Fullwidth</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите группу: переключайте вариант, тип, размер, количество кнопок, ориентацию и состояние — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/button-group.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-menu.js"></script>
+<script src="../../scripts/ds-buttongroup.js"></script>
+<script>
+/* ---------- icons ---------- */
+const ICONS = {
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>',
+  star:     '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.9 5.9 6.6.9-4.8 4.6 1.1 6.6L12 18.9 6.2 21l1.1-6.6L2.5 9.3l6.6-.9z"/></svg>',
+  plus:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  chevron:  '<svg class="btn__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  bold:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5h7a3.5 3.5 0 0 1 0 7H7zM7 12h8a3.5 3.5 0 0 1 0 7H7z"/></svg>',
+  italic:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 4h-9M14 20H5M15 4L9 20"/></svg>',
+  underline:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v6a6 6 0 0 0 12 0V4M4 21h16"/></svg>',
+  list:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+  grid:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+};
+/* подставляем иконки из библиотеки ДС (bold/italic/underline — оставляем) */
+(function(){ const L=window.DS_ICONS||{}; const m={download:'download',star:'star-filled',plus:'add',list:'list-view-01',grid:'layout-grid-01'};
+  for(const k in m){ if(L[m[k]]) ICONS[k]=L[m[k]]; }
+  if(L['chevron-down']) ICONS.chevron=L['chevron-down'].replace('<svg','<svg class="btn__chevron"');
+  const setSvg=(sel,key)=>{ const el=document.querySelector(sel); if(el&&L[key]) el.outerHTML=L[key]; };
+  setSvg('.crumb svg','arrow-left'); setSvg('.g.do .tag svg','check'); setSvg('.g.dont .tag svg','close');
+})();
+
+/* ---------- single button factory ---------- */
+function makeBtn(o = {}) {
+  const { type='accent', size='m', text='Button', lead=null, trail=null,
+          chevron=false, iconOnly=null, pressed=null } = o;
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'btn btn--' + type + ' btn--' + size;
+  if (iconOnly) b.classList.add('btn--icon-only');
+  if (pressed !== null) b.setAttribute('aria-pressed', String(pressed));
+  let html = '';
+  if (iconOnly) html = ICONS[iconOnly];
+  else {
+    if (lead) html += ICONS[lead];
+    html += '<span class="btn__label">' + text + '</span>';
+    if (chevron) html += ICONS.chevron;
+    else if (trail) html += ICONS[trail];
+  }
+  b.innerHTML = html;
+  return b;
+}
+
+/* ---------- group factory ---------- */
+function makeGroup(o = {}) {
+  const { type='accent', size='m', items=[], vertical=false, fullwidth=false,
+          disabled=false, toggle=false, split=false, label=null, single=false } = o;
+  const g = document.createElement('div');
+  g.className = 'btn-group btn-group--' + type;
+  if (vertical)   g.classList.add('btn-group--vertical');
+  if (fullwidth)  g.classList.add('btn-group--fullwidth');
+  if (disabled)   g.classList.add('btn-group--disabled');
+  if (toggle)     g.classList.add('btn-group--toggle');
+  if (split)      g.classList.add('btn-group--split');
+  g.setAttribute('role', (toggle && single) ? 'radiogroup' : 'group');
+  if (label) g.setAttribute('aria-label', label);
+  if (disabled) g.setAttribute('aria-disabled', 'true');
+  items.forEach(it => g.appendChild(makeBtn({ type, size, ...it })));
+  return g;
+}
+
+/* ---------- dropdown for split button: реальный ContextMenu + DSMenu.bind ---------- */
+const SPLIT_MENU = [
+  { label:'Сохранить как…', icon:'download' },
+  { label:'Создать копию',  icon:'plus' },
+  { label:'В избранное',    icon:'star' },
+];
+function makeSplit(o = {}) {
+  const { type='accent', size='m', lead=null, right=false, disabled=false, text='Button' } = o;
+  const wrap = document.createElement('div');
+  wrap.className = 'btn-group btn-group--' + type + ' btn-group--split menu-anchor';
+  wrap.setAttribute('role', 'group');
+  if (disabled) wrap.classList.add('btn-group--disabled');
+  if (disabled) wrap.setAttribute('aria-disabled', 'true');
+
+  const main = makeBtn({ type, size, text, lead });
+  const chev = makeBtn({ type, size, iconOnly:'chevron' });
+
+  const menu = document.createElement('div');
+  menu.className = 'menu menu--floating'; menu.setAttribute('role','menu');
+  SPLIT_MENU.forEach(it => {
+    const mi = document.createElement('button'); mi.type='button'; mi.className='menu__item'; mi.setAttribute('role','menuitem');
+    mi.innerHTML = '<span class="menu__item-icon">' + ICONS[it.icon] + '</span><span class="menu__item-label">' + it.label + '</span>';
+    menu.appendChild(mi);
+  });
+
+  wrap.append(main, chev, menu);
+  if (disabled) chev.disabled = true;
+  window.DSMenu.bind(chev, { menu, placement:'bottom', align: right ? 'end' : 'start' });
+  return wrap;
+}
+
+/* ---------- helpers ---------- */
+function txt(n){ return Array.from({length:n}, () => ({ text:'Button' })); }
+function mount(id, node){ const el = document.getElementById(id); if(el) el.appendChild(node); }
+function mountAll(id, nodes){ const el = document.getElementById(id); nodes.forEach(n => el.appendChild(n)); }
+
+/* ---------- USAGE ---------- */
+mountAll('usage-row', [
+  makeGroup({ type:'accent', items:[{lead:'list',text:'Список'},{lead:'grid',text:'Плитка'}], label:'Режим отображения' }),
+  makeGroup({ type:'outline', items:[{text:'День'},{text:'Неделя'},{text:'Месяц'}], label:'Период' }),
+]);
+
+/* ---------- ANATOMY ---------- */
+mount('anat-accent', makeGroup({ type:'accent', items:txt(5) }));
+mount('anat-outline', makeGroup({ type:'outline', items:txt(5) }));
+
+/* ---------- TYPES: count ---------- */
+mountAll('count-row', [2,3,4,5].map(n => makeGroup({ type:'accent', items:txt(n) })));
+/* fill */
+mountAll('fill-row', [
+  makeGroup({ type:'accent', items:txt(3) }),
+  makeGroup({ type:'outline', items:txt(3) }),
+]);
+/* content */
+mountAll('content-row', [
+  makeGroup({ type:'accent', items:[{text:'Button'},{text:'Button'}] }),
+  makeGroup({ type:'accent', items:[{lead:'download',text:'Button'},{lead:'star',text:'Button'}] }),
+  makeGroup({ type:'accent', items:[{iconOnly:'download'},{iconOnly:'star'},{iconOnly:'plus'}] }),
+]);
+
+/* ---------- SPLIT ---------- */
+mountAll('split-row', [
+  makeSplit({ type:'accent' }),
+  makeSplit({ type:'outline' }),
+]);
+mountAll('split-icon-row', [
+  makeSplit({ type:'accent', lead:'download' }),
+  makeSplit({ type:'accent' }),
+]);
+mountAll('split-menu-row', [
+  makeSplit({ type:'accent', right:false }),
+  makeSplit({ type:'accent', right:true }),
+]);
+
+/* ---------- ORIENTATION ---------- */
+mountAll('orient-row', [
+  makeGroup({ type:'accent', vertical:true, items:[{lead:'download',text:'Скачать'},{lead:'star',text:'В избранное'},{lead:'plus',text:'Создать копию'}] }),
+  makeGroup({ type:'outline', vertical:true, items:[{text:'Профиль'},{text:'Настройки'},{text:'Выйти'}] }),
+]);
+
+/* ---------- TOGGLE ---------- */
+(function(){
+  // single select (radio-like): exactly one pressed
+  const single = makeGroup({ type:'outline', toggle:true, single:true, label:'Режим отображения',
+    items:[{iconOnly:'list',pressed:true},{iconOnly:'grid',pressed:false}] });
+  mount('toggle-single', single);
+
+  // multi select (checkbox-like)
+  const multi = makeGroup({ type:'outline', toggle:true, label:'Форматирование',
+    items:[{iconOnly:'bold',pressed:true},{iconOnly:'italic',pressed:false},{iconOnly:'underline',pressed:false}] });
+  mount('toggle-multi', multi);
+})();
+
+/* ---------- FULLWIDTH ---------- */
+mountAll('fw-row', [
+  makeGroup({ type:'accent', fullwidth:true, items:[{text:'Отмена'},{text:'Применить'}] }),
+  makeGroup({ type:'outline', fullwidth:true, items:[{text:'Day'},{text:'Week'},{text:'Month'},{text:'Year'}] }),
+]);
+
+/* ---------- STATES MATRIX ---------- */
+(function(){
+  const m = document.getElementById('states-matrix');
+  ['','Default','Hover','Active'].forEach((h,i) => {
+    const d = document.createElement('div');
+    d.className = i===0 ? 'rowname' : 'col-head'; d.textContent = h; m.appendChild(d);
+  });
+  function block(type){
+    const g = document.createElement('div'); g.className='grouphdr'; g.textContent = type[0].toUpperCase()+type.slice(1); m.appendChild(g);
+    const name = document.createElement('div'); name.className='rowname'; name.textContent='Кнопка'; m.appendChild(name);
+    [null,'is-hover','is-active'].forEach(force => {
+      const cell = document.createElement('div'); cell.className='cell';
+      const grp = makeGroup({ type, items:[{text:'Button'},{text:'Button'},{text:'Button'}] });
+      if (force) grp.children[1].classList.add(force);  // middle button shows the state
+      cell.appendChild(grp); m.appendChild(cell);
+    });
+  }
+  block('accent');
+  block('outline');
+})();
+
+/* ---------- DISABLED ---------- */
+mountAll('disabled-row', [
+  makeGroup({ type:'accent', disabled:true, items:txt(3) }),
+  makeGroup({ type:'outline', disabled:true, items:txt(3) }),
+]);
+
+/* ---------- SIZES ---------- */
+(function(){
+  const grid = document.getElementById('size-grid');
+  [['M','40','m'],['S','32','s'],['XS','24','xs']].forEach(([name,h,sz]) => {
+    const tag = document.createElement('div'); tag.className='sz-tag';
+    tag.innerHTML = name + '<span>'+h+' px</span>'; grid.appendChild(tag);
+    const cell = document.createElement('div'); cell.style.display='flex'; cell.style.gap='28px'; cell.style.flexWrap='wrap'; cell.style.alignItems='center';
+    cell.appendChild(makeGroup({ type:'accent', size:sz, items:[{lead:'download',text:'Button'},{text:'Button'},{text:'Button'}] }));
+    cell.appendChild(makeSplit({ type:'outline', size:sz }));
+    grid.appendChild(cell);
+  });
+})();
+
+/* ---------- GUIDELINES ---------- */
+mount('do-demo', makeGroup({ type:'outline', items:[{text:'День'},{text:'Неделя'},{text:'Месяц'}] }));
+(function(){
+  // bad: mixed types + sizes
+  const bad = document.createElement('div'); bad.className='btn-group btn-group--accent'; bad.setAttribute('role','group');
+  bad.appendChild(makeBtn({ type:'accent', size:'m', text:'Button' }));
+  bad.appendChild(makeBtn({ type:'outline', size:'s', text:'Button' }));
+  const b3 = makeBtn({ type:'accent', size:'m', text:'Button' }); b3.disabled = true; bad.appendChild(b3);
+  mount('dont-demo', bad);
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function(){
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue){
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r,g,b,a=1, m=v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m){ r=+m[1]*255; g=+m[2]*255; b=+m[3]*255; if(m[4]!==undefined) a=+m[4]; }
+    else { const n=v.match(/[\d.]+/g); if(!n) return cssValue; r=+n[0]; g=+n[1]; b=+n[2]; if(n[3]!==undefined) a=+n[3]; }
+    const hx=n=>Math.round(n).toString(16).padStart(2,'0').toUpperCase();
+    let s='#'+hx(r)+hx(g)+hx(b); if(a<1) s+=' · '+Math.round(a*100)+'%'; return s;
+  }
+  const groups = [
+    { name:'Accent', rows:[
+      ['Заливка', '--primary'],
+      ['Заливка (hover)', '--primary-dark'],
+      ['Шов между кнопками', '--btng-divider-accent'],
+      ['Шов (disabled)', '--btng-divider-disabled'],
+    ]},
+    { name:'Outline', rows:[
+      ['Обводка', '--primary'],
+      ['Текст', '--primary'],
+    ]},
+    { name:'Disabled', rows:[
+      ['Заливка / обводка', '--disabled'],
+      ['Текст (Outline/Transparent)', '--text-inactive'],
+    ]},
+    { name:'Toggle (нажато)', rows:[
+      ['Заливка', '--primary'],
+      ['Текст', '--text-on-dark'],
+    ]},
+  ];
+  const root = document.getElementById('color-ref');
+  if(!root) return;
+  root.innerHTML = groups.map(g=>`
+    <section class="cref-group">
+      <h3>${g.name}</h3>
+      <div class="cref-rows">
+        ${g.rows.map(([role,tok])=>`
+          <div class="cref-row">
+            <div class="cref-sw"><div class="cf" style="background:var(${tok});"></div></div>
+            <div class="cref-meta"><p class="role">${role}</p><p class="tname">${tok}</p></div>
+            <div class="cref-hex">${resolveHex('var('+tok+')')}</div>
+          </div>`).join('')}
+      </div>
+    </section>`).join('');
+  probe.remove();
+})();
+
+/* ---------- DEV: redline measured from live component ---------- */
+(function(){
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  function measure(sz){
+    const g = makeGroup({ type:'accent', size:sz, items:[{text:'A'},{text:'B'}] });
+    host.appendChild(g);
+    const btn = g.children[0];
+    const cs = getComputedStyle(btn);
+    return { h:cs.height, rad:cs.borderTopLeftRadius, seam:getComputedStyle(g.children[1]).marginLeft };
+  }
+  const sizes = ['m','s','xs'];
+  const d = {}; sizes.forEach(sz => d[sz] = measure(sz));
+  host.remove();
+  const r = n => Math.round(n*10)/10;
+  const px = v => { const n = parseFloat(v); return isNaN(n) ? v : r(n)+' px'; };
+  const rows = [
+    ['Высота кнопки', z => px(d[z].h)],
+    ['Радиус внешних углов', z => px(d[z].rad)],
+    ['Сдвиг соседних кнопок (collapse шва)', z => px(d[z].seam)],
+  ];
+  const tb = document.querySelector('#dev-spec-table');
+  if (tb) tb.innerHTML = rows.map(([label,fn]) =>
+    `<div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.55fr 0.55fr 0.55fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${label}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('m')}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('s')}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('xs')}</span></span></div><div class="tc tc--separator"></div></div>`
+  ).join('');
+})();
+
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+
+/* ---------- PLAYGROUND ---------- */
+(function(){
+  const state = {
+    variant:'standard', type:'accent', size:'m', count:3,
+    orientation:'horizontal', content:'text', state:'default', fullwidth:false,
+  };
+  const controls = document.getElementById('pg-controls');
+  const preview  = document.getElementById('pg-preview');
+  const codeEl   = document.getElementById('pg-code');
+
+  function seg(label, options, getCur, onPick){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const s=document.createElement('div'); s.className='seg';
+    options.forEach(([val,t])=>{
+      const b=document.createElement('button'); b.type='button'; b.textContent=t;
+      b.setAttribute('aria-selected', String(val===getCur()));
+      b.addEventListener('click',()=>{ onPick(val); [...s.children].forEach(c=>c.setAttribute('aria-selected', String(c===b))); render(); });
+      s.appendChild(b);
+    });
+    wrap.appendChild(s); return wrap;
+  }
+  function select(label, options, getCur, onPick){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    options.forEach(([val,t])=>{ const o=document.createElement('option'); o.value=val; o.textContent=t; if(String(val)===String(getCur())) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{ onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+  /* Бинарная опция — селект: docs-split.js конвертирует его в свитч ДС
+     (label.pg-toggle) в правую колонку; подпись свитча статична
+     (DS_SPLIT_SWITCH_LABELS, правило Switch). state[key] остаётся boolean. */
+  function ctlToggle(label, key){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    [['no','Нет'],['yes','Да']].forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; if((v==='yes')===!!state[key]) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{ state[key]=sel.value==='yes'; render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  controls.appendChild(select('Вариант', [['standard','Standard'],['split','Split Button'],['toggle','Toggle / Segmented']], ()=>state.variant, v=>state.variant=v));
+  controls.appendChild(select('Тип', [['accent','Accent'],['outline','Outline'],['transparent','Transparent']], ()=>state.type, v=>state.type=v));
+  controls.appendChild(select('Размер', [['m','M'],['s','S'],['xs','XS']], ()=>state.size, v=>state.size=v));
+  controls.appendChild(select('Кол-во кнопок', [['2','2'],['3','3'],['4','4'],['5','5']], ()=>state.count, v=>state.count=+v));
+  controls.appendChild(select('Ориентация', [['horizontal','Гориз.'],['vertical','Верт.']], ()=>state.orientation, v=>state.orientation=v));
+  controls.appendChild(select('Контент', [['text','Текст'],['icon-text','Иконка + текст'],['icon','Только иконки']], ()=>state.content, v=>state.content=v));
+  controls.appendChild(select('Состояние', [['default','Default'],['disabled','Disabled']], ()=>state.state, v=>state.state=v));
+  controls.appendChild(ctlToggle('Fullwidth','fullwidth'));
+
+  function buildItems(){
+    const n = state.count;
+    const arr = [];
+    for (let i=0;i<n;i++){
+      if (state.content==='icon') arr.push({ iconOnly: ['download','star','plus','list','grid'][i%5] });
+      else if (state.content==='icon-text') arr.push({ lead:['download','star','plus','list','grid'][i%5], text:'Button' });
+      else arr.push({ text:'Button' });
+    }
+    return arr;
+  }
+
+  function render(){
+    preview.innerHTML='';
+    const disabled = state.state==='disabled';
+    const vertical = state.orientation==='vertical';
+    let node, codeClasses;
+
+    if (state.variant==='split'){
+      node = makeSplit({ type:state.type, size:state.size, lead: state.content==='text' ? null : 'download', disabled });
+      if (state.fullwidth) node.classList.add('btn-group--fullwidth');
+      codeClasses = 'btn-group btn-group--'+state.type+' btn-group--split'+(state.fullwidth?' btn-group--fullwidth':'')+(disabled?' btn-group--disabled':'');
+    } else if (state.variant==='toggle'){
+      node = makeGroup({ type:'outline', size:state.size, toggle:true, single:true, vertical, disabled,
+        items: buildItems().map((it,i)=>({ ...it, pressed: i===0 })) });
+      codeClasses = 'btn-group btn-group--outline btn-group--toggle'+(vertical?' btn-group--vertical':'')+(disabled?' btn-group--disabled':'');
+    } else {
+      node = makeGroup({ type:state.type, size:state.size, vertical, fullwidth:state.fullwidth, disabled, items:buildItems() });
+      codeClasses = 'btn-group btn-group--'+state.type+(vertical?' btn-group--vertical':'')+(state.fullwidth?' btn-group--fullwidth':'')+(disabled?' btn-group--disabled':'');
+    }
+    preview.appendChild(node);
+    codeEl.innerHTML = '<code>&lt;div class="'+codeClasses+'" role="group"&gt;</code>';
+  }
+  render();
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Ориентация': 'Вертикально', 'Состояние': 'Показывать Disabled', 'Fullwidth': 'На всю ширину' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- горизонтальная группа Accent из кнопок Button -->
+<div class="btn-group btn-group--accent" role="group" aria-label="Режим отображения">
+  <button class="btn btn--accent btn--m">Список</button>
+  <button class="btn btn--accent btn--m">Плитка</button>
+</div>
+
+<!-- Split Button: основное действие + стрелка — реальный ContextMenu (DSMenu.bind) -->
+<div class="btn-group btn-group--accent btn-group--split menu-anchor" role="group">
+  <button class="btn btn--accent btn--m">Сохранить</button>
+  <button class="btn btn--accent btn--m btn--icon-only" aria-haspopup="menu" aria-expanded="false">…</button>
+  <div class="menu menu--floating" role="menu">
+    <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon">…</span><span class="menu__item-label">Сохранить как…</span></button>
+  </div>
+</div>
+
+<!-- Сегментированный выбор (toggle): aria-pressed на каждой кнопке -->
+<div class="btn-group btn-group--outline btn-group--toggle" role="group" aria-label="Форматирование">
+  <button class="btn btn--outline btn--m" aria-pressed="true">…</button>
+  <button class="btn btn--outline btn--m" aria-pressed="false">…</button>
+</div>
+
+<!-- вертикальная + заблокированная -->
+<div class="btn-group btn-group--outline btn-group--vertical btn-group--disabled" role="group" aria-disabled="true">…</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+// Состояние конструктора
+const state = { variant:'standard', type:'accent', size:'m', count:3,
+                orientation:'horizontal', content:'text', state:'default', fullwidth:false };
+
+// Сборка группы из кнопок Button:
+//  makeGroup({ type, size, vertical, fullwidth, disabled, toggle, single, items })
+//  makeSplit({ type, size, lead, disabled })  — Split Button (меню — DSMenu.bind)
+// Классы контейнера: .btn-group--<type> / --vertical / --fullwidth / --disabled / --toggle / --split
+// Disabled — только на всю группу: .btn-group--disabled + aria-disabled (pointer-events:none)</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — ButtonGroup
+   Joins related Button components into a single, visually unified control.
+   Types:        accent · outline · transparent
+   Sizes:        inherited from Button — m (40) · s (32) · xs (24)
+   Orientation:  horizontal (default) · vertical
+   Variants:     standard · split (text + chevron) · toggle (segmented select)
+   States:       buttons inherit their own states; Disabled applies to the
+                 WHOLE group; the outline type keeps its border color across
+                 hover / active.
+   Requires: typography.css, colors.css, button.css
+   ========================================================================= */
+
+:root {
+  /* seam between joined buttons */
+  --btng-divider-accent:   color-mix(in srgb, var(--primary-dark) 45%, transparent);
+  --btng-divider-disabled: color-mix(in srgb, #fff 38%, transparent);
+  /* outer corner radius — matches Button per size (M/S 8px, XS 6px) */
+  --btn-radius: var(--radius-control);
+}
+
+/* ---------- shell --------------------------------------------------------- */
+.btn-group {
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: middle;
+}
+
+/* every joined button is its own stacking context so hover / focus rings sit
+   above the neighbours instead of being clipped by them */
+.btn-group > .btn { position: relative; }
+.btn-group > .btn:hover,
+.btn-group > .btn:active,
+.btn-group > .btn.is-hover,
+.btn-group > .btn.is-active { z-index: 1; }
+.btn-group > .btn:focus-visible { z-index: 2; }
+
+/* ---------- HORIZONTAL joining (default) ---------------------------------- */
+.btn-group > .btn { border-radius: 0; }
+.btn-group > .btn:first-child {
+  border-top-left-radius: var(--btn-radius);
+  border-bottom-left-radius: var(--btn-radius);
+}
+.btn-group > .btn:last-child {
+  border-top-right-radius: var(--btn-radius);
+  border-bottom-right-radius: var(--btn-radius);
+}
+/* collapse the 1px borders of adjacent buttons into one shared line */
+.btn-group > .btn + .btn { margin-left: -1px; }
+
+/* a single child keeps the full radius (group of one — edge case) */
+.btn-group > .btn:only-child { border-radius: var(--btn-radius); }
+
+/* XS buttons use the smaller control radius (6px) — direct token, no scoped custom property */
+.btn-group:has(> .btn--xs) > .btn:first-child {
+  border-top-left-radius: var(--radius-control-s);
+  border-bottom-left-radius: var(--radius-control-s);
+}
+.btn-group:has(> .btn--xs) > .btn:last-child {
+  border-top-right-radius: var(--radius-control-s);
+  border-bottom-right-radius: var(--radius-control-s);
+}
+.btn-group:has(> .btn--xs) > .btn:only-child { border-radius: var(--radius-control-s); }
+
+/* ---------- accent: painted divider --------------------------------------- */
+/* accent borders match the fill, so the seam is drawn explicitly */
+.btn-group--accent > .btn + .btn {
+  box-shadow: inset 1px 0 0 0 var(--btng-divider-accent);
+}
+
+/* ---------- outline / transparent: keep the border line ------------------- */
+/* the collapsed 1px primary borders already form the divider — no override
+   needed for outline. The outline type must NOT change its border color on
+   hover / active inside a group (unlike a standalone button). */
+.btn-group--outline > .btn:hover,
+.btn-group--outline > .btn:active,
+.btn-group--outline > .btn.is-hover,
+.btn-group--outline > .btn.is-active { border-color: var(--primary); }
+
+/* transparent group needs a visible seam — borrow a light divider */
+.btn-group--transparent > .btn + .btn {
+  box-shadow: inset 1px 0 0 0 var(--border-light);
+}
+
+/* ---------- VERTICAL orientation ------------------------------------------ */
+.btn-group--vertical { flex-direction: column; align-items: stretch; }
+.btn-group--vertical > .btn { width: 100%; }
+.btn-group--vertical > .btn:first-child {
+  border-radius: var(--btn-radius) var(--btn-radius) 0 0;
+}
+.btn-group--vertical > .btn:last-child {
+  border-radius: 0 0 var(--btn-radius) var(--btn-radius);
+}
+.btn-group--vertical:has(> .btn--xs) > .btn:first-child {
+  border-radius: var(--radius-control-s) var(--radius-control-s) 0 0;
+}
+.btn-group--vertical:has(> .btn--xs) > .btn:last-child {
+  border-radius: 0 0 var(--radius-control-s) var(--radius-control-s);
+}
+.btn-group--vertical > .btn + .btn { margin-left: 0; margin-top: -1px; }
+.btn-group--vertical.btn-group--accent > .btn + .btn {
+  box-shadow: inset 0 1px 0 0 var(--btng-divider-accent);
+}
+.btn-group--vertical.btn-group--transparent > .btn + .btn {
+  box-shadow: inset 0 1px 0 0 var(--border-light);
+}
+
+/* ---------- FULLWIDTH / equal width --------------------------------------- */
+.btn-group--fullwidth { display: flex; width: 100%; }
+.btn-group--fullwidth > .btn { flex: 1 1 0; }
+/* split button: the text button grows, the chevron stays square */
+.btn-group--split.btn-group--fullwidth > .btn:not(.btn--icon-only) { flex: 1 1 auto; }
+.btn-group--split.btn-group--fullwidth > .btn--icon-only { flex: 0 0 auto; }
+
+/* ---------- DISABLED — applies to the whole group ------------------------- */
+.btn-group--disabled { pointer-events: none; cursor: default; }
+
+.btn-group--accent.btn-group--disabled > .btn {
+  background: var(--disabled); border-color: var(--disabled); color: var(--text-on-dark);
+}
+.btn-group--accent.btn-group--disabled > .btn svg { color: var(--text-on-dark); }
+.btn-group--accent.btn-group--disabled > .btn + .btn {
+  box-shadow: inset 1px 0 0 0 var(--btng-divider-disabled);
+}
+.btn-group--accent.btn-group--vertical.btn-group--disabled > .btn + .btn {
+  box-shadow: inset 0 1px 0 0 var(--btng-divider-disabled);
+}
+
+.btn-group--outline.btn-group--disabled > .btn {
+  background: var(--bg-tile); border-color: var(--disabled); color: var(--text-inactive);
+}
+.btn-group--outline.btn-group--disabled > .btn svg { color: var(--text-inactive); }
+
+.btn-group--transparent.btn-group--disabled > .btn {
+  background: transparent; color: var(--text-inactive);
+}
+.btn-group--transparent.btn-group--disabled > .btn svg { color: var(--text-inactive); }
+
+/* ---------- TOGGLE / segmented select ------------------------------------- */
+/* An outline group whose items behave like a single- or multi-select control.
+   The pressed item is filled with the accent color. Drives off aria-pressed. */
+.btn-group--toggle > .btn[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--text-on-dark);
+  border-color: var(--primary);
+  z-index: 1;
+}
+.btn-group--toggle > .btn[aria-pressed="true"] svg { color: var(--text-on-dark); }
+.btn-group--toggle > .btn[aria-pressed="true"]:hover { background: var(--primary-dark); }
+.btn-group--toggle.btn-group--disabled > .btn[aria-pressed="true"] {
+  background: var(--disabled); border-color: var(--disabled);
+}
+
+/* ---------- SPLIT button -------------------------------------------------- */
+/* the dropdown menu node is appended after the chevron, so the chevron is no
+   longer :last-child — radius the trailing button by type instead */
+.btn-group--split > .btn:last-of-type {
+  border-top-right-radius: var(--btn-radius);
+  border-bottom-right-radius: var(--btn-radius);
+}
+.btn-group--split:has(> .btn--xs) > .btn:last-of-type {
+  border-top-right-radius: var(--radius-control-s);
+  border-bottom-right-radius: var(--radius-control-s);
+}
+/* chevron half rotates when its menu is open (managed by .is-open on a parent) */
+.btn-group--split .btn__chevron { transition: transform .15s ease; }
+.btn-group--split.is-open .btn__chevron,
+.btn-group--split .dropdown.is-open .btn__chevron { transform: rotate(180deg); }</script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+/* =========================================================================
+   DatePicker (Календарь) — всплывающая поверхность выбора даты/диапазона.
+   Поднимается полями InputDate / InputDateRange. Material-подход в токенах ДС.
+   Только семантические токены; собственных цветов/радиусов/теней нет.
+   Зависимости на экране: styles/icon-button.css (стрелки, ✕), styles/button.css (футер).
+   ========================================================================= */
+
+/* ---------- контейнер ---------- */
+.dpk {
+  --dpk-cell: 40px;
+  display: inline-flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: calc(var(--dpk-cell) * 7 + 24px);
+  padding: 12px;
+  background: var(--bg-popup);
+  border-radius: var(--radius-m);
+  box-shadow: var(--elevation-5);
+  color: var(--text-primary);
+  user-select: none;
+  flex: none;
+}
+/* встроенный (docked, без тени) — например, внутри модалки/панели */
+.dpk--inline { box-shadow: none; border: 1px solid var(--border-light); }
+
+/* ---------- шапка: заголовок + навигация ---------- */
+.dpk__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 40px;
+  padding: 0 2px 0 4px;
+}
+.dpk__caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 6px 0 8px;
+  min-width: 0;
+  max-width: 100%;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color .12s;
+}
+.dpk__caption > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.dpk__caption:hover { background: var(--bgtable-row-hover); }
+.dpk__caption:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.dpk__cap-icon { display: inline-flex; color: var(--text-secondary); transition: transform .18s; }
+.dpk__cap-icon :is(svg,[data-icon]){ width: 18px; height: 18px; display: block; }
+.dpk--panel .dpk__cap-icon { transform: rotate(180deg); }
+.dpk__nav { display: inline-flex; gap: 2px; }
+/* в режиме выбора месяца/года стрелки листают блок (±1 год у месяцев, ±12 лет у годов) */
+
+/* ---------- дни недели ---------- */
+.dpk__weekdays { display: grid; grid-template-columns: repeat(7, var(--dpk-cell)); margin-top: 4px; }
+.dpk__weekday {
+  height: 32px;
+  display: grid;
+  place-items: center;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+}
+
+/* ---------- сетка дней ---------- */
+.dpk__grid { display: grid; grid-template-columns: repeat(7, var(--dpk-cell)); grid-auto-rows: var(--dpk-cell); }
+.dpk__day {
+  position: relative;
+  width: var(--dpk-cell);
+  height: var(--dpk-cell);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: var(--type-body-s);
+  color: var(--text-primary);
+}
+/* фон-полоса диапазона (позади кружка) */
+.dpk__day::before {
+  content: "";
+  position: absolute;
+  top: 2px; bottom: 2px; left: 0; right: 0;
+  background: transparent;
+  z-index: 0;
+}
+.dpk__day--in-range::before { background: var(--primary-bg); }
+.dpk__day--range-start::before { background: var(--primary-bg); left: 50%; }
+.dpk__day--range-end::before   { background: var(--primary-bg); right: 50%; }
+
+/* кружок числа */
+.dpk__daynum {
+  position: relative;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+  transition: background-color .12s, box-shadow .12s, color .12s;
+}
+.dpk__day:not(.dpk__day--disabled):not([aria-disabled="true"]):not(.dpk__day--selected):not([aria-selected="true"]):not(.dpk__day--range-start):not(.dpk__day--range-end):hover .dpk__daynum {
+  background: var(--bgtable-row-hover);
+}
+.dpk__day:focus-visible { outline: none; }
+.dpk__day:focus-visible .dpk__daynum { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+/* дни соседних месяцев */
+.dpk__day--outside .dpk__daynum { color: var(--text-inactive); }
+
+/* сегодня */
+.dpk__day--today .dpk__daynum { box-shadow: inset 0 0 0 1px var(--primary); color: var(--primary); font-weight: 600; }
+
+/* выбрано / концы диапазона — класс форс-состояния витрины; реальная ячейка
+   несёт aria-selected="true" (грид-паттерн, RulesAudit W1). */
+.dpk__day--selected .dpk__daynum,
+.dpk__day[aria-selected="true"] .dpk__daynum,
+.dpk__day--range-start .dpk__daynum,
+.dpk__day--range-end .dpk__daynum {
+  background: var(--primary);
+  color: var(--text-on-dark);
+  box-shadow: none;
+  font-weight: 600;
+}
+
+/* недоступно */
+.dpk__day--disabled,
+.dpk__day[aria-disabled="true"] { cursor: default; }
+.dpk__day--disabled .dpk__daynum,
+.dpk__day[aria-disabled="true"] .dpk__daynum { color: var(--st-disabled); }
+.dpk__day--disabled::before,
+.dpk__day[aria-disabled="true"]::before { display: none; }
+
+/* ---------- панель выбора месяца / года ---------- */
+.dpk__panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 6px;
+  padding: 10px 4px 4px;
+}
+.dpk__panel--years { max-height: 236px; overflow-y: auto; overscroll-behavior: contain; }
+.dpk__panel-cell {
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: background-color .12s, box-shadow .12s, color .12s;
+}
+.dpk__panel-cell:hover { background: var(--bgtable-row-hover); }
+.dpk__panel-cell:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.dpk__panel-cell--current { box-shadow: inset 0 0 0 1px var(--primary); color: var(--primary); }
+.dpk__panel-cell--selected { background: var(--primary); color: var(--text-on-dark); box-shadow: none; font-weight: 600; }
+.dpk__panel-cell--disabled { color: var(--st-disabled); cursor: default; }
+.dpk__panel-cell--disabled:hover { background: transparent; }
+
+/* ---------- футер ---------- */
+.dpk__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+}
+.dpk__foot-left { display: inline-flex; align-items: center; gap: 8px; }
+.dpk__foot-right { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dpk__cap-icon, .dpk__daynum, .dpk__panel-cell { transition: none; }
+}

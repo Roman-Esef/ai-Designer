@@ -1,0 +1,87 @@
+/* =========================================================================
+   DOCS-SPLIT — каркас страницы документации со сплиттером и табами
+   (пилот AllocationBar2 → общий слой, 29.08.2026).
+
+   Структура: верхняя панель — демо компонента (на всю ширину), нижняя —
+   табы «Конструктор / Документация / Код». Между ними горизонтальный
+   Splitter ДС (высота демо регулируется). Документация — прежний контент
+   (max-width ~1600, контентная колонка ~1200px) с локальным TOC справа.
+
+   Страница-хост ставит класс ds-split на main.page:
+     <main class="page ds-split">…
+   ВСЕ правила этого файла префиксованы main.ds-split — на страницы без
+   класса не влияют.
+
+   Подключение на странице-хосте:
+     <link rel="stylesheet" href="../../styles/ds-docs.css">
+     <link rel="stylesheet" href="../../styles/splitter.css">
+     <link rel="stylesheet" href="../../styles/segment-control.css">
+     <link rel="stylesheet" href="../../styles/tab.css">
+     <link rel="stylesheet" href="../../styles/docs-split.css">  ← после ds-docs.css
+   и рантаймы: scripts/ds-splitter.js, scripts/ds-tabs.js,
+   scripts/docs-split.js (после page.js страницы).
+   ========================================================================= */
+
+/* ---------- раскладка: верх — демо, низ — табы ---------- */
+/* scrollbar-gutter: stable — место под скроллбар резервируется всегда,
+   чтобы ширина рабочей области не скакала при переключении табов
+   (у «Конструктора» контент короче — скроллбар документа может
+   появляться/исчезать и сдвигать контент на 15px) */
+html{scrollbar-gutter:stable}
+main.ds-split{max-width:none;padding:0;height:100vh;overflow:hidden;display:flex;box-sizing:border-box}
+main.ds-split .splitpane{flex:1;min-height:0;height:100%;border-radius:var(--radius-2xl)}
+/* панели обязаны оставаться flex-контейнерами: не использовать .splitpane--app
+   (его правило переводит панели в display:block и ломает раскладку) */
+main.ds-split .app-pane-demo{display:flex!important;background:var(--bg-page)!important}
+main.ds-split .demo-stage{flex:1;min-height:0;padding:32px;display:flex;flex-direction:column;gap:12px;align-items:safe center;justify-content:safe center;overflow:auto;box-sizing:border-box}
+main.ds-split .app-pane-docs{display:flex!important;flex-direction:column!important;min-height:0}
+main.ds-split .app-pane-docs .tabs{flex:none;padding:10px 24px 0;background:var(--bg-tile)}
+main.ds-split .tabs-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+main.ds-split .tabpane{min-width:0}
+
+/* ---------- вкладка «Документация»: контент ~1200px + локальный TOC ---------- */
+main.ds-split .docs-layout{max-width:1600px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 236px;gap:48px;padding:clamp(40px,6vw,88px) clamp(24px,3vw,48px) 140px;box-sizing:border-box}
+main.ds-split .docs-main{min-width:0}
+main.ds-split .docs-toc{position:sticky;top:28px;align-self:start;max-height:calc(100vh - 120px);overflow-y:auto;display:flex;flex-direction:column;font-family:var(--font-text),system-ui,sans-serif}
+main.ds-split .docs-toc__label{font:var(--type-button-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--text-inactive);margin:0 0 10px;padding-left:15px}
+main.ds-split .docs-toc__list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+main.ds-split .docs-toc__link{display:block;padding:6px 10px 6px 13px;border-left:2px solid var(--border-light);font:var(--type-body-s);color:var(--text-secondary);text-decoration:none;transition:color .12s ease,border-color .12s ease,background-color .12s ease;text-wrap:balance}
+main.ds-split .docs-toc__link:hover{color:var(--text-primary);background:var(--bgtable-row-hover)}
+main.ds-split .docs-toc__link.is-active{border-left-color:var(--primary);color:var(--primary);font-weight:600}
+@media(max-width:1280px){main.ds-split .docs-layout{grid-template-columns:1fr}main.ds-split .docs-toc{display:none}}
+
+/* ---------- все табы используют единый контейнер .docs-layout ----------
+   «Конструктор» и «Код» переиспользуют ту же раскладку, что «Документация»:
+   центрирование по горизонтали, та же ширина рабочей области (~1200px),
+   те же отступы. Вторая колонка сетки (236px, под TOC) у них пустая —
+   контент выровнен с колонкой документации при любой ширине окна. */
+main.ds-split .docs-main > h2:first-child{font:var(--type-h3-strong);margin:0 0 8px;color:var(--text-primary)}
+main.ds-split .docs-main > .desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 24px;max-width:76ch;text-wrap:pretty}
+/* ---------- вкладка «Конструктор»: две колонки ----------
+   Слева (.ctl-col) — выпадающие списки и инпуты; справа (.toggles) —
+   свитчеры, чекбоксы, радиобаттоны и слайдеры. Если в конструкторе только
+   один тип контролов — он встаёт в левую колонку (первый в разметке).
+   Контролы, разбитые на группы (.ctl-group), сохраняют группировку:
+   заголовок группы на всю ширину, внутри группы — те же две колонки. */
+main.ds-split .docs-main .pg__controls{display:grid;grid-template-columns:1fr 1fr;gap:18px 48px;align-items:start;padding:0;max-height:none;overflow:visible;border:none}
+main.ds-split .docs-main .ctl-col{display:flex;flex-direction:column;gap:18px;min-width:0}
+main.ds-split .docs-main .toggles{display:flex;flex-direction:column;gap:14px;min-width:0}
+main.ds-split .docs-main .ctl--span{grid-column:1/-1}
+main.ds-split .docs-main .readout{grid-column:1/-1}
+/* контрол в колонке: подпись (.lbl) + сам контрол; .is-off — неактуальный скрыт.
+   Вынесено из pg-kit.css (урок: pg-kit построен под старый .panel.pg, на
+   docs-split-страницах не подключается; живые правила переехали сюда, 30.08.2026) */
+main.ds-split .docs-main .ctl{display:flex;flex-direction:column;gap:8px;min-width:0}
+main.ds-split .docs-main .ctl.is-off{display:none!important}
+main.ds-split .docs-main .ctl > .lbl{font:var(--type-body-s-strong);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.05em;font-size:11px}
+/* группа контролов: заголовок + свои две колонки */
+main.ds-split .docs-main .ctl-group{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px 48px;align-items:start;margin-top:8px}
+main.ds-split .docs-main .ctl-group__head{grid-column:1/-1;font:var(--type-body-s-strong);font-size:11px;color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;margin:0;padding-bottom:6px;border-bottom:1px solid var(--border-light)}
+@media(max-width:760px){main.ds-split .docs-main .pg__controls{grid-template-columns:1fr}}
+
+/* ---------- вкладка «Код»: сегмент + код-панели ---------- */
+main.ds-split .code-switch{margin-bottom:18px}
+main.ds-split .code-view pre{margin:0;padding:20px 24px;overflow:auto;max-height:66vh;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.65;color:rgba(255,255,255,.85);white-space:pre}
+main.ds-split .code-view .tk-pun{color:rgba(255,255,255,.5)}
+main.ds-split .code-view .tk-kw{color:#C792EA}
+main.ds-split .code-view .tk-num{color:#F78C6C}

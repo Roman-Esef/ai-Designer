@@ -1,0 +1,125 @@
+/* =========================================================================
+   Design System — Badge
+   A small child element overlaid on, or set inline with, a parent component
+   to convey a numeric count (Counter) or a status (Dot).
+
+   Types:   counter · dot
+   Sizes:   m (32) · s (24) · xs (20) · xxs (16)   — counter
+            dot is fixed at 8px
+   Tone:    neutral · accent · success · info · warning · error
+   Extras:  bordered (white ring for overlay) · text (borderless «+99»)
+            muted (disabled parent) · overflow «99+»
+   Requires: typography.css, colors.css
+   ========================================================================= */
+
+.badge {
+  /* size tokens — overridden per size modifier */
+  --bdg-size: 24px;
+  --bdg-pad: 0 7px;
+  --bdg-font: var(--type-body-s);
+
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: var(--bdg-size);
+  height: var(--bdg-size);
+  padding: var(--bdg-pad);
+  border-radius: var(--radius-pill);
+  font: var(--bdg-font);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  user-select: none;
+  /* neutral tone by default */
+  background: var(--c-cgrey-100);
+  color: var(--text-primary);
+  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+/* ---------- sizes (counter) ----------------------------------------------- *
+   Размеры — прямыми свойствами (не через --bdg-* в модификаторе). */
+.badge--m   { min-width: 32px; height: 32px; padding: 0 10px; font: var(--type-body-m); }
+.badge--s   { min-width: 24px; height: 24px; padding: 0 8px;  font: var(--type-body-s); }
+.badge--xs  { min-width: 20px; height: 20px; padding: 0 6px;  font: var(--type-body-s); }
+.badge--xxs { min-width: 16px; height: 16px; padding: 0 5px;  font: var(--type-body-xs); }
+
+/* ---------- type: dot ----------------------------------------------------- */
+.badge--dot {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  padding: 0;
+  border-radius: var(--radius-circle);
+  font-size: 0;
+}
+/* optional dot scale */
+.badge--dot.badge--dot-s { width: 6px; height: 6px; min-width: 6px; }
+.badge--dot.badge--dot-l { width: 10px; height: 10px; min-width: 10px; }
+
+/* ---------- tone ---------------------------------------------------------- */
+.badge--neutral { background: var(--c-cgrey-100); color: var(--text-primary); }
+.badge--accent  { background: var(--primary);     color: var(--text-on-dark); }
+.badge--success { background: var(--success);     color: var(--text-on-dark); }
+.badge--info    { background: var(--info);        color: var(--text-on-dark); }
+.badge--warning { background: var(--warning);     color: var(--text-primary); }
+.badge--error   { background: var(--error);       color: var(--text-on-dark); }
+
+/* ---------- text variant (borderless «+99», inline counts) ---------------- */
+.badge--text {
+  background: transparent;
+  color: var(--text-primary);
+  padding: 0;
+  min-width: 0;
+  height: auto;
+  border-radius: 0;
+}
+.badge--text.badge--accent  { color: var(--primary); }
+.badge--text.badge--error   { color: var(--error); }
+.badge--text.badge--success { color: var(--success-dark); }
+
+/* ---------- bordered (white ring for overlay on imagery/colour) ----------- */
+.badge--bordered { box-shadow: 0 0 0 2px var(--bg-tile); }
+
+/* ---------- muted (parent component disabled) ----------------------------- */
+.badge--muted {
+  background: var(--disabled) !important;
+  color: var(--text-inactive) !important;
+  box-shadow: none;
+}
+.badge--muted.badge--dot,
+.badge--muted.badge--text { color: var(--text-inactive) !important; }
+
+/* ---------- appearance animation ------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .badge--animate { animation: badge-pop .18s cubic-bezier(.34,1.56,.64,1) both; }
+}
+@keyframes badge-pop {
+  from { transform: scale(.4); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+/* =========================================================================
+   ANCHOR — overlay a badge on a parent (icon, avatar, button, tab…)
+   The parent gets `.badge-anchor` (position:relative); the badge is placed
+   absolutely at the top-right corner and nudged outward.
+   ========================================================================= */
+.badge-anchor {
+  position: relative;
+  display: inline-flex;
+}
+.badge-anchor > .badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(45%, -45%);
+  z-index: 2;
+  pointer-events: none;
+}
+.badge-anchor > .badge--dot {
+  transform: translate(15%, 15%);
+  top: auto;
+  bottom: 0;          /* dot sits bottom-right by default (status) */
+}
+.badge-anchor--dot-tr > .badge--dot { top: 0; bottom: auto; transform: translate(15%, -15%); }

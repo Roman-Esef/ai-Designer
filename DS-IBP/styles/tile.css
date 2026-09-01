@@ -1,0 +1,260 @@
+/* ============================================================
+   Tile — основной компонент-плашка интерфейса.
+   Состав: TileHeader (размер M) + опц. Alert + Контентная область.
+   Радиус 8 (--radius-m) · бордер 1px solid --border-light.
+   Внутренние отступы контента: 0 / 20 / 24 / 20 (top/right/bottom/left);
+   зазор 10 от хэдера даёт паддинг TileHeader снизу.
+   Зазор строк 16 (или 24) · зазор колонок 16.
+   Собственных состояний нет — активны только вложенные IconButton /
+   Button / Link. Только токены ДС (var(--*)).
+   ============================================================ */
+
+.tile {
+  --tile-pad-x: 20px;
+  --tile-pad-bottom: 24px;
+  --tile-gap-row: 16px;
+  --tile-gap-col: 16px;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  align-self: stretch;              /* высота = высоте ряда grid/flex-контейнера (RulesAudit W2) */
+  background: var(--bg-tile);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-m);   /* 8 */
+}
+
+/* ------------------------------------------------------------
+   Раскладка нескольких тайлов — общие утилиты, чтобы экрану не
+   изобретать свою сетку заново (RulesAudit W2).
+
+   .tile-row — ряд: CSS Grid растягивает элементы ряда по высоте
+   САМ (align-items:stretch — поведение Grid по умолчанию, ничего
+   специально включать не нужно); align-self:stretch у .tile выше
+   даёт то же самое, даже если контейнер экрана переопределил
+   align-items:start — так поймали дефект на 02-Deal-v3 (высоты
+   214/186/242 в одном ряду). Колонки — свои под контент экрана:
+   ширина каждого тайла — style="grid-column:span N" (3–12 из 12).
+   Тайл один на весь ряд (span 12) высоту берёт по контенту —
+   это не особый случай, а естественное поведение Grid (тайл —
+   единственный элемент своего ряда, "тянуться к самому высокому
+   в ряду" равно "остаться собой").
+
+   .tile-stack — колонка/стопка тайлов (канбан: несколько .tile-stack
+   рядом, каждый — набор тайлов разной суммарной высоты). Сама
+   стопка — обычный grid-item (span N, align-self:stretch тянет её
+   по высоте ряда), но ВНУТРИ — flex-column: у flex-column ось
+   растяжения (align-self:stretch) — это ширина, не высота, поэтому
+   тайлы внутри стопки остаются каждый со своей высотой по контенту,
+   а не делят высоту стопки поровну. */
+.tile-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+/* .tile-group — группа рядов одной тайловой сетки. Ряды внутри группы
+   разделяются теми же 16px, что и тайлы внутри ряда: это продолжение
+   одной сетки, а не разные зоны экрана.
+   ВАЖНО: .screen__content — flex-колонка с gap 24px (--layout-block-gap),
+   поэтому зазор между рядами НЕЛЬЗЯ задавать margin'ом на .tile-row —
+   он сложится с gap контейнера и даст 40px. Группа решает это тем, что
+   является ОДНИМ ребёнком .screen__content: 24px остаётся только между
+   крупными зонами (PageHeader ↔ группа), а внутри группы работает 16px.
+   Зафиксировано 26.08.2026 после разбора DealPipelineCard. */
+.tile-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.tile-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  align-self: stretch;
+}
+
+/* ------------------------------------------------------------
+   TileHeader (размер M) — размещается над контентом.
+   Title: H5 Strong · Subtitle: Body XS · gap title↔subtitle↔chiplist 8px.
+   Паддинги хэдера: 20 сверху / 20 по бокам / 10 снизу.
+   ------------------------------------------------------------ */
+.tile__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px var(--tile-pad-x) 10px;
+}
+/* зазор хэдер↔контент (10) живёт в паддинге хэдера — контент сверху без паддинга */
+.tile__header-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tile__title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.tile__title {
+  margin: 0;
+  min-width: 0;
+  font: var(--type-h5-strong);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+/* Addition к тайтлу: Link / Icon / Chip / Badge — все inline после тайтла */
+.tile__title-add {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+.tile__title-add--icon {
+  width: 20px;
+  height: 20px;
+  color: var(--warning);
+}
+.tile__title-add--icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.tile__title-link {
+  flex: none;
+}
+
+/* Subtitle — Body XS, вторичный текст, опц. ведущая иконка */
+.tile__subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  font: var(--type-body-xs);
+  color: var(--text-secondary);
+}
+.tile__subtitle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--success);
+}
+
+/* Chiplist в хэдере — ряд чипов XS под тайтлом/сабтайтлом, зазор 4 */
+.tile__chiplist {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Actions — трейлинг-группа: 1..3 действия (IconButton и/или Button), зазор 8 */
+.tile__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+/* ------------------------------------------------------------
+   Alert-слот — опц., полноширинный, между хэдером и контентом.
+   Растягивается по ширине тайла (углы прямые, чтобы касаться бордера).
+   ------------------------------------------------------------ */
+.tile__alert {
+  margin-top: 0;
+}
+.tile__alert .alert {
+  border-radius: 0;
+}
+
+/* ------------------------------------------------------------
+   Контентная область. Контент индивидуален под задачу тайла:
+   текст, дивайдеры, ReadOnly-поля, кнопки, ссылки, аккордеоны.
+   Отступы 10/20/24/20.
+   ------------------------------------------------------------ */
+.tile__body {
+  padding: 10px var(--tile-pad-x) var(--tile-pad-bottom);
+}
+
+/* сетки контента */
+.tile__grid {
+  display: grid;
+  gap: var(--tile-gap-row) var(--tile-gap-col);
+}
+.tile__grid--gap-24 {
+  row-gap: 24px;
+}
+/* Элемент на всю ширину сетки тайла — длинное «Описание», комментарий,
+   вложенный Alert: остаётся В сетке (тот же зазор и та же левая кромка,
+   что у полей), а не выносится соседним блоком со своими паддингами.
+   Добавлено 26.08.2026: на DealPipelineCard «Описание» вынесли из
+   .tile__grid отдельным блоком — поле разъехалось с сеткой по отступам. */
+.tile__grid > .tile__grid-full { grid-column: 1 / -1; }
+.tile__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tile-gap-row);
+}
+.tile__rows--gap-24 {
+  gap: 24px;
+}
+
+/* ------------------------------------------------------------
+   TileHeadless — тайл без заголовка.
+   Хэдера нет, состояний нет, отступы 20/20/32/20.
+   ------------------------------------------------------------ */
+.tile--headless > .tile__body {
+  padding: 20px 20px 32px;
+}
+
+/* ------------------------------------------------------------
+   AccordionTile — разворачивается/сворачивается.
+   Полный коллапс: весь контент в .tile__collapsible.
+   Частичный коллапс: часть контента видна всегда, сворачивается
+   только .tile__collapsible.
+   ------------------------------------------------------------ */
+.tile__chevron {
+  display: inline-flex;
+  transition: transform .18s ease;
+}
+.tile--collapsed .tile__chevron,
+.tile__toggle[aria-expanded="false"] .tile__chevron {
+  transform: rotate(-180deg);
+}
+/* .tile__collapsible — сворачивание чисто через display:none (см. .tile--collapsed
+   ниже), без анимации высоты (ds-tile.js её не делает) — поэтому здесь НЕТ
+   overflow:hidden: он не нужен для коллапса и лишь обрезал бы floating-контент
+   (Popover/RiskMetric) любого компонента, вложенного в аккордеон-тайл. */
+.tile--collapsed .tile__collapsible {
+  display: none;
+}
+/* частичный коллапс: сводка (.tile__body прямым потомком .tile, до
+   .tile__collapsible) держит малый зазор перед скрываемым контентом;
+   свёрнутый — сама становится нижним краем тайла, паддинг контентный (20) */
+.tile--accordion > .tile__body {
+  padding-bottom: 8px;
+}
+.tile--accordion.tile--collapsed > .tile__body {
+  padding-bottom: 20px;
+}
+/* полный коллапс: контента после хэдера нет вовсе (весь тайл__body внутри
+   .tile__collapsible) — нижним краем становится хэдер, паддинг тот же (20) */
+.tile--accordion.tile--collapsed > .tile__header:has(+ .tile__collapsible) {
+  padding-bottom: 20px;
+}
+/* свёрнутый аккордеон (полный и частичный коллапс — то же .tile--collapsed)
+   не должен нести нижний паддинг под скрытый контент */
+.tile--accordion.tile--collapsed > .tile__body {
+  padding-bottom: 20px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile__chevron { transition: none; }
+}

@@ -1,0 +1,1149 @@
+<!-- @dsCard group="Components" name="Entity" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entity — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/chip.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/avatar.css">
+<link rel="stylesheet" href="../../styles/checkbox.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/entity.css">
+<link rel="stylesheet" href="../../styles/skeleton.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+a{color:var(--link);} a:hover{color:var(--link-dark);}
+
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:80ch;text-wrap:pretty;}
+
+.subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:32px 0 14px;}
+
+/* контролы конструктора (вкладка «Конструктор») */
+.ctl{display:flex;flex-direction:column;gap:10px;}
+.ctl.is-off{display:none;}
+.ctl>.lbl{font:600 11px/1 var(--font-text),sans-serif;color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+/* preview stage (демо в верхней панели) */
+.entity-stage{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg-page);border:1px solid var(--border-light);border-radius:12px;padding:28px;min-height:220px;width:100%;}
+.entity-stage__card{width:100%;max-width:460px;background:var(--bg-tile);border:1px solid var(--border-light);border-radius:12px;padding:16px 18px;box-shadow:var(--elevation-1,0 1px 2px rgba(40,50,55,.06));}
+.ws-cap{font:var(--type-body-xs);color:var(--text-inactive);margin:12px 0 0;text-wrap:pretty;}
+/* anatomy */
+.anat{display:grid;grid-template-columns:1fr 320px;gap:40px;align-items:start;}
+@media(max-width:820px){.anat{grid-template-columns:1fr;}}
+.anat__stage{background:color-mix(in srgb,var(--primary) 5%,#fff);border:1px solid var(--border-light);border-radius:14px;padding:44px 40px;display:flex;justify-content:center;}
+.anat-dia{position:relative;display:inline-block;width:100%;max-width:420px;background:var(--bg-tile);border:1px solid var(--border-light);border-radius:12px;padding:16px 18px;}
+.mk{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--text-primary);color:#fff;font:700 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5;pointer-events:none;}
+.anat__legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;}
+.anat__legend li{display:flex;gap:12px;align-items:flex-start;}
+.anat__legend li .n{width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font:700 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;flex:none;margin-top:2px;}
+.anat__legend li .d em{font-style:normal;color:var(--text-inactive);}
+/* sizes rail */
+.size-rail{display:flex;flex-direction:column;gap:0;}
+.size-row{display:grid;grid-template-columns:64px 1fr;gap:20px;align-items:center;padding:22px 0;border-bottom:1px solid var(--border-light);}
+.size-tag{font:var(--type-body-s-strong);color:var(--text-primary);}
+/* usage example cards */
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:760px){.ex-grid{grid-template-columns:1fr;}}
+.ex-card{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:12px;padding:20px 22px;}
+.ex-card__title{font:var(--type-body-m-strong);color:var(--text-primary);margin:0 0 16px;}
+.ex-card__list{display:flex;flex-direction:column;gap:14px;}
+.ex-cap{font:var(--type-body-xs);color:var(--text-inactive);margin:10px 0 0;}
+.ex-more{font:var(--type-body-s);color:var(--link);margin:14px 0 0;cursor:pointer;}
+/* states */
+.states-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:760px){.states-grid{grid-template-columns:1fr;}}
+.st-card{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;}
+.st-card__label{font:var(--type-body-xs);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+.st-card__label b{color:var(--text-secondary);}
+/* content guide */
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.guide{grid-template-columns:1fr;}}
+.guide-card{border-radius:12px;overflow:hidden;border:1px solid var(--border-light);background:var(--bg-tile);}
+.guide-card__tag{font:var(--type-body-s-strong);padding:12px 18px 0;}
+.guide-card__body{padding:20px 18px;}
+.guide-card__cap{padding:0 18px 16px;font:var(--type-body-xs);color:var(--text-inactive);}
+/* ref table */
+.ref-table th,.ref-table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--border-light);font:var(--type-body-m);color:var(--text-primary);vertical-align:middle;}
+/* code blocks */
+/* colors */
+@media(max-width:700px){.cref{grid-template-columns:1fr;}}
+
+.cref-group>h3{font:var(--type-body-m-strong);margin:0;padding:14px 18px;border-bottom:1px solid var(--border-light);color:var(--text-primary);}
+.cref-row{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border-light);font:var(--type-body-s);color:var(--text-secondary);}
+.rl-sample{position:absolute;top:-9999px;left:0;width:420px;}
+.ent-chev{width:14px;height:14px;display:inline-block;}
+.entity__actions .btn i[data-icon]{width:14px;height:14px;}
+
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Entity">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="entity-stage">
+          <div class="entity-stage__card">
+            <div id="demo-entity"></div>
+          </div>
+        </div>
+        <p class="ws-cap">Entity не имеет собственного фона — здесь он показан на белом тайле для наглядности. Ведущий элемент, состав и состояние переключаются справа.</p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+  <a class="crumb" href="../../index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Обзор компонентов
+  </a>
+  <div class="meta">
+    <span>Версия <b>1.006</b></span>
+    <span>Обновлено <b>21.08.2026</b></span>
+    <span>CSS <b>styles/entity.css</b></span>
+    <span>Зависимости <b>avatar, chip, icon-button, button, badge</b></span>
+  </div>
+  <div class="eyebrow">Дизайн-система · Организмы</div>
+  <h1>Entity</h1>
+  <p class="lead">Компонент для отображения любых объектов — компаний, людей, файлов, метрик — в тайлах, списках и формах. Собственного фона нет: тянется на всю ширину контейнера и выравнивается по левому краю.</p>
+</header>
+
+<!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#demo-entity),
+     контролы — во вкладку «Конструктор» нижней панели (см. в конце) -->
+
+  <!-- 2. ИСПОЛЬЗОВАНИЕ -->
+<section class="section" id="usage" data-screen-label="Использование">
+  <h2>Использование</h2>
+  <p class="desc">Используется для отображения любых объектов — как в списках, так и по отдельности. Примеры объектов: пользователи, компании, метрики компании, файлы.</p>
+
+  <div class="panel">
+    <p class="subhead" style="margin-top:0;">В карточках</p>
+    <div class="ex-grid">
+      <!-- Документы -->
+      <div class="ex-card">
+        <p class="ex-card__title">Документы</p>
+        <div class="ex-card__list">
+          <div class="entity entity--s">
+            <div class="entity__lead"><span class="entity__icon"><i data-icon="document-unread"></i></span></div>
+            <div class="entity__main"><div class="entity__titles"><div class="entity__labelrow"><span class="entity__label entity__label--truncate">ЮгСтройИнвестМонтаж 30-08-25.pptx</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Загружено: 31.08.2025</span></div></div>
+            <div class="entity__actions entity__actions--center"><a class="link link--with-icon" href="#" onclick="return false"><span class="link__text">Открыть</span><span class="link__icon"><i data-icon="arrow-right"></i></span></a></div>
+          </div>
+          <div class="entity entity--s">
+            <div class="entity__lead"><span class="entity__icon"><i data-icon="document-unread"></i></span></div>
+            <div class="entity__main"><div class="entity__titles"><div class="entity__labelrow"><span class="entity__label entity__label--truncate">ЮгСтройИнвестМонтаж 30-08-25.pptx</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Загружено: 31.08.2025</span></div></div>
+            <div class="entity__actions entity__actions--center"><a class="link link--with-icon" href="#" onclick="return false"><span class="link__text">Открыть</span><span class="link__icon"><i data-icon="arrow-right"></i></span></a></div>
+          </div>
+          <div class="entity entity--s">
+            <div class="entity__lead"><span class="entity__icon"><i data-icon="document-unread"></i></span></div>
+            <div class="entity__main"><div class="entity__titles"><div class="entity__labelrow"><span class="entity__label entity__label--truncate">ЮгСтройИнвестМонтаж 30-08-25.pptx</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Загружено: 31.08.2025</span></div></div>
+            <div class="entity__actions entity__actions--center"><a class="link link--with-icon" href="#" onclick="return false"><span class="link__text">Открыть</span><span class="link__icon"><i data-icon="arrow-right"></i></span></a></div>
+          </div>
+        </div>
+        <p class="ex-more">Ещё 2 документа</p>
+        <p class="ex-cap">Отображение документов и файлов</p>
+      </div>
+      <!-- Отрасль -->
+      <div class="ex-card">
+        <p class="ex-card__title">Отрасль</p>
+        <div class="ex-card__list">
+          <div class="entity entity--s">
+            <div class="entity__lead"><span class="entity__icon"><i data-icon="bar-chart-square"></i></span></div>
+            <div class="entity__main"><div class="entity__titles"><p class="entity__header">Сегмент</p><div class="entity__labelrow"><span class="entity__label">Крупнейшие</span></div></div></div>
+          </div>
+          <div class="entity entity--s">
+            <div class="entity__lead"><span class="entity__icon"><i data-icon="bank"></i></span></div>
+            <div class="entity__main"><div class="entity__titles"><p class="entity__header">Территориальный банк</p><div class="entity__labelrow"><span class="entity__label">Центральный банк</span></div></div></div>
+          </div>
+          <div class="entity entity--s">
+            <div class="entity__lead"><span class="entity__icon"><i data-icon="marker-pin"></i></span></div>
+            <div class="entity__main"><div class="entity__titles"><p class="entity__header">ГОСБ из ЕПК</p><div class="entity__labelrow"><span class="entity__label">Калужское отделение № 8608</span></div></div></div>
+          </div>
+        </div>
+        <p class="ex-cap">Список показателей клиента</p>
+      </div>
+      <!-- Команда сделки -->
+      <div class="ex-card">
+        <p class="ex-card__title">Команда сделки</p>
+        <div class="ex-card__list">
+          <div class="entity">
+            <div class="entity__lead"><span class="av av--circular av--l"><span class="av__text">СИ</span></span></div>
+            <div class="entity__main"><div class="entity__titles"><div class="entity__labelrow"><span class="entity__label entity__label--truncate">Сидоров Иван Иванович</span><span class="entity__postfix">18181824</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Территориальный менеджер</span></div></div>
+          </div>
+          <div class="entity">
+            <div class="entity__lead"><span class="av av--circular av--l av--accent"><span class="av__text">ПК</span></span></div>
+            <div class="entity__main"><div class="entity__titles"><div class="entity__labelrow"><span class="entity__label entity__label--truncate">Петров Константин Константинович</span><span class="entity__postfix">19181822</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Старший банкир конгломерата</span></div></div>
+          </div>
+          <div class="entity">
+            <div class="entity__lead"><span class="av av--circular av--l"><span class="av__text">МЕ</span></span></div>
+            <div class="entity__main"><div class="entity__titles"><div class="entity__labelrow"><span class="entity__label entity__label--truncate">Михайлов Евгений Александрович</span><span class="entity__postfix">17141824</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Территориальный менеджер</span></div></div>
+          </div>
+        </div>
+        <p class="ex-cap">Список сотрудников банка</p>
+      </div>
+      <!-- Связанные физлица -->
+      <div class="ex-card">
+        <p class="ex-card__title">Связанные физические лица</p>
+        <div class="ex-card__list">
+          <div class="entity">
+            <div class="entity__lead"><span class="av av--circular av--l av--accent"><span class="av__text">ПК</span></span></div>
+            <div class="entity__main"><div class="entity__titles"><div class="entity__labelrow"><span class="entity__label entity__label--truncate">Петров Константин Петрович</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Территориальный менеджер</span></div><div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Позвонить"><i data-icon="phone"></i></button><button class="ibtn ibtn--neutral ibtn--s" aria-label="Написать"><i data-icon="mail"></i></button><button class="ibtn ibtn--neutral ibtn--s" aria-label="Документы"><i data-icon="passport"></i></button></div></div>
+          </div>
+          <div class="entity">
+            <div class="entity__lead"><span class="av av--circular av--l"><span class="av__text">ИА</span></span></div>
+            <div class="entity__main"><div class="entity__titles"><div class="entity__labelrow"><span class="entity__label entity__label--truncate">Иванов Алексей Сергеевич</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Территориальный менеджер</span></div><div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Позвонить"><i data-icon="phone"></i></button><button class="ibtn ibtn--neutral ibtn--s" aria-label="Написать"><i data-icon="mail"></i></button><button class="ibtn ibtn--neutral ibtn--s" aria-label="Документы"><i data-icon="passport"></i></button></div></div>
+          </div>
+          <div class="entity">
+            <div class="entity__lead"><span class="av av--circular av--l"><span class="av__text">МЕ</span></span></div>
+            <div class="entity__main"><div class="entity__titles"><div class="entity__labelrow"><span class="entity__label entity__label--truncate">Михайлов Евгений Александрович</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-icon"><i data-icon="check-circle"></i></span><span class="entity__subs-list">Бенефициар владелец</span><span class="entity__subs-more">+99</span></div><div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Позвонить"><i data-icon="phone"></i></button><button class="ibtn ibtn--neutral ibtn--s" aria-label="Написать"><i data-icon="mail"></i></button><button class="ibtn ibtn--neutral ibtn--s" aria-label="Документы"><i data-icon="passport"></i></button></div></div>
+          </div>
+        </div>
+        <p class="ex-cap">Список людей с контактами</p>
+      </div>
+    </div>
+
+    <p class="subhead">Как отдельный элемент на странице профиля</p>
+    <div class="entity entity--l">
+      <div class="entity__lead"><span class="entity__icon"><i data-icon="bar-chart-square"></i></span></div>
+      <div class="entity__main">
+        <div class="entity__titles">
+          <p class="entity__header">ЗАО ПИК Строй монтаж</p>
+          <div class="entity__labelrow"><span class="entity__label">ООО ЮгСтройИнвестМонтаж</span><button class="entity__bookmark" aria-label="В избранное"><i data-icon="bookmark-add"></i></button></div>
+        </div>
+        <div class="entity__chips">
+          <span class="chip chip--m chip--rounded"><span class="chip__label">Резидент РФ</span></span>
+          <span class="chip chip--m chip--rounded"><span class="chip__label">Ключевой клиент</span></span>
+          <span class="chip chip--m chip--rounded chip--success"><span class="chip__label">19</span></span>
+        </div>
+      </div>
+    </div>
+    <p class="ex-cap">Заголовок на странице клиента</p>
+  </div>
+</section>
+
+  <!-- 3. АНАТОМИЯ -->
+<section class="section" id="anatomy" data-screen-label="Анатомия">
+  <h2>Анатомия</h2>
+  <p class="desc">Entity — композитный компонент. Максимальная композиция (<b>EntityUniversal</b>) собирается из вложенных дизайнерских подкомпонентов, которые отдельно в продукте не публикуются.</p>
+  <div class="anat">
+    <div class="anat__stage">
+      <div class="anat-dia">
+        <div class="entity">
+          <div class="entity__lead"><span class="entity__icon"><i data-icon="bar-chart-square"></i></span></div>
+          <div class="entity__main">
+            <div class="entity__titles">
+              <p class="entity__header">Header</p>
+              <div class="entity__labelrow"><span class="entity__label">Text Label</span><span class="entity__postfix">Postf</span><button class="entity__bookmark" aria-label="В избранное"><i data-icon="bookmark-add"></i></button></div>
+            </div>
+            <div class="entity__subs"><span class="entity__subs-icon"><i data-icon="check-circle"></i></span><span class="entity__subs-list">Subheader, Subheader, Subheader</span><span class="entity__subs-more">+99</span></div>
+            <div class="entity__chips"><span class="chip chip--s"><span class="chip__label">Text</span></span><span class="chip chip--s"><span class="chip__label">Text</span></span></div>
+            <div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Позвонить"><i data-icon="phone"></i></button><button class="ibtn ibtn--neutral ibtn--s" aria-label="Написать"><i data-icon="mail"></i></button></div>
+          </div>
+          <div class="entity__actions"><button class="btn btn--outline btn--xs" aria-haspopup="menu"><span class="btn__label">Button</span><i data-icon="chevron-down" class="ent-chev"></i></button><button class="ibtn ibtn--neutral ibtn--s" aria-label="Убрать"><i data-icon="close"></i></button></div>
+        </div>
+        <span class="mk" style="left:26px;top:26px;">1</span>
+        <span class="mk" style="left:78px;top:22px;">2</span>
+        <span class="mk" style="left:110px;top:44px;">3</span>
+        <span class="mk" style="left:96px;top:72px;">4</span>
+        <span class="mk" style="left:70px;top:98px;">5</span>
+        <span class="mk" style="left:70px;top:122px;">6</span>
+        <span class="mk" style="right:-10px;top:24px;position:absolute;left:auto;">7</span>
+      </div>
+    </div>
+    <ul class="anat__legend">
+      <li><span class="n">1</span><div><span class="k">Ведущий элемент</span><span class="d">Иконка в скруглённом контейнере, <b>Avatar</b> или ничего. Размер = размеру Entity (32/40/96). <em>Avatar пока не в Storybook.</em></span></div></li>
+      <li><span class="n">2</span><div><span class="k">Header + Text_MASTER</span><span class="d">Надзаголовок (Body XS, inactive) + строка Label: prefix · <b>Label</b> · postfix · закладка. <em>Label / Text_MASTER — часть InputText, только в ДС дизайнеров.</em></span></div></li>
+      <li><span class="n">3</span><div><span class="k">Постфикс / закладка</span><span class="d">Серый постфикс (Postf) и опциональная иконка избранного (bookmark) в конце строки Label.</span></div></li>
+      <li><span class="n">4</span><div><span class="k">EntitySubtitleGroup</span><span class="d">Иконка + список подзаголовков (Subheader, …) + счётчик <code class="tok">+N</code>. Клэмп до 2 строк. <em>Спец-компонент Entity.</em></span></div></li>
+      <li><span class="n">5</span><div><span class="k">ChipList</span><span class="d">Сборный компонент из <b>Chip</b> (readonly, S). Опционален. <em>Только в ДС дизайнеров.</em></span></div></li>
+      <li><span class="n">6</span><div><span class="k">EntityIconButtonGroup</span><span class="d">Ряд <b>IconButton</b> S: телефон · почта · документы · история. <em>Спец-компонент Entity.</em></span></div></li>
+      <li><span class="n">7</span><div><span class="k">EntityActions</span><span class="d">Трейлинг: до 2 кнопок (может быть кебаб-меню) + закрытие. Выравнивание по верху. <em>Спец-компонент Entity.</em></span></div></li>
+    </ul>
+  </div>
+  <div class="panel" style="margin-top:20px;">
+    <ul class="bullets">
+      <li>Компонент растягивается на всю ширину контентной области и <b>выравнивается по левому краю</b>.</li>
+      <li><b>Не имеет собственного фона</b> — наследует фон контейнера (тайл, карточка, строка таблицы).</li>
+      <li>Ведущий элемент и текстовый блок выровнены по центру по вертикали; блок действий — по верху.</li>
+    </ul>
+  </div>
+</section>
+
+  <!-- VARIANTS (STUB) -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Не применимо: компонент существует в единственной конфигурации, отдельных вариантов нет.</p>
+  </section>
+
+  <!-- 4. РАЗМЕРЫ -->
+<section class="section" id="sizes" data-screen-label="Размеры">
+  <h2>Размеры</h2>
+  <p class="desc">Три размера — по размеру ведущего элемента: 32, 40 и 96px. Типографика и зазоры масштабируются вместе с ним.</p>
+  <div class="panel">
+    <div class="size-rail">
+      <div class="size-row">
+        <div class="size-tag">S<small>32px</small></div>
+        <div class="entity entity--s">
+          <div class="entity__lead"><span class="entity__icon"><i data-icon="document-unread"></i></span></div>
+          <div class="entity__main"><div class="entity__titles"><p class="entity__header">Header</p><div class="entity__labelrow"><span class="entity__label">Text Label</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Subheader</span></div></div>
+        </div>
+      </div>
+      <div class="size-row">
+        <div class="size-tag">M<small>40px</small></div>
+        <div class="entity">
+          <div class="entity__lead"><span class="entity__icon"><i data-icon="document-unread"></i></span></div>
+          <div class="entity__main"><div class="entity__titles"><p class="entity__header">Header</p><div class="entity__labelrow"><span class="entity__label">Text Label</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Subheader</span></div></div>
+        </div>
+      </div>
+      <div class="size-row">
+        <div class="size-tag">L<small>96px</small></div>
+        <div class="entity entity--l">
+          <div class="entity__lead"><span class="entity__icon"><i data-icon="document-unread"></i></span></div>
+          <div class="entity__main"><div class="entity__titles"><p class="entity__header">Header</p><div class="entity__labelrow"><span class="entity__label">Text Label</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Subheader</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:16px;padding:0;overflow:hidden;">
+    <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.26fr 1.26fr 1.31fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">S · 32</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">M · 40</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">L · 96</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.26fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ведущий элемент</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">32px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">40px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">96px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.26fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Радиус контейнера</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">10px <code class="tok">--radius-l</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12px <code class="tok">--radius-xl</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">28px <code class="tok">--radius-5xl</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.26fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Глиф иконки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">18px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">22px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">48px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.26fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Header</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Body XS · 12</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Body XS · 12</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Body S · 14</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.26fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Body S Strong · 14</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Body M Strong · 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Body XL Strong · 24</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.26fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Subheaders</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Body XS · 12</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Body S · 14</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Body M · 16</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.26fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор ведущий ↔ контент</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">10px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16px</span></span></div><div class="tc tc--separator"></div></div></div>
+  </div>
+
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Скругление относится к ведущему элементу и растёт вместе с ним; сама строка Entity фона и радиуса не имеет.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S — ведущий элемент 32px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">10 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-l</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M — ведущий элемент 40px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--e-lead-radius (--radius-xl)</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L — ведущий элемент 96px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">28 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-5xl</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фокус-обводка закладки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xs</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- 5. КОНТЕНТ -->
+<section class="section" id="content" data-screen-label="Контент">
+  <h2>Контент</h2>
+  <p class="desc">Правила наполнения строки Label и подзаголовков.</p>
+  <div class="guide">
+    <div class="guide-card good">
+      <div class="guide-card__bar"></div>
+      <div class="guide-card__tag">✓ Правильно</div>
+      <div class="guide-card__body">
+        <div class="entity">
+          <div class="entity__lead"><span class="entity__icon"><i data-icon="bank"></i></span></div>
+          <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label entity__label--truncate">ООО ЮгСтройИнвестМонтаж</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">ИНН 7701234567</span></div></div>
+        </div>
+      </div>
+      <p class="guide-card__cap">Длинное название усекается многоточием; полное значение — в Tooltip по наведению.</p>
+    </div>
+    <div class="guide-card bad">
+      <div class="guide-card__bar"></div>
+      <div class="guide-card__tag">✗ Неправильно</div>
+      <div class="guide-card__body">
+        <div class="entity">
+          <div class="entity__lead"><span class="entity__icon"><i data-icon="bank"></i></span></div>
+          <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label" style="white-space:normal;">ООО ЮгСтройИнвестМонтаж-Проектстрой-Девелопмент-Групп-Холдинг</span></div></div></div>
+        </div>
+      </div>
+      <p class="guide-card__cap">Label не переносится в 3+ строки — усекайте, а подробности выносите в подзаголовок или Tooltip.</p>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:20px;">
+    <p class="subhead" style="margin-top:0;">Corner cases</p>
+    <ul class="bullets">
+      <li><b>Нет значения</b> — вместо Label показывается «—» (<code class="tok">.entity--empty</code>), цвет inactive.</li>
+      <li><b>Длинное значение</b> — <code class="tok">.entity__label--truncate</code> усекает в одну строку; наведение открывает Tooltip с полным текстом.</li>
+      <li><b>Много подзаголовков</b> — список клэмпится до 2 строк, остаток сворачивается в счётчик <code class="tok">+N</code> (max +99).</li>
+      <li><b>Объект удалён / недоступен</b> — <code class="tok">.entity--error</code>: иконка в тоне error, Label зачёркнут.</li>
+      <li><b>Действий больше 2</b> — не допускается: сверните в кебаб-меню или пересмотрите паттерн.</li>
+    </ul>
+  </div>
+</section>
+
+  <!-- BEHAVIOR -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Клик по кликабельному тайлу и вложенные действия.</p>
+
+<div class="subsec" data-screen-label="ClickTarget">
+    <h3>Клик по тайлу и вложенные действия</h3>
+    <p class="desc">В интерактивном режиме (<code class="tok">entity--interactive</code>) кликабельна вся строка целиком, а не только Label — это увеличивает область попадания и упрощает выбор в списках. Если внутри тайла есть собственные интерактивные элементы (кнопка действия, чекбокс выбора), их клик не должен всплывать до обработчика строки (<code class="tok">stopPropagation</code>) — иначе клик по кнопке «Удалить» одновременно откроет/выберет саму сущность.</p>
+  </div>
+  </section>
+
+  <!-- 6. СОСТОЯНИЯ -->
+<section class="section" id="states" data-screen-label="Состояния">
+  <h2>Состояния</h2>
+  <p class="desc">Помимо базового отображения Entity поддерживает интерактивные и служебные состояния — по образцу Material и лучших практик списочных компонентов.</p>
+  <div class="states-grid">
+    <div class="st-card">
+      <div class="st-card__label"><b>Обычное</b> · статичный объект</div>
+      <div class="entity">
+        <div class="entity__lead"><span class="entity__icon"><i data-icon="bank"></i></span></div>
+        <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label">ООО ЮгСтрой</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">ИНН 7701234567</span></div></div>
+      </div>
+    </div>
+    <div class="st-card">
+      <div class="st-card__label"><b>Интерактивное</b> · hover (кликабельный тайл)</div>
+      <div class="entity entity--interactive" tabindex="0" style="background:var(--bgtable-row-hover);">
+        <div class="entity__lead"><span class="entity__icon"><i data-icon="bank"></i></span></div>
+        <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label">ООО ЮгСтрой</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">ИНН 7701234567</span></div></div>
+      </div>
+    </div>
+    <div class="st-card">
+      <div class="st-card__label"><b>Выбрано</b> · selected</div>
+      <div class="entity entity--interactive entity--selected">
+        <div class="entity__lead"><span class="entity__icon entity__icon--accent"><i data-icon="bank"></i></span></div>
+        <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label">ООО ЮгСтрой</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">ИНН 7701234567</span></div></div>
+      </div>
+    </div>
+    <div class="st-card">
+      <div class="st-card__label"><b>С чекбоксом</b> · множественный выбор</div>
+      <div class="entity entity--selectable">
+        <div class="entity__lead"><label class="cb cb--selected" style="gap:0;"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label></div>
+        <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label">ООО ЮгСтрой</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">ИНН 7701234567</span></div></div>
+      </div>
+    </div>
+    <div class="st-card">
+      <div class="st-card__label"><b>Skeleton</b> · загрузка (компонент подкачки)</div>
+      <div class="entity entity--skeleton" aria-busy="true">
+        <div class="entity__lead"><span class="entity__icon sk-surface"></span></div>
+        <div class="entity__main"><div class="entity__titles"><span class="sk-line sk-line--caption" style="--sk-w:42%"></span><span class="sk-line sk-line--title" style="--sk-w:68%"></span></div><span class="sk-line sk-line--caption" style="--sk-w:88%"></span></div>
+      </div>
+    </div>
+    <div class="st-card">
+      <div class="st-card__label"><b>Нет данных</b> · пустое значение</div>
+      <div class="entity entity--empty">
+        <div class="entity__lead"><span class="entity__icon entity__icon--neutral"><i data-icon="bank"></i></span></div>
+        <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label">—</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list entity__value--empty">Не указан</span></div></div>
+      </div>
+    </div>
+    <div class="st-card">
+      <div class="st-card__label"><b>Ошибка</b> · объект удалён</div>
+      <div class="entity entity--error">
+        <div class="entity__lead"><span class="entity__icon"><i data-icon="alert-circle"></i></span></div>
+        <div class="entity__main"><div class="entity__titles"><p class="entity__header">Объект удалён</p><div class="entity__labelrow"><span class="entity__label">ООО ЮгСтрой</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">Недоступен для просмотра</span></div></div>
+      </div>
+    </div>
+    <div class="st-card">
+      <div class="st-card__label"><b>Drag-handle</b> · переупорядочивание</div>
+      <div class="entity">
+        <button class="entity__drag" aria-label="Перетащить"><i data-icon="drag-dots"></i></button>
+        <div class="entity__lead"><span class="entity__icon"><i data-icon="bank"></i></span></div>
+        <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label">ООО ЮгСтрой</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">ИНН 7701234567</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- 7. ДОСТУПНОСТЬ -->
+<section class="section" id="a11y" data-screen-label="Доступность">
+  <h2>Доступность</h2>
+  <div class="panel">
+    <ul class="bullets">
+      <li><b>Кликабельный тайл</b> (<code class="tok">.entity--interactive</code>) — <code class="tok">role="button"</code> или ссылка, <code class="tok">tabindex="0"</code>, реакция на Enter/Space; фокус-обводка 2px solid <code class="tok">var(--primary)</code>.</li>
+      <li><b>Выбор из списка</b> — реальный чекбокс внутри <code class="tok">.entity__lead</code>; клик по всей строке переключает выбор, состояние — <code class="tok">aria-selected</code>/<code class="tok">aria-checked</code>.</li>
+      <li><b>Ведущая иконка / аватар</b> — декоративны: <code class="tok">aria-hidden="true"</code>; смысл несёт текст Label.</li>
+      <li><b>Иконки-кнопки и закрытие</b> — обязателен <code class="tok">aria-label</code> (кнопки без текста).</li>
+      <li><b>Усечённый Label</b> — полное значение доступно через Tooltip и <code class="tok">title</code>/<code class="tok">aria-label</code>.</li>
+      <li><b>Skeleton</b> — на контейнере <code class="tok">aria-busy="true"</code>; после загрузки заменяется реальным содержимым.</li>
+      <li><b>Счётчик +N</b> — озвучивается как «и ещё N»; полный список доступен по клику/во всплывающем элементе.</li>
+      <li><b>prefers-reduced-motion</b> — шиммер skeleton отключается.</li>
+    </ul>
+  </div>
+</section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Все текстовые слои — гарнитура <b>SB Sans Text</b>. Значения ниже — для размера M; у S и L своя ступень шкалы (см. <code class="tok">styles/entity.css</code>).</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Header (надзаголовок)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m-strong)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Prefix / Postfix</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Subheader</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- 8. ЦВЕТА -->
+<section class="section" id="colors" data-screen-label="Цвета">
+  <h2>Цвета</h2>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Счётчик +N</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Подзаголовки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Header, постфикс, «—»</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ведущая иконка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон (по умолчанию)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-swamp-100</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-swamp-100)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5ECEB</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ведущая иконка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Глиф (по умолчанию)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ведущая иконка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Глиф (тон accent)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#007A6D</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ведущая иконка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон (тон neutral)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-cgrey-100</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-100)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E8EDED</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Интерактив</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bgtable-row-hover</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bgtable-row-hover)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#F6FAFA</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Интерактив</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон selected · 6% #00AA9B</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Интерактив</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Закладка active, фокус</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ошибка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон иконки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error-bg-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error-bg-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FCF1F1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.08fr 1.58fr 1.31fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ошибка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка, Header</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- 9. ДЛЯ РАЗРАБОТЧИКОВ -->
+<section class="section" id="dev" data-screen-label="Для разработчиков">
+  <h2>Для разработчиков</h2>
+  <p class="desc">Хендофф-пакет. Имена классов условны — важны сами элементы, их роли и состояния. Разработчики собирают компонент на React.</p>
+
+  <p class="subhead">Точные размеры (redline)</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.85fr 1.31fr 2.03fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Свойство</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Значение (размер M)</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен / описание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.85fr 1.31fr 2.03fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Высота ведущего</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-lead">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">= размеру Entity (32/40/96)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.85fr 1.31fr 2.03fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Радиус контейнера иконки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-radius">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xl</code> для M</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.85fr 1.31fr 2.03fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Глиф иконки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-icon">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">18 / 22 / 48px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.85fr 1.31fr 2.03fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор ведущий ↔ контент</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-gap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">10 / 12 / 16px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.85fr 1.31fr 2.03fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор Header ↔ Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-headgap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">2 / 2 / 3px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.85fr 1.31fr 2.03fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор блоков (Label↔Subs↔Chips)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-blockgap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">5 / 6 / 8px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.85fr 1.31fr 2.03fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор в строке Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-rowgap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">prefix · label · postfix · bookmark</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.85fr 1.31fr 2.03fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Клэмп подзаголовков</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">2 строки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">-webkit-line-clamp: 2</code>; single → 1</span></span></div><div class="tc tc--separator"></div></div></div>
+  </div>
+  <div class="rl-sample" aria-hidden="true">
+    <div class="entity" id="rl-entity">
+      <div class="entity__lead"><span class="entity__icon" id="rl-iconbox"><i data-icon="bank"></i></span></div>
+      <div class="entity__main"><div class="entity__titles"><p class="entity__header">Header</p><div class="entity__labelrow"><span class="entity__label">Text Label</span><span class="entity__postfix">Postf</span></div></div><div class="entity__subs"><span class="entity__subs-icon"><i data-icon="check-circle"></i></span><span class="entity__subs-list">Subheader</span></div></div>
+    </div>
+  </div>
+
+  <p class="subhead">Поведение (framework-agnostic)</p>
+  <div class="code-wrap">
+    <button class="copy-btn" data-copy="logic">Скопировать</button>
+    <code id="code-logic">// 1. Усечение Label + Tooltip
+//    Label в одну строку (--truncate). Если scrollWidth > clientWidth —
+//    показать Tooltip/title с полным значением. Иначе Tooltip не нужен.
+if (labelEl.scrollWidth > labelEl.clientWidth) attachTooltip(labelEl, fullText)
+
+// 2. Свёртка подзаголовков в +N
+//    Рендерим все подзаголовки; список клэмпится CSS-ом до 2 строк.
+//    Счётчик +N считается на данных, не по факту переполнения:
+hidden = subheaders.length - visibleCount        // visibleCount по дизайну
+more   = min(hidden, 99)                          // максимум +99
+if (more > 0) render(<span class="entity__subs-more">+{more}</span>)
+
+// 3. Кликабельный тайл
+//    role=button|link, обрабатывать Enter/Space; клик по вложенным
+//    кнопкам действий не должен всплывать до onSelect (stopPropagation).
+
+// 4. Выбор из списка
+//    Клик по всей строке ⇢ toggle(checkbox); клавиатура — Space.
+//    Состояние: aria-selected на строке + checked на input.
+
+// 5. Skeleton
+//    Пока data == null → рендер .entity--skeleton (aria-busy).
+//    Ширины плейсхолдеров — фиксированные (head 42%, label 68%, sub 88%).
+
+// 6. Действия (max 2)
+//    Если действий > 2 — свернуть в кебаб-меню (ContextMenu).
+//    Порядок кнопок = порядку в заголовке страницы.</code>
+  </div>
+
+  </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Inline-редактирование Label</b> — двойной клик переводит подпись в режим редактирования на месте.</li>
+        <li><b>Drag handle</b> — перетаскивание строки Entity в списках с ручной сортировкой.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Entity</span>
+    <span>Компании · люди · файлы · метрики — тайлы, списки и формы</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите объект: размер, ведущий элемент, состав текстового блока, чипы, иконки-кнопки и действия. Демо обновляется наверху.</p>
+              <div class="pg__controls">
+                <div class="ctl-col">
+                  <div class="ctl">
+                    <div class="lbl">Размер</div>
+                    <div class="pg-select"><select id="ctl-size">
+                      <option value="s">S · 32px</option>
+                      <option value="m" selected>M · 40px</option>
+                      <option value="l">L · 96px</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Ведущий элемент</div>
+                    <div class="pg-select" data-pg-keep-select><select id="ctl-lead">
+                      <option value="icon" selected>Иконка</option>
+                      <option value="avatar">Аватар</option>
+                      <option value="none">Нет</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl" id="ctl-glyph-wrap">
+                    <div class="lbl">Глиф иконки</div>
+                    <div class="pg-select"><select id="ctl-glyph">
+                      <option value="bar-chart-square" selected>bar-chart-square</option>
+                      <option value="bank">bank</option>
+                      <option value="document-unread">document-unread</option>
+                      <option value="building-01">building-01</option>
+                      <option value="folder">folder</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Состояние</div>
+                    <div class="pg-select"><select id="ctl-state">
+                      <option value="default" selected>Обычное</option>
+                      <option value="interactive">Интерактивное (hover)</option>
+                      <option value="selected">Выбрано</option>
+                      <option value="skeleton">Skeleton / загрузка</option>
+                      <option value="empty">Нет данных (—)</option>
+                      <option value="error">Ошибка — объект удалён</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Подзаголовки</div>
+                    <div class="pg-select"><select id="ctl-subs">
+                      <option value="none">Нет</option>
+                      <option value="one">Один</option>
+                      <option value="many" selected>Много + N</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Действия (трейлинг)</div>
+                    <div class="pg-select"><select id="ctl-actions">
+                      <option value="none" selected>Нет</option>
+                      <option value="one">Кнопка + закрыть</option>
+                      <option value="two">2 кнопки + закрыть</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Заголовок (Label)</div>
+                    <div class="pg-text"><input id="ctl-label" type="text" placeholder="Text Label" maxlength="48"></div>
+                  </div>
+                </div>
+                <div class="toggles">
+                  <label class="pg-toggle"><input id="ctl-header" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать надзаголовок</span></label>
+                  <label class="pg-toggle"><input id="ctl-postfix" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать постфикс «Postf»</span></label>
+                  <label class="pg-toggle"><input id="ctl-bookmark" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать иконку избранного</span></label>
+                  <label class="pg-toggle"><input id="ctl-chips" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать список чипов</span></label>
+                  <label class="pg-toggle"><input id="ctl-icons" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать иконки-кнопки</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка и исходники Entity: HTML — из спеки, CSS — styles/entity.css (полностью), JS — принцип сборки. Демо страницы строит инлайн-скрипт buildEntity() в Entity.html.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main><!-- .page -->
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-tooltip.js"></script>
+<script src="../../scripts/ds-menu.js"></script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html"><div class="entity">
+  <div class="entity__lead"><span class="entity__icon" aria-hidden="true"><i data-icon="building-01"></i></span></div>
+  <div class="entity__main">
+    <div class="entity__titles">
+      <p class="entity__header">Header</p>
+      <div class="entity__labelrow">
+        <span class="entity__prefix-icon"><i data-icon="check-circle"></i></span>
+        <span class="entity__prefix">Pref</span>
+        <span class="entity__label entity__label--truncate">Text Label</span>
+        <span class="entity__postfix">Postf</span>
+        <button class="entity__bookmark" aria-label="В избранное"><i data-icon="star"></i></button>
+      </div>
+    </div>
+    <div class="entity__subs">
+      <span class="entity__subs-icon"><i data-icon="check-circle"></i></span>
+      <span class="entity__subs-list">Subheader, Subheader, Subheader</span>
+      <span class="entity__subs-more">+99</span>
+    </div>
+    <div class="entity__chips">…Chip readonly S…</div>
+    <div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Позвонить"><i data-icon="phone"></i></button></div>
+  </div>
+  <div class="entity__actions">
+    <button class="btn btn--outline btn--xs" aria-haspopup="menu">…</button>
+    <button class="ibtn ibtn--neutral ibtn--s" aria-label="Убрать"><i data-icon="close"></i></button>
+  </div>
+</div></script>
+
+<script type="text/plain" id="src-code-js">/* Entity — статичная разметка; публичного рантайма нет.
+   Демо страницы строит инлайн-скрипт buildEntity() в Entity.html. */
+
+function buildEntity(cfg) {
+  // lead: .entity__icon (glyph / .av avatar / none) — размер s/m/l через .entity--s/--l
+  // main:
+  //   .entity__titles → header (опц.) + labelrow (prefix · label · postfix · bookmark)
+  //   .entity__subs   → subs-icon + subs-list (clamp 2) + subs-more «+N»
+  //   .entity__chips  → Chip readonly S
+  //   .entity__icons  → ряд IconButton s
+  // actions: до 2 кнопок + закрытие (max 2)
+}
+
+/* Состояния: .entity--interactive (hover) · .entity--selected / [aria-selected="true"]
+   · .entity--skeleton (Skeleton) · .entity--empty (Label «—») · .entity--error (удалён) */
+
+/* React API (предложение): EntityProps — size s/m/l · state · lead{kind:'icon'|'avatar'|'none', glyph, tone}
+   · header · prefix · label · postfix · bookmark · subheaders[] · chips · icons[] · actions[] (max 2) */</script>
+
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Entity — компонент для отображения объектов (компании, люди, файлы,
+   метрики) в тайлах, списках и формах. Композитный: собирается из
+   ведущего элемента (иконка/аватар), текстового блока (Header · Label ·
+   Subheaders), чипов, группы иконок-кнопок и блока действий.
+
+   Токены масштаба задаются модификатором размера (--s / --m / --l) через
+   набор --e-* переменных. Собственного фона нет — Entity наследует фон
+   контейнера и тянется на всю его ширину.
+   ========================================================================= */
+
+.entity {
+  /* дефолт = размер m (40px) */
+  --e-lead:        40px;
+  --e-lead-radius: var(--radius-xl);
+  --e-lead-icon:   22px;
+  --e-gap:         12px;   /* ведущий ↔ контент          */
+  --e-row-gap:     6px;    /* внутри строки Label         */
+  --e-head-gap:    2px;    /* Header ↔ Label              */
+  --e-block-gap:   6px;    /* Label ↔ Subheaders ↔ Chips  */
+  --e-font-header: var(--type-body-xs);
+  --e-font-label:  var(--type-body-m-strong);
+  --e-font-affix:  var(--type-body-m);
+  --e-font-sub:    var(--type-body-s);
+  --e-bookmark:    18px;
+
+  display: flex;
+  align-items: center;
+  gap: var(--e-gap);
+  min-width: 0;
+  width: 100%;
+  font-family: var(--font-text), system-ui, sans-serif;
+  color: var(--text-primary);
+}
+
+/* ширина по контенту (в inline-контекстах — таблицы, чипы) */
+.entity--inline { display: inline-flex; width: auto; }
+
+/* ---------- размеры ------------------------------------------------------- *
+   Шкала размера — прямыми свойствами на конкретных потомках (не через --e-*
+   в модификаторе), чтобы компилятор чисто регистрировал токены. Размер m = дефолты
+   .entity (отдельных правил не требует). */
+.entity--s { gap: 10px; }
+.entity--s .entity__main { gap: 5px; }
+.entity--s .entity__icon { width: 32px; height: 32px; border-radius: var(--radius-l); }
+.entity--s .entity__icon > :is(svg,[data-icon]){ width: 18px; height: 18px; }
+.entity--s .entity__label { font: var(--type-body-s-strong); }
+.entity--s .entity__prefix, .entity--s .entity__postfix { font: var(--type-body-s); }
+.entity--s .entity__subs { font: var(--type-body-xs); }
+.entity--s .entity__bookmark { width: 16px; height: 16px; }
+
+.entity--l { gap: 16px; }
+.entity--l .entity__titles { gap: 3px; }
+.entity--l .entity__main { gap: 8px; }
+.entity--l .entity__icon { width: 96px; height: 96px; border-radius: var(--radius-5xl); }
+.entity--l .entity__icon > :is(svg,[data-icon]){ width: 48px; height: 48px; }
+.entity--l .entity__header { font: var(--type-body-s); }
+.entity--l .entity__label { font: var(--type-body-xl-strong); }
+.entity--l .entity__prefix, .entity--l .entity__postfix { font: var(--type-body-xl); }
+.entity--l .entity__subs { font: var(--type-body-m); }
+.entity--l .entity__bookmark { width: 22px; height: 22px; }
+
+/* =========================================================================
+   Ведущий элемент — иконка в скруглённом контейнере / аватар / чекбокс / грип
+   ========================================================================= */
+.entity__lead { flex: none; align-self: center; }
+
+/* иконочный контейнер */
+.entity__icon {
+  box-sizing: border-box;
+  width: var(--e-lead);
+  height: var(--e-lead);
+  border-radius: var(--e-lead-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-swamp-100);
+  color: var(--text-primary);
+}
+.entity__icon > :is(svg,[data-icon]){ width: var(--e-lead-icon); height: var(--e-lead-icon); display: block; }
+
+/* тон иконочного контейнера */
+.entity__icon--accent  { background: color-mix(in srgb, var(--primary) 14%, var(--c-mgrey-50)); color: var(--primary-dark); }
+.entity__icon--neutral { background: var(--c-cgrey-100); color: var(--text-secondary); }
+
+/* аватар как ведущий (используется .av из ДС) — синхронизирует размер */
+.entity__lead .av { flex: none; }
+
+/* =========================================================================
+   Контентный блок
+   ========================================================================= */
+.entity__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-block-gap);
+}
+
+/* --- Header (надзаголовок) --- */
+.entity__header {
+  font: var(--e-font-header);
+  color: var(--text-inactive);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* группа Header + Label с малым зазором */
+.entity__titles { display: flex; flex-direction: column; gap: var(--e-head-gap); min-width: 0; }
+
+/* --- строка Label: prefix · label · postfix · bookmark --- */
+.entity__labelrow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--e-row-gap);
+  min-width: 0;
+}
+.entity__prefix-icon {
+  align-self: center;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  color: var(--text-inactive);
+  display: inline-flex;
+}
+.entity__prefix-icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.entity__prefix { font: var(--e-font-affix); color: var(--text-inactive); flex: none; }
+
+.entity__label {
+  font: var(--e-font-label);
+  color: var(--text-primary);
+  min-width: 0;
+}
+/* усечение в одну строку с многоточием (для тултипа) */
+.entity__label--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.entity__postfix { font: var(--e-font-affix); color: var(--text-inactive); flex: none; }
+
+/* закладка/избранное — иконочная кнопка внутри строки label */
+.entity__bookmark {
+  align-self: center;
+  flex: none;
+  width: var(--e-bookmark);
+  height: var(--e-bookmark);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-inactive);
+  cursor: pointer;
+  display: inline-flex;
+  transition: color .15s ease;
+}
+.entity__bookmark > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.entity__bookmark:hover { color: var(--text-secondary); }
+.entity__bookmark--active { color: var(--primary); }
+.entity__bookmark:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-xs); }
+
+/* =========================================================================
+   EntitySubtitleGroup — .entity__subs: check-icon + список подзаголовков + +N
+   ========================================================================= */
+.entity__subs {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  font: var(--e-font-sub);
+  color: var(--text-secondary);
+}
+.entity__subs-icon {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  color: var(--text-inactive);
+  display: inline-flex;
+  margin-top: .05em;
+}
+.entity__subs-icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.entity__subs-list {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.entity__subs--single .entity__subs-list { -webkit-line-clamp: 1; line-clamp: 1; }
+.entity__subs-more { flex: none; font-weight: var(--weight-semibold); color: var(--text-primary); }
+
+/* =========================================================================
+   Chips — переиспользуем .chiplist из ДС; тут только раскладка-обёртка
+   ========================================================================= */
+.entity__chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+
+/* =========================================================================
+   EntityIconButtonGroup — .entity__icons: ряд IconButton s из ДС
+   ========================================================================= */
+.entity__icons { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
+
+/* =========================================================================
+   EntityActions — трейлинг: до 2 кнопок + закрытие; выравнивание по верху
+   ========================================================================= */
+.entity__actions {
+  flex: none;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.entity__actions--center { align-self: center; }
+
+/* =========================================================================
+   Интерактивный тайл — hover / focus / selected
+   ========================================================================= */
+.entity--interactive {
+  cursor: pointer;
+  border-radius: var(--radius-m);
+  padding: 8px 10px;
+  margin: -8px -10px;
+  transition: background-color .15s ease;
+}
+.entity--interactive:hover { background: var(--bgtable-row-hover); }
+.entity--interactive:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+/* Класс .entity--selected — форс-состояние витрины; реальный выбор из списка
+   несёт aria-selected="true" на самом тайле (RulesAudit W1). */
+.entity:is(.entity--selected,[aria-selected="true"]) { background: var(--primary-bg); }
+.entity:is(.entity--selected,[aria-selected="true"]):hover { background: color-mix(in srgb, var(--primary) 10%, transparent); }
+
+/* выбор чекбоксом (список с множественным выбором) */
+.entity--selectable .entity__lead { position: relative; }
+
+/* =========================================================================
+   Drag-handle — грип для переупорядочивания
+   ========================================================================= */
+.entity__drag {
+  flex: none;
+  align-self: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-inactive);
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.entity__drag > :is(svg,[data-icon]){ width: 18px; height: 18px; display: block; }
+.entity__drag:hover { color: var(--text-secondary); }
+.entity__drag:active { cursor: grabbing; }
+
+/* =========================================================================
+   Skeleton / загрузка (компонент подкачки) — общий компонент Skeleton:
+   ведущая иконка получает .sk-surface (свой размер/радиус сохраняются),
+   строки — обычные .sk-line с шириной через --sk-w (styles/skeleton.css).
+   ========================================================================= */
+
+/* =========================================================================
+   Пустое / нет данных (—) и состояние ошибки (объект удалён/недоступен)
+   ========================================================================= */
+.entity--empty .entity__label,
+.entity__value--empty { color: var(--text-inactive); font-weight: var(--weight-regular); }
+
+.entity--error .entity__icon { background: var(--error-bg-light); color: var(--error); }
+.entity--error .entity__label { color: var(--text-secondary); text-decoration: line-through; text-decoration-color: var(--text-inactive); }
+.entity--error .entity__header { color: var(--error); }</script>
+
+<script>
+/* ---- icon helper ---- */
+function getIcon(name, size) {
+  size = size || 20;
+  if (!window.DS_ICONS) return '';
+  var raw = window.DS_ICONS[name] || ''; if (!raw) return '';
+  var d = document.createElement('div'); d.innerHTML = raw;
+  var s = d.firstElementChild; if (!s) return '';
+  s.setAttribute('width', size); s.setAttribute('height', size); s.setAttribute('aria-hidden', 'true');
+  return s.outerHTML;
+}
+function esc(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ---- constructor ---- */
+var ICON_PX = { s:18, m:22, l:48 };
+var CHEV = { s:14, m:14, l:18 };
+
+function buildEntity() {
+  var size   = document.getElementById('ctl-size').value;
+  var lead   = document.getElementById('ctl-lead').value;
+  var glyph  = document.getElementById('ctl-glyph').value;
+  var state  = document.getElementById('ctl-state').value;
+  var header = document.getElementById('ctl-header').checked;
+  var postfix= document.getElementById('ctl-postfix').checked;
+  var bookmk = document.getElementById('ctl-bookmark').checked;
+  var subs   = document.getElementById('ctl-subs').value;
+  var chips  = document.getElementById('ctl-chips').checked;
+  var icons  = document.getElementById('ctl-icons').checked;
+  var actions= document.getElementById('ctl-actions').value;
+  var label  = document.getElementById('ctl-label').value.trim() || 'Text Label';
+
+  /* show/hide glyph control */
+  document.getElementById('ctl-glyph-wrap').classList.toggle('is-off', lead !== 'icon');
+
+  var cls = 'entity entity--' + size;
+  if (state === 'interactive') cls += ' entity--interactive';
+  if (state === 'selected')    cls += ' entity--interactive entity--selected';
+  if (state === 'skeleton')    cls += ' entity--skeleton';
+  if (state === 'empty')       cls += ' entity--empty';
+  if (state === 'error')       cls += ' entity--error';
+
+  var host = document.getElementById('demo-entity');
+  host.className = cls;
+  host.setAttribute('tabindex', (state==='interactive'||state==='selected') ? '0' : '-1');
+  if (state === 'skeleton') host.setAttribute('aria-busy','true'); else host.removeAttribute('aria-busy');
+
+  /* ---- skeleton short-circuit ---- */
+  if (state === 'skeleton') {
+    host.innerHTML =
+      '<div class="entity__lead"><span class="entity__icon sk-surface"></span></div>' +
+      '<div class="entity__main"><div class="entity__titles"><span class="sk-line sk-line--caption" style="--sk-w:42%"></span><span class="sk-line sk-line--title" style="--sk-w:68%"></span></div><span class="sk-line sk-line--caption" style="--sk-w:88%"></span></div>';
+    return;
+  }
+
+  /* ---- lead ---- */
+  var leadHtml = '';
+  if (lead === 'icon') {
+    var toneCls = state==='error' ? '' : (state==='selected' ? ' entity__icon--accent' : (state==='empty' ? ' entity__icon--neutral' : ''));
+    var g = state==='error' ? 'alert-circle' : glyph;
+    leadHtml = '<div class="entity__lead"><span class="entity__icon' + toneCls + '">' + getIcon(g, ICON_PX[size]) + '</span></div>';
+  } else if (lead === 'avatar') {
+    var avSize = size==='s' ? 'av--m' : (size==='l' ? 'av--xl' : 'av--l');
+    leadHtml = '<div class="entity__lead"><span class="av av--circular ' + avSize + ' av--accent"><span class="av__text">ЮС</span></span></div>';
+  }
+
+  /* ---- titles ---- */
+  var labelText = (state==='empty') ? '—' : esc(label);
+  var headerHtml = header ? '<p class="entity__header">' + (state==='error'?'Объект удалён':'Header') + '</p>' : '';
+  var postfixHtml = (postfix && state!=='empty') ? '<span class="entity__postfix">Postf</span>' : '';
+  var bookmarkHtml = (bookmk && state!=='empty') ? '<button class="entity__bookmark" aria-label="В избранное">' + getIcon('bookmark-add', size==='l'?22:(size==='s'?16:18)) + '</button>' : '';
+  var labelCls = 'entity__label entity__label--truncate';
+  var labelRow = '<div class="entity__labelrow"><span class="' + labelCls + '">' + labelText + '</span>' + postfixHtml + bookmarkHtml + '</div>';
+  var titles = '<div class="entity__titles">' + headerHtml + labelRow + '</div>';
+
+  /* ---- subheaders ---- */
+  var subHtml = '';
+  if (subs !== 'none' && state!=='skeleton') {
+    var iconPart = '<span class="entity__subs-icon">' + getIcon('check-circle', size==='l'?16:13) + '</span>';
+    if (subs === 'one') {
+      subHtml = '<div class="entity__subs entity__subs--single">' + iconPart + '<span class="entity__subs-list">Subheader</span></div>';
+    } else {
+      var many = 'Subheader, Subheader, Subheader, Subheader, Subheader, Subheader, Subheader';
+      subHtml = '<div class="entity__subs">' + iconPart + '<span class="entity__subs-list">' + many + '</span><span class="entity__subs-more">+99</span></div>';
+    }
+  }
+
+  /* ---- chips ---- */
+  var chipsHtml = chips ? '<div class="entity__chips"><span class="chip chip--s"><span class="chip__label">Text</span></span><span class="chip chip--s"><span class="chip__label">Text</span></span><span class="chip chip--s"><span class="chip__label">Text</span></span></div>' : '';
+
+  /* ---- icon buttons ---- */
+  var iconsHtml = '';
+  if (icons) {
+    iconsHtml = '<div class="entity__icons">' +
+      '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Позвонить">' + getIcon('phone',16) + '</button>' +
+      '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Написать">' + getIcon('mail',16) + '</button>' +
+      '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Документы">' + getIcon('passport',16) + '</button>' +
+      '<button class="ibtn ibtn--neutral ibtn--s" aria-label="История">' + getIcon('history',16) + '</button>' +
+    '</div>';
+  }
+
+  var main = '<div class="entity__main">' + titles + subHtml + chipsHtml + iconsHtml + '</div>';
+
+  /* ---- actions ---- */
+  var actHtml = '';
+  if (actions !== 'none') {
+    var btn = '<button class="btn btn--outline btn--xs" aria-haspopup="menu"><span class="btn__label">Button</span>' + getIcon('chevron-down', CHEV[size]) + '</button>';
+    var second = actions==='two' ? btn : '';
+    actHtml = '<div class="entity__actions">' + btn + second + '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Убрать">' + getIcon('close',16) + '</button></div>';
+  }
+
+  host.innerHTML = leadHtml + main + actHtml;
+}
+
+['ctl-size','ctl-lead','ctl-glyph','ctl-state','ctl-header','ctl-postfix','ctl-bookmark','ctl-subs','ctl-chips','ctl-icons','ctl-actions','ctl-label'].forEach(function(id){
+  var el = document.getElementById(id);
+  if (el) { el.addEventListener('change', buildEntity); el.addEventListener('input', buildEntity); }
+});
+buildEntity();
+
+/* ---- redline ---- */
+function measureRedline() {
+  var e = document.getElementById('rl-entity'); if (!e) return;
+  var cs = getComputedStyle(e);
+  var box = document.getElementById('rl-iconbox');
+  var titles = e.querySelector('.entity__titles');
+  var main = e.querySelector('.entity__main');
+  var row = e.querySelector('.entity__labelrow');
+  function set(id,v){ var n=document.getElementById(id); if(n) n.textContent=v; }
+  set('rl-lead', box ? getComputedStyle(box).height : '—');
+  set('rl-radius', box ? getComputedStyle(box).borderRadius : '—');
+  var icn = box && box.querySelector('svg');
+  set('rl-icon', icn ? (icn.getAttribute('width')+'px') : '22px');
+  set('rl-gap', cs.columnGap || cs.gap);
+  set('rl-headgap', titles ? getComputedStyle(titles).rowGap || getComputedStyle(titles).gap : '—');
+  set('rl-blockgap', main ? getComputedStyle(main).rowGap || getComputedStyle(main).gap : '—');
+  set('rl-rowgap', row ? getComputedStyle(row).columnGap || getComputedStyle(row).gap : '—');
+}
+setTimeout(measureRedline, 300);
+
+/* ---- copy buttons ---- */
+document.querySelectorAll('.copy-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var el = document.getElementById('code-' + btn.getAttribute('data-copy')); if(!el) return;
+    navigator.clipboard.writeText(el.textContent).then(function(){
+      btn.textContent='Скопировано ✓'; btn.classList.add('is-copied');
+      setTimeout(function(){ btn.textContent='Скопировать'; btn.classList.remove('is-copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1108 @@
+<!-- @dsCard group="Components" name="Badge" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Badge — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:78ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:20px; }
+
+  
+
+  
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { display:flex; align-items:center; justify-content:center; gap:40px; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* range / number */
+  .pg-range { display:flex; align-items:center; gap:12px; }
+  .pg-range input[type=range]{ flex:1; accent-color: var(--primary); }
+  .pg-range .val { font:var(--type-body-m-strong); color:var(--text-primary); font-variant-numeric:tabular-nums; min-width:34px; text-align:right; }
+
+  /* ---------- matrices / grids ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .sizes-grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:20px 16px; align-items:end; min-width:560px; text-align:center; }
+  .sizes-grid .col-head { font: var(--type-body-s-strong); color: var(--primary); }
+  .sizes-grid .cell { display:flex; flex-direction:column; align-items:center; gap:18px; padding:18px 0; }
+  .sizes-grid .cell .sub { font:var(--type-body-xs); color:var(--text-inactive); }
+
+  .tone-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:18px; }
+  .tone-cell { border:1px solid var(--border-light); border-radius:12px; padding:20px 18px; display:flex; flex-direction:column; align-items:center; gap:14px; background:var(--bg-tile); }
+  .tone-cell .swrow { display:flex; align-items:center; gap:12px; height:32px; }
+  .tone-cell .nm { font:var(--type-body-m-strong); color:var(--text-primary); }
+  .tone-cell .rl { font:var(--type-body-xs); color:var(--text-secondary); text-align:center; text-wrap:pretty; }
+
+  /* ---------- usage tiles ---------- */
+  .use-tiles { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:680px){ .use-tiles{ grid-template-columns:1fr; } }
+  .use-tile__stage { height:150px; display:flex; align-items:center; justify-content:center; background: var(--tertiary-light); }
+
+  /* nav cell mock */
+  .navcell { width:56px; height:56px; border-radius:14px; background:var(--bg-tile); border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); box-shadow:0 4px 14px rgba(40,50,55,.06); }
+  .navcell svg { width:26px; height:26px; }
+  /* avatar mock */
+  .avatar { width:48px; height:48px; border-radius:50%; background:var(--c-swamp-100); color:var(--text-primary); display:flex; align-items:center; justify-content:center; font:var(--type-body-m-strong); }
+
+  /* tabs mock */
+  .tabs { display:flex; gap:4px; border-bottom:1px solid var(--border-light); }
+  .tab { display:inline-flex; align-items:center; gap:8px; padding:12px 14px 14px; font:var(--type-body-m); color:var(--text-secondary); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
+  .tab[aria-selected="true"] { color:var(--text-primary); font-weight:600; border-bottom-color:var(--primary); }
+  .tab:hover { color:var(--text-primary); }
+
+  /* list with trailing counts */
+  .clist { display:flex; flex-direction:column; }
+  .clist__row { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 14px; border-left:2px solid transparent; }
+  .clist__row[aria-current="true"] { border-left-color:var(--primary); }
+  .clist__row .nm { font:var(--type-body-m); color:var(--text-secondary); }
+  .clist__row[aria-current="true"] .nm { color:var(--text-primary); }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(260px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:54px 44px; display:flex; justify-content:center; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+
+  /* anatomy diagram */
+  .anat-dia { position:relative; }
+  .anat-dia .big { --bdg-size:48px; min-width:48px; height:48px; padding:0 14px; font:var(--weight-semibold) 22px/1 var(--font-text); }
+  .anat-dia .mk { position:absolute; width:22px; height:22px; border-radius:50%; background:var(--text-primary); color:#fff; font:var(--type-body-xs); font-weight:600; display:flex; align-items:center; justify-content:center; }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:28px 20px; flex:1; display:flex; align-items:center; justify-content:center; gap:24px; }
+  .guide-card__cap { padding:0 20px 18px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:15px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- developer handoff ---------- */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 34px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Badge">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.002</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Badge</h1>
+    <p class="lead">Бейдж — небольшой дочерний элемент, который накладывается на родительский компонент или ставится рядом с ним. Тип <b>Counter</b> показывает количество (счётчик), тип <b>Dot</b> — статус без числа. Пять размеров — M / S / XS / XXS / Dot — и семантические тона.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">Встраивается в компонент в качестве дочернего:</p>
+    <div class="panel">
+      <ul class="bullets" style="margin-bottom:28px;">
+        <li>применяется как счётчик (counter) для отображения количественных значений;</li>
+        <li>или в качестве уведомления о состоянии материнского компонента (dot).</li>
+      </ul>
+      <div class="use-tiles">
+        <div class="use-tile">
+          <div class="use-tile__stage" id="use-nav"></div>
+          <div class="use-tile__cap">Ячейка навигационной панели с counter-бейджем</div>
+        </div>
+        <div class="use-tile">
+          <div class="use-tile__stage" id="use-avatar"></div>
+          <div class="use-tile__cap">Аватар пользователя с dot-бейджем</div>
+        </div>
+      </div>
+      <p class="desc" style="margin:30px 0 18px; color:var(--text-primary);">В табах — для обозначения количества сущностей, которые в них содержатся:</p>
+      <div class="tabs" id="use-tabs"></div>
+      <div class="clist" id="use-list" style="margin-top:8px; max-width:340px;"></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Guidelines">
+    <h3>Правила</h3>
+    <p class="desc">Бейдж дополняет родителя, а не заменяет его. Не помещайте в счётчик длинные строки и не используйте его как самостоятельную метку-«пилюлю».</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad1"></div>
+        <p class="guide-card__cap">Текст в счётчике растягивает капсулу — для текста есть Tag/Chip.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="guide-good1"></div>
+        <p class="guide-card__cap">Счётчик несёт только число; переполнение сворачивается в «99+».</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad2"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad2"></div>
+        <p class="guide-card__cap">Dot со значением — противоречие: точка не несёт числа.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good2"></span>Так</div>
+        <div class="guide-card__body" id="guide-good2"></div>
+        <p class="guide-card__cap">Нужно число — берём Counter; нужен статус — Dot.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Бейдж — это контейнер-капсула со значением внутри. Ширина зависит от контента, высота фиксирована по размеру. При наложении на родителя бейдж позиционируется в правом верхнем углу и выступает за его границу.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div class="anat-dia" id="anat-diagram"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Контейнер</span><span class="d">капсула со скруглением 999px; высота фиксирована, ширина тянется по контенту</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Значение</span><span class="d">число, токен Body (вес зашит в токен), tabular-nums; центрировано</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Индикатор переполнения</span><span class="d">«+» при значении больше максимума</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Types">
+    <h3>Типы</h3>
+    <p class="desc">Два типа по содержимому. Counter несёт число — точное количество непрочитанного, элементов в табе, товаров в корзине. Dot не несёт числа — это компактный индикатор наличия события или статуса.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <div style="display:flex; align-items:center; gap:18px; margin-bottom:16px;" id="type-counter"></div>
+        <p style="font:var(--type-h5-strong); color:var(--text-primary); margin:0 0 6px;">Counter</p>
+        <p class="desc" style="margin:0;">Числовой счётчик. Поддерживает переполнение «99+». Скрывается при значении 0.</p>
+      </div>
+      <div class="panel" style="flex:1; min-width:280px;">
+        <div style="display:flex; align-items:center; gap:18px; margin-bottom:16px; height:32px;" id="type-dot"></div>
+        <p style="font:var(--type-h5-strong); color:var(--text-primary); margin:0 0 6px;">Dot</p>
+        <p class="desc" style="margin:0;">Точка 8px без числа. Сигнализирует о новом событии или статусе родителя.</p>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Tone">
+    <h3>Тон</h3>
+    <p class="desc">Тон передаёт смысл, а не просто цвет. <b>Neutral</b> — нейтральный счётчик без эмоциональной окраски (количество в табах, списках). <b>Accent</b> — привлекает внимание к новому (непрочитанное). Статусные тона — для индикации состояния родителя.</p>
+    <div class="panel">
+      <div class="tone-grid" id="tone-grid"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Четыре размера счётчика и фиксированный Dot. Размер выбирается по габаритам родителя и плотности интерфейса. Однозначное число даёт круг (min-width = высота), многозначное — капсулу с горизонтальными отступами.</p>
+    <div class="panel">
+      <div class="matrix-wrap">
+        <div class="sizes-grid" id="sizes-grid"></div>
+      </div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden; margin-top:20px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.5fr 0.7fr 0.9fr 0.9fr 1.7fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Высота</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Мин. ширина</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Кегль значения</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Применение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="sizes-table"></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Счётчик — пилюля в любом размере: радиус не зависит от числа знаков.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Счётчик — L / M / S / XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Dot</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Text — текстовый бейдж без плашки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Содержимое бейджа — число (Counter) или его отсутствие (Dot). Краткий свод правил (подробно — в «Переполнение и формат» выше):</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li><b>Counter</b> несёт только целое неотрицательное число — никакого текста, букв или знаков препинания внутри (для этого есть Tag/Chip);</li>
+      <li>у каждого счётчика есть порог переполнения (<code class="tok">max</code>, по умолчанию 99) — при превышении показывается <code class="tok">max+</code> (например, «99+»), точное значение — в тултипе;</li>
+      <li>для компактных второстепенных счётчиков («ещё N») используется безфоновый текстовый вариант <code class="tok">badge--text</code> в формате «+99»;</li>
+      <li><b>Dot</b> не несёт никакого текста или числа — это только индикатор наличия события/статуса; если нужно число — используйте Counter;</li>
+      <li>при <code class="tok">value = 0</code> счётчик скрывается по умолчанию — не показывайте пустой бейдж вместо того, чтобы его скрыть.</li>
+    </ul>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="Overflow">
+    <h3>Переполнение и формат</h3>
+    <p class="desc">У счётчика есть максимум (по умолчанию 99). Если значение его превышает, бейдж показывает <code class="tok">max+</code> — например «99+», чтобы капсула не растягивалась бесконтрольно. В компактных местах (счётчик скрытых элементов, «ещё N») используется безфоновый текстовый вариант <code class="tok">badge--text</code> в формате «+99».</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:18px;">Рост значения и переполнение при max = 99</p>
+        <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;" id="overflow-demo"></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:18px;">Текстовый вариант «+N» (без фона)</p>
+        <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;" id="overflow-text"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Positioning">
+    <h3>Позиционирование</h3>
+    <p class="desc">Counter накладывается на правый верхний угол родителя и центрируется на его границе. Dot для статуса ставится в правый нижний угол (например, индикатор «онлайн» на аватаре). На цветном или фото-фоне у бейджа появляется белая обводка (<code class="tok">badge--bordered</code>), чтобы он читался отдельно от подложки.</p>
+    <div class="panel">
+      <div class="row" style="align-items:center; gap:48px; justify-content:center; padding:18px 0;" id="pos-demo"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- STATES & BEHAVIOR -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Поведение бейджа определяется значением и состоянием родителя.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:18px;">Значение 0 — бейдж скрывается</p>
+        <div style="display:flex; align-items:center; gap:22px;" id="state-zero"></div>
+        <p class="desc" style="margin:18px 0 0; font:var(--type-body-s); color:var(--text-inactive);">При count = 0 счётчик не отображается; исключение — явный режим «показывать ноль».</p>
+      </div>
+      <div class="panel" style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:18px;">Родитель disabled — бейдж приглушается</p>
+        <div style="display:flex; align-items:center; gap:22px;" id="state-muted"></div>
+        <p class="desc" style="margin:18px 0 0; font:var(--type-body-s); color:var(--text-inactive);">Тон сбрасывается в серый <code class="tok">--disabled</code>, чтобы не конкурировать с неактивным родителем.</p>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:20px;">
+      <p class="desc tight" style="margin-bottom:18px;">Тултип при переполнении — наведите, чтобы увидеть точное значение</p>
+      <div style="display:flex; align-items:center; gap:28px;" id="state-tooltip"></div>
+    </div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Бейдж — неинтерактивный визуальный элемент: он сам по себе не получает фокус и не имеет собственной семантики вне контекста родителя. За доступность отвечает компонент, к которому бейдж прикреплён.</p>
+    <div class="panel">
+      <ul class="bullets">
+        <li><b>Counter:</b> число дублируйте в <code class="tok">aria-label</code> родителя (например, <code class="tok">aria-label="Входящие, 12"</code>), а сам бейдж помечайте <code class="tok">aria-hidden="true"</code> — иначе число прочитается дважды;</li>
+        <li><b>Dot:</b> без сопровождающего текста статус недоступен для скрин-ридера — добавляйте <code class="tok">aria-label</code> на родителе (например, «Онлайн» или «Есть новые уведомления»);</li>
+        <li>не полагайтесь только на тон (цвет) для критичных различий (например, Error против Success) — для пользователей с нарушениями цветовосприятия различие должно дублироваться текстом или иконкой в самом родителе;</li>
+        <li><code class="tok">title</code> при переполнении — mouse-only тултип; если точное число важно, продублируйте его в <code class="tok">aria-label</code> родителя;</li>
+        <li>в состоянии <code class="tok">muted</code> бейдж только следует за <code class="tok">aria-disabled</code> родителя, а не сигнализирует самостоятельно.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Значение набирается токенами типографики ДС — вес зашит в токен и не переопределяется: M(32) — <code class="tok">--type-body-m</code>, S(24) и XS(20) — <code class="tok">--type-body-s</code>, XXS(16) — <code class="tok">--type-body-xs</code>. Моноширинные цифры (<code class="tok">font-variant-numeric: tabular-nums</code>), чтобы счётчик не «прыгал» при смене цифр.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.99fr 0.9fr 1.58fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.99fr 0.9fr 1.58fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 px / Regular (Body M)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.99fr 0.9fr 1.58fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 px / Regular (Body S)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.99fr 0.9fr 1.58fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 px / Regular (Body S)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.99fr 0.9fr 1.58fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XXS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 px / Regular (Body XS)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены. Текст на цветных тонах — <code class="tok">--text-on-dark</code>; на amber (warning) для контраста — <code class="tok">--text-primary</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон тона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Neutral</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-cgrey-100</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-100)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E8EDED</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон тона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон тона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--success</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--success)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#7CB342</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон тона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Info</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--info</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--info)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#1E88E5</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон тона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Warning</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--warning</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--warning)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFB300</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон тона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст значения</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">На цветном фоне</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст значения</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">На neutral</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст значения</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">На warning (amber)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Оверлей</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Обводка bordered</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-tile</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-tile)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Muted (disabled)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--disabled)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#BEC5C8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Muted (disabled)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/badge.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/badge.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Значение count = 0 и нет явного флага showZero → бейдж не рендерится (display:none)</span>
+
+<span class="tk-cm">// 2. Переполнение: если count &gt; max → текст = max + "+"; полное значение — в title/aria-label</span>
+
+<span class="tk-cm">// 3. Позиционирование при наложении на родителя (требует position:relative на родителе):</span>
+<span class="tk-cm">//    Counter → правый верхний угол, translate(45%, -45%) от собственного размера бейджа;</span>
+<span class="tk-cm">//    Dot (статус) → правый нижний угол по умолчанию; модификатор → правый верхний, если нужен тот же угол, что и у counter</span>
+
+<span class="tk-cm">// 4. Bordered: добавляется автоматически, когда родитель — фото/цветная подложка (аватар, обложка обложки)</span>
+
+<span class="tk-cm">// 5. Muted: синхронизируется с disabled-состоянием родителя, не управляется независимо</span>
+
+<span class="tk-cm">// 6. Бейдж не интерактивен: нет собственного focus/hover/keyboard — все взаимодействие через родителя</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">makeBadge</code> / <code class="tok">anchor</code> в коде этой страницы).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Badge с иконкой</b> — статус-глиф вместо точки/числа (например, «в процессе») — частый кейс в Carbon/Ant Design.</li>
+        <li><b>Анимация счётчика</b> — плавная смена значения Counter при обновлении в реальном времени.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Badge</span>
+    <span>Counter · Dot — M / S / XS / XXS / Dot · Neutral / Accent / Success / Info / Warning / Error</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите бейдж: переключайте тип, тон, размер и значение — превью и наложение на родителя обновляются мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script>
+/* ---------- icons ---------- */
+const ICONS = {
+  bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  cart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h2l2.2 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L23 6H5.1"/></svg>',
+  bad:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  good: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+};
+/* подставляем иконки из библиотеки ДС, где есть эквивалент (bell — оставляем) */
+(function(){ const L=window.DS_ICONS||{}; const m={mail:'mail',cart:'shopping-cart',bad:'close',good:'check'};
+  for(const k in m){ if(L[m[k]]) ICONS[k]=L[m[k]]; } })();
+
+/* ---------- badge factory ----------
+   o: { type:'counter'|'dot', tone, size, value, max, bordered, text, muted, animate, showZero } */
+function makeBadge(o = {}) {
+  const { type='counter', tone='neutral', size='s', value=9, max=99,
+          bordered=false, text=false, muted=false, animate=false, showZero=false } = o;
+  const b = document.createElement('span');
+  b.className = 'badge';
+  if (type === 'dot') b.classList.add('badge--dot');
+  else b.classList.add('badge--' + size);
+  b.classList.add('badge--' + tone);
+  if (text)     b.classList.add('badge--text');
+  if (bordered) b.classList.add('badge--bordered');
+  if (muted)    b.classList.add('badge--muted');
+  if (animate)  b.classList.add('badge--animate');
+
+  if (type === 'counter') {
+    if (value === 0 && !showZero) { b.style.display = 'none'; b.dataset.hidden = '1'; }
+    const over = value > max;
+    b.textContent = text ? '+' + value : (over ? max + '+' : String(value));
+    if (over) b.title = String(value);
+  }
+  return b;
+}
+
+/* anchor a badge on a child node */
+function anchor(child, badge, dotTopRight=false) {
+  const a = document.createElement('span');
+  a.className = 'badge-anchor' + (dotTopRight ? ' badge-anchor--dot-tr' : '');
+  a.appendChild(child);
+  a.appendChild(badge);
+  return a;
+}
+function navCell(icon) {
+  const c = document.createElement('span'); c.className = 'navcell'; c.innerHTML = icon; return c;
+}
+function avatar(txt) {
+  const c = document.createElement('span'); c.className = 'avatar'; c.textContent = txt; return c;
+}
+
+/* ---------- PLAYGROUND ---------- */
+(function(){
+  const state = { type:'counter', tone:'accent', size:'s', value:9, bordered:false, onParent:true, text:false, muted:false };
+  const controls = document.getElementById('pg-controls');
+  const preview  = document.getElementById('pg-preview');
+  const codeEl   = document.getElementById('pg-code');
+
+  function select(label, options, getCur, onPick){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    options.forEach(([val,txt])=>{ const op=document.createElement('option'); op.value=val; op.textContent=txt; if(val===getCur()) op.selected=true; sel.appendChild(op); });
+    sel.addEventListener('change',()=>{ onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); wrap._sel=sel; return wrap;
+  }
+  /* Бинарные опции — селекты: docs-split.js конвертирует их в свитчи ДС (урок Л4) */
+  function ctlToggle(label, key){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    [['no','Нет'],['yes','Да']].forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; if((v==='yes')===!!state[key]) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{ state[key]=sel.value==='yes'; render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  controls.appendChild(select('Тип',
+    [['counter','Counter'],['dot','Dot']], ()=>state.type, v=>state.type=v));
+  const sizeCtl = select('Размер',
+    [['m','M · 32'],['s','S · 24'],['xs','XS · 20'],['xxs','XXS · 16']], ()=>state.size, v=>state.size=v);
+  controls.appendChild(sizeCtl);
+  controls.appendChild(select('Тон',
+    [['neutral','Neutral'],['accent','Accent'],['success','Success'],['info','Info'],['warning','Warning'],['error','Error']],
+    ()=>state.tone, v=>state.tone=v));
+
+  // value slider
+  const valWrap=document.createElement('div'); valWrap.className='ctl';
+  const vl=document.createElement('div'); vl.className='lbl'; vl.textContent='Значение'; valWrap.appendChild(vl);
+  const rng=document.createElement('div'); rng.className='pg-range';
+  const input=document.createElement('input'); input.type='range'; input.min='0'; input.max='130'; input.value=String(state.value);
+  const out=document.createElement('span'); out.className='val'; out.textContent=state.value;
+  input.addEventListener('input',()=>{ state.value=+input.value; out.textContent=input.value; render(); });
+  rng.appendChild(input); rng.appendChild(out); valWrap.appendChild(rng); controls.appendChild(valWrap);
+
+  const tParent = ctlToggle('Наложить на родителя','onParent');
+  const tBorder = ctlToggle('Обводка','bordered');
+  const tText = ctlToggle('Текстовый без фона (+N)','text');
+  const tMuted = ctlToggle('Disabled','muted');
+  controls.appendChild(tParent);
+  controls.appendChild(tBorder);
+  controls.appendChild(tText);
+  controls.appendChild(tMuted);
+
+  function render(){
+    // dot disables size + value controls visually
+    valWrap.style.opacity = state.type==='dot' ? .4 : 1;
+    valWrap.style.pointerEvents = state.type==='dot' ? 'none' : 'auto';
+    sizeCtl.style.opacity = state.type==='dot' ? .4 : 1;
+    sizeCtl.style.pointerEvents = state.type==='dot' ? 'none' : 'auto';
+    // text variant is inline-only and counter-only
+    tText.classList.toggle('is-off', state.type==='dot');
+    const asText = state.text && state.type!=='dot';
+    tParent.classList.toggle('is-off', asText);
+    tBorder.classList.toggle('is-off', asText);
+    tMuted.classList.toggle('is-off', asText);  // disabled не применим к безфоновому варианту
+    const muted = state.muted && !asText;
+
+    const o = { type:state.type, tone:state.tone, size:state.size, value:state.value,
+                bordered:state.bordered && !asText, text:asText, muted:muted, showZero:true };
+    preview.innerHTML='';
+    if (state.onParent && !asText) {
+      const icon = navCell(ICONS.bell);
+      preview.appendChild(anchor(icon, makeBadge(o), state.type==='dot'));
+    } else {
+      preview.appendChild(makeBadge(o));
+    }
+
+    const cls=['badge'];
+    if (state.type==='dot') cls.push('badge--dot'); else cls.push('badge--'+state.size);
+    cls.push('badge--'+state.tone);
+    if (asText) cls.push('badge--text');
+    if (state.bordered && !asText) cls.push('badge--bordered');
+    if (state.muted && !asText) cls.push('badge--muted');
+    let content;
+    if (state.type==='dot') content='';
+    else if (asText) content = '+' + state.value;
+    else content = state.value>99 ? '99+' : state.value;
+    codeEl.innerHTML = '<code>&lt;span class="'+cls.join(' ')+'"&gt;'+content+'&lt;/span&gt;</code>';
+  }
+  render();
+})();
+
+/* ---------- USAGE ---------- */
+(function(){
+  // nav cell with counter
+  const nav = document.getElementById('use-nav');
+  nav.appendChild(anchor(navCell(ICONS.mail), makeBadge({ type:'counter', tone:'accent', size:'xs', value:7, bordered:true })));
+
+  // avatar with dot (online)
+  const av = document.getElementById('use-avatar');
+  av.appendChild(anchor(avatar('ИБ'), makeBadge({ type:'dot', tone:'success', bordered:true })));
+
+  // tabs with counters
+  const tabs = document.getElementById('use-tabs');
+  [['Активные',2,false],['В работе',9,true],['Архив',5,false],['Все',16,false]].forEach(([t,n,sel])=>{
+    const el=document.createElement('span'); el.className='tab'; el.setAttribute('role','tab'); el.setAttribute('aria-selected', String(sel));
+    el.textContent=t; el.appendChild(makeBadge({ type:'counter', tone:'neutral', size:'xs', value:n }));
+    tabs.appendChild(el);
+  });
+
+  // list with trailing counts
+  const list = document.getElementById('use-list');
+  [['Входящие',12,false],['Избранное',9,true],['Спам',1,false]].forEach(([t,n,cur])=>{
+    const r=document.createElement('div'); r.className='clist__row'; r.setAttribute('aria-current', String(cur));
+    const nm=document.createElement('span'); nm.className='nm'; nm.textContent=t;
+    r.appendChild(nm); r.appendChild(makeBadge({ type:'counter', tone:'neutral', size:'xs', value:n }));
+    list.appendChild(r);
+  });
+})();
+
+/* ---------- ANATOMY ---------- */
+(function(){
+  const d = document.getElementById('anat-diagram');
+  const b = makeBadge({ type:'counter', tone:'accent', size:'m', value:128, max:99 });
+  b.classList.add('big');
+  d.appendChild(b);
+  const marks = [['1','-12px','-12px'],['2','50%','-26px'],['3','calc(100% - 6px)','-12px']];
+  marks.forEach(([n,left,top])=>{
+    const m=document.createElement('span'); m.className='mk'; m.textContent=n;
+    m.style.left=left; m.style.top=top; m.style.transform='translate(-50%,-50%)';
+    d.appendChild(m);
+  });
+})();
+
+/* ---------- TYPES ---------- */
+(function(){
+  const c = document.getElementById('type-counter');
+  [{value:3},{value:24},{value:128}].forEach(o=> c.appendChild(makeBadge(Object.assign({type:'counter',tone:'accent',size:'m'},o))));
+  const dt = document.getElementById('type-dot');
+  ['success','accent','warning','error'].forEach(tone=> dt.appendChild(makeBadge({type:'dot',tone})));
+})();
+
+/* ---------- SIZES ---------- */
+(function(){
+  const g = document.getElementById('sizes-grid');
+  const cols = [['M','32',[['m',9],['m',128]]],['S','24',[['s',9],['s',128]]],['XS','20',[['xs',9],['xs',128]]],['XXS','16',[['xxs',9],['xxs',128]]],['Dot','8',null]];
+  // headers
+  cols.forEach(([name,px])=>{ const h=document.createElement('div'); h.className='col-head'; h.innerHTML=name+' <span style="color:var(--text-inactive)">| '+px+'</span>'; g.appendChild(h); });
+  // cells
+  cols.forEach(([name,px,specs])=>{
+    const cell=document.createElement('div'); cell.className='cell';
+    if (specs){
+      specs.forEach(([sz,val])=> cell.appendChild(makeBadge({type:'counter',tone:'accent',size:sz,value:val})));
+    } else {
+      ['neutral','accent','success','info','warning','error'].forEach(tone=> cell.appendChild(makeBadge({type:'dot',tone})));
+    }
+    g.appendChild(cell);
+  });
+
+  const rows = [
+    ['M','32 px','32 px','16 px / 600','Крупные счётчики, заголовки разделов'],
+    ['S','24 px','24 px','13 px / 600','Базовый размер: табы, списки'],
+    ['XS','20 px','20 px','12 px / 600','Навигация, компактные ячейки'],
+    ['XXS','16 px','16 px','11 px / 600','Плотные таблицы, мелкие иконки'],
+    ['Dot','8 px','8 px','—','Индикатор статуса без числа'],
+  ];
+  document.querySelector('#sizes-table').innerHTML = rows.map(r=>`<div class="tbl__row" style="grid-template-columns:8px 0.5fr 0.7fr 0.9fr 0.9fr 1.7fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><b>${r[0]}</b></span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${r[1]}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${r[2]}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${r[3]}</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">${r[4]}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
+})();
+
+/* ---------- TONE ---------- */
+(function(){
+  const g = document.getElementById('tone-grid');
+  const tones = [
+    ['neutral','Neutral','Нейтральный счётчик: количество без акцента'],
+    ['accent','Accent','Привлекает внимание к новому — непрочитанное'],
+    ['success','Success','Положительный статус, «в сети», готово'],
+    ['info','Info','Информационное событие, новое сообщение'],
+    ['warning','Warning','Требует внимания, ожидает действия'],
+    ['error','Error','Ошибка, просрочено, критическое уведомление'],
+  ];
+  tones.forEach(([tone,nm,rl])=>{
+    const c=document.createElement('div'); c.className='tone-cell';
+    const row=document.createElement('div'); row.className='swrow';
+    row.appendChild(makeBadge({type:'counter',tone,size:'s',value:9}));
+    // neutral — служебный счётчик без статуса; точки-индикатора у него нет
+    if (tone !== 'neutral') row.appendChild(makeBadge({type:'dot',tone}));
+    c.appendChild(row);
+    const n=document.createElement('div'); n.className='nm'; n.textContent=nm; c.appendChild(n);
+    const r=document.createElement('div'); r.className='rl'; r.textContent=rl; c.appendChild(r);
+    g.appendChild(c);
+  });
+})();
+
+/* ---------- OVERFLOW ---------- */
+(function(){
+  const d = document.getElementById('overflow-demo');
+  [5,42,99,128,1240].forEach(v=> d.appendChild(makeBadge({type:'counter',tone:'accent',size:'m',value:v,max:99})));
+  const t = document.getElementById('overflow-text');
+  [['neutral',9],['accent',99],['error',128]].forEach(([tone,v])=> t.appendChild(makeBadge({type:'counter',tone,size:'m',value:v,text:true})));
+})();
+
+/* ---------- POSITIONING ---------- */
+(function(){
+  const p = document.getElementById('pos-demo');
+  // counter top-right on icon
+  const a1 = anchor(navCell(ICONS.bell), makeBadge({type:'counter',tone:'error',size:'xs',value:3,bordered:true}));
+  // dot bottom-right on avatar (online)
+  const a2 = anchor(avatar('АК'), makeBadge({type:'dot',tone:'success',bordered:true}));
+  // counter on cart
+  const a3 = anchor(navCell(ICONS.cart), makeBadge({type:'counter',tone:'accent',size:'xs',value:24,bordered:true}));
+  // dot top-right on icon (status)
+  const a4 = anchor(navCell(ICONS.mail), makeBadge({type:'dot',tone:'warning',bordered:true}), true);
+  [a1,a2,a3,a4].forEach(el=> p.appendChild(el));
+})();
+
+/* ---------- STATES ---------- */
+(function(){
+  // zero hidden
+  const z = document.getElementById('state-zero');
+  [0,1].forEach(v=>{
+    const wrap=document.createElement('span'); wrap.style.display='inline-flex'; wrap.style.flexDirection='column'; wrap.style.alignItems='center'; wrap.style.gap='10px';
+    wrap.appendChild(anchor(navCell(ICONS.bell), makeBadge({type:'counter',tone:'accent',size:'xs',value:v})));
+    const cap=document.createElement('span'); cap.style.font='var(--type-body-xs)'; cap.style.color='var(--text-inactive)'; cap.textContent='count = '+v;
+    wrap.appendChild(cap); z.appendChild(wrap);
+  });
+
+  // muted
+  const m = document.getElementById('state-muted');
+  const enabled = anchor(navCell(ICONS.bell), makeBadge({type:'counter',tone:'accent',size:'xs',value:5,bordered:true}));
+  const disCell = navCell(ICONS.bell); disCell.style.opacity='.5'; disCell.style.color='var(--text-inactive)';
+  const disabled = anchor(disCell, makeBadge({type:'counter',tone:'accent',size:'xs',value:5,muted:true,bordered:true}));
+  [['Активен',enabled],['Disabled',disabled]].forEach(([t,el])=>{
+    const wrap=document.createElement('span'); wrap.style.display='inline-flex'; wrap.style.flexDirection='column'; wrap.style.alignItems='center'; wrap.style.gap='10px';
+    wrap.appendChild(el);
+    const cap=document.createElement('span'); cap.style.font='var(--type-body-xs)'; cap.style.color='var(--text-inactive)'; cap.textContent=t;
+    wrap.appendChild(cap); m.appendChild(wrap);
+  });
+
+  // tooltip
+  const tt = document.getElementById('state-tooltip');
+  [128,1240,99999].forEach(v=>{
+    const b=makeBadge({type:'counter',tone:'accent',size:'m',value:v,max:99});
+    b.style.cursor='help';
+    tt.appendChild(b);
+  });
+})();
+
+/* ---------- GUIDELINES ---------- */
+(function(){
+  document.getElementById('ic-bad1').innerHTML  = ICONS.bad;
+  document.getElementById('ic-bad2').innerHTML  = ICONS.bad;
+  document.getElementById('ic-good1').innerHTML = ICONS.good;
+  document.getElementById('ic-good2').innerHTML = ICONS.good;
+
+  // bad1: text inside counter
+  const bad1=document.getElementById('guide-bad1');
+  const fake=document.createElement('span'); fake.className='badge badge--m badge--accent'; fake.textContent='Новое'; bad1.appendChild(fake);
+  // good1: overflow
+  document.getElementById('guide-good1').appendChild(makeBadge({type:'counter',tone:'accent',size:'m',value:128,max:99}));
+
+  // bad2: dot with number-ish (simulate misuse: oversized dot with text)
+  const bad2=document.getElementById('guide-bad2');
+  const fake2=document.createElement('span'); fake2.className='badge badge--xxs badge--error';
+  fake2.style.borderRadius='50%'; fake2.style.minWidth='16px'; fake2.style.width='16px'; fake2.style.height='16px'; fake2.style.padding='0'; fake2.textContent='5';
+  bad2.appendChild(fake2);
+  // good2: counter + dot
+  const good2=document.getElementById('guide-good2');
+  good2.appendChild(makeBadge({type:'counter',tone:'error',size:'m',value:5}));
+  good2.appendChild(makeBadge({type:'dot',tone:'error'}));
+})();
+
+/* ---------- TYPOGRAPHY ---------- */
+(function(){
+  const rows = [
+    ['M',  '128', 'SB Sans Text', '16 px / Regular (Body M)'],
+    ['S',  '128', 'SB Sans Text', '14 px / Regular (Body S)'],
+    ['XS', '128', 'SB Sans Text', '14 px / Regular (Body S)'],
+    ['XXS','128', 'SB Sans Text', '12 px / Regular (Body XS)'],
+  ];
+  const sizeMap={M:'m',S:'s',XS:'xs',XXS:'xxs'};
+  const tb = document.querySelector('#typo-table tbody');
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    const td0=document.createElement('td'); td0.innerHTML='<b>'+r[0]+'</b>';
+    const td1=document.createElement('td'); td1.appendChild(makeBadge({type:'counter',tone:'neutral',size:sizeMap[r[0]],value:128}));
+    const td2=document.createElement('td'); td2.textContent=r[2];
+    const td3=document.createElement('td'); td3.className='rt-num'; td3.textContent=r[3];
+    tr.append(td0,td1,td2,td3); tb.appendChild(tr);
+  });
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function(){
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue){
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r,g,b,a=1, m=v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m){ r=+m[1]*255; g=+m[2]*255; b=+m[3]*255; if(m[4]!==undefined) a=+m[4]; }
+    else { const n=v.match(/[\d.]+/g); if(!n) return cssValue; r=+n[0]; g=+n[1]; b=+n[2]; if(n[3]!==undefined) a=+n[3]; }
+    const hx=n=>Math.round(n).toString(16).padStart(2,'0').toUpperCase();
+    let s='#'+hx(r)+hx(g)+hx(b); if(a<1) s+=' · '+Math.round(a*100)+'%'; return s;
+  }
+  const groups = [
+    { name:'Фон тона', rows:[
+      ['Neutral', '--c-cgrey-100'],
+      ['Accent', '--primary'],
+      ['Success', '--success'],
+      ['Info', '--info'],
+      ['Warning', '--warning'],
+      ['Error', '--error'],
+    ]},
+    { name:'Текст значения', rows:[
+      ['На цветном фоне', '--text-on-dark'],
+      ['На neutral', '--text-primary'],
+      ['На warning (amber)', '--text-primary'],
+    ]},
+    { name:'Оверлей', rows:[
+      ['Обводка bordered', '--bg-tile'],
+    ]},
+    { name:'Muted (disabled)', rows:[
+      ['Фон', '--disabled'],
+      ['Текст', '--text-inactive'],
+    ]},
+  ];
+  const root = document.getElementById('color-ref');
+  root.innerHTML = groups.map(g=>`
+    <section class="cref-group">
+      <h3>${g.name}</h3>
+      <div class="cref-rows">
+        ${g.rows.map(([role,tok])=>`
+          <div class="cref-row">
+            <div class="cref-sw"><div class="cf" style="background:var(${tok});"></div></div>
+            <div class="cref-meta"><p class="role">${role}</p><p class="tname">${tok}</p></div>
+            <div class="cref-hex">${resolveHex('var('+tok+')')}</div>
+          </div>`).join('')}
+      </div>
+    </section>`).join('');
+  probe.remove();
+})();
+
+/* ---------- DEV: redline measured from live component ---------- */
+(function(){
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  const bm  = makeBadge({ type:'counter', tone:'accent', size:'m',   value:9 });
+  const bs  = makeBadge({ type:'counter', tone:'accent', size:'s',   value:9 });
+  const bxs = makeBadge({ type:'counter', tone:'accent', size:'xs',  value:9 });
+  const bxxs= makeBadge({ type:'counter', tone:'accent', size:'xxs', value:9 });
+  const bdot= makeBadge({ type:'dot', tone:'success' });
+  const bord= makeBadge({ type:'counter', tone:'accent', size:'m', value:9, bordered:true });
+  host.append(bm, bs, bxs, bxxs, bdot, bord);
+
+  const r = n => Math.round(n*10)/10;
+  const px = v => { const n = parseFloat(v); return isNaN(n) ? v : r(n)+' px'; };
+  function specOf(el){
+    const cs = getComputedStyle(el);
+    return { h: px(cs.height), minw: px(cs.minWidth), pad: cs.padding, font: cs.fontSize + ' / ' + cs.fontWeight };
+  }
+  const dm=specOf(bm), ds=specOf(bs), dxs=specOf(bxs), dxxs=specOf(bxxs), ddot=specOf(bdot);
+  const borderSpread = (()=>{ const nums = getComputedStyle(bord).boxShadow.match(/-?[\d.]+px/g); return nums && nums.length>=4 ? Math.round(parseFloat(nums[3]))+'px' : '\u2014'; })();
+  const capsuleRadius = px(getComputedStyle(bm).borderTopLeftRadius);
+  host.remove();
+
+  const rows = [
+    ['\u0420\u0430\u0437\u043c\u0435\u0440 M (\u0432\u044b\u0441\u043e\u0442\u0430 / \u043c\u0438\u043d.\u0448\u0438\u0440\u0438\u043d\u0430)', dm.h + ' / ' + dm.minw],
+    ['\u0420\u0430\u0437\u043c\u0435\u0440 S', ds.h + ' / ' + ds.minw],
+    ['\u0420\u0430\u0437\u043c\u0435\u0440 XS', dxs.h + ' / ' + dxs.minw],
+    ['\u0420\u0430\u0437\u043c\u0435\u0440 XXS', dxxs.h + ' / ' + dxxs.minw],
+    ['Dot', ddot.h + ' / ' + ddot.minw],
+    ['\u041a\u0435\u0433\u043b\u044c \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u044f (M)', dm.font],
+    ['\u041e\u0431\u0432\u043e\u0434\u043a\u0430 bordered', borderSpread],
+    ['\u0421\u043a\u0440\u0443\u0433\u043b\u0435\u043d\u0438\u0435 (\u043a\u0430\u043f\u0441\u0443\u043b\u0430)', capsuleRadius],
+    ['\u0421\u043c\u0435\u0449\u0435\u043d\u0438\u0435 \u044f\u043a\u043e\u0440\u044f (Counter, top-right)', '45% / -45% \u043e\u0442 \u0440\u0430\u0437\u043c\u0435\u0440\u0430 \u0431\u0435\u0439\u0434\u0436\u0430'],
+    ['\u0421\u043c\u0435\u0449\u0435\u043d\u0438\u0435 \u044f\u043a\u043e\u0440\u044f (Dot, bottom-right)', '15% / 15% \u043e\u0442 \u0440\u0430\u0437\u043c\u0435\u0440\u0430 \u0431\u0435\u0439\u0434\u0436\u0430'],
+  ];
+  const tb = document.querySelector('#dev-spec-table');
+  if (tb) tb.innerHTML = rows.map(([p,v]) => `<div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${p}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${v}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
+})();
+
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = '\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Тип': 'Показывать статус-точку', 'Наложить на родителя': 'Наложить на родителя', 'Обводка': 'Показывать обводку', 'Текстовый без фона (+N)': 'Текстовый без фона (+N)', 'Disabled': 'Показывать Disabled' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- counter, наложенный на родителя (иконка) -->
+<span class="badge-anchor" aria-label="Уведомления, 7">
+  <span class="ibtn ibtn--neutral ibtn--m"><i data-icon="mail"></i></span>
+  <span class="badge badge--xs badge--accent badge--bordered" aria-hidden="true">7</span>
+</span>
+
+<!-- dot-статус на аватаре: без числа, описание — через aria-label родителя -->
+<span class="badge-anchor" aria-label="Иван Белов, онлайн">
+  <span class="av av--m"><span class="av__text">ИБ</span></span>
+  <span class="badge badge--dot badge--success badge--bordered" aria-hidden="true"></span>
+</span>
+
+<!-- безфоновый текстовый вариант «+N» -->
+<span class="badge badge--m badge--neutral badge--text">+99</span></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function makeBadge(o) {
+  // o: { type:'counter'|'dot', size:'m'|'s'|'xs'|'xxs', tone, value, max, bordered, text, muted, animate, showZero }
+  // .badge(.badge--dot)(.badge--<size>)(.badge--<tone>)(.badge--text)(.badge--bordered)
+  // counter: значение 9, максимум 99 → '99+'; dot: статус без числа, tone — цвет
+}
+// Наложение на родителя: .badge-host (position:relative) → .badge абсолютно
+// (counter — правый верхний угол, dot — углы по варианту)</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Badge
+   A small child element overlaid on, or set inline with, a parent component
+   to convey a numeric count (Counter) or a status (Dot).
+
+   Types:   counter · dot
+   Sizes:   m (32) · s (24) · xs (20) · xxs (16)   — counter
+            dot is fixed at 8px
+   Tone:    neutral · accent · success · info · warning · error
+   Extras:  bordered (white ring for overlay) · text (borderless «+99»)
+            muted (disabled parent) · overflow «99+»
+   Requires: typography.css, colors.css
+   ========================================================================= */
+
+.badge {
+  /* size tokens — overridden per size modifier */
+  --bdg-size: 24px;
+  --bdg-pad: 0 7px;
+  --bdg-font: var(--type-body-s);
+
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: var(--bdg-size);
+  height: var(--bdg-size);
+  padding: var(--bdg-pad);
+  border-radius: var(--radius-pill);
+  font: var(--bdg-font);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  user-select: none;
+  /* neutral tone by default */
+  background: var(--c-cgrey-100);
+  color: var(--text-primary);
+  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+/* ---------- sizes (counter) ----------------------------------------------- *
+   Размеры — прямыми свойствами (не через --bdg-* в модификаторе). */
+.badge--m   { min-width: 32px; height: 32px; padding: 0 10px; font: var(--type-body-m); }
+.badge--s   { min-width: 24px; height: 24px; padding: 0 8px;  font: var(--type-body-s); }
+.badge--xs  { min-width: 20px; height: 20px; padding: 0 6px;  font: var(--type-body-s); }
+.badge--xxs { min-width: 16px; height: 16px; padding: 0 5px;  font: var(--type-body-xs); }
+
+/* ---------- type: dot ----------------------------------------------------- */
+.badge--dot {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  padding: 0;
+  border-radius: var(--radius-circle);
+  font-size: 0;
+}
+/* optional dot scale */
+.badge--dot.badge--dot-s { width: 6px; height: 6px; min-width: 6px; }
+.badge--dot.badge--dot-l { width: 10px; height: 10px; min-width: 10px; }
+
+/* ---------- tone ---------------------------------------------------------- */
+.badge--neutral { background: var(--c-cgrey-100); color: var(--text-primary); }
+.badge--accent  { background: var(--primary);     color: var(--text-on-dark); }
+.badge--success { background: var(--success);     color: var(--text-on-dark); }
+.badge--info    { background: var(--info);        color: var(--text-on-dark); }
+.badge--warning { background: var(--warning);     color: var(--text-primary); }
+.badge--error   { background: var(--error);       color: var(--text-on-dark); }
+
+/* ---------- text variant (borderless «+99», inline counts) ---------------- */
+.badge--text {
+  background: transparent;
+  color: var(--text-primary);
+  padding: 0;
+  min-width: 0;
+  height: auto;
+  border-radius: 0;
+}
+.badge--text.badge--accent  { color: var(--primary); }
+.badge--text.badge--error   { color: var(--error); }
+.badge--text.badge--success { color: var(--success-dark); }
+
+/* ---------- bordered (white ring for overlay on imagery/colour) ----------- */
+.badge--bordered { box-shadow: 0 0 0 2px var(--bg-tile); }
+
+/* ---------- muted (parent component disabled) ----------------------------- */
+.badge--muted {
+  background: var(--disabled) !important;
+  color: var(--text-inactive) !important;
+  box-shadow: none;
+}
+.badge--muted.badge--dot,
+.badge--muted.badge--text { color: var(--text-inactive) !important; }
+
+/* ---------- appearance animation ------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .badge--animate { animation: badge-pop .18s cubic-bezier(.34,1.56,.64,1) both; }
+}
+@keyframes badge-pop {
+  from { transform: scale(.4); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+/* =========================================================================
+   ANCHOR — overlay a badge on a parent (icon, avatar, button, tab…)
+   The parent gets `.badge-anchor` (position:relative); the badge is placed
+   absolutely at the top-right corner and nudged outward.
+   ========================================================================= */
+.badge-anchor {
+  position: relative;
+  display: inline-flex;
+}
+.badge-anchor > .badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(45%, -45%);
+  z-index: 2;
+  pointer-events: none;
+}
+.badge-anchor > .badge--dot {
+  transform: translate(15%, 15%);
+  top: auto;
+  bottom: 0;          /* dot sits bottom-right by default (status) */
+}
+.badge-anchor--dot-tr > .badge--dot { top: 0; bottom: auto; transform: translate(15%, -15%); }</script>
+</body>
+</html>

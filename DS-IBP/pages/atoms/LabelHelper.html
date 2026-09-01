@@ -1,0 +1,618 @@
+<!-- @dsCard group="Components" name="LabelHelper" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Label / Helper — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/checkbox.css">
+<link rel="stylesheet" href="../../styles/radio.css">
+<link rel="stylesheet" href="../../styles/switch.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+  .dep-note { display:inline-flex; align-items:center; gap:8px; margin-top:18px; font: var(--type-body-s-strong); color: var(--text-primary); background: var(--tertiary); padding:8px 14px; border-radius:999px; }
+  .dep-note svg { width:16px; height:16px; flex:none; }
+  .dep-note i { display:contents; }
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:78ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:24px; }
+
+  
+
+  
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:340px; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+  .ctl.is-off { opacity:.4; pointer-events:none; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- field mock (демо-обёртка для Input-семейства — сами инпуты ещё не реализованы) ---------- */
+  .field-mock { display:flex; flex-direction:column; gap:6px; width:100%; }
+  .field-mock__box { border:1px solid var(--border-primary); border-radius: var(--radius-field); background: var(--bg-tile); padding:10px 14px; min-height:44px; display:flex; align-items:center; font: var(--type-body-m); color: var(--text-inactive); }
+  .field-mock__box.is-right { justify-content:flex-end; }
+  .field-mock__box.is-disabled { background: var(--disabled-bg); border-color: var(--disabled-border); }
+  .field-mock__box.is-error { border-color: var(--error); }
+
+  /* ---------- anatomy ---------- */
+  .anat2 { display:grid; grid-template-columns: 1fr 1fr; gap:28px; }
+  @media (max-width:760px){ .anat2 { grid-template-columns:1fr; } }
+  .anat2__cell { border:1px solid var(--border-light); border-radius:14px; padding:26px; background: var(--tertiary-light); display:flex; flex-direction:column; gap:18px; }
+  .anat2__cell h3 { font: var(--type-h5-strong); color: var(--text-primary); margin:0; }
+  .anat2__stage { background: var(--bg-tile); border:1px solid var(--border-light); border-radius:12px; padding:22px 20px; display:flex; align-items:center; justify-content:center; min-height:80px; }
+  .anat2__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .anat2__legend li { font: var(--type-body-s); color: var(--text-secondary); display:flex; gap:8px; }
+  .anat2__legend li b { color: var(--text-primary); font-weight:600; flex:none; }
+
+  /* ---------- guide (do/don't) ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:26px 20px; flex:1; display:flex; align-items:center; justify-content:center; min-height:90px; }
+  .guide-card__cap { padding:0 20px 20px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- floating (dependency-rule bad example) ---------- */
+  .floating { border:1px dashed var(--border-primary); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; position:relative; opacity:.7; }
+  .floating::after { content:"?"; position:absolute; top:8px; right:10px; font:var(--type-body-s-strong); color:var(--text-inactive); }
+
+  /* ---------- mapping table ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:15px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+  .ref-table .yes { color: var(--success-dark); display:flex; }
+  .ref-table .yes svg { width:18px; height:18px; }
+  .ref-table .no  { color: var(--border-primary); display:flex; }
+  .ref-table .no svg { width:18px; height:18px; }
+
+  /* ---------- composition ---------- */
+  .compo-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap:18px; }
+  .compo-cell { border:1px solid var(--border-light); border-radius:12px; padding:20px 22px; background: var(--bg-tile); display:flex; flex-direction:column; gap:14px; }
+  .compo-cell__cap { font: var(--type-body-s-strong); color: var(--text-primary); }
+  .compo-cell__uses { font: var(--type-body-xs); color: var(--text-inactive); }
+
+  /* ---------- color reference ---------- */
+  
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- proposal callout ---------- */
+  .callout { border:1px solid color-mix(in srgb, var(--primary) 22%, transparent); background: var(--primary-bg); border-radius:14px; padding:24px 26px; }
+  .callout h3 { font:var(--type-h5-strong); color:var(--text-primary); margin:0 0 8px; display:flex; align-items:center; gap:10px; }
+  .callout p { font:var(--type-body-m); color:var(--text-secondary); margin:0; text-wrap:pretty; max-width:80ch; }
+  .callout p + p { margin-top:10px; }
+  .callout code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.9em; color: var(--primary-dark); }
+
+  /* ---------- state spec tables ---------- */
+  .spec { border:1px solid var(--border-light); border-radius:14px; overflow:hidden; }
+  .spec + .spec { margin-top:20px; }
+  .spec__row { display:grid; grid-template-columns: 130px 200px 1fr; align-items:center; gap:16px; padding:20px; border-bottom:1px solid var(--border-light); }
+  @media (max-width:720px){ .spec__row{ grid-template-columns:1fr; gap:14px; } }
+  .spec__cline { display:grid; grid-template-columns: 84px 18px 160px 1fr; align-items:center; gap:10px; font:var(--type-body-s); color:var(--text-secondary); }
+
+  /* ---------- developer handoff ---------- */
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="LabelHelper">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.004</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Label / Helper</h1>
+    <p class="lead">Общие вспомогательные текстовые слоты, вынесенные из нескольких родительских компонентов в отдельную группу. <b>Label</b> подписывает поле ввода, <b>Helper</b> поясняет назначение или ограничение контрола. Оба переиспользуются в разных компонентах, но не имеют собственного визуального контейнера.</p>
+    <span class="dep-note">
+      <i data-icon="alert-triangle"></i>
+      Не существуют самостоятельно — только внутри родительского компонента
+    </span>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND (interactive — always first) -->
+  
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">Label и Helper — два переиспользуемых текстовых слота, которые каждый компонент подключает по необходимости:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li><b>Label</b> подписывает элемент управления — используется только в полях ввода (InputText, InputAutocomplete, InputDate, ReadOnlyField) — у Checkbox/Radiobutton/Switch эту роль играет собственный текст пункта;</li>
+      <li><b>Helper</b> поясняет назначение, формат или ошибку заполнения — используется шире: во всех полях ввода, во всех контролах выбора (Checkbox, Radiobutton, Switch) и в опциях выпадающего списка (Select · DropdownList);</li>
+      <li>слоты включаются независимо друг от друга — компонент может использовать оба, только один или ни одного (см. таблицу ниже, раздел «Используется в компонентах»);</li>
+      <li>выравнивание (left/right) — общее свойство пары: Label и Helper одного поля всегда выровнены одинаково — не бывает так, чтобы Helper был справа, а Label слева;</li>
+      <li>Label и Helper не публикуются отдельно от родителя — см. «Правило зависимости» ниже.</li>
+    </ul>
+  
+<div class="subsec" data-screen-label="Rule">
+    <h3>Правило зависимости</h3>
+    <p class="desc">Label и Helper — не самостоятельные компоненты дизайн-системы. У них нет собственного узнаваемого контейнера: вне контекста родителя их невозможно опознать на экране. Публикуются только как часть композиции Checkbox, Radiobutton, Switch или полей ввода.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body">
+          <div class="floating">
+            <span class="ds-label"><span class="ds-label__text">Label</span></span>
+            <span class="ds-helper ds-helper--left">Helper</span>
+          </div>
+        </div>
+        <p class="guide-card__cap">Label/Helper сами по себе, без родительского контрола или поля — так они на экране не встречаются.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="rule-good"></div>
+        <p class="guide-card__cap">Helper всегда встроен в конкретный компонент — здесь в Checkbox, в паре с его названием.</p>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="UsageMap">
+    <h3>Используется в компонентах</h3>
+    <p class="desc">Каждый слот переиспользуется независимо — компонент может задействовать только Helper, только Label, или ни одного из них.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.2fr 0.9fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Компонент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Label</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Helper</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="usage-table"></div></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Composition">
+    <h3>Композиция с родителем</h3>
+    <p class="desc">Одни и те же слоты выглядят одинаково независимо от родителя — меняется только то, что их окружает.</p>
+    <div class="compo-grid" id="compo-grid"></div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Оба слота набираются одним и тем же типографским токеном <code class="tok">Body XS</code> и отличаются только цветом и составом; выравнивание задаётся одной общей настройкой на оба слота.</p>
+    <div class="anat2">
+      <div class="anat2__cell">
+        <h3>Label</h3>
+        <div class="anat2__stage" id="anat-label"></div>
+        <ul class="anat2__legend">
+          <li><b>Текст —</b> подпись поля, без переноса, обрезается многоточием.</li>
+          <li><b>Иконки —</b> опционально, одна или две, любого назначения — редкий кейс.</li>
+          <li><b>Выравнивание —</b> left/right — общее с Helper (см. право зависимости).</li>
+        </ul>
+      </div>
+      <div class="anat2__cell">
+        <h3>Helper</h3>
+        <div class="anat2__stage" id="anat-helper"></div>
+        <ul class="anat2__legend">
+          <li><b>Текст —</b> пояснение или ограничение, может переноситься на несколько строк.</li>
+          <li><b>Выравнивание —</b> left/right — общее с Label, по ориентации родителя.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS (STUB) -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Не применимо: компонент существует в единственной конфигурации, отдельных вариантов нет.</p>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">У Label и Helper нет собственной шкалы размеров — оба слота всегда набираются одним и тем же токеном <code class="tok">Body XS</code>, независимо от размера родительского компонента. Значения ниже измерены на живом экземпляре.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.7fr 1fr 1.1fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Слот</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Кегль / строка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Иконка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="size-table"></div></div>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Текстовые правила для обоих слотов:</p>
+    <ul class="bullets">
+      <li><b>Label</b> — короткое существительное или номинативная фраза, называющая поле («ИНН контрагента», а не «Введите ИНН контрагента»); без двоеточия в конце; не переносится — при нехватке ширины обрезается многоточием;</li>
+      <li><b>Helper</b> — короткое пояснение к формату или ограничению значения («10 или 12 цифр»), не дублирует Label; может занимать несколько строк — переносится свободно, без обрезания;</li>
+      <li><b>Helper · Error</b> — конкретная причина ошибки («Нужно выбрать хотя бы один вариант»), а не общее «Ошибка» без пояснения;</li>
+      <li>иконки в Label — редкий кейс: добавляйте одну или две иконки, только если одной подписи недостаточно для контекста; каждая иконка — <a class="inl" href="../atoms/IconButton.html">IconButton</a> размера S, тон neutral, с обязательным <code class="tok">aria-label</code> (см. «Доступность»).</li>
+    </ul>
+  
+<div class="subsec" data-screen-label="LabelDetail">
+    <h3>Label</h3>
+    <p class="desc tight">Подпись над полем ввода. Используется в <b>InputText</b>, <b>InputAutocomplete</b>, <b>InputDate</b>, <b>ReadOnlyField</b>. Может содержать одну или две дополнительные иконки любого назначения (информирование, действие, статус и т.п.) — редкий кейс, только когда одной подписи недостаточно. Каждая иконка — <b>IconButton S neutral</b>.</p>
+    <div class="panel">
+      <div class="row">
+        <div style="flex:1; min-width:220px;">
+          <p class="desc tight" style="margin-bottom:14px;">Без иконки</p>
+          <div id="label-plain"></div>
+        </div>
+        <div style="flex:1; min-width:220px;">
+          <p class="desc tight" style="margin-bottom:14px;">С одной иконкой</p>
+          <div id="label-info"></div>
+        </div>
+        <div style="flex:1; min-width:220px;">
+          <p class="desc tight" style="margin-bottom:14px;">С двумя иконками</p>
+          <div id="label-actions"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="HelperDetail">
+    <h3>Helper</h3>
+    <p class="desc tight">Пояснительный текст под контролом или полем. Используется в <b>Checkbox</b>, <b>Radiobutton</b>, <b>Switch</b>, <b>InputText</b>, <b>InputAutocomplete</b>, <b>InputDate</b>, <b>ReadOnlyField</b>, а также как вторая строка опции в <b>Select · DropdownList</b>. Выравнивание задаётся одной настройкой на всю пару — Label и Helper одного поля всегда идут в одной ориентации: left — базовое, right — когда этого требует ориентация родителя (например, поле с выравниванием значения по правому краю).</p>
+    <div class="panel">
+      <div class="row">
+        <div style="flex:1; min-width:240px;">
+          <p class="desc tight" style="margin-bottom:14px;">Left — базовое выравнивание</p>
+          <div class="field-mock" id="helper-left"></div>
+        </div>
+        <div style="flex:1; min-width:240px;">
+          <p class="desc tight" style="margin-bottom:14px;">Right — под ориентацию поля (Label и Helper вместе)</p>
+          <div class="field-mock" id="helper-right"></div>
+        </div>
+      </div>
+    </div>
+    <p class="desc tight" style="margin:26px 0 14px;">Состояние <b>Error</b> — текст окрашивается в <code class="tok">--error</code>; иконка предупреждения (<code class="tok">alert-triangle-filled</code>) — опциональна, добавляется классом <code class="tok">.ds-helper--with-icon</code>.</p>
+    <div class="panel">
+      <div class="row">
+        <div style="flex:1; min-width:240px;">
+          <p class="desc tight" style="margin-bottom:14px;">Error — без иконки</p>
+          <div class="field-mock" id="helper-error-plain"></div>
+        </div>
+        <div style="flex:1; min-width:240px;">
+          <p class="desc tight" style="margin-bottom:14px;">Error — с иконкой</p>
+          <div class="field-mock" id="helper-error-icon"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- BEHAVIOR (STUB) -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Не применимо: специфического поведения (позиционирование, анимация, адаптивность) у компонента нет.</p>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Оба слота синхронизированы с состоянием родительского компонента: <b>Default</b> и <b>Disabled</b> — у обоих слотов, <b>Error</b> — только у Helper: Label визуально не меняется при ошибке родителя — сообщение об ошибке несёт только Helper.</p>
+    <div id="state-specs"></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Label и Helper — вспомогательный текст, который должен быть программно связан с элементом управления, а не просто визуально расположен рядом.</p>
+    <div class="panel">
+      <ul class="bullets">
+        <li>Label связывается с полем через <code class="tok">&lt;label for="…"&gt;</code> (либо оборачивая инпут) — клик по подписи должен фокусировать поле;</li>
+        <li>Helper связывается через <code class="tok">aria-describedby</code>, указывающий на id текста Helper — иначе скрин-ридер озвучит только значение поля без пояснения;</li>
+        <li>Helper в состоянии Error дополнительно получает <code class="tok">role="alert"</code> (или <code class="tok">aria-live="polite"</code>), чтобы сообщение об ошибке озвучивалось сразу при появлении, а не только при переходе фокуса;</li>
+        <li>иконка предупреждения в Helper — декоративна (<code class="tok">aria-hidden="true"</code>), сам смысл ошибки несёт текст;</li>
+        <li>иконки в Label (редкий кейс, до двух) — это <a class="inl" href="../atoms/IconButton.html">IconButton</a> S neutral, поэтому <code class="tok">aria-label</code> обязателен всегда: название действия («Удалить», «Изменить»), а не название иконки; если иконка информационная — связывается с <a class="inl" href="../molecules/Tooltip.html">Tooltip</a> тем же способом, что и любой другой информационный тултип.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Label и Helper набираются одним токеном <code class="tok">--type-body-xs</code> — различие только в цвете.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.08fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Helper</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены текста и ситуативные токены ошибки.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.76fr 1.17fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.76fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.76fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконки — IconButton S neutral</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#B8D6D3</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.76fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Label</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.76fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Helper</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.76fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Helper</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.76fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Helper</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Label и Helper — не отдельные React-компоненты, а общие текстовые слоты внутри пропсов родительских компонентов. Здесь — точные размеры, разметка и рекомендуемая форма пропсов, которые разработчик передаёт в реализацию поля/контрола.</p>
+
+    <p class="subhead2">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре (<code class="tok">getComputedStyle</code>), источник — <code class="tok">styles/label-helper.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить:</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/icon-button.css</code>
+      <code class="tok">styles/label-helper.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Генерировать общий id для пары поле↔helper (например useId() в React) —</span>
+<span class="tk-cm">//    не хардкодить строку, чтобы избежать коллизий при повторном использовании формы</span>
+
+<span class="tk-cm">// 2. label[for] ИЛИ обёртка <label>…<input/></label> — оба варианта равнозначны,</span>
+<span class="tk-cm">//    не делайте и то и другое одновременно (двойное объявление связи)</span>
+
+<span class="tk-cm">// 3. При status === 'error': aria-invalid="true" на поле, role="alert" на Helper —</span>
+<span class="tk-cm">//    текст должен реально измениться (React/DOM diff), чтобы alert прозвучал повторно</span>
+
+<span class="tk-cm">// 4. Иконка Error — всегда aria-hidden, смысл несёт исключительно текст Helper</span></code></pre>
+    </div>
+    <p class="dev-note">Рабочий референс на vanilla JS — функции <code class="tok">makeLabel</code> / <code class="tok">makeHelper</code> в <code class="tok">label-helper.page.js</code>.</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Helper с двумя иконками</b> — например статус + подсказка одновременно — сейчас только один <code class="tok">.ds-helper__icon</code>.</li>
+        <li><b>Промежуточное состояние во время проверки</b> — спиннер в Helper на время асинхронной валидации поля.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Компоненты · Label / Helper</span>
+    <span>Используется в: Checkbox · Radiobutton · Switch · InputText · InputAutocomplete · InputDate · ReadOnlyField · Select · DropdownList</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Выберите родительский компонент и соберите его Label/Helper — состав и доступные настройки зависят от того, кто в данный момент выступает хозяином слота.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/label-helper.page.js"></script>
+<script>
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = {};</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><label class="ds-label" for="field-inn">
+  <span class="ds-label__text">ИНН контрагента</span>
+</label>
+
+<input id="field-inn" aria-describedby="field-inn-helper" aria-invalid="true" />
+
+<span id="field-inn-helper" class="ds-helper ds-helper--left ds-helper--error ds-helper--with-icon" role="alert">
+  <span class="ds-helper__icon" aria-hidden="true"><i data-icon="alert-triangle"></i></span>
+  <span class="ds-helper__text">Нужно 10 или 12 цифр</span>
+</span></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/label-helper.page.js)
+function makeLabel(o) {
+  // o: { text, icons:0|1|2, align:'left'|'right', disabled }
+  // span.ds-label(.ds-label--right)(.ds-label--disabled) → .ds-label__text (+ .ds-label__icon ×N)
+}
+function makeHelper(o) {
+  // o: { text, align, status:'default'|'disabled'|'error', icon? }
+  // span.ds-helper(.ds-helper--right)(.ds-helper--error)(.ds-helper--with-icon) → .ds-helper__icon + текст
+}</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Label & Helper  («компоненты подкачки»)
+   ---------------------------------------------------------------------
+   Вспомогательные текстовые слоты. Не являются самостоятельными
+   компонентами: не имеют собственного визуального контейнера и никогда
+   не выводятся на экран без родительского компонента.
+
+   Label   — используется в: InputText, InputAutocomplete, InputDate,
+             ReadOnlyField. Может содержать иконки информирования или
+             действий (редкий кейс).
+             Шрифт: Body XS · Цвет: Text-Secondary.
+
+   Helper  — используется в: Checkbox, Radiobutton, Switch, InputText,
+             InputAutocomplete, InputDate, ReadOnlyField.
+             Выравнивание left/right — по ориентации родителя.
+             Шрифт: Body XS · Цвет: Text-Inactive.
+             Состояние Error — цвет Error, опционально с иконкой
+             предупреждения (alert-triangle-filled) перед текстом.
+
+   Requires: typography.css, colors.css, icons-data.js (для иконки Error)
+   ========================================================================= */
+
+/* ---------- Label ---------- */
+.ds-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+  font: var(--type-body-xs);
+  color: var(--text-secondary);
+}
+/* выравнивание — всегда синхронизировано с Helper той же пары (см. правило
+   зависимости): left — по умолчанию, right — когда родитель выровнен по
+   правому краю (например, поле со значением, выровненным по правому краю). */
+.ds-label--right { justify-content: flex-end; }
+/* при выравнивании справа иконки (IconButton) идут слева от текста */
+.ds-label--right .ds-label__icons { order: -1; }
+.ds-label__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* дополнительные иконки (одна или две, любого назначения) — редкий кейс, справа от текста.
+   Каждая иконка — IconButton S neutral (см. IconButton); контейнер задаёт раскладку. */
+.ds-label__icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+/* IconButton S внутри Label ужимается до 16px (высота строки Body XS),
+   чтобы Label не вырастал до 24px — глиф остаётся 16px. */
+.ds-label__icons .ibtn--s { width: 16px; height: 16px; }
+
+/* обязательное поле — звёздочка сразу после текста */
+.ds-label__req { color: var(--error); margin-left: 2px; }
+
+.ds-label--disabled { color: var(--text-inactive); }
+
+/* ---------- Helper ---------- */
+.ds-helper {
+  display: block;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+  text-wrap: pretty;
+}
+/* выравнивание зависит от ориентации родителя: left — по умолчанию
+   (чекбокс/радио/свитч/поле), right — когда родитель выровнен по правому
+   краю (например, компактное числовое поле). */
+.ds-helper--left  { text-align: left; }
+.ds-helper--right { text-align: right; }
+
+.ds-helper--error    { color: var(--error); }
+.ds-helper--disabled { color: var(--text-inactive); }
+
+/* --- вариант с иконкой (используется в состоянии Error) --- */
+.ds-helper--with-icon {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.ds-helper--with-icon.ds-helper--right { justify-content: flex-end; }
+.ds-helper__icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: inherit;
+}
+.ds-helper__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.ds-helper__text { min-width: 0; }</script>
+</body>
+</html>

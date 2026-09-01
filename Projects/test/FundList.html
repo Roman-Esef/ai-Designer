@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<!-- FIDELITY-GATE: N/A · нет исходного макета · 27.08.2026 -->
+<!--
+  belongs_to: Projects/test
+  source:     DS-IBP/uploads/brd-funds.md, раздел 6.1 «Список фондов»
+  updated:    27.08.2026
+-->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Список фондов — IBP</title>
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка этого экрана ──────────────────────────────────────────────
+     Только grid/flex/gap на токенах. Ни одного цвета, ни одного размера «на
+     глаз»: высота топбара 56px = 40px (высота Input M) + 8+8px паддинга —
+     выведена из размера вложенного контрола, не выбрана произвольно.        */
+
+  /* Глобальная верхняя панель модуля (поиск + уведомления). В ДС нет
+     отдельного каркасного компонента «TopBar» (Layout.md описывает только
+     три зоны: NavPanel + крошки + контент) — раскладка ниже собственная,
+     цвета и типографика — только токены ДС. См. допущение в screen.md. */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1001; /* выше .nav (1000, styles/nav-panel.css) — топбар лежит НАД панелью, не под ней */
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+    height: 56px;
+    padding: 0 var(--space-24);
+    background: var(--bg-tile);
+    border-bottom: 1px solid var(--border-primary);
+  }
+  .topbar__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    flex: none;
+    font: var(--type-body-m-strong);
+    color: var(--text-primary);
+  }
+  .topbar__spacer { flex: 1 1 auto; }
+  .topbar__search { width: 340px; flex: none; }
+  .topbar__actions { display: flex; align-items: center; gap: var(--space-8); flex: none; }
+
+  /* NavPanel — хард-инвариант ДС: .nav-layout > .nav { position:fixed; top:0;
+     height:100vh } (styles/nav-panel.css), а зона крошек — .screen > .crumbs
+     { position:sticky; top:0 } (styles/layout.css). Без сдвига панель и
+     залипающие крошки рисуются от самого верха вьюпорта, под фиксированным
+     топбаром. Файлы ДС не трогаем — сдвиг только для этого экрана, ровно на
+     высоту топбара (56px), у .nav и .screen > .crumbs, плюс паддинг у
+     .nav-layout, чтобы контент начинался под топбаром. См. допущение в
+     screen.md. */
+  .topbar ~ .nav-layout { padding-top: 56px; }
+  .topbar ~ .nav-layout > .nav { top: 56px; height: calc(100vh - 56px); }
+  .topbar ~ .nav-layout .screen > .crumbs { top: 56px; }
+  /* .screen наследует свой min-height:100vh (styles/layout.css) без поправки на топбар —
+     56px padding-top у .nav-layout плюс полные 100vh у .screen дают документ выше вьюпорта
+     на 56px без причины. Урезаем ровно на высоту топбара, чтобы страница не была выше окна. */
+  .topbar ~ .nav-layout .screen { min-height: calc(100vh - 56px); }
+
+  /* Таблица-мастер + правая панель предпросмотра — Splitter ДС (DS-IBP/specs/Splitter.md,
+     пример использования «слева таблица-мастер, справа карточка деталей»).
+     Фон панелей у демо-страницы компонента — плейсхолдер-цвета для витрины;
+     на экране используется --bg-page, как у остальной рабочей области. */
+  .fund-split .splitpane__a,
+  .fund-split .splitpane__b { background: var(--bg-page); }
+  .fund-split .splitpane__b { padding-left: var(--space-20); }
+
+  .fund-preview { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; }
+  .fund-preview__title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-8); }
+  .fund-preview__title { font: var(--type-h5-strong); margin: 0; }
+  .fund-preview__chips { display: flex; flex-wrap: wrap; gap: var(--space-6); }
+  .entity-list { display: flex; flex-direction: column; gap: var(--space-12); }
+  .fund-preview__foot { display: flex; gap: var(--space-8); flex-wrap: wrap; }
+
+  /* ── Альтернативное состояние правой панели: «Активы фонда» (см. ниже) ──── */
+  .fund-assets-alt { display: flex; flex-direction: column; gap: var(--space-8); }
+  .fund-assets-alt__caption { display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap; }
+  .fund-assets-alt__text { font: var(--type-body-s); color: var(--text-secondary); }
+  .fund-assets-alt__panel { max-width: 520px; }
+
+  /* .topbar живёт ВНЕ .screen (перед .nav-layout в разметке) — именованный контейнер
+     screen (styles/layout.css:34-35) создаётся только на .screen, и .topbar его потомком
+     не является: @container screen тут никогда не сработает (K12). При этом топбар и так
+     растянут на весь вьюпорт независимо от состояния nav-панели (в отличие от .screen,
+     чья ширина меняется при закреплении rail → drawer) — поэтому здесь корректен именно
+     обычный @media по ширине окна, не свой именованный контейнер. */
+  @media (max-width: 1320px) {
+    .topbar__search { width: 240px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Верхняя панель модуля (глобальный поиск, уведомления) ──────────────── -->
+<div class="topbar">
+  <div class="topbar__brand"><i data-icon="funds"></i>ИБП: Фонды и активы</div>
+  <div class="topbar__spacer"></div>
+  <div class="inp inp--s topbar__search">
+    <div class="inp__field">
+      <span class="inp__lead"><i data-icon="search"></i></span>
+      <input class="inp__control" type="text" placeholder="Глобальный поиск: фонды, активы, идеи…" aria-label="Глобальный поиск">
+    </div>
+  </div>
+  <div class="topbar__actions">
+    <span class="badge-anchor" aria-label="Уведомления, 6">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Уведомления"><i data-icon="mail"></i></button>
+      <span class="badge badge--xs badge--accent badge--bordered" aria-hidden="true">6</span>
+    </span>
+  </div>
+</div>
+
+<div class="nav-layout">
+
+  <!-- ── Боковое меню модуля (минимальный состав, не полное дерево IA) ────── -->
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Фонды и активы</div>
+        <a class="nav__item nav__item--selected" href="#" aria-current="page"><span class="nav__ico"><i data-icon="funds"></i></span><span class="nav__label">Фонды</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="folder"></i></span><span class="nav__label">Активы</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="zap"></i></span><span class="nav__label">Идеи сделок</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="modify"></i></span><span class="nav__label">Изменения</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calendar"></i></span><span class="nav__label">Коммуникации</span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <div class="nav__user">
+        <span class="av av--circular av--m"><span class="av__text">АБ</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Анна Белова</span><span class="nav__user-role">Инвестиционный аналитик</span></span>
+      </div>
+      <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <!-- ── Рабочая область ─────────────────────────────────────────────────── -->
+  <div class="screen">
+
+    <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
+      <li class="crumbs__item"><a class="link link--muted" href="#">Главная</a></li>
+      <li class="crumbs__item"><a class="link link--muted" href="#">Фонды</a></li>
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Список фондов</span>
+      </li>
+    </nav>
+
+    <main class="screen__content">
+
+      <!-- ── Шапка страницы ───────────────────────────────────────────────── -->
+      <div class="phead">
+        <div class="phead__main">
+          <div class="phead__title-row">
+            <div class="phead__title-group"><h1 class="phead__title">Список фондов</h1></div>
+          </div>
+          <div class="phead__subtitle">
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="funds"></i></span>138 фондов</span>
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="calendar"></i></span>Обновлено 27.08.2026</span>
+          </div>
+        </div>
+        <div class="phead__actions">
+          <button class="btn btn--accent btn--m"><i data-icon="add"></i><span class="btn__label">Добавить фонд</span></button>
+        </div>
+      </div>
+
+      <!-- ── Таблица-мастер + панель предпросмотра ───────────────────────── -->
+      <div class="splitpane fund-split" data-splitter data-min="55" data-max="85" data-initial="73">
+        <div class="splitpane__panel splitpane__a">
+
+          <div class="dtable">
+            <div class="dtable__toolbar">
+              <div class="dtable__toolbar-left">
+                <h3 class="dtable__title">Фонды</h3>
+                <span class="dtable__count">138</span>
+              </div>
+              <div class="dtable__toolbar-right">
+                <div class="inp inp--s" style="width:260px">
+                  <div class="inp__field">
+                    <span class="inp__lead"><i data-icon="search"></i></span>
+                    <input class="inp__control" type="text" placeholder="Название или бенефициар" aria-label="Поиск по фондам">
+                  </div>
+                </div>
+                <div class="tfilter" role="group" aria-label="Фильтр таблицы">
+                  <button class="btn btn--outline btn--s tfilter__open" aria-haspopup="dialog" aria-expanded="false" data-modal="filter-scrim">
+                    <i data-icon="filter"></i><span class="btn__label">Фильтр</span>
+                  </button>
+                  <span class="chip chip--edit chip--m tfilter__applied" tabindex="0">
+                    <span class="chip__label">Применено: 2</span>
+                    <span class="chip__remove" role="button" aria-label="Сбросить все фильтры"><i data-icon="close"></i></span>
+                  </span>
+                </div>
+                <button class="ibtn ibtn--neutral ibtn--m" aria-label="Настроить колонки" data-modal="cols-scrim"><i data-icon="settings"></i></button>
+                <button class="btn btn--outline btn--s"><i data-icon="download"></i><span class="btn__label">Экспорт</span></button>
+              </div>
+            </div>
+
+            <div class="dtable__body">
+              <div class="tbl" data-table>
+
+                <!-- Шапка -->
+                <div class="tbl__row" style="grid-template-columns:8px 44px 2.2fr 1.3fr 132px 1.6fr 104px 96px 72px 72px 76px minmax(8px,1fr);">
+                  <div class="th th--separator"></div>
+                  <div class="th th--select">
+                    <label class="cb cb--no-content cb--indeterminate"><input type="checkbox" class="cb__input" aria-label="Выбрать все"><span class="cb__box"><span class="cb__mark"><i data-icon="minus"></i></span></span></label>
+                    <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                  </div>
+                  <div class="th th--sorted" aria-sort="ascending">
+                    <span class="th__label">Название</span>
+                    <span class="th__tools">
+                      <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
+                      <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort aria-label="Сортировать"><i data-icon="arrow-narrow-up"></i></button>
+                    </span>
+                    <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                  </div>
+                  <div class="th" aria-sort="none">
+                    <span class="th__label">Тип</span>
+                    <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button></span>
+                    <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                  </div>
+                  <div class="th" aria-sort="none">
+                    <span class="th__label">Приоритет</span>
+                    <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button></span>
+                    <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                  </div>
+                  <div class="th" aria-sort="none">
+                    <span class="th__label">Бенефициар</span>
+                    <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button></span>
+                    <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                  </div>
+                  <div class="th"><span class="th__label">Контакты</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                  <div class="th th--center"><span class="th__label">Новости</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                  <div class="th th--center"><span class="th__label">Активы</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                  <div class="th th--center"><span class="th__label">История</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                  <div class="th th--center"><span class="th__label">Действия</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                  <div class="th th--separator"></div>
+                </div>
+
+                <!-- Строка 1 -->
+                <div class="tbl__row" style="grid-template-columns:8px 44px 2.2fr 1.3fr 132px 1.6fr 104px 96px 72px 72px 76px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc tc--select"><label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку «Fort Ross Ventures»"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label></div>
+                  <div class="tc"><span class="tc__row"><a class="tc__text tc__text--truncate" href="#">Fort Ross Ventures</a></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__icon"><i data-icon="funds"></i></span><span class="tc__text tc__text--truncate">Венчурный фонд</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__label">Приоритет 1</span></span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Виктор Орловский</span></span></div>
+                  <div class="tc tc--center">
+                    <span class="av-group av-group--s" role="group" aria-label="Контакты: Екатерина Крылова, Дмитрий Сомов">
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Екатерина Крылова — банкир, покрытие"><span class="av__text">ЕК</span></span>
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Дмитрий Сомов — инвестиционный аналитик"><span class="av__text">ДС</span></span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center">
+                    <span class="badge-anchor" aria-label="Новости: 4">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Новости фонда"><i data-icon="message-text"></i></button>
+                      <span class="badge badge--xs badge--accent badge--bordered" aria-hidden="true">4</span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Активы фонда — открыть в панели"><i data-icon="folder"></i></button></div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" data-tooltip="Последняя встреча: 14.08.2026" aria-label="История взаимодействий"><i data-icon="calendar"></i></button></div>
+                  <div class="tc tc--center">
+                    <span class="menu-anchor">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия" data-menu="fund-menu-1" data-menu-align="end"><i data-icon="more-dots"></i></button>
+                      <div id="fund-menu-1" class="menu" role="menu">
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="open-wide"></i></span><span class="menu__item-label">Открыть карточку фонда</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="calendar-plus"></i></span><span class="menu__item-label">Добавить встречу</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="zap"></i></span><span class="menu__item-label">Запустить анализ идеи</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="modify"></i></span><span class="menu__item-label">Изменить приоритет</span></button>
+                        <hr class="menu__divider">
+                        <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="archive"></i></span><span class="menu__item-label">Архивировать</span></button>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <!-- Строка 2 — выбрана чекбоксом (демонстрация массовых действий) -->
+                <div class="tbl__row tbl__row--selected" style="grid-template-columns:8px 44px 2.2fr 1.3fr 132px 1.6fr 104px 96px 72px 72px 76px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc tc--select"><label class="cb cb--no-content"><input type="checkbox" class="cb__input" checked aria-label="Выбрать строку «Baring Vostok Capital Partners»"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label></div>
+                  <div class="tc"><span class="tc__row"><a class="tc__text tc__text--truncate" href="#">Baring Vostok Capital Partners</a></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__icon"><i data-icon="funds"></i></span><span class="tc__text tc__text--truncate">Фонд прямых инвестиций (PE)</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__label">Приоритет 1</span></span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Майкл Калви</span></span></div>
+                  <div class="tc tc--center">
+                    <span class="av-group av-group--s" role="group" aria-label="Контакты: Наталья Кузьмина, Артём Лебедев">
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Наталья Кузьмина — банкир, покрытие"><span class="av__text">НК</span></span>
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Артём Лебедев — инвестиционный аналитик"><span class="av__text">АЛ</span></span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center">
+                    <span class="badge-anchor" aria-label="Новости: 7">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Новости фонда"><i data-icon="message-text"></i></button>
+                      <span class="badge badge--xs badge--accent badge--bordered" aria-hidden="true">7</span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Активы фонда — открыть в панели"><i data-icon="folder"></i></button></div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" data-tooltip="Последняя встреча: 20.08.2026" aria-label="История взаимодействий"><i data-icon="calendar"></i></button></div>
+                  <div class="tc tc--center">
+                    <span class="menu-anchor">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия" data-menu="fund-menu-2" data-menu-align="end"><i data-icon="more-dots"></i></button>
+                      <div id="fund-menu-2" class="menu" role="menu">
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="open-wide"></i></span><span class="menu__item-label">Открыть карточку фонда</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="calendar-plus"></i></span><span class="menu__item-label">Добавить встречу</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="zap"></i></span><span class="menu__item-label">Запустить анализ идеи</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="modify"></i></span><span class="menu__item-label">Изменить приоритет</span></button>
+                        <hr class="menu__divider">
+                        <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="archive"></i></span><span class="menu__item-label">Архивировать</span></button>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <!-- Строка 3 — тек. строка предпросмотра (aria-current, показана в правой панели) -->
+                <div class="tbl__row tbl__row--focus" aria-current="true" style="grid-template-columns:8px 44px 2.2fr 1.3fr 132px 1.6fr 104px 96px 72px 72px 76px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc tc--select"><label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку «РВК»"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label></div>
+                  <div class="tc"><span class="tc__row"><a class="tc__text tc__text--truncate" href="#">РВК — Российская венчурная компания</a></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__icon"><i data-icon="funds"></i></span><span class="tc__text tc__text--truncate">Венчурный фонд</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Приоритет 2</span></span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Государство РФ (100%)</span></span></div>
+                  <div class="tc tc--center">
+                    <span class="av-group av-group--s" role="group" aria-label="Контакты: Анна Белова, Игорь Петров, Светлана Морозова">
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Анна Белова — инвестиционный аналитик"><span class="av__text">АБ</span></span>
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Игорь Петров — директор по инвестициям"><span class="av__text">ИП</span></span>
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Светлана Морозова — банкир, покрытие"><span class="av__text">СМ</span></span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center">
+                    <span class="badge-anchor" aria-label="Новости: 1">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Новости фонда"><i data-icon="message-text"></i></button>
+                      <span class="badge badge--xs badge--accent badge--bordered" aria-hidden="true">1</span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Активы фонда — открыть в панели"><i data-icon="folder"></i></button></div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" data-tooltip="Последняя встреча: 05.08.2026" aria-label="История взаимодействий"><i data-icon="calendar"></i></button></div>
+                  <div class="tc tc--center">
+                    <span class="menu-anchor">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия" data-menu="fund-menu-3" data-menu-align="end"><i data-icon="more-dots"></i></button>
+                      <div id="fund-menu-3" class="menu" role="menu">
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="open-wide"></i></span><span class="menu__item-label">Открыть карточку фонда</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="calendar-plus"></i></span><span class="menu__item-label">Добавить встречу</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="zap"></i></span><span class="menu__item-label">Запустить анализ идеи</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="modify"></i></span><span class="menu__item-label">Изменить приоритет</span></button>
+                        <hr class="menu__divider">
+                        <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="archive"></i></span><span class="menu__item-label">Архивировать</span></button>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <!-- Строка 4 -->
+                <div class="tbl__row" style="grid-template-columns:8px 44px 2.2fr 1.3fr 132px 1.6fr 104px 96px 72px 72px 76px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc tc--select"><label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку «PPF Real Estate Holding»"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label></div>
+                  <div class="tc"><span class="tc__row"><a class="tc__text tc__text--truncate" href="#">PPF Real Estate Holding</a></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__icon"><i data-icon="funds"></i></span><span class="tc__text tc__text--truncate">Фонд недвижимости</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Приоритет 3</span></span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Group PPF</span></span></div>
+                  <div class="tc tc--center">
+                    <span class="av-group av-group--s" role="group" aria-label="Контакты: Людмила Титова">
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Людмила Титова — банкир, покрытие"><span class="av__text">ЛТ</span></span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center">
+                    <span class="badge-anchor" aria-label="Новости: нет">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Новости фонда"><i data-icon="message-text"></i></button>
+                    </span>
+                  </div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Активы фонда — открыть в панели"><i data-icon="folder"></i></button></div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" data-tooltip="Последняя встреча: 22.07.2026" aria-label="История взаимодействий"><i data-icon="calendar"></i></button></div>
+                  <div class="tc tc--center">
+                    <span class="menu-anchor">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия" data-menu="fund-menu-4" data-menu-align="end"><i data-icon="more-dots"></i></button>
+                      <div id="fund-menu-4" class="menu" role="menu">
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="open-wide"></i></span><span class="menu__item-label">Открыть карточку фонда</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="calendar-plus"></i></span><span class="menu__item-label">Добавить встречу</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="zap"></i></span><span class="menu__item-label">Запустить анализ идеи</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="modify"></i></span><span class="menu__item-label">Изменить приоритет</span></button>
+                        <hr class="menu__divider">
+                        <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="archive"></i></span><span class="menu__item-label">Архивировать</span></button>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <!-- Строка 5 -->
+                <div class="tbl__row" style="grid-template-columns:8px 44px 2.2fr 1.3fr 132px 1.6fr 104px 96px 72px 72px 76px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc tc--select"><label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку «Da Vinci Capital»"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label></div>
+                  <div class="tc"><span class="tc__row"><a class="tc__text tc__text--truncate" href="#">Da Vinci Capital</a></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__icon"><i data-icon="funds"></i></span><span class="tc__text tc__text--truncate">Фонд прямых инвестиций (PE)</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Приоритет 2</span></span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Олег Железко</span></span></div>
+                  <div class="tc tc--center">
+                    <span class="av-group av-group--s" role="group" aria-label="Контакты: Олег Жуков, Вера Панина">
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Олег Жуков — инвестиционный аналитик"><span class="av__text">ОЖ</span></span>
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Вера Панина — банкир, покрытие"><span class="av__text">ВП</span></span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center">
+                    <span class="badge-anchor" aria-label="Новости: 2">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Новости фонда"><i data-icon="message-text"></i></button>
+                      <span class="badge badge--xs badge--accent badge--bordered" aria-hidden="true">2</span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Активы фонда — открыть в панели"><i data-icon="folder"></i></button></div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" data-tooltip="Последняя встреча: 11.08.2026" aria-label="История взаимодействий"><i data-icon="calendar"></i></button></div>
+                  <div class="tc tc--center">
+                    <span class="menu-anchor">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия" data-menu="fund-menu-5" data-menu-align="end"><i data-icon="more-dots"></i></button>
+                      <div id="fund-menu-5" class="menu" role="menu">
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="open-wide"></i></span><span class="menu__item-label">Открыть карточку фонда</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="calendar-plus"></i></span><span class="menu__item-label">Добавить встречу</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="zap"></i></span><span class="menu__item-label">Запустить анализ идеи</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="modify"></i></span><span class="menu__item-label">Изменить приоритет</span></button>
+                        <hr class="menu__divider">
+                        <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="archive"></i></span><span class="menu__item-label">Архивировать</span></button>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <!-- Строка 6 — выбрана чекбоксом -->
+                <div class="tbl__row tbl__row--selected" style="grid-template-columns:8px 44px 2.2fr 1.3fr 132px 1.6fr 104px 96px 72px 72px 76px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc tc--select"><label class="cb cb--no-content"><input type="checkbox" class="cb__input" checked aria-label="Выбрать строку «ВЭБ Инфраструктура»"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label></div>
+                  <div class="tc"><span class="tc__row"><a class="tc__text tc__text--truncate" href="#">ВЭБ Инфраструктура</a></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__icon"><i data-icon="funds"></i></span><span class="tc__text tc__text--truncate">Инфраструктурный фонд</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__label">Приоритет 1</span></span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ВЭБ.РФ</span></span></div>
+                  <div class="tc tc--center">
+                    <span class="av-group av-group--s" role="group" aria-label="Контакты: Григорий Костин, Наталья Родина, Юлия Лапина">
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Григорий Костин — банкир, покрытие"><span class="av__text">ГК</span></span>
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Наталья Родина — инвестиционный аналитик"><span class="av__text">НР</span></span>
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Юлия Лапина — риск-менеджер"><span class="av__text">ЮЛ</span></span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center">
+                    <span class="badge-anchor" aria-label="Новости: 5">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Новости фонда"><i data-icon="message-text"></i></button>
+                      <span class="badge badge--xs badge--accent badge--bordered" aria-hidden="true">5</span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Активы фонда — открыть в панели"><i data-icon="folder"></i></button></div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" data-tooltip="Последняя встреча: 18.08.2026" aria-label="История взаимодействий"><i data-icon="calendar"></i></button></div>
+                  <div class="tc tc--center">
+                    <span class="menu-anchor">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия" data-menu="fund-menu-6" data-menu-align="end"><i data-icon="more-dots"></i></button>
+                      <div id="fund-menu-6" class="menu" role="menu">
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="open-wide"></i></span><span class="menu__item-label">Открыть карточку фонда</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="calendar-plus"></i></span><span class="menu__item-label">Добавить встречу</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="zap"></i></span><span class="menu__item-label">Запустить анализ идеи</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="modify"></i></span><span class="menu__item-label">Изменить приоритет</span></button>
+                        <hr class="menu__divider">
+                        <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="archive"></i></span><span class="menu__item-label">Архивировать</span></button>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <!-- Строка 7 -->
+                <div class="tbl__row" style="grid-template-columns:8px 44px 2.2fr 1.3fr 132px 1.6fr 104px 96px 72px 72px 76px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc tc--select"><label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку «Prosperity Capital Management»"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label></div>
+                  <div class="tc"><span class="tc__row"><a class="tc__text tc__text--truncate" href="#">Prosperity Capital Management</a></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__icon"><i data-icon="funds"></i></span><span class="tc__text tc__text--truncate">Хедж-фонд</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Приоритет 3</span></span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Александр Бранис</span></span></div>
+                  <div class="tc tc--center">
+                    <span class="av-group av-group--s" role="group" aria-label="Контакты: Артур Брагин">
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Артур Брагин — банкир, покрытие"><span class="av__text">АБ</span></span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center">
+                    <span class="badge-anchor" aria-label="Новости: нет">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Новости фонда"><i data-icon="message-text"></i></button>
+                    </span>
+                  </div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Активы фонда — открыть в панели"><i data-icon="folder"></i></button></div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" data-tooltip="Последняя встреча: 02.06.2026" aria-label="История взаимодействий"><i data-icon="calendar"></i></button></div>
+                  <div class="tc tc--center">
+                    <span class="menu-anchor">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия" data-menu="fund-menu-7" data-menu-align="end"><i data-icon="more-dots"></i></button>
+                      <div id="fund-menu-7" class="menu" role="menu">
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="open-wide"></i></span><span class="menu__item-label">Открыть карточку фонда</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="calendar-plus"></i></span><span class="menu__item-label">Добавить встречу</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="zap"></i></span><span class="menu__item-label">Запустить анализ идеи</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="modify"></i></span><span class="menu__item-label">Изменить приоритет</span></button>
+                        <hr class="menu__divider">
+                        <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="archive"></i></span><span class="menu__item-label">Архивировать</span></button>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <!-- Строка 8 -->
+                <div class="tbl__row" style="grid-template-columns:8px 44px 2.2fr 1.3fr 132px 1.6fr 104px 96px 72px 72px 76px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc tc--select"><label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку «УК «Альфа-Капитал»"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label></div>
+                  <div class="tc"><span class="tc__row"><a class="tc__text tc__text--truncate" href="#">УК «Альфа-Капитал» — Фонд прямых инвестиций</a></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__icon"><i data-icon="funds"></i></span><span class="tc__text tc__text--truncate">Фонд прямых инвестиций (PE)</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Приоритет 2</span></span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Альфа-Групп</span></span></div>
+                  <div class="tc tc--center">
+                    <span class="av-group av-group--s" role="group" aria-label="Контакты: Марина Соколова, Кирилл Титов">
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Марина Соколова — банкир, покрытие"><span class="av__text">МС</span></span>
+                      <span class="av av--circular av--s" aria-hidden="true" data-tooltip="Кирилл Титов — инвестиционный аналитик"><span class="av__text">КТ</span></span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center">
+                    <span class="badge-anchor" aria-label="Новости: 3">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Новости фонда"><i data-icon="message-text"></i></button>
+                      <span class="badge badge--xs badge--accent badge--bordered" aria-hidden="true">3</span>
+                    </span>
+                  </div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Активы фонда — открыть в панели"><i data-icon="folder"></i></button></div>
+                  <div class="tc tc--center"><button type="button" class="ibtn ibtn--neutral ibtn--s" data-tooltip="Последняя встреча: 25.08.2026" aria-label="История взаимодействий"><i data-icon="calendar"></i></button></div>
+                  <div class="tc tc--center">
+                    <span class="menu-anchor">
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия" data-menu="fund-menu-8" data-menu-align="end"><i data-icon="more-dots"></i></button>
+                      <div id="fund-menu-8" class="menu" role="menu">
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="open-wide"></i></span><span class="menu__item-label">Открыть карточку фонда</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="calendar-plus"></i></span><span class="menu__item-label">Добавить встречу</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="zap"></i></span><span class="menu__item-label">Запустить анализ идеи</span></button>
+                        <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="modify"></i></span><span class="menu__item-label">Изменить приоритет</span></button>
+                        <hr class="menu__divider">
+                        <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="archive"></i></span><span class="menu__item-label">Архивировать</span></button>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="dtable__footer">
+              <div class="pgn-row pgn-row--bulk">
+                <div class="pgn-bulk">
+                  <span class="pgn-bulk__count" aria-live="polite">Выбрано: <b>2</b></span>
+                  <span class="pgn-bulk__actions">
+                    <button class="btn btn--transparent btn--s"><i data-icon="download"></i><span class="btn__label">Экспорт выбранных</span></button>
+                    <button class="btn btn--transparent btn--s"><i data-icon="modify"></i><span class="btn__label">Изменить приоритет</span></button>
+                    <button class="btn btn--transparent btn--s"><i data-icon="archive"></i><span class="btn__label">Архивировать</span></button>
+                  </span>
+                </div>
+              </div>
+              <div class="pgn-row">
+                <div class="pgn-row__right">
+                  <div class="pgn">
+                    <span class="pgn__pagesize"><span class="pgn__pagesize-label">Показывать строк: <b>50</b></span><button class="pgn__pagesize-btn" aria-haspopup="listbox"><i data-icon="chevron-down"></i></button></span>
+                    <span class="pgn__range">1 из 3</span>
+                    <nav class="pgn__nav" aria-label="Страницы">
+                      <button class="pgn__arrow" aria-label="Предыдущая страница" disabled>‹</button>
+                      <button class="pgn__num" aria-current="page">1</button>
+                      <button class="pgn__num">2</button>
+                      <button class="pgn__num">3</button>
+                      <button class="pgn__arrow" aria-label="Следующая страница">›</button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="spl" role="separator" aria-orientation="vertical"
+             aria-valuemin="55" aria-valuemax="85" aria-valuenow="73"
+             aria-label="Изменить ширину таблицы и панели предпросмотра" tabindex="0">
+          <span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+
+        <div class="splitpane__panel splitpane__b">
+
+          <!-- ── Панель предпросмотра фонда (inline preview) ─────────────── -->
+          <div class="fund-preview">
+            <div>
+              <div class="fund-preview__title-row">
+                <h2 class="fund-preview__title">РВК — Российская венчурная компания</h2>
+                <span class="menu-anchor">
+                  <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Действия" data-menu="preview-menu" data-menu-align="end"><i data-icon="more-dots"></i></button>
+                  <div id="preview-menu" class="menu" role="menu">
+                    <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="open-wide"></i></span><span class="menu__item-label">Открыть карточку фонда</span></button>
+                    <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="calendar-plus"></i></span><span class="menu__item-label">Добавить встречу</span></button>
+                    <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="modify"></i></span><span class="menu__item-label">Изменить приоритет</span></button>
+                    <hr class="menu__divider">
+                    <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="archive"></i></span><span class="menu__item-label">Архивировать</span></button>
+                  </div>
+                </span>
+              </div>
+              <div class="fund-preview__chips">
+                <span class="chip chip--s chip--warning"><span class="chip__label">Приоритет 2</span></span>
+                <span class="chip chip--s"><span class="chip__marker"><i data-icon="funds"></i></span><span class="chip__label">Венчурный фонд</span></span>
+              </div>
+            </div>
+
+            <div class="tile-stack">
+              <section class="tile tile--headless">
+                <div class="tile__body">
+                  <div class="tile__grid" style="grid-template-columns:1fr">
+                    <div class="rof">
+                      <span class="ds-label"><span class="ds-label__text">Бенефициар</span></span>
+                      <div class="rof__row"><span class="rof__value">Государство РФ (100%)</span></div>
+                    </div>
+                    <div class="rof">
+                      <span class="ds-label"><span class="ds-label__text">Активов в портфеле</span></span>
+                      <div class="rof__row"><span class="rof__value">24</span></div>
+                    </div>
+                    <div class="rof">
+                      <span class="ds-label"><span class="ds-label__text">Непрочитанных новостей</span></span>
+                      <div class="rof__row"><span class="rof__value">1</span></div>
+                    </div>
+                    <div class="rof">
+                      <span class="ds-label"><span class="ds-label__text">Последнее взаимодействие</span></span>
+                      <div class="rof__row"><span class="rof__value">05.08.2026</span></div>
+                    </div>
+                    <div class="rof tile__grid-full">
+                      <span class="ds-label"><span class="ds-label__text">Описание</span></span>
+                      <div class="rof__row"><span class="rof__value">Институт развития венчурного рынка: соинвестирует в фонды ранних стадий и напрямую в компании ИТ и биотеха.</span></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="tile">
+                <header class="tile__header">
+                  <div class="tile__header-main"><div class="tile__title-row"><h3 class="tile__title">Контакты</h3></div></div>
+                </header>
+                <div class="tile__body">
+                  <div class="entity-list">
+                    <div class="entity entity--s">
+                      <div class="entity__lead"><span class="av av--circular av--s" aria-hidden="true"><span class="av__text">АБ</span></span></div>
+                      <div class="entity__main">
+                        <div class="entity__titles">
+                          <p class="entity__header">Инвестиционный аналитик · покрытие</p>
+                          <div class="entity__labelrow"><span class="entity__label entity__label--truncate">Анна Белова</span></div>
+                        </div>
+                      </div>
+                      <div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Позвонить Анне Беловой"><i data-icon="phone"></i></button></div>
+                    </div>
+                    <div class="entity entity--s">
+                      <div class="entity__lead"><span class="av av--circular av--s" aria-hidden="true"><span class="av__text">ИП</span></span></div>
+                      <div class="entity__main">
+                        <div class="entity__titles">
+                          <p class="entity__header">Директор по инвестициям, контрагент</p>
+                          <div class="entity__labelrow"><span class="entity__label entity__label--truncate">Игорь Петров</span></div>
+                        </div>
+                      </div>
+                      <div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Позвонить Игорю Петрову"><i data-icon="phone"></i></button></div>
+                    </div>
+                    <div class="entity entity--s">
+                      <div class="entity__lead"><span class="av av--circular av--s" aria-hidden="true"><span class="av__text">СМ</span></span></div>
+                      <div class="entity__main">
+                        <div class="entity__titles">
+                          <p class="entity__header">Банкир, relationship manager</p>
+                          <div class="entity__labelrow"><span class="entity__label entity__label--truncate">Светлана Морозова</span></div>
+                        </div>
+                      </div>
+                      <div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Позвонить Светлане Морозовой"><i data-icon="phone"></i></button></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div class="fund-preview__foot">
+              <button class="btn btn--accent btn--m"><i data-icon="open-wide"></i><span class="btn__label">Открыть карточку фонда</span></button>
+              <button class="btn btn--outline btn--m"><i data-icon="calendar-plus"></i><span class="btn__label">Добавить встречу</span></button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Альтернативное состояние правой панели: клик по иконке «Активы» в строке ──────
+           ТЗ 6.1 (колонка «Активы | 📁 (сайдбар)»): клик по 📁 в строке переключает правую
+           панель с профиля фонда на список его активов. Экран статичен (не кликабельный
+           прототип) — оба состояния показаны явно вёрсткой, не одно вместо другого:
+           профиль — в .fund-preview выше, это состояние — отдельным маркированным блоком
+           ниже, с подписью, что оно приходит на смену профилю по клику на data-icon="folder"
+           в столбце «Активы». Поля — по колонкам экрана «Список активов» (ТЗ 6.3: Название,
+           Год, Объём, Отрасль), без Фонда/Новостей/Истории/Идеи — сюда попадает только
+           контекст одного уже выбранного фонда, не весь экран 6.3. -->
+      <section class="fund-assets-alt" aria-label="Правая панель — альтернативное состояние «Активы фонда»">
+        <div class="fund-assets-alt__caption">
+          <span class="chip chip--s chip--info"><span class="chip__label">Альтернативное состояние панели</span></span>
+          <span class="fund-assets-alt__text">Показывается вместо профиля фонда по клику на <i data-icon="folder"></i> в столбце «Активы» строки таблицы</span>
+        </div>
+        <div class="fund-preview fund-assets-alt__panel">
+          <div class="fund-preview__title-row">
+            <h2 class="fund-preview__title">Активы фонда: РВК — Российская венчурная компания</h2>
+          </div>
+          <div class="tile-stack">
+            <section class="tile">
+              <header class="tile__header">
+                <div class="tile__header-main">
+                  <div class="tile__title-row">
+                    <h3 class="tile__title">Активы в портфеле</h3>
+                    <span class="tile__title-add"><span class="badge badge--s badge--neutral badge--text">24</span></span>
+                  </div>
+                </div>
+              </header>
+              <div class="tile__body">
+                <div class="entity-list">
+                  <div class="entity entity--s">
+                    <div class="entity__lead"><span class="entity__icon" aria-hidden="true"><i data-icon="folder"></i></span></div>
+                    <div class="entity__main">
+                      <div class="entity__titles">
+                        <p class="entity__header">Биотех · 2019</p>
+                        <div class="entity__labelrow">
+                          <span class="entity__label entity__label--truncate">БиоСинтез</span>
+                          <span class="entity__postfix">450 000 000 ₽</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть актив «БиоСинтез»"><i data-icon="chevron-right"></i></button></div>
+                  </div>
+                  <div class="entity entity--s">
+                    <div class="entity__lead"><span class="entity__icon" aria-hidden="true"><i data-icon="folder"></i></span></div>
+                    <div class="entity__main">
+                      <div class="entity__titles">
+                        <p class="entity__header">Финтех · 2021</p>
+                        <div class="entity__labelrow">
+                          <span class="entity__label entity__label--truncate">КвантумПэй</span>
+                          <span class="entity__postfix">220 000 000 ₽</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть актив «КвантумПэй»"><i data-icon="chevron-right"></i></button></div>
+                  </div>
+                  <div class="entity entity--s">
+                    <div class="entity__lead"><span class="entity__icon" aria-hidden="true"><i data-icon="folder"></i></span></div>
+                    <div class="entity__main">
+                      <div class="entity__titles">
+                        <p class="entity__header">ИИ и аналитика · 2020</p>
+                        <div class="entity__labelrow">
+                          <span class="entity__label entity__label--truncate">НейроЛаб</span>
+                          <span class="entity__postfix">310 000 000 ₽</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть актив «НейроЛаб»"><i data-icon="chevron-right"></i></button></div>
+                  </div>
+                  <div class="entity entity--s">
+                    <div class="entity__lead"><span class="entity__icon" aria-hidden="true"><i data-icon="folder"></i></span></div>
+                    <div class="entity__main">
+                      <div class="entity__titles">
+                        <p class="entity__header">АгроТех · 2018</p>
+                        <div class="entity__labelrow">
+                          <span class="entity__label entity__label--truncate">АгроСкан</span>
+                          <span class="entity__postfix">180 000 000 ₽</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="entity__icons"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть актив «АгроСкан»"><i data-icon="chevron-right"></i></button></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="fund-preview__foot">
+            <button class="btn btn--outline btn--m"><i data-icon="folder"></i><span class="btn__label">Все активы фонда</span></button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Модальное окно фильтра ──────────────────────────────────────────── -->
+<div class="modal-scrim" id="filter-scrim" hidden>
+  <div class="modal modal--w6 tfm" role="dialog" aria-modal="true" aria-labelledby="tfm-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="tfm-title">Фильтр</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body modal__body--flush">
+      <div class="tfm__body">
+        <nav class="tabs tabs--vert tfm__nav" aria-label="Разделы фильтра">
+          <button class="tab tab--m tab--vert tab--selected" aria-current="true" data-target="tfm-sec-general"><span class="tab__label">Общие параметры</span><span class="tab__badge">2</span></button>
+          <button class="tab tab--m tab--vert" data-target="tfm-sec-activity"><span class="tab__label">Активность</span></button>
+        </nav>
+        <div class="tfm__panel">
+          <section class="tfm__sec" id="tfm-sec-general">
+            <div class="tfm__grid">
+              <div class="cb-group" role="group" aria-labelledby="tfm-type-t">
+                <p class="cb-group__title" id="tfm-type-t">Тип фонда</p>
+                <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Венчурный фонд</span></span></label>
+                <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Фонд прямых инвестиций (PE)</span></span></label>
+                <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Фонд недвижимости</span></span></label>
+                <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Инфраструктурный фонд</span></span></label>
+                <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Хедж-фонд</span></span></label>
+              </div>
+              <div class="cb-group" role="group" aria-labelledby="tfm-prio-t">
+                <p class="cb-group__title" id="tfm-prio-t">Приоритет</p>
+                <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Приоритет 1</span></span></label>
+                <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Приоритет 2</span></span></label>
+                <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Приоритет 3</span></span></label>
+              </div>
+              <div class="tfm__span-2">
+                <div class="inp inp--m">
+                  <label class="ds-label" for="tfm-benef"><span class="ds-label__text">Бенефициар</span></label>
+                  <div class="inp__field">
+                    <input class="inp__control" id="tfm-benef" placeholder="Например, ООО «Ромашка»">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="tfm__sec" id="tfm-sec-activity">
+            <div class="tfm__grid">
+              <div class="tfm__span-2">
+                <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Есть активные идеи по фонду</span></span></label>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-left">
+        <button class="btn btn--transparent btn--m"><span class="btn__label">Сохранить пресет</span></button>
+      </div>
+      <div class="modal__foot-right">
+        <button class="btn btn--transparent btn--m"><span class="btn__label">Очистить</span></button>
+        <button class="btn btn--accent btn--m"><span class="btn__label">Применить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- ── Модальное окно настройки колонок ────────────────────────────────── -->
+<div class="modal-scrim" id="cols-scrim" hidden>
+  <div class="modal modal--w4" role="dialog" aria-modal="true" aria-labelledby="cols-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="cols-title">Настроить колонки</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <label class="cb"><input type="checkbox" class="cb__input" checked disabled><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Название</span></span></label>
+      <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Тип</span></span></label>
+      <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Приоритет</span></span></label>
+      <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Бенефициар</span></span></label>
+      <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Контакты</span></span></label>
+      <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Новости</span></span></label>
+      <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Активы</span></span></label>
+      <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">История</span></span></label>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-left">
+        <button class="btn btn--transparent btn--m"><span class="btn__label">Сбросить</span></button>
+      </div>
+      <div class="modal__foot-right">
+        <button class="btn btn--accent btn--m"><span class="btn__label">Применить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="../../DS-IBP/scripts/ds.js"></script>
+</body>
+</html>

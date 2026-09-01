@@ -1,0 +1,48 @@
+/* ============================================================
+   ILLUSTRATION — слот продуктовой иллюстрации.
+   Использование: <span class="illu" data-illu="имя" aria-hidden="true"></span>
+   scripts/ds-illustrations.js подставляет <img> из assets/illustrations/<имя>.svg.
+   Размер задаётся width/height слота; SVG масштабируется внутри (object-fit: contain),
+   исходные пропорции файлов библиотеки — 195×140 (не 1:1).
+   Если имени нет в библиотеке (404) — рисуется штриховая заглушка с именем.
+   ============================================================ */
+
+.illu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  flex: none;
+}
+
+.illu img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+/* заглушка: имени нет в библиотеке (img выдал 404 и удалил себя) */
+.illu:empty {
+  border: 1.5px dashed var(--border-primary);
+  border-radius: var(--radius-l);
+  background:
+    repeating-linear-gradient(-45deg,
+      transparent 0 6px,
+      color-mix(in srgb, var(--border-light) 55%, transparent) 6px 7px);
+}
+.illu:empty::after {
+  content: attr(data-illu);
+  font: var(--type-body-xs);
+  line-height: 1;
+  color: var(--text-inactive);
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}

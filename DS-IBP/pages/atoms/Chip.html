@@ -1,0 +1,913 @@
+<!-- @dsCard group="Components" name="Chip" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chip — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/avatar.css">
+<link rel="stylesheet" href="../../styles/chip.css">
+<link rel="stylesheet" href="../../styles/spinner.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:80ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:20px; }
+
+  .subhead { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; margin:0 0 16px; }
+
+  
+
+  
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- matrices / grids ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .sizes-grid { display:grid; grid-template-columns: 70px repeat(4, 1fr); gap:18px 16px; align-items:center; min-width:620px; }
+  .sizes-grid .col-head { font: var(--type-body-s-strong); color: var(--primary); text-align:center; }
+  .sizes-grid .cell { display:flex; align-items:center; justify-content:center; padding:6px 0; }
+
+  /* type / style comparison columns */
+  .cols2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:680px){ .cols2{ grid-template-columns:1fr; } }
+  .demo-col__title { font: var(--type-h5-strong); color: var(--text-primary); margin:0 0 4px; }
+  .demo-col__sub { font: var(--type-body-s); color: var(--text-secondary); margin:0 0 18px; text-wrap:pretty; }
+  .demo-rows { display:flex; flex-direction:column; gap:16px; }
+  .demo-rowlabel { font: var(--type-body-xs); color: var(--text-inactive); margin-bottom:7px; }
+
+  /* mock surfaces */
+  .surface { border:1px solid var(--border-light); border-radius:12px; background:var(--bg-tile); padding:18px 20px; }
+  .surface__cap { font:var(--type-body-xs); color:var(--text-inactive); margin:14px 0 0; text-wrap:pretty; }
+  .input-mock { display:flex; align-items:center; flex-wrap:wrap; gap:8px; min-height:48px; padding:7px 10px; border:1px solid var(--border-primary); border-radius:10px; background:var(--bg-tile); }
+  .input-mock__field { flex:1; min-width:60px; font:var(--type-body-m); color:var(--text-inactive); padding:4px; }
+  .input-mock.is-readonly { background:var(--disabled-bg); border-color:var(--border-light); }
+
+  /* anatomy */
+  .anat { display:grid; grid-template-columns: minmax(260px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:54px 44px; display:flex; justify-content:center; }
+  .anat-dia { position:relative; }
+  .anat-dia .chip { --chip-height:48px; --chip-pad-x:18px; --chip-font:var(--weight-semibold) 20px/1 var(--font-text); --chip-icon:24px; }
+  .anat-dia .mk { position:absolute; width:22px; height:22px; border-radius:50%; background:var(--text-primary); color:#fff; font:var(--type-body-xs); font-weight:600; display:flex; align-items:center; justify-content:center; transform:translate(-50%,-50%); }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+
+  /* state spec tables (mirrors source doc) */
+  .spec { border:1px solid var(--border-light); border-radius:14px; overflow:hidden; }
+  .spec + .spec { margin-top:20px; }
+  .spec__row { display:grid; grid-template-columns: 130px 150px 1fr; align-items:center; gap:16px; padding:20px; border-bottom:1px solid var(--border-light); }
+  @media (max-width:720px){ .spec__row{ grid-template-columns:1fr; gap:14px; } }
+  .spec__cline { display:grid; grid-template-columns: 84px 18px 150px 1fr; align-items:center; gap:10px; font:var(--type-body-s); color:var(--text-secondary); }
+
+  /* tone grid */
+  .tone-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap:16px; }
+  .tone-cell { border:1px solid var(--border-light); border-radius:12px; padding:18px 16px; display:flex; flex-direction:column; align-items:flex-start; gap:12px; background:var(--bg-tile); }
+  .tone-cell .nm { font:var(--type-body-m-strong); color:var(--text-primary); }
+  .tone-cell .rl { font:var(--type-body-xs); color:var(--text-secondary); text-wrap:pretty; }
+
+  /* leading slot tiles */
+  .slot-tiles { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:18px; }
+  .slot-tile { border:1px solid var(--border-light); border-radius:12px; padding:22px 20px; background:var(--bg-tile); display:flex; flex-direction:column; gap:16px; }
+  .slot-tile__name { font:var(--type-h6-strong); color:var(--text-primary); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:15px; }
+  .slot-tile__demo { display:flex; flex-wrap:wrap; gap:10px; }
+  .slot-tile__desc { font:var(--type-body-s); color:var(--text-secondary); text-wrap:pretty; }
+
+  /* reference tables */
+  .ref-table th, .ref-table td { text-align:left; padding:15px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  /* do / don't */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:28px 20px; flex:1; display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; }
+  .guide-card__cap { padding:0 20px 18px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* color reference */
+  
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* proposal callout */
+  .callout { border:1px solid color-mix(in srgb, var(--primary) 22%, transparent); background: var(--primary-bg); border-radius:14px; padding:24px 26px; }
+  .callout h3 { font:var(--type-h5-strong); color:var(--text-primary); margin:0 0 6px; display:flex; align-items:center; gap:10px; }
+  .callout p { font:var(--type-body-m); color:var(--text-secondary); margin:0 0 16px; text-wrap:pretty; max-width:78ch; }
+
+  /* ---------- developer handoff ---------- */
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+
+  /* ---------- accessibility focus demo ---------- */
+  .a11y-demo:focus-visible { outline: none; }
+  .rof-mock { display: flex; flex-direction: column; gap: 4px; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Chip">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.009</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Chip</h1>
+    <p class="lead">Чип — компактный интерактивный элемент для фильтрации и группировки данных. Применяется как <b>тег</b>, <b>маркер</b> и <b>статус</b>, входит в состав чиплиста и InputAutocomplete. Два типа — <b>Edit</b> и <b>ReadOnly</b>, два стиля — <b>Fill</b> и <b>Outline</b>.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">Чипы используются в составе чиплиста для отображения параметров фильтра, в InputAutocomplete при множественном выборе, а также как статус-метки в таблицах и карточках.</p>
+    <div class="panel">
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li><b>Фильтры.</b> Чиплист отображает применённые параметры фильтрации; удаляемые чипы (с крестиком) сбрасывают параметр.</li>
+        <li><b>Множественный выбор.</b> В InputAutocomplete выбранные значения показываются чипами внутри поля.</li>
+        <li><b>Статусы и теги.</b> Цветной тон передаёт состояние сущности (активна, в работе, просрочена).</li>
+        <li>Удалённый чип повторно не отображается в чиплисте.</li>
+      </ul>
+      <div class="cols2">
+        <div class="surface">
+          <p class="demo-rowlabel">Чиплист фильтра</p>
+          <div class="chiplist" id="use-filters"></div>
+          <p class="surface__cap">Удаляемые чипы сбрасывают параметр фильтра. Порядок удаления зависит от выравнивания чиплиста.</p>
+        </div>
+        <div class="surface">
+          <p class="demo-rowlabel">InputAutocomplete · множественный выбор</p>
+          <div class="input-mock" id="use-input"></div>
+          <p class="surface__cap">Выбранные значения — чипы типа Edit с возможностью удаления прямо в поле.</p>
+        </div>
+        <div class="surface">
+          <p class="demo-rowlabel">Статусы в строке таблицы</p>
+          <div class="chiplist" id="use-status"></div>
+          <p class="surface__cap">Тон чипа передаёт состояние записи без дополнительной иконки. Статус — всегда Rounded.</p>
+        </div>
+        <div class="surface">
+          <p class="demo-rowlabel">ReadOnlyField · значение-чипы</p>
+          <div class="rof-mock">
+            <span class="ds-label"><span class="ds-label__text">Регионы присутствия</span></span>
+            <div id="use-readonly"></div>
+          </div>
+          <p class="surface__cap">Тип ReadOnly, размер <b>XS</b> — так чип используется в <a class="inl" href="../molecules/ReadOnlyField.html">ReadOnlyField</a> (значение типа «Чипы»); как и любое значение в ReadOnlyField, оно всегда идёт с лейблом; без рамки и фона у самого поля, без крестика.</p>
+        </div>
+      </div>
+    </div>
+  
+<div class="subsec" data-screen-label="Guidelines">
+    <h3>Правила</h3>
+    <p class="desc">Чип несёт короткую метку или статус. Не превращайте его в кнопку и не помещайте длинные предложения — для этого есть другие компоненты.</p>
+    <div class="guide">
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good3"></span>Так</div>
+        <div class="guide-card__body" id="guide-good3"></div>
+        <p class="guide-card__cap">Статус или стадия сущности — скруглённый чип (Rounded, 999px). Так — в 90% случаев.</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad3"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad3"></div>
+        <p class="guide-card__cap">Квадратный чип для статуса. Квадратные цветные чипы оставляйте для категорий сущности (типы продуктов, типы активов и т.п.), не для статусов.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="guide-good1"></div>
+        <p class="guide-card__cap">Короткая метка; длинный текст обрезается многоточием с тултипом.</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad1"></div>
+        <p class="guide-card__cap">Целое предложение растягивает чип — это не его задача.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good2"></span>Так</div>
+        <div class="guide-card__body" id="guide-good2"></div>
+        <p class="guide-card__cap">Тон передаёт статус; крестик — только когда чип удаляемый.</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad2"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad2"></div>
+        <p class="guide-card__cap">Не используйте чип как основную кнопку действия.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Чип — это капсула-контейнер с текстом и опциональными слотами. Ширина зависит от контента, высота фиксирована по размеру. Максимальная ширина — <b>320px</b>; при переполнении текст уходит в многоточие.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div class="anat-dia" id="anat-diagram"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Контейнер</span><span class="d">капсула с заливкой и/или обводкой; высота фиксирована, ширина тянется по контенту до 320px</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Дополнительный элемент</span><span class="d">иконка-маркер, иконка, бейдж или аватар — опционально</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Текст</span><span class="d">SB Sans Text; обрезается многоточием при переполнении</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Действие</span><span class="d">крестик удаления или шеврон выпадающего списка — опционально</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Types">
+    <h3>Типы</h3>
+    <p class="desc">Компонент имеет два типа. <b>Edit</b> — интерактивный чип, реагирует на наведение и поддерживает удаление. <b>ReadOnly</b> — для показа значения без редактирования (например, в <a class="inl" href="../molecules/ReadOnlyField.html">ReadOnlyField</a>) и на наведение не реагирует.</p>
+    <div class="cols2">
+      <div class="panel">
+        <p class="demo-col__title">Edit</p>
+        <p class="demo-col__sub">Интерактивный. Меняет фон при наведении, поддерживает крестик удаления. Размеры M / S (+ XS для компактных мест).</p>
+        <div class="demo-rows" id="type-edit"></div>
+      </div>
+      <div class="panel">
+        <p class="demo-col__title">ReadOnly</p>
+        <p class="demo-col__sub">Показ значения без редактирования. Не реагирует на наведение. Размеры L / M / S / XS — <a class="inl" href="../molecules/ReadOnlyField.html">ReadOnlyField</a> использует XS для значений-чипов.</p>
+        <div class="demo-rows" id="type-readonly"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Style">
+    <h3>Стиль</h3>
+    <p class="desc"><b>Fill</b> (Border + Fill) — заливка плюс обводка, базовый стиль для чиплистов и инпутов. <b>Outline</b> (Border) — только обводка, для более лёгкого вида на плотных поверхностях; при наведении появляется заливка.</p>
+    <div class="cols2">
+      <div class="panel">
+        <p class="demo-col__title">Fill</p>
+        <p class="demo-col__sub">Border + Fill</p>
+        <div class="chiplist" id="style-fill"></div>
+      </div>
+      <div class="panel">
+        <p class="demo-col__title">Outline</p>
+        <p class="demo-col__sub">Border</p>
+        <div class="chiplist" id="style-outline"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Leading">
+    <h3>Ведущие элементы</h3>
+    <p class="desc">Слева к тексту можно добавить дополнительный элемент. <code class="tok">.Chip_Content</code> — иконка-маркер; <b>Иконка</b> — смысловая пиктограмма, не завязанная на тон/статус; <b>Аватар</b> — компонент <a class="inl" href="../atoms/Avatar.html">Avatar</a> с выбираемым содержимым (текст-инициалы, иконка или фото). Отдельный слот «бейдж» убран — он объединён с аватаром. Справа — действие: крестик удаления или шеврон выпадающего списка (<code class="tok">.Chip_Action</code>) — взаимоисключающие, вместе не ставятся.</p>
+    <div class="panel">
+      <div class="slot-tiles" id="slot-tiles"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Tones">
+    <h3>Тон и статусы</h3>
+    <p class="desc">Текущая ДС описывает только нейтральный системный тон (StSystem). Поскольку чипы используются и как статусы, предлагаем тональную шкалу на базе локальных статус-рамп: фон <code class="tok">Light</code>, текст <code class="tok">Dark</code>, иконка — базовый цвет статуса. Это даёт семантику «активно / в работе / ошибка» без отдельной иконки.</p>
+    <div class="panel">
+      <div class="tone-grid" id="tone-grid"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Rounded">
+    <h3>Скругление (Rounded)</h3>
+    <p class="desc">Новые чипы объединили с маркером и добавили свойство <b>Rounded</b> для включения полного скругления (капсула 999px). В дизайн-системе пока не перешли на них — будем переводить после внутренних тестов нового компонента.</p>
+    <p class="desc"><b>Правило применения.</b> В 90% случаев для <b>статусов</b> и <b>стадий</b> (частный вид статуса) используются преимущественно скруглённые чипы (Rounded, 999px). Квадратные цветные чипы (скругление 6–8px) допустимы для отображения <b>категорий сущности</b> — например, разных продуктов, разных типов активов и т.п., — но не для статусов. Исключения возможны и фиксируются дизайнером индивидуально для конкретного кейса.</p>
+    <div class="panel">
+      <div class="cols2">
+        <div>
+          <p class="demo-rowlabel">Default · скругление 6–8px — для категорий сущности</p>
+          <div class="chiplist" id="rounded-off"></div>
+        </div>
+        <div>
+          <p class="demo-rowlabel">Rounded · 999px — для статусов и стадий</p>
+          <div class="chiplist" id="rounded-on"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Четыре размера. <b>L</b> — крупный ReadOnly-показ (зарезервирован). <b>M</b> и <b>S</b> — базовые для чиплистов и фильтров. <b>XS</b> — для компактных мест (плотные таблицы, инлайн-метки, значения-чипы в <a class="inl" href="../molecules/ReadOnlyField.html">ReadOnlyField</a>).</p>
+    <div class="panel">
+      <div class="matrix-wrap"><div class="sizes-grid" id="sizes-grid"></div></div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden; margin-top:20px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.45fr 0.6fr 1fr 0.6fr 0.7fr 1.6fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Высота</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Кегль текста</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Иконка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Скругление</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Применение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="sizes-table"></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус задан размером; форма Rounded делает чип пилюлей в любом размере.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Rounded — любой размер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Слоты: аватар, крестик, информер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Текстовое содержимое чипа — метка, опциональный числовой суффикс и текст в альтернативах (title/aria-label). Краткий свод правил (подробно — в «Переполнение текста» и «Правила» выше/ниже):</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li><b>Метка</b> (<code class="tok">.chip__label</code>) — короткая номинативная фраза или существительное, не предложение и не глагол-действие — для действий есть Button;</li>
+      <li>регистр — как в остальном интерфейсе (sentence case); точку в конце не ставим;</li>
+      <li>максимум ширины — 320px; при превышении текст обрезается многоточием, полное значение — в <code class="tok">title</code>;</li>
+      <li><b>Счётчик</b> (<code class="tok">.chip__count</code>) — только число, без единиц измерения и без текста;</li>
+      <li>крестик удаления не несёт текста визуально — сопровождайте <code class="tok">aria-label</code> с именем чипа (см. «Доступность»);</li>
+      <li>для чипов-статусов используйте краткие существительные состояния («Активна», «Просрочена»), не глаголы.</li>
+    </ul>
+  
+<div class="subsec" data-screen-label="Overflow">
+    <h3>Переполнение текста</h3>
+    <p class="desc">Размер чипа зависит от контента, максимальная ширина — <b>320px</b>. Если длина контента превышает максимум, текст уходит в многоточие, а при наведении показываем тултип с полной версией. Это работает и для Disabled-чипа с длинной текстовкой.</p>
+    <div class="panel">
+      <div class="row" style="gap:16px;" id="overflow-demo"></div>
+    </div>
+    <div class="panel" style="margin-top:20px;">
+      <p class="demo-rowlabel">Переполнение чиплиста — свёртка в «+N»</p>
+      <div class="chiplist" id="overflow-list"></div>
+      <p class="surface__cap">Когда чипов больше, чем помещается, лишние сворачиваются в чип-счётчик «+N», открывающий полный список.</p>
+    </div>
+  </div>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="Removable">
+    <h3>Удаление</h3>
+    <p class="desc">Если нужно дать пользователю управлять набором чипов, добавляется крестик. Крестик — единственная интерактивная зона помимо самого чипа; на наведении у него появляется собственный стейт-слой. Удаление доступно мышью и с клавиатуры (Backspace / Delete на сфокусированном чипе).</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Наведите на крестик и удалите чипы — попробуйте</p>
+      <div class="chiplist" id="removable-demo" style="min-height:34px;"></div>
+      <p class="surface__cap" id="removable-status">Осталось чипов: 5</p>
+    </div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Базовые состояния чипа и их цветовые токены. При наведении меняется цвет фона. Чип в состоянии Disabled на наведение не реагирует — кроме случаев с длинными текстовками, когда показываем тултип.</p>
+    <div id="state-specs"></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Чип Edit — фокусируемый элемент (<code class="tok">tabindex="0"</code>); крестик удаления — вторая интерактивная зона внутри него. ReadOnly-чип неинтерактивен и из таб-порядка исключён.</p>
+    <div class="panel">
+      <ul class="bullets" style="margin-bottom:22px;">
+        <li>Фокус на самом чипе удаляет его при <code class="tok">Backspace</code> / <code class="tok">Delete</code> (см. «Удаление» выше) — мышь и клавиатура дают одинаковый результат;</li>
+        <li>крестик (<code class="tok">.chip__remove</code>) помечайте <code class="tok">role="button"</code> и <code class="tok">aria-label="Удалить {метка}"</code> — без этого скрин-ридер озвучит только иконку без контекста;</li>
+        <li><code class="tok">:focus-visible</code> показывает обводку 2px <code class="tok">--primary</code> с отступом 2px (состояние Focus — Предложение). Нажмите <b>Tab</b>, чтобы увидеть:</li>
+      </ul>
+      <div class="chiplist" id="a11y-focus-demo" style="margin-bottom:22px;"></div>
+      <ul class="bullets">
+        <li>Disabled-чип исключён из таб-порядка (<code class="tok">pointer-events:none</code>), но если текст обрезан — класс <code class="tok">.chip--has-tooltip</code> возвращает наведение для тултипа; полный текст дублируйте в <code class="tok">title</code>;</li>
+        <li>не полагайтесь только на тон (цвет) для критичных статусов (например, Error против Success) — для пользователей с нарушениями цветовосприятия дублируйте смысл маркером/иконкой;</li>
+        <li>для чипов-фильтров с выбором (<code class="tok">chip--selected</code>, Предложение) рекомендуем <code class="tok">aria-pressed</code> на каждом чипе и <code class="tok">role="group"</code> на чиплисте.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Текст чипа набирается гарнитурой <b>SB Sans Text</b>. Кегль зависит от размера и совпадает с токенами Body. Letter-spacing — 0.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 px / Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 px / Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 px / Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 px / Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические и локальные токены статусов. Базовый системный тон — на рампе StSystem; статусные тона — на локальных рампах.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">System (база)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Fill / Border</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #7A9994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">System (база)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Fill hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system-midlight</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system-midlight)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">32% #7A9994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">System (база)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Border outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system-mid</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system-mid)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">56% #7A9994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">System (база)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">System (база)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#7A9994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Fill / Border</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4% #324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Border outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled-mid</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled-mid)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">40% #324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">24% #324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — фон (Light)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-primary-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-primary-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — фон (Light)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-green-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-green-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #4CAF50</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — фон (Light)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Info</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-lblue-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-lblue-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #03A9F4</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — фон (Light)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Warning</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-orange-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-orange-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #FFA000</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — фон (Light)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-red-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-red-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #EF5350</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — текст (Dark)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-primary-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-primary-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00635A</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — текст (Dark)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-green-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-green-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#2E7D32</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — текст (Dark)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Info</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-lblue-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-lblue-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#01579B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — текст (Dark)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Warning</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-orange-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-orange-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FF6F00</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.44fr 1.08fr 1.35fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статусы — текст (Dark)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-red-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-red-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#D32F2F</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead2">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/chip.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.4fr 0.55fr 0.55fr 0.55fr 0.55fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">L</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">S</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">XS</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/chip.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Hover — только для Edit и только когда не disabled: чистый CSS (:hover)</span>
+
+<span class="tk-cm">// 2. Обрезка текста: когда scrollWidth элемента &gt; clientWidth (текст обрезан</span>
+<span class="tk-cm">//    ellipsis) — добавить title с полным текстом. Работает и для Disabled (chip--has-tooltip возвращает pointer-events)</span>
+
+<span class="tk-cm">// 3. Удаление: клик по chip__remove ИЛИ Backspace/Delete на сфокусированном чипе →</span>
+<span class="tk-cm">//    анимация исчезновения (opacity+scale) → удалить из DOM → перенести фокус на соседний чип</span>
+
+<span class="tk-cm">// 4. Переполнение чиплиста (Предложение): измерить, сколько чипов вмещается в одну строку,</span>
+<span class="tk-cm">//    остальные свернуть в чип-счётчик «+N», открывающий полный список по клику</span>
+
+<span class="tk-cm">// 5. Клавиатура: Tab фокусирует чип (если Edit); :focus-visible → outline 2px --primary, offset 2px</span>
+
+<span class="tk-cm">// 6. Disabled: pointer-events: none, кроме chip--has-tooltip (тултип должен работать и в disabled)</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функция <code class="tok">makeChip</code> в <code class="tok">chip.page.js</code>).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Proposals">
+    <h2>Бэклог</h2>
+    <p class="desc">Сверяясь с Material Design и практиками других ДС, в документации недостаёт ряда состояний и кейсов. Ниже — предлагаемые дополнения; все собраны на существующих токенах.</p>
+    <div class="callout">
+      <h3>Предлагаемые дополнения</h3>
+      <p>Состояния Selected / Focus / Loading / Invalid, статусные тона и числовой счётчик уже реализованы и переехали в «Варианты» / «Состояния». В бэклоге осталось одно нереализованное предложение.</p>
+      <div class="prop-grid" id="proposals"></div>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Chip</span>
+    <span>Edit · ReadOnly — Fill / Outline — L / M / S / XS</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите чип: тип, стиль, размер, тон, дополнительный элемент, удаление и скругление — превью и код обновляются мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/image-slot.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/chip.page.js"></script>
+<script>
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Тип': 'Читаемый (ReadOnly)', 'Стиль': 'Контурный (Outline)', 'Крестик удаления': 'Показывать крестик удаления', 'Выпадающий список': 'Показывать выпадающий список', 'Счётчик': 'Показывать счётчик', 'Rounded': 'Скруглённые углы' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- Edit-чип с маркером и крестиком удаления -->
+<span class="chip chip--edit chip--m chip--rounded" tabindex="0">
+  <span class="chip__marker"><i data-icon="circle-filled"></i></span>
+  <span class="chip__label">Активна</span>
+  <span class="chip__remove" role="button" aria-label="Удалить Активна"><i data-icon="close"></i></span>
+</span>
+
+<!-- ReadOnly-чип: без tabindex и без крестика -->
+<span class="chip chip--m"><span class="chip__label">Договор</span></span>
+
+<!-- чиплист: контейнер с авто-переносом и единым зазором -->
+<div class="chiplist" role="group" aria-label="Фильтры">…</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/chip.page.js)
+function makeChip(o) {
+  // o: { type:'edit'|'readonly', style:'fill'|'outline', size, tone, label, leading, removable, dropdown, count, rounded, state, disabled }
+  // span.chip.chip--<size>(.chip--outline)(.chip--<tone>)(.chip--removable)(.chip--rounded)
+  //   → .chip__label + .chip__marker/.chip__icon/.chip__avatar + .chip__remove (крестик)
+  // выпадающий список: .chip + .menu (ContextMenu, DSMenu) — крестик и меню взаимоисключаются
+}</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Chip
+   A compact, interactive element used for filters, tags and statuses, and as
+   a child inside other components (InputAutocomplete, chiplists).
+
+   Type:    edit (interactive) · readonly (inside ReadOnly inputs)
+   Style:   fill  (Border + Fill) · outline (Border only)
+   Sizes:   l (40) · m (32) · s (24) · xs (20)
+            l — readonly only · xs — content/compact
+   Tone:    system (default) · accent · success · info · warning · error · dark ← proposed
+            Solid: success-solid · warning-solid · error-solid · dark-solid ← proposed
+            (base status fill + white text — критичные акценты, RiskMetric красная/чёрная зона)
+            Тон — не фиксированный список «ситуативных» имён: чип может брать любой
+            локальный статус-тон (Local, colors.css). success/info/warning/error —
+            просто самые частые алиасы (StGreen/StLBlue/StOrange/StRed); dark — ещё
+            один локальный тон (StGrey), для нейтрально-тёмной/«чёрной» семантики
+            (см. RiskMetric — Чёрная зона).
+   States:  default · hover · selected ← proposed · focus ← proposed
+            disabled · loading ← proposed · error/invalid ← proposed
+   Slots:   leading icon / marker / avatar (компонент Avatar) · trailing remove (×) /
+            dropdown (chevron) / info-trigger (Popover) / counter
+   Extras:  rounded (999px pill) · max-width 320px → ellipsis + tooltip
+   Requires: typography.css, colors.css
+   ========================================================================= */
+
+.chip {
+  /* size tokens — overridden per size modifier */
+  --chip-height: 24px;
+  --chip-pad-x: 10px;
+  --chip-gap: 6px;
+  --chip-icon: 16px;
+  --chip-radius: var(--radius-control-s);
+  --chip-font: var(--type-body-s);
+
+  /* tone tokens — system by default; overridden per tone */
+  --chip-fill: var(--st-system-light);          /* Swamp_400 16% */
+  --chip-fill-hover: var(--st-system-midlight);  /* Swamp_400 32% */
+  --chip-border: var(--st-system-light);
+  --chip-border-hover: var(--st-system-light);
+  --chip-text: var(--st-system-dark);            /* CGrey_600 */
+  --chip-icon-color: var(--st-system);           /* Swamp_400 */
+
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--chip-gap);
+  max-width: 320px;
+  height: var(--chip-height);
+  padding: 0 var(--chip-pad-x);
+  border: 1px solid var(--chip-border);
+  border-radius: var(--chip-radius);
+  background: var(--chip-fill);
+  color: var(--chip-text);
+  font: var(--chip-font);
+  letter-spacing: 0;
+  white-space: nowrap;
+  user-select: none;
+  cursor: default;
+  vertical-align: middle;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+/* the text label — truncates with ellipsis at max-width */
+.chip__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* ---------- icon / slot sizing -------------------------------------------- */
+.chip__icon,
+.chip__marker,
+.chip__remove,
+.chip__dropdown,
+.chip__info {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--chip-icon);
+  height: var(--chip-icon);
+  color: var(--chip-icon-color);
+}
+.chip__icon :is(svg,[data-icon]), .chip__marker :is(svg,[data-icon]), .chip__remove :is(svg,[data-icon]), .chip__dropdown :is(svg,[data-icon]), .chip__info :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }.chip__dropdown :is(svg,[data-icon]){ width: 80%; height: 80%; }
+.chip__info :is(svg,[data-icon]){ width: 100%; height: 100%; }
+
+/* leading marker (graph-node / status dot proxy) */
+.chip__marker { color: var(--chip-icon-color); }
+
+/* mini leading avatar — переиспользует компонент Avatar (.av): форма и слоты
+   содержимого (text / icon / image), уменьшен под размер чипа. */
+.chip__avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--chip-height) - 6px);
+  height: calc(var(--chip-height) - 6px);
+  border-radius: var(--radius-circle);
+  background: var(--st-system-midlight);
+  color: inherit;
+  font: var(--weight-semibold) 10px/1 var(--font-text);
+  overflow: hidden;
+}
+.chip__avatar .av__text { display: block; }
+.chip__avatar .av__icon { width: 62%; height: 62%; }
+.chip__avatar .av__img,
+.chip__avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* trailing counter — «(3)» style numeric suffix */
+.chip__count {
+  flex: none;
+  font-weight: var(--weight-semibold);
+  color: var(--chip-icon-color);
+  font-variant-numeric: tabular-nums;
+}
+
+/* remove (×) is genuinely interactive — gets its own hit state */
+.chip__remove { cursor: pointer; border-radius: var(--radius-circle); transition: background-color .12s ease, color .12s ease; }
+.chip__remove:hover { color: inherit; background: color-mix(in srgb, currentColor 12%, transparent); }
+.chip__dropdown { cursor: pointer; }
+
+/* info-trigger (×) — PROPOSED: opens a Popover with metric detail (used by RiskMetric).
+   Unlike other trailing slots it is a real <button>, independently focusable even
+   inside a chip--readonly (the chip itself carries no tabindex/hover state). */
+.chip__info {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+  border-radius: var(--radius-circle);
+  transition: background-color .12s ease, color .12s ease;
+  font: inherit;
+}
+.chip__info:hover { color: inherit; background: color-mix(in srgb, currentColor 12%, transparent); }
+.chip__info:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+/* trailing info-trigger carries its own visual weight, so the padding rhythm shifts:
+   text (left) keeps a fuller 8px, icon (right) reads correctly at a tighter 4px.
+   Scoped to chips with .chip__info (RiskMetric) — doesn't touch other Chip usages. */
+.chip:has(.chip__info) { padding-left: 8px; padding-right: 4px; }
+
+/* ---------- sizes --------------------------------------------------------- *
+   NB: size/tone/state values live directly on properties (not via local --*
+   overrides in modifiers) so the DS compiler can register tokens cleanly.
+   Descendant consumers (icon slots, spinner, avatar) get per-size rules. */
+.chip--l  { height: 40px; padding: 0 14px; gap: 8px; border-radius: var(--radius-control);   font: var(--type-body-m); }
+.chip--m  { height: 32px; padding: 0 12px; gap: 6px; border-radius: var(--radius-control);   font: var(--type-body-m); }
+.chip--s  { height: 24px; padding: 0 10px; gap: 6px; border-radius: var(--radius-control-s); font: var(--type-body-s); }
+.chip--xs { height: 20px; padding: 0 8px;  gap: 4px; border-radius: var(--radius-control-s); font: var(--type-body-xs); }
+
+/* per-size icon + spinner slot sizing (mirror --chip-icon) */
+.chip--l .chip__icon, .chip--l .chip__marker, .chip--l .chip__remove, .chip--l .chip__dropdown, .chip--l .chip__info, .chip--l .spin { width: 20px; height: 20px; }
+.chip--m .chip__icon, .chip--m .chip__marker, .chip--m .chip__remove, .chip--m .chip__dropdown, .chip--m .chip__info, .chip--m .spin { width: 20px; height: 20px; }
+.chip--s .chip__icon, .chip--s .chip__marker, .chip--s .chip__remove, .chip--s .chip__dropdown, .chip--s .chip__info, .chip--s .spin { width: 16px; height: 16px; }
+.chip--xs .chip__icon, .chip--xs .chip__marker, .chip--xs .chip__remove, .chip--xs .chip__dropdown, .chip--xs .chip__info, .chip--xs .spin { width: 16px; height: 16px; }
+
+/* per-size leading avatar (mirror calc(--chip-height - 6)) */
+.chip--l .chip__avatar { width: 34px; height: 34px; }
+.chip--m .chip__avatar { width: 26px; height: 26px; }
+.chip--s .chip__avatar { width: 18px; height: 18px; }
+.chip--xs .chip__avatar { width: 14px; height: 14px; }
+
+/* ---------- padding по слотам (как у кнопок) ------------------------------ *
+   Сторона с иконкой/маркером/аватаром/действием получает меньший паддинг, чем
+   текстовая сторона. Значение — своё на каждый размер; аватар прижат сильнее. */
+.chip--l:has(.chip__marker), .chip--l:has(.chip__icon), .chip--l:has(.spin) { padding-left: 10px; }
+.chip--m:has(.chip__marker), .chip--m:has(.chip__icon), .chip--m:has(.spin) { padding-left: 8px; }
+.chip--s:has(.chip__marker), .chip--s:has(.chip__icon), .chip--s:has(.spin) { padding-left: 6px; }
+.chip--xs:has(.chip__marker), .chip--xs:has(.chip__icon), .chip--xs:has(.spin) { padding-left: 5px; }
+.chip--l:has(.chip__avatar) { padding-left: 6px; }
+.chip--m:has(.chip__avatar) { padding-left: 5px; }
+.chip--s:has(.chip__avatar) { padding-left: 4px; }
+.chip--xs:has(.chip__avatar) { padding-left: 3px; }
+.chip--l:has(.chip__remove), .chip--l:has(.chip__dropdown) { padding-right: 10px; }
+.chip--m:has(.chip__remove), .chip--m:has(.chip__dropdown) { padding-right: 8px; }
+.chip--s:has(.chip__remove), .chip--s:has(.chip__dropdown) { padding-right: 6px; }
+.chip--xs:has(.chip__remove), .chip--xs:has(.chip__dropdown) { padding-right: 5px; }
+
+/* ---------- style: outline (Border only) ---------------------------------- */
+.chip--outline { background: transparent; border-color: var(--st-system-mid); /* Swamp_400 56% */ }
+.chip--edit.chip--outline:not(:is(.chip--disabled,[aria-disabled="true"])):hover,
+.chip--edit.chip--outline:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { border-color: var(--st-system-mid); }
+
+/* ---------- rounded (full pill) ------------------------------------------- */
+.chip--rounded { border-radius: var(--radius-pill); }
+
+/* ---------- hover (Edit only) --------------------------------------------- */
+.chip--edit:not(:is(.chip--disabled,[aria-disabled="true"])):hover,
+.chip--edit:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover {
+  background: var(--chip-fill-hover);
+  border-color: var(--chip-border-hover);
+}
+
+/* ---------- focus-visible (keyboard a11y) — PROPOSED ---------------------- */
+.chip--edit:focus-visible,
+.chip--edit.is-focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- selected (filter toggle) — PROPOSED --------------------------- */
+.chip--selected { background: var(--st-primary-light); border-color: color-mix(in srgb, var(--primary) 56%, transparent); color: var(--primary-dark); }
+.chip--selected .chip__icon, .chip--selected .chip__marker, .chip--selected .chip__remove, .chip--selected .chip__dropdown, .chip--selected .chip__info, .chip--selected .chip__count { color: var(--primary); }
+.chip--edit.chip--selected:not(:is(.chip--disabled,[aria-disabled="true"])):hover,
+.chip--edit.chip--selected:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-primary-midlight); border-color: var(--primary); }
+
+/* ---------- tones / statuses — PROPOSED ----------------------------------- *
+   Used when chips carry status meaning (active/blocked/overdue…) rather than
+   neutral tags. Fill = status Light, text = status Dark, icon = status base. */
+.chip--accent  { background: var(--st-primary-light); border-color: var(--st-primary-light); color: var(--st-primary-dark); }
+.chip--success { background: var(--st-green-light);   border-color: var(--st-green-light);   color: var(--st-green-dark); }
+.chip--info    { background: var(--st-lblue-light);   border-color: var(--st-lblue-light);   color: var(--st-lblue-dark); }
+.chip--warning { background: var(--st-orange-light);  border-color: var(--st-orange-light);  color: var(--st-orange-dark); }
+.chip--error   { background: var(--st-red-light);     border-color: var(--st-red-light);     color: var(--st-red-dark); }
+.chip--dark    { background: var(--st-grey-light);    border-color: var(--st-grey-light);    color: var(--st-grey-dark); }
+
+.chip--accent  .chip__icon, .chip--accent  .chip__marker, .chip--accent  .chip__remove, .chip--accent  .chip__dropdown, .chip--accent  .chip__info, .chip--accent  .chip__count { color: var(--primary); }
+.chip--success .chip__icon, .chip--success .chip__marker, .chip--success .chip__remove, .chip--success .chip__dropdown, .chip--success .chip__info, .chip--success .chip__count { color: var(--st-green); }
+.chip--info    .chip__icon, .chip--info    .chip__marker, .chip--info    .chip__remove, .chip--info    .chip__dropdown, .chip--info    .chip__info, .chip--info    .chip__count { color: var(--st-lblue); }
+.chip--warning .chip__icon, .chip--warning .chip__marker, .chip--warning .chip__remove, .chip--warning .chip__dropdown, .chip--warning .chip__info, .chip--warning .chip__count { color: var(--st-orange); }
+.chip--error   .chip__icon, .chip--error   .chip__marker, .chip--error   .chip__remove, .chip--error   .chip__dropdown, .chip--error   .chip__info, .chip--error   .chip__count { color: var(--st-red); }
+.chip--dark    .chip__icon, .chip--dark    .chip__marker, .chip--dark    .chip__remove, .chip--dark    .chip__dropdown, .chip--dark    .chip__info, .chip--dark    .chip__count { color: var(--st-grey); }
+
+.chip--edit.chip--accent:not(:is(.chip--disabled,[aria-disabled="true"])):hover,  .chip--edit.chip--accent:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover  { background: var(--st-primary-midlight); border-color: var(--st-primary-light); }
+.chip--edit.chip--success:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--success:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-green-midlight);   border-color: var(--st-green-light); }
+.chip--edit.chip--info:not(:is(.chip--disabled,[aria-disabled="true"])):hover,    .chip--edit.chip--info:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover    { background: var(--st-lblue-midlight);   border-color: var(--st-lblue-light); }
+.chip--edit.chip--warning:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--warning:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-orange-midlight);  border-color: var(--st-orange-light); }
+.chip--edit.chip--error:not(:is(.chip--disabled,[aria-disabled="true"])):hover,   .chip--edit.chip--error:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover   { background: var(--st-red-midlight);     border-color: var(--st-red-light); }
+.chip--edit.chip--dark:not(:is(.chip--disabled,[aria-disabled="true"])):hover,    .chip--edit.chip--dark:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover    { background: var(--st-grey-midlight);    border-color: var(--st-grey-light); }
+
+/* outline + tone — только цвет рамки (Mid opacity); заливки НЕТ (прозрачный фон) */
+.chip--outline.chip--accent  { background: transparent; border-color: color-mix(in srgb, var(--primary) 56%, transparent); }
+.chip--outline.chip--success { background: transparent; border-color: var(--st-green-mid); }
+.chip--outline.chip--info    { background: transparent; border-color: var(--st-lblue-mid); }
+.chip--outline.chip--warning { background: transparent; border-color: var(--st-orange-mid); }
+.chip--outline.chip--error   { background: transparent; border-color: var(--st-red-mid); }
+.chip--outline.chip--dark    { background: transparent; border-color: var(--st-grey-mid); }
+
+/* ---------- solid tones — PROPOSED ---------------------------------------- *
+   Насыщенная заливка = status base, текст и иконка белые (--c-mgrey-50).
+   Для критичных статусов, где светлого фона недостаточно (красная/чёрная
+   зона в RiskMetric). Тон-масштаб: чем выше критичность, тем плотнее фон. */
+.chip--success-solid { background: var(--st-green);  border-color: var(--st-green);  color: var(--c-mgrey-50); }
+.chip--warning-solid { background: var(--st-orange); border-color: var(--st-orange); color: var(--c-mgrey-50); }
+.chip--error-solid   { background: var(--st-red);    border-color: var(--st-red);    color: var(--c-mgrey-50); }
+.chip--dark-solid    { background: var(--st-grey);   border-color: var(--st-grey);   color: var(--c-mgrey-50); }
+.chip--success-solid .chip__icon, .chip--success-solid .chip__marker, .chip--success-solid .chip__remove, .chip--success-solid .chip__dropdown, .chip--success-solid .chip__info, .chip--success-solid .chip__count { color: var(--c-mgrey-50); }
+.chip--warning-solid .chip__icon, .chip--warning-solid .chip__marker, .chip--warning-solid .chip__remove, .chip--warning-solid .chip__dropdown, .chip--warning-solid .chip__info, .chip--warning-solid .chip__count { color: var(--c-mgrey-50); }
+.chip--error-solid .chip__icon, .chip--error-solid .chip__marker, .chip--error-solid .chip__remove, .chip--error-solid .chip__dropdown, .chip--error-solid .chip__info, .chip--error-solid .chip__count { color: var(--c-mgrey-50); }
+.chip--dark-solid .chip__icon, .chip--dark-solid .chip__marker, .chip--dark-solid .chip__remove, .chip--dark-solid .chip__dropdown, .chip--dark-solid .chip__info, .chip--dark-solid .chip__count { color: var(--c-mgrey-50); }
+.chip--edit.chip--success-solid:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--success-solid:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-green-dark);  border-color: var(--st-green-dark); }
+.chip--edit.chip--warning-solid:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--warning-solid:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-orange-dark); border-color: var(--st-orange-dark); }
+.chip--edit.chip--error-solid:not(:is(.chip--disabled,[aria-disabled="true"])):hover,   .chip--edit.chip--error-solid:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover   { background: var(--st-red-dark);    border-color: var(--st-red-dark); }
+.chip--edit.chip--dark-solid:not(:is(.chip--disabled,[aria-disabled="true"])):hover,    .chip--edit.chip--dark-solid:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover    { background: var(--st-grey-dark);   border-color: var(--st-grey-dark); }
+
+/* ---------- invalid / validation error on input chip — PROPOSED ----------- */
+.chip--invalid { background: var(--error-bg-light); border-color: var(--st-red-mid); color: var(--error-dark); }
+.chip--invalid .chip__icon, .chip--invalid .chip__marker, .chip--invalid .chip__remove, .chip--invalid .chip__dropdown, .chip--invalid .chip__info, .chip--invalid .chip__count { color: var(--error); }
+.chip--edit.chip--invalid:not(:is(.chip--disabled,[aria-disabled="true"])):hover,
+.chip--edit.chip--invalid:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--error-bg); border-color: var(--error); }
+
+/* ---------- disabled ------------------------------------------------------ */
+:is(.chip--disabled,[aria-disabled="true"]) {
+  background: var(--st-disabled-light);          /* CGrey_600 4% */
+  border-color: var(--st-disabled-light);
+  color: var(--st-disabled-dark);                /* CGrey_600 40% */
+  cursor: not-allowed;
+  pointer-events: none;
+}
+:is(.chip--disabled,[aria-disabled="true"]) .chip__icon, :is(.chip--disabled,[aria-disabled="true"]) .chip__marker, :is(.chip--disabled,[aria-disabled="true"]) .chip__remove, :is(.chip--disabled,[aria-disabled="true"]) .chip__dropdown, :is(.chip--disabled,[aria-disabled="true"]) .chip__info, :is(.chip--disabled,[aria-disabled="true"]) .chip__count { color: var(--st-disabled); /* CGrey_600 24% */ }
+.chip--outline:is(.chip--disabled,[aria-disabled="true"]) { background: transparent; border-color: var(--st-disabled-mid); /* CGrey_600 16% */ }
+/* a disabled chip with long, truncated text must still show its tooltip */
+:is(.chip--disabled,[aria-disabled="true"]).chip--has-tooltip { pointer-events: auto; }
+:is(.chip--disabled,[aria-disabled="true"]) .chip__remove { pointer-events: none; }
+
+/* ---------- loading — PROPOSED -------------------------------------------- */
+/* Индикатор — общий Spinner: <span class="spin"> внутри .chip. */
+.chip--loading .chip__icon, .chip--loading .chip__marker, .chip--loading .chip__remove, .chip--loading .chip__dropdown, .chip--loading .chip__info, .chip--loading .chip__count { color: var(--st-system); }
+.chip .spin {
+  flex: none;
+  width: var(--chip-icon);
+  height: var(--chip-icon);
+  border: 2px solid color-mix(in srgb, var(--st-system) 28%, transparent);
+  border-top-color: var(--st-system);
+}
+
+/* =========================================================================
+   CHIPLIST — wrapping container of chips with consistent gaps
+   ========================================================================= */
+.chiplist {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.chiplist--s { gap: 6px; }
+/* overflow counter «+N» chip uses the same outline visual */</script>
+</body>
+</html>

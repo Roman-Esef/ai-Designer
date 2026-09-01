@@ -1,0 +1,146 @@
+/* =========================================================================
+   Design System — Link
+   A text link for layout/modal navigation and breadcrumbs.
+   Tones:  accent (primary) · muted (Breadcrumbs_1) · neutral (Breadcrumbs_2)
+   Sizes:  m (Body M) · s (Body S)   — inline variant inherits text size
+   States: default · hover (=focus, underline) · pressed · disabled
+   Variants: inline (always underlined) · with-icon / external · truncate
+   Requires: typography.css, colors.css, radius.css
+   ========================================================================= */
+
+.link {
+  /* color comes from the tone; default = accent.
+     --link-fg* — инаследуемые токены темы (Alert/SnackBar переопределяют
+     их для вложенных ссылок). Дефолты (= accent) живут в корне
+     компонента (разрешёно), а не в :not()-правиле — элемент-level значения
+     идентичны прежнему дефолту. */
+  --link-fg:        var(--link);
+  --link-fg-hover:  var(--link-dark);
+  --link-fg-active: var(--c-emerald-900);
+  color: var(--link-fg, var(--link));
+  text-decoration: none;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  border-radius: var(--radius-xs); /* 4px — форма фокус-обводки */
+  -webkit-tap-highlight-color: transparent;
+  transition: color .15s ease, text-decoration-color .15s ease;
+}
+
+/* ---------- sizes (standalone links) -------------------------------------- */
+.link--m { font: var(--type-body-m); letter-spacing: 0; }
+.link--s { font: var(--type-body-s); letter-spacing: 0; }
+
+/* ---------- tones --------------------------------------------------------- *
+   Тон = цвет напрямую (не через --link-fg* в модификаторе). Префикс
+   .link.link--X — чтобы hover/active перебивали базовые :hover/:active независимо от порядка. */
+/* accent — layout & modal links (primary) */
+.link.link--accent  { color: var(--link); }
+.link.link--accent:hover, .link.link--accent.is-hover, .link.link--accent:focus-visible, .link.link--accent.is-focus { color: var(--link-dark); }
+.link.link--accent:active, .link.link--accent.is-pressed { color: var(--c-emerald-900); }
+/* muted — Breadcrumbs_1 (ancestor / secondary crumbs) */
+.link.link--muted   { color: var(--text-inactive); }
+.link.link--muted:hover, .link.link--muted.is-hover, .link.link--muted:focus-visible, .link.link--muted.is-focus { color: var(--text-secondary); }
+.link.link--muted:active, .link.link--muted.is-pressed { color: var(--text-primary); }
+/* neutral — Breadcrumbs_2 (emphasised crumb): non-interactive, Default only */
+.link.link--neutral {
+  color: var(--text-primary);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ---------- semantic state tones (Info · Warning · Error · Success) -------- *
+   Модификатор поверх ссылки — цвет в тон палитры Situative. Переиспользуются
+   в Alert и SnackBar: ссылка внутри плашки получает .link--<тон>, совпадающий
+   с тоном компонента (тот же приём, что и .btn--<тон>). Hover — *-dark,
+   pressed — на ступень темнее. */
+.link.link--info    { color: var(--info); }
+.link.link--info:hover, .link.link--info.is-hover, .link.link--info:focus-visible, .link.link--info.is-focus { color: var(--info-dark); }
+.link.link--info:active, .link.link--info.is-pressed { color: color-mix(in srgb, var(--info-dark) 80%, #000); }
+.link.link--warning { color: var(--warning); }
+.link.link--warning:hover, .link.link--warning.is-hover, .link.link--warning:focus-visible, .link.link--warning.is-focus { color: var(--warning-dark); }
+.link.link--warning:active, .link.link--warning.is-pressed { color: color-mix(in srgb, var(--warning-dark) 80%, #000); }
+.link.link--error   { color: var(--error); }
+.link.link--error:hover, .link.link--error.is-hover, .link.link--error:focus-visible, .link.link--error.is-focus { color: var(--error-dark); }
+.link.link--error:active, .link.link--error.is-pressed { color: color-mix(in srgb, var(--error-dark) 80%, #000); }
+.link.link--success { color: var(--success); }
+.link.link--success:hover, .link.link--success.is-hover, .link.link--success:focus-visible, .link.link--success.is-focus { color: var(--success-dark); }
+.link.link--success:active, .link.link--success.is-pressed { color: color-mix(in srgb, var(--success-dark) 80%, #000); }
+
+/* ---------- hover = focus (underline) ------------------------------------- */
+/* ---------- hover = focus (одинаковое оформление — единый визуал для мыши и клавиатуры, без отдельной обводки) ---- */
+.link:hover,
+.link.is-hover,
+.link:focus-visible,
+.link.is-focus {
+  color: var(--link-fg-hover);
+  text-decoration-line: underline;
+  outline: none;
+}
+
+/* ---------- pressed ------------------------------------------------------- */
+.link:active,
+.link.is-pressed {
+  color: var(--link-fg-active);
+  text-decoration-line: underline;
+}
+
+/* ---------- neutral override — no hover/focus/pressed visuals ------------- */
+.link--neutral:hover,
+.link--neutral.is-hover,
+.link--neutral:focus-visible,
+.link--neutral.is-focus,
+.link--neutral:active,
+.link--neutral.is-pressed {
+  color: var(--text-primary);
+  text-decoration-line: none;
+  outline: none;
+}
+
+/* ---------- disabled ------------------------------------------------------ */
+.link--disabled,
+.link[aria-disabled="true"] {
+  color: var(--text-inactive);
+  text-decoration: none;
+  pointer-events: none;
+  cursor: default;
+}
+
+/* ---------- inline (inside body text) ------------------------------------- */
+/* Inline links must be distinguishable without colour → always underlined. */
+.link--inline {
+  font: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+.link--inline:hover,
+.link--inline.is-hover,
+.link--inline:focus-visible { text-decoration-color: currentColor; }
+
+/* ---------- with icon / external ------------------------------------------ */
+.link--with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: baseline;
+}
+.link__icon { width: 1em; height: 1em; flex: none; display: block; }
+.link__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* ---------- truncation ---------------------------------------------------- */
+.link--truncate {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+/* =========================================================================
+   Breadcrumbs — вынесен в отдельный компонент, см. styles/breadcrumbs.css
+   и Breadcrumbs.html (полная спецификация: анатомия, авто-схлопывание,
+   обрезка текущей крошки, доступность). Здесь остаются только ссылки
+   Breadcrumbs_1 / Breadcrumbs_2 (тона .link--muted / .link--neutral выше).
+   ========================================================================= */

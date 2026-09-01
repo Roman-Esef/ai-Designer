@@ -1,0 +1,577 @@
+<!-- @dsCard group="Components" name="DatePicker" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DatePicker — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/datepicker.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/input-pages.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<style>
+  /* демо-стадия (docs-split): растяжение на ширину панели демо;
+     padding/фон/min-height — из input-pages.css */
+  .pg__stage { flex:1; width:100%; }
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="DatePicker">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage" id="pg-stage"></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.005</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>DatePicker</h1>
+    <p class="lead">Календарь — всплывающая поверхность выбора даты или диапазона дат. Поднимается полями <a class="inl" href="InputDate.html">InputDate</a> и <a class="inl" href="InputDateRange.html">InputDateRange</a> при фокусе или по кнопке-календарю. Material-подход, собранный на токенах и шрифтах ДС. Неделя начинается с понедельника, локаль — русская.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc">DatePicker — единственный способ выбора даты указателем. Он не вводится в поток формы сам по себе, а всплывает над полем InputDate / InputDateRange (floating) либо встраивается в панель или модалку (inline). С клавиатуры дату можно ввести и без календаря — прямо в поле по маске.</p>
+    <div class="panel">
+      <div class="use-grid">
+        <div class="use-block">
+          <div class="use-block__stage" id="use-single"></div>
+          <div class="use-block__cap">Одиночная дата — выбор одного дня для поля InputDate.</div>
+        </div>
+        <div class="use-block">
+          <div class="use-block__stage" id="use-range"></div>
+          <div class="use-block__cap">Диапазон — начало и конец периода для InputDateRange, промежуток подсвечен.</div>
+        </div>
+        <div class="use-block">
+          <div class="use-block__stage" id="use-inline"></div>
+          <div class="use-block__cap">Inline — встроенный в модалку/панель, с кнопками подтверждения.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsec" data-screen-label="WhenToUse">
+      <h3>Когда использовать</h3>
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li>выбор конкретной даты указателем: подписание, транш, плановая дата;</li>
+        <li>выбор периода «с … по …» — режим диапазона для InputDateRange;</li>
+        <li>выбор месяца целиком (отчётный период) — режим «Месяц».</li>
+      </ul>
+      <p class="desc">Для ручного ввода одной даты по маске поле <a class="inl" href="InputDate.html">InputDate</a> достаточно и без открытия календаря. Выбор из справочника значений — <a class="inl" href="InputAutocomplete.html">InputAutocomplete</a>, не календарь.</p>
+    </div>
+
+    <div class="subsec" data-screen-label="WhenNotToUse">
+      <h3>Когда не использовать</h3>
+      <ul class="bullets">
+        <li>для быстрого ввода известной даты, когда календарь только мешает, — оставьте ввод по маске в поле;</li>
+        <li>для выбора из 2–6 фиксированных периодов (Неделя / Месяц / Год) — это <a class="inl" href="SegmentControl.html">SegmentControl</a>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Поверхность из трёх зон: шапка с навигацией, сетка дней и опциональный футер с подтверждением.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage" id="anat-diagram"></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Заголовок</span><span class="d"> — месяц и год; клик открывает выбор года → месяца</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Навигация</span><span class="d"> — стрелки «назад / вперёд» листают месяцы (<code class="tok">.ibtn</code>)</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Дни недели</span><span class="d"> — строка Пн…Вс, Body XS, <code class="tok">--text-inactive</code></span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Сетка дней</span><span class="d"> — 6×7 ячеек 40px; сегодня, выбор, диапазон, недоступно</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Футер</span><span class="d"> — опционально: «Сегодня» слева, «Отмена / Готово» справа</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации: режим выбора, текущее представление и наличие футера.</p>
+
+    <div class="subsec" data-screen-label="Modes">
+      <h3>Режимы выбора</h3>
+      <p class="desc">Одиночная дата, диапазон дат и выбор месяца целиком.</p>
+      <div class="panel"><div class="demo-grid" id="var-modes-grid">
+        <span id="var-single"></span><span id="var-range"></span><span id="var-month"></span>
+      </div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Views">
+      <h3>Представления</h3>
+      <p class="desc">Три внутренних представления одной поверхности: дни, месяцы, годы. Переключаются кликом по заголовку и стрелками.</p>
+      <div class="panel"><div class="demo-grid" id="var-views-grid">
+        <span id="var-view-day"></span><span id="var-view-month"></span><span id="var-view-year"></span>
+      </div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Footer">
+      <h3>С футером и без</h3>
+      <p class="desc">Без футера выбор применяется сразу (docked). Футер добавляют, когда нужно подтверждение (Отмена / Готово) или быстрый переход к сегодняшней дате.</p>
+      <div class="panel"><div class="demo-grid" id="var-foot-grid">
+        <span id="var-foot-none"></span><span id="var-foot-btns"></span><span id="var-foot-quick"></span>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Один размер поверхности: фиксированная ширина 304px (7 ячеек по 40px + паддинг 12px) — одинаковая для всех вариантов футера, сетка всегда растянута на всю ширину без пустот по бокам. Ячейка дня 40×40, кружок числа 36px. Меняется не размер, а способ размещения: floating (всплывает над полем, с тенью) и inline (встроен в контейнер, без тени, с рамкой).</p>
+    <div class="panel"><div class="demo-grid" id="sizes-grid">
+      <span id="sizes-floating"></span><span id="sizes-inline"></span>
+    </div></div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Поверхность одна на оба режима (floating и inline); скругления внутренних ячеек различают день, месяц и год.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поверхность календаря</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-m</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок месяца и года (кнопка)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ячейка дня</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ячейка панели месяцев и годов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Правила контента:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>неделя начинается с <b>понедельника</b>, дни недели — двухбуквенные (Пн…Вс);</li>
+      <li>заголовок — месяц в именительном падеже и год: «Октябрь 2025»;</li>
+      <li>дни соседних месяцев показываются приглушённо и остаются кликабельными (переводят на свой месяц);</li>
+      <li>границы <code class="tok">min</code> / <code class="tok">max</code> делают даты вне диапазона недоступными (disabled), а не скрывают их.</li>
+    </ul>
+    <div class="panel"><div class="demo-grid" id="content-demo-grid"><span id="content-demo"></span></div></div>
+    <p class="desc" style="margin-top:16px;">Здесь доступны только дни с 3 по 27 октября — остальные недоступны.</p>
+  </section>
+
+  <!-- BEHAVIOR -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Навигация по периодам, выбор диапазона и позиционирование относительно поля.</p>
+
+    <div class="subsec" data-screen-label="Navigation">
+      <h3>Навигация</h3>
+      <p class="desc">Стрелки листают на месяц назад / вперёд. Клик по заголовку открывает выбор года, затем месяца (представления year → month → day). В представлении года стрелки листают на 12 лет.</p>
+      <div class="panel"><div class="demo-grid" id="beh-nav-grid"><span id="beh-nav"></span></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="RangeSelection">
+      <h3>Выбор диапазона</h3>
+      <p class="desc">Первый клик задаёт начало (конец сбрасывается), второй — конец. Клик по дате раньше начала перезапускает выбор с новой начальной даты. Промежуток между концами подсвечивается полосой <code class="tok">--primary-bg</code>.</p>
+      <div class="panel"><div class="demo-grid" id="beh-range-grid"><span id="beh-range"></span></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Positioning">
+      <h3>Позиционирование</h3>
+      <p class="desc">В режиме floating календарь всплывает под полем с зазором и авто-разворотом вверх, если внизу не хватает места, — приём идентичен <a class="inl" href="../organisms/Popover.html">Popover</a> (<code class="tok">role="dialog"</code>, <code class="tok">aria-modal="false"</code>). Одновременно открыт только один календарь. В режиме inline поверхность встроена в контейнер и не позиционируется.</p>
+    </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Состояния — на уровне ячейки дня. Наведение даёт мягкую заливку кружка, сегодня — обводка <code class="tok">--primary</code>, выбор и концы диапазона — заливка <code class="tok">--primary</code> с белым числом, промежуток — полоса, недоступные даты приглушены и не реагируют.</p>
+    <div class="panel"><div class="demo-grid" id="states-demo"></div></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Поверхность — <code class="tok">role="dialog"</code> с <code class="tok">aria-modal="false"</code> и <code class="tok">aria-label="Выбор даты"</code>. Сетка — <code class="tok">role="grid"</code>, ячейки — <code class="tok">role="gridcell"</code> с полным <code class="tok">aria-label</code> даты («15 октября 2025»), выбранная несёт <code class="tok">aria-selected="true"</code>. Недоступные — <code class="tok">aria-disabled="true"</code>. Стрелки и заголовок — настоящие кнопки с <code class="tok">aria-label</code>.</p>
+    <div class="panel" style="max-width:640px;">
+      <p class="desc tight" style="margin-bottom:18px;">Клавиатура</p>
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.22fr 2.43fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>←</kbd> <kbd>→</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">предыдущий / следующий день</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 2.43fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>↑</kbd> <kbd>↓</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">та же дата неделей раньше / позже</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 2.43fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>PageUp</kbd> / <kbd>PageDown</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">предыдущий / следующий месяц</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 2.43fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Home</kbd> / <kbd>End</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">начало / конец недели</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 2.43fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Enter</kbd> / <kbd>Space</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">выбрать дату в фокусе</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 2.43fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Esc</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">закрыть календарь, фокус возвращается в поле</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Заголовок — <b>SB Sans Text</b> Body S Strong; числа и ячейки — Body S с табличными цифрами; дни недели — Body XS.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок (месяц/год)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s-strong)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Дни недели</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Число дня</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.4fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ячейка месяца / года</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Только семантические токены. Поверхность — <code class="tok">--bg-popup</code> с тенью <code class="tok">--elevation-5</code>; выбор и концы диапазона — <code class="tok">--primary</code>; промежуток — <code class="tok">--primary-bg</code>; сегодня — обводка <code class="tok">--primary</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поверхность</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон календаря</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-popup</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-popup)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поверхность</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Тень (floating)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--elevation-5</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поверхность</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Рамка (inline)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E1EDE7</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Поверхность</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Радиус</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Дни и статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Число дня</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Дни и статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Дни недели / соседний месяц</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Дни и статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Ховер дня</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bgtable-row-hover</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bgtable-row-hover)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#F6FAFA</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Дни и статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Сегодня (обводка)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Дни и статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Выбрано / концы диапазона (фон)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Дни и статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">В диапазоне (полоса)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 1.85fr 1.31fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Дни и статусы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Недоступно</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">24% #324844</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры поверхности и алгоритм построения сетки/выбора. Календарь framework-agnostic — верстка на токенах, логика описана псевдокодом.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/datepicker.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/shadow.css</code>
+      <code class="tok">styles/icon-button.css</code>
+      <code class="tok">styles/button.css</code>
+      <code class="tok">styles/datepicker.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Сетка: firstOfMonth; lead = (firstOfMonth.weekday + 6) % 7 (Пн = 0);</span>
+<span class="tk-cm">//    gridStart = firstOfMonth − lead дней; рисуем 42 ячейки (6 недель).</span>
+<span class="tk-cm">//    Ячейка вне текущего месяца → класс outside (приглушённая).</span>
+
+<span class="tk-cm">// 2. Классы дня: today (обводка), selected (заливка), disabled (min/max),</span>
+<span class="tk-cm">//    range-start / range-end (заливка) + in-range (полоса между концами).</span>
+
+<span class="tk-cm">// 3. Выбор диапазона: клик1 → start, end = null; клик2 → если дата < start,</span>
+<span class="tk-cm">//    то start = дата (перезапуск), иначе end = дата.</span>
+
+<span class="tk-cm">// 4. Навигация: стрелки ±1 месяц (в day), ±1 год (в month), ±12 лет (в year).</span>
+<span class="tk-cm">//    Заголовок: day → year → month → day.</span>
+
+<span class="tk-cm">// 5. Позиционирование (floating): под полем, зазор 8px, авто-flip вверх,</span>
+<span class="tk-cm">//    как Popover; один открытый календарь; Esc — закрыть, фокус в поле.</span>
+
+<span class="tk-cm">// 6. Клавиатура: стрелки — по дням/неделям, PageUp/Down — месяц,</span>
+<span class="tk-cm">//    Home/End — неделя, Enter/Space — выбрать, Esc — закрыть.</span></code></pre>
+    </div>
+
+    </section>
+
+  <!-- BACKLOG -->
+  <div class="backlog" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых пока нет в компоненте:</p>
+    <ul class="bullets">
+      <li>пресеты диапазонов (Сегодня, 7 дней, Месяц, Квартал) колонкой слева от сетки;</li>
+      <li>двухмесячная раскладка для выбора длинных диапазонов;</li>
+      <li>выбор времени (ЧЧ:ММ) под сеткой — DateTimePicker;</li>
+      <li>подсветка диапазона по наведению (hover-preview) до второго клика.</li>
+    </ul>
+  </div>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · DatePicker</span>
+    <span>single / range / month · day / month / year · footer · min-max · Material в токенах ДС</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите календарь: режим выбора и футер. Выбор живой — кликайте по дням, листайте месяцы стрелками, откройте выбор года кликом по заголовку.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/datepicker.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-datepicker.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/datepicker.page.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Кнопки Отменить / Применить': 'Показывать кнопки Отменить / Применить', 'Быстрое «Сегодня»': 'Показывать «Сегодня»' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><div class="dpk" role="dialog" aria-modal="false" aria-label="Выбор даты">
+  <div class="dpk__head">
+    <button class="dpk__caption" aria-haspopup="true"><span>Октябрь 2025</span><span class="dpk__cap-icon">…chevron-down…</span></button>
+    <div class="dpk__nav">
+      <button class="ibtn ibtn--neutral ibtn--s dpk__prev" aria-label="Назад">…chevron-left…</button>
+      <button class="ibtn ibtn--neutral ibtn--s dpk__next" aria-label="Вперёд">…chevron-right…</button>
+    </div>
+  </div>
+  <div class="dpk__weekdays" aria-hidden="true"><span class="dpk__weekday">Пн</span>…<span class="dpk__weekday">Вс</span></div>
+  <div class="dpk__grid" role="grid">
+    <button class="dpk__day dpk__day--outside" role="gridcell" aria-label="29 сентября 2025" tabindex="-1"><span class="dpk__daynum">29</span></button>
+    <button class="dpk__day dpk__day--today" role="gridcell" aria-label="15 октября 2025" aria-selected="false" tabindex="-1"><span class="dpk__daynum">15</span></button>
+    <button class="dpk__day dpk__day--selected" role="gridcell" aria-selected="true" tabindex="0"><span class="dpk__daynum">21</span></button>
+    <!-- диапазон: --range-start / --in-range / --range-end -->
+  </div>
+  <!-- опц. футер -->
+  <div class="dpk__foot">
+    <div class="dpk__foot-left"><button class="btn btn--transparent btn--xs dpk__today"><span class="btn__label">Сегодня</span></button></div>
+    <div class="dpk__foot-right">
+      <button class="btn btn--transparent btn--xs dpk__cancel"><span class="btn__label">Отменить</span></button>
+      <button class="btn btn--accent btn--xs dpk__ok"><span class="btn__label">Применить</span></button>
+    </div>
+  </div>
+</div>
+<!-- панель месяца/года: root + .dpk--panel, тело .dpk__panel(.--years) > .dpk__panel-cell(.--current/.--selected/.--disabled) --></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/datepicker.page.js)
+// Календарь строит общий рантайм: window.DSDatePicker.makeCalendar(spec)
+const spec = {
+  today: new Date(2025, 9, 15),   // фикс. «сегодня» для стабильной документации
+  mode: 'single',                 // 'single' | 'range' | 'month' (view='month')
+  selected: new Date(2025, 9, 15),
+  rangeStart: new Date(2025, 9, 8), rangeEnd: new Date(2025, 9, 21),
+  min: null, max: null,           // ограничения доступности дней
+  live: true,                     // живой выбор
+  foot: false, quick: false,      // футер «Отменить/Применить» + «Сегодня»
+  inline: false,                  // docked — без тени, только рамка
+  view: 'day'                     // 'day' | 'month' | 'year'
+};
+// .dpk (role="dialog") + .dpk__head/.dpk__weekdays/.dpk__grid/.dpk__foot</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   DatePicker (Календарь) — всплывающая поверхность выбора даты/диапазона.
+   Поднимается полями InputDate / InputDateRange. Material-подход в токенах ДС.
+   Только семантические токены; собственных цветов/радиусов/теней нет.
+   Зависимости на экране: styles/icon-button.css (стрелки, ✕), styles/button.css (футер).
+   ========================================================================= */
+
+/* ---------- контейнер ---------- */
+.dpk {
+  --dpk-cell: 40px;
+  display: inline-flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: calc(var(--dpk-cell) * 7 + 24px);
+  padding: 12px;
+  background: var(--bg-popup);
+  border-radius: var(--radius-m);
+  box-shadow: var(--elevation-5);
+  color: var(--text-primary);
+  user-select: none;
+  flex: none;
+}
+/* встроенный (docked, без тени) — например, внутри модалки/панели */
+.dpk--inline { box-shadow: none; border: 1px solid var(--border-light); }
+
+/* ---------- шапка: заголовок + навигация ---------- */
+.dpk__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 40px;
+  padding: 0 2px 0 4px;
+}
+.dpk__caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 6px 0 8px;
+  min-width: 0;
+  max-width: 100%;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color .12s;
+}
+.dpk__caption > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.dpk__caption:hover { background: var(--bgtable-row-hover); }
+.dpk__caption:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.dpk__cap-icon { display: inline-flex; color: var(--text-secondary); transition: transform .18s; }
+.dpk__cap-icon :is(svg,[data-icon]){ width: 18px; height: 18px; display: block; }
+.dpk--panel .dpk__cap-icon { transform: rotate(180deg); }
+.dpk__nav { display: inline-flex; gap: 2px; }
+/* в режиме выбора месяца/года стрелки листают блок (±1 год у месяцев, ±12 лет у годов) */
+
+/* ---------- дни недели ---------- */
+.dpk__weekdays { display: grid; grid-template-columns: repeat(7, var(--dpk-cell)); margin-top: 4px; }
+.dpk__weekday {
+  height: 32px;
+  display: grid;
+  place-items: center;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+}
+
+/* ---------- сетка дней ---------- */
+.dpk__grid { display: grid; grid-template-columns: repeat(7, var(--dpk-cell)); grid-auto-rows: var(--dpk-cell); }
+.dpk__day {
+  position: relative;
+  width: var(--dpk-cell);
+  height: var(--dpk-cell);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: var(--type-body-s);
+  color: var(--text-primary);
+}
+/* фон-полоса диапазона (позади кружка) */
+.dpk__day::before {
+  content: "";
+  position: absolute;
+  top: 2px; bottom: 2px; left: 0; right: 0;
+  background: transparent;
+  z-index: 0;
+}
+.dpk__day--in-range::before { background: var(--primary-bg); }
+.dpk__day--range-start::before { background: var(--primary-bg); left: 50%; }
+.dpk__day--range-end::before   { background: var(--primary-bg); right: 50%; }
+
+/* кружок числа */
+.dpk__daynum {
+  position: relative;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+  transition: background-color .12s, box-shadow .12s, color .12s;
+}
+.dpk__day:not(.dpk__day--disabled):not([aria-disabled="true"]):not(.dpk__day--selected):not([aria-selected="true"]):not(.dpk__day--range-start):not(.dpk__day--range-end):hover .dpk__daynum {
+  background: var(--bgtable-row-hover);
+}
+.dpk__day:focus-visible { outline: none; }
+.dpk__day:focus-visible .dpk__daynum { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+/* дни соседних месяцев */
+.dpk__day--outside .dpk__daynum { color: var(--text-inactive); }
+
+/* сегодня */
+.dpk__day--today .dpk__daynum { box-shadow: inset 0 0 0 1px var(--primary); color: var(--primary); font-weight: 600; }
+
+/* выбрано / концы диапазона — класс форс-состояния витрины; реальная ячейка
+   несёт aria-selected="true" (грид-паттерн, RulesAudit W1). */
+.dpk__day--selected .dpk__daynum,
+.dpk__day[aria-selected="true"] .dpk__daynum,
+.dpk__day--range-start .dpk__daynum,
+.dpk__day--range-end .dpk__daynum {
+  background: var(--primary);
+  color: var(--text-on-dark);
+  box-shadow: none;
+  font-weight: 600;
+}
+
+/* недоступно */
+.dpk__day--disabled,
+.dpk__day[aria-disabled="true"] { cursor: default; }
+.dpk__day--disabled .dpk__daynum,
+.dpk__day[aria-disabled="true"] .dpk__daynum { color: var(--st-disabled); }
+.dpk__day--disabled::before,
+.dpk__day[aria-disabled="true"]::before { display: none; }
+
+/* ---------- панель выбора месяца / года ---------- */
+.dpk__panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 6px;
+  padding: 10px 4px 4px;
+}
+.dpk__panel--years { max-height: 236px; overflow-y: auto; overscroll-behavior: contain; }
+.dpk__panel-cell {
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: background-color .12s, box-shadow .12s, color .12s;
+}
+.dpk__panel-cell:hover { background: var(--bgtable-row-hover); }
+.dpk__panel-cell:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.dpk__panel-cell--current { box-shadow: inset 0 0 0 1px var(--primary); color: var(--primary); }
+.dpk__panel-cell--selected { background: var(--primary); color: var(--text-on-dark); box-shadow: none; font-weight: 600; }
+.dpk__panel-cell--disabled { color: var(--st-disabled); cursor: default; }
+.dpk__panel-cell--disabled:hover { background: transparent; }
+
+/* ---------- футер ---------- */
+.dpk__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+}
+.dpk__foot-left { display: inline-flex; align-items: center; gap: 8px; }
+.dpk__foot-right { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dpk__cap-icon, .dpk__daynum, .dpk__panel-cell { transition: none; }
+}</script>
+</body>
+</html>

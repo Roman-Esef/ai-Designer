@@ -1,0 +1,289 @@
+<!-- @dsCard group="Type" name="Typography" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Типографика — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/ds-toc.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* ---------- Page frame ---------- */
+
+  
+  
+  .masthead p {
+    font: var(--type-body-l);
+    color: var(--text-primary);
+    max-width: 56ch;
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  /* meta strip */
+  .families {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border-light);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 48px 0 8px;
+  }
+  @media (max-width: 760px) { .families { grid-template-columns: 1fr; } }
+  .family { background: var(--bg-tile); padding: 28px 30px; }
+  .family .glyphs { font-family: var(--font-display); font-size: 46px; line-height: 1; color: var(--text-primary); margin-bottom: 18px; }
+  .family.text .glyphs   { font-family: var(--font-text); }
+  .family.screen .glyphs { font-family: var(--font-screen); }
+  .family h3 { font: var(--type-h6-strong); margin: 0 0 6px; }
+  .family .role { font: var(--type-body-s); color: var(--text-secondary); margin: 0 0 14px; }
+  .family .weights { display: flex; flex-wrap: wrap; gap: 6px; }
+  .family .weights span {
+    font: var(--type-button-xs);
+    color: var(--text-primary);
+    background: var(--bgtable-row-hover);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+
+  /* ---------- Section ---------- */
+  
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 8px;
+    padding-bottom: 16px;
+  }
+  .section-head h2 { font: var(--type-h4-strong); margin: 0; }
+  .section-head .count { font: var(--type-body-s); color: var(--text-secondary); }
+  .section-head .fam {
+    margin-left: auto;
+    font: var(--type-button-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  /* ---------- Specimen rows ---------- */
+  .rows { border-top: 1px solid var(--border-light); }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 40px;
+    align-items: center;
+    padding: 26px 4px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .row:hover { background: var(--bgtable-row-hover); }
+  .specimen { min-width: 0; overflow: hidden; }
+  .specimen .name {
+    font: var(--type-body-xs);
+    color: var(--primary);
+    margin: 0 0 10px;
+    letter-spacing: 0.04em;
+  }
+  .specimen .sample { color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .specimen .usage {
+    font: var(--type-body-s);
+    color: var(--text-secondary);
+    margin: 12px 0 0;
+    max-width: 64ch;
+    text-wrap: pretty;
+    white-space: normal;
+  }
+
+  .spec {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 4px 22px;
+    align-content: center;
+    justify-content: end;
+  }
+  .spec .pair { text-align: right; }
+  .spec .k { font: var(--type-button-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+  .spec .v { font: var(--type-body-s-strong); color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .spec .v.font { color: var(--text-primary); }
+
+  @media (max-width: 860px) {
+    .row { grid-template-columns: 1fr; gap: 18px; }
+    .spec { justify-content: start; grid-template-columns: repeat(4, auto); gap: 4px 18px; }
+    .spec .pair { text-align: left; }
+    .specimen .sample { white-space: normal; }
+  }
+
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+</head>
+<body>
+<main class="page" data-screen-label="Typography">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.001</b></span><span>Обновлено: <b>07.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Основы</p>
+    <h1>Типографика</h1>
+    <p>Три гарнитуры SB Sans формируют всю текстовую иерархию продукта. Display — для заголовков, Text — для контента, Screen — для элементов управления. Letter spacing везде равен 0.</p>
+  </header>
+
+  <section class="families">
+    <div class="family display">
+      <div class="glyphs">Ag</div>
+      <h3>SB Sans Display</h3>
+      <p class="role">Заголовки H1–H6</p>
+      <div class="weights"><span>Light</span><span>Regular</span><span>Semibold</span></div>
+    </div>
+    <div class="family text">
+      <div class="glyphs">Ag</div>
+      <h3>SB Sans Text</h3>
+      <p class="role">Основной текст Body</p>
+      <div class="weights"><span>Regular</span><span>Semibold</span></div>
+    </div>
+    <div class="family screen">
+      <div class="glyphs">Ag</div>
+      <h3>SB Sans Screen</h3>
+      <p class="role">Текст кнопок Button</p>
+      <div class="weights"><span>Regular</span></div>
+    </div>
+  </section>
+
+  <!-- ===================== HEADINGS ===================== -->
+  <section class="section" data-screen-label="Headings">
+    <div class="section-head">
+      <h2>Заголовки</h2>
+      <span class="count">10 стилей</span>
+      <span class="fam">SB Sans Display</span>
+    </div>
+    <div class="rows" id="headings"></div>
+  </section>
+
+  <!-- ===================== BODY ===================== -->
+  <section class="section" data-screen-label="Body">
+    <div class="section-head">
+      <h2>Основной текст</h2>
+      <span class="count">9 стилей</span>
+      <span class="fam">SB Sans Text</span>
+    </div>
+    <div class="rows" id="body"></div>
+  </section>
+
+  <!-- ===================== BUTTONS ===================== -->
+  <section class="section" data-screen-label="Buttons">
+    <div class="section-head">
+      <h2>Текст кнопок</h2>
+      <span class="count">3 стиля</span>
+      <span class="fam">SB Sans Screen</span>
+    </div>
+    <div class="rows" id="buttons"></div>
+  </section>
+
+  <section class="section" data-screen-label="Metrics">
+    <div class="section-head">
+      <h2>Оптическая нормализация метрик Display</h2>
+      <span class="count">05.08.2026</span>
+      <span class="fam">@font-face</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;padding:20px 0;">
+      <p style="margin:0;max-width:70ch;font:var(--type-body-m);color:var(--text-secondary);text-wrap:pretty;">У SB Sans Display собственные метрики несимметричны относительно визуального блока (cap-height ↔ descender): заголовок вставал на 4% em выше оптического центра строки. В <code>@font-face</code> добавлены <code>ascent-override</code> и <code>descent-override</code>, совмещающие центр content-area с оптическим центром глифов. SB Sans Text и SB Sans Screen — с исходными метриками.</p>
+      <div class="tbl" style="max-width:560px;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr 1fr 1fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Фейс</span></div>
+          <div class="th"><span class="th__label">ascent-override</span></div>
+          <div class="th"><span class="th__label">descent-override</span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.6fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">SB Sans Display 300 / 400 / 600</span></span></div>
+          <div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">80%</span></span></div>
+          <div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">29%</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+      <p style="margin:0;max-width:70ch;font:var(--type-body-xs);color:var(--text-inactive);text-wrap:pretty;">Сумма ascent + descent сохранена, поэтому <code>line-height: normal</code> и высоты строк не изменились — двигается только положение глифов внутри строки.</p>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Типографика</span>
+    <span>SB Sans Display · Text · Screen — Letter spacing 0</span>
+  </footer>
+
+</main>
+
+<script>
+  // token: [class, name, sample, font, weight, size, line-height, usage]
+  const headings = [
+    ["ds-h1",        "H1",        "Заголовок",     "Display", "Light",    52, 68, "В редких случаях для экранов ошибки"],
+    ["ds-h2",        "H2",        "Заголовок",     "Display", "Light",    42, 52, "—"],
+    ["ds-h3-strong", "H3 Strong", "Заголовок",     "Display", "Semibold", 28, 32, "Основной заголовок страницы"],
+    ["ds-h3",        "H3",        "Заголовок",     "Display", "Regular",  28, 32, "—"],
+    ["ds-h4-strong", "H4 Strong", "Заголовок",     "Display", "Semibold", 22, 24, "Заголовок шапки модального окна"],
+    ["ds-h4",        "H4",        "Заголовок",     "Display", "Regular",  22, 24, "—"],
+    ["ds-h5-strong", "H5 Strong", "Заголовок",     "Display", "Semibold", 18, 24, "Заголовок информационных карточек-плиток на страницах"],
+    ["ds-h5",        "H5",        "Заголовок",     "Display", "Regular",  18, 24, "—"],
+    ["ds-h6-strong", "H6 Strong", "Заголовок",     "Display", "Semibold", 16, 20, "Заголовки разделов внутри модального окна · заголовок в интерактивных плитках (например Card_contractor)"],
+    ["ds-h6",        "H6",        "Заголовок",     "Display", "Regular",  16, 20, "Подзаголовок некоторых блоков и разделов, где избыточно применение более акцентного H6 Strong"],
+  ];
+
+  const body = [
+    ["ds-body-xl",        "Body XL",        "Основной текст", "Text", "Regular",  24, 32, "—"],
+    ["ds-body-xl-strong", "Body XL Strong", "Основной текст", "Text", "Semibold", 24, 32, "—"],
+    ["ds-body-l",         "Body L",         "Основной текст", "Text", "Regular",  18, 24, "Заголовки в алертах"],
+    ["ds-body-l-strong",  "Body L Strong",  "Основной текст", "Text", "Semibold", 18, 24, "—"],
+    ["ds-body-m",         "Body M",         "Основной текст", "Text", "Regular",  16, 20, "Основной текст на всех страницах · текст чекбоксов и радио-кнопок · текст в инпутах и информационных полях размера M · текст в табах размера M"],
+    ["ds-body-m-strong",  "Body M Strong",  "Основной текст", "Text", "Semibold", 16, 20, "Акцентный текст на страницах"],
+    ["ds-body-s",         "Body S",         "Основной текст", "Text", "Regular",  14, 16, "Текст в хлебных крошках · текст в чипах размера S · заголовки в снек-баре · текст в тултипах · текст в ячейках таблиц"],
+    ["ds-body-s-strong",  "Body S Strong",  "Основной текст", "Text", "Semibold", 14, 16, "—"],
+    ["ds-body-xs",        "Body XS",        "Основной текст", "Text", "Regular",  12, 16, "Лейбл инпутов, дропдаун-инпутов и информационных полей · текст в алертах · текст в снек-баре"],
+  ];
+
+  const buttons = [
+    ["ds-button-m",  "Button M",  "Текст кнопки", "Screen", "Regular", 16, 24, "Текст в кнопках размера M"],
+    ["ds-button-s",  "Button S",  "Текст кнопки", "Screen", "Regular", 14, 20, "Текст в кнопках размера S и XS"],
+    ["ds-button-xs", "Button XS", "Текст кнопки", "Screen", "Regular", 12, 16, "—"],
+  ];
+
+  function specPair(k, v, isFont) {
+    return `<div class="pair"><div class="k">${k}</div><div class="v${isFont ? ' font' : ''}">${v}</div></div>`;
+  }
+
+  function render(targetId, tokens) {
+    const html = tokens.map(([cls, name, sample, font, weight, size, lh, usage]) => {
+      const usageHtml = usage === "—"
+        ? `<p class="usage">—</p>`
+        : `<p class="usage">${usage}</p>`;
+      return `
+      <div class="row">
+        <div class="specimen">
+          <p class="name">${name}</p>
+          <div class="sample ${cls}">${sample}</div>
+          ${usageHtml}
+        </div>
+        <div class="spec">
+          ${specPair("Font", "SB Sans " + font, true)}
+          ${specPair("Weight", weight)}
+          ${specPair("Size", size)}
+          ${specPair("Line", lh)}
+        </div>
+      </div>`;
+    }).join("");
+    document.getElementById(targetId).innerHTML = html;
+  }
+
+  render("headings", headings);
+  render("body", body);
+  render("buttons", buttons);
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-toc.js"></script>
+</body>
+</html>

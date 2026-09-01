@@ -1,0 +1,138 @@
+/* =========================================================================
+   Design System — Toast
+   Индикатор запуска фонового / блокирующего процесса. Тёмная «пилюля»,
+   всплывающая по верхней границе рабочей области по центру.
+
+   Роли:      bar (фоновый, авто-скрытие) · loader (блокирующий, затемнение)
+   Ведущий слот: none · spinner (loader) · status icon  (взаимоисключающие)
+   Тоны:      neutral · success · error · info
+   Показ:     single · stack (≤ 3) с переполнением
+
+   Requires: typography.css, colors.css, radius.css
+   (опц. shadow.css для --elevation-2, icons — currentColor SVG)
+   ========================================================================= */
+
+:root {
+  /* геометрия пилюли — токены, а не хардкод */
+  --toast-bg:      var(--st-grey);              /* StGrey · CGrey_700 #333F48         */
+  --toast-fg:      var(--text-on-dark);         /* текст — белый                      */
+  --toast-radius:  var(--radius-control);       /* 8px                                */
+  --toast-pad-y:   11px;
+  --toast-pad-x:   16px;
+  --toast-gap:     8px;                          /* зазор ведущий-слот ↔ текст         */
+  --toast-icon:    16px;                         /* размер иконки / спиннера           */
+  --toast-shadow:  var(--elevation-2);           /* 0 10px 30px rgba(40,50,55,.16)     */
+  --toast-maxw:    60%;                           /* макс. ширина = 60% рабочей области */
+  --toast-guard:   24px;                          /* охранное поле вокруг компонента    */
+
+  --toast-stack-gap: 8px;                         /* зазор между тостами в стеке        */
+  --toast-scrim:  color-mix(in srgb, var(--st-grey) 25%, transparent); /* затемнение 25% */
+
+  /* акцентные тона иконок — семантические токены Situative (светлые рампы) */
+  --toast-icon-success: var(--success-light);    /* LightGreen_400 #9CCC65 */
+  --toast-icon-error:   var(--error-light);      /* Red_200 #E57373        */
+  --toast-icon-info:    var(--info-light);       /* LightBlue_400 #29B6F6  */
+}
+
+/* ---------- базовая пилюля ------------------------------------------------- */
+.toast {
+  display: inline-flex;
+  align-items: flex-start;               /* иконка выравнивается по верхней строке текста */
+  gap: var(--toast-gap);
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--toast-pad-y) var(--toast-pad-x);
+  border-radius: var(--toast-radius);
+  background: var(--toast-bg);
+  color: var(--toast-fg);
+  box-shadow: var(--toast-shadow);
+  font: var(--type-body-s);
+  letter-spacing: 0;
+  text-align: left;
+}
+
+/* ведущий слот — спиннер и/или статус-иконка; выше текста при переносе */
+.toast__lead {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* центрируем слот по высоте первой строки текста.
+     Фолбэк для браузеров без единицы lh: 16/14 — line-height/font-size --type-body-s. */
+  height: calc(1em * 16 / 14);
+  height: 1lh;
+}
+.toast__lead:empty { display: none; }
+
+/* статус-иконка */
+.toast__icon { flex: none; width: var(--toast-icon); height: var(--toast-icon); display: block; color: var(--toast-fg); }
+.toast__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* сообщение */
+.toast__msg {
+  min-width: 0;
+  color: var(--toast-fg);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- спиннер — общий Spinner: <span class="spin spin--current"> в .toast__lead ------ */
+.toast__lead .spin { width: var(--toast-icon); height: var(--toast-icon); }
+
+/* ---------- тоны статус-иконки --------------------------------------------- */
+.toast--success .toast__icon { color: var(--toast-icon-success); }
+.toast--error   .toast__icon { color: var(--toast-icon-error); }
+.toast--info    .toast__icon { color: var(--toast-icon-info); }
+
+/* ---------- стек тостов ---------------------------------------------------- */
+.toast-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--toast-stack-gap);
+  max-width: var(--toast-maxw);
+}
+.toast-stack > .toast { max-width: 100%; }
+
+/* ---------- анимации ------------------------------------------------------- */
+/* добавляется линейной анимацией сверху */
+@keyframes toast-in  { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+/* удаляется фейдом вниз */
+@keyframes toast-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(12px); } }
+
+.toast--enter { animation: toast-in .18s linear both; }
+.toast--leave { animation: toast-out .2s ease-in both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast--enter { animation: toast-in .18s linear both; }
+  .toast--leave { animation: toast-out .2s ease-in both; }
+  @keyframes toast-in  { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes toast-out { from { opacity: 1; } to { opacity: 0; } }
+}
+
+/* =========================================================================
+   Раскладка слоя: тост позиционируется по верхней границе рабочей области,
+   горизонтально — по центру. Используется внутри position:relative контейнера.
+   ========================================================================= */
+.toast-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  /* охранное поле 24px вокруг всего компонента (сверху и по бокам) */
+  padding: var(--toast-guard);
+  pointer-events: none;              /* тост не перехватывает клики */
+  z-index: 40;
+}
+/* ToastBar — слой ПОД снэкбаром; ToastLoader — слой НАД снэкбаром */
+.toast-layer--bar    { z-index: 40; }
+.toast-layer--loader { z-index: 60; }
+
+/* затемняющий слой для ToastLoader (25%) */
+.toast-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--toast-scrim);
+  z-index: 55;
+  pointer-events: none;
+}

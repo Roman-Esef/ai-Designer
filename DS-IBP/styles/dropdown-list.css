@@ -1,0 +1,355 @@
+/* =========================================================================
+   Design System — DropdownList (выпадающий список — выбор значения из перечня)
+   ---------------------------------------------------------------------
+   Поверхность-поповер со списком опций, которая раскрывается под полем
+   Select / InputAutocomplete. В отличие от Context Menu (список команд-
+   действий), DropdownList — это ВЫБОР ЗНАЧЕНИЯ:
+     • одиночный выбор — выбранная опция подсвечивается заливкой строки;
+     • множественный выбор — у каждой опции ведущий чекбокс (Checkbox ДС);
+     • автокомплит — подсветка совпавшей подстроки в подписи.
+
+   Container:   .ddl                (+ --scroll · --floating · --pinned)
+   Group:       .ddl__group
+   Item:        .ddl__item          (+ --selected · --wrap · --danger · --all)
+     parts:     .ddl__item-check · .ddl__item-icon · .ddl__item-body
+                .ddl__item-label · .ddl__item-helper · .ddl__item-trail
+     match:     .ddl__match         (подсветка совпадения в автокомплите)
+   States:      default · hover · focus · active · selected · disabled · mixed
+                (mixed — строка «Выбрать всё» при частичном выборе)
+   System row:  .ddl__state         (+ --loading · --empty · --error)
+
+   Локальные токены (наследуются от семантических токенов ДС):
+     --ddl-bg / --ddl-radius / --ddl-min / --ddl-max / --ddl-shadow
+     --ddl-item-h / --ddl-item-hover / --ddl-item-selected /
+     --ddl-item-selected-hover
+   Requires: typography.css, colors.css, radius.css, shadow.css,
+             checkbox.css, label-helper.css
+   ========================================================================= */
+
+.ddl {
+  --ddl-bg:                 var(--bg-popup);            /* #FFFFFF                     */
+  --ddl-radius:             var(--radius-popup);        /* 12px                        */
+  --ddl-min:                200px;
+  --ddl-max:                420px;
+  --ddl-pad-y:              4px;                          /* верт. паддинг контейнера    */
+  --ddl-item-h:             40px;                         /* высота однострочной опции   */
+  --ddl-item-px:            14px;
+  --ddl-item-gap:           10px;
+  --ddl-icon:               20px;
+  --ddl-item-hover:         var(--tertiary-light);        /* #EEF2F1 — нейтральный серый */
+  --ddl-item-selected:      var(--bgtable-row-focus);     /* #DEEDEC — «выбранная строка»*/
+  --ddl-item-selected-hover: color-mix(in srgb, var(--c-swamp-300) 30%, var(--bg-popup));
+  --ddl-shadow:             var(--elevation-2);           /* тень выпадашки — Elevation_2 из shadow.css */
+
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-direction: column;
+  min-width: var(--ddl-min);
+  max-width: var(--ddl-max);
+  padding: var(--ddl-pad-y) 0;
+  background: var(--ddl-bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--ddl-radius);
+  box-shadow: var(--ddl-shadow);
+  letter-spacing: 0;
+  z-index: 40;
+}
+
+/* =========================================================================
+   ITEM (опция списка)
+   ========================================================================= */
+.ddl__item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--ddl-item-gap);
+  width: 100%;
+  min-height: var(--ddl-item-h);
+  padding: 0 var(--ddl-item-px);
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: var(--type-body-m);                /* Body M — 16 / 20 */
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color .12s ease, color .12s ease;
+}
+
+/* content column — подпись + опциональный helper */
+.ddl__item-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1 1 auto; }
+
+/* опция с helper — вторая строка, увеличенная высота с вертикальным паддингом.
+   Ведущий слот (чекбокс/иконка 20px) и правая часть выравниваются по ПЕРВОЙ
+   строке подписи: line-height Body M = 20px, поэтому достаточно flex-start. */
+.ddl__item:has(.ds-helper) { min-height: 52px; padding-top: 7px; padding-bottom: 7px; align-items: flex-start; }
+.ddl__item:has(.ds-helper) .ddl__item-trail,
+.ddl__item--wrap .ddl__item-trail { align-items: flex-start; height: 20px; }
+
+.ddl__item-label {
+  min-width: 0;
+  /* по умолчанию — одна строка с многоточием */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* helper — общий компонент подкачки (.ds-helper из label-helper.css:
+   Body XS · Text-Inactive); внутри опции сокращается многоточием */
+.ddl__item .ds-helper {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* перенос длинных опций на 2+ строки */
+.ddl__item--wrap { align-items: flex-start; padding-top: 9px; padding-bottom: 9px; }
+.ddl__item--wrap .ddl__item-label { white-space: normal; text-wrap: pretty; }
+
+/* ---------- ведущая иконка ---------- */
+.ddl__item-icon {
+  flex: none;
+  width: var(--ddl-icon);
+  height: var(--ddl-icon);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Active · Secondary — токен --secondary */
+  color: var(--secondary);
+}
+.ddl__item-icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* ---------- ведущий чекбокс (множественный выбор) ----------
+   Переиспользует визуал компонента Checkbox (.cb__box / .cb__mark):
+   строка целиком — область клика, поэтому у чекбокса нет собственных
+   hover/focus-состояний; заливка управляется состоянием строки. */
+.ddl__item-check { flex: none; pointer-events: none; }
+.ddl__item-check .cb__mark { transition: background-color .15s ease, border-color .15s ease; }
+.ddl__item-check .cb__mark svg { opacity: 0; }
+.ddl__item[aria-checked="true"] .cb__mark {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.ddl__item[aria-checked="true"] .cb__mark svg { opacity: 1; }
+/* mixed — «Выбрать всё» при частичном выборе: чёрточка вместо галочки */
+.ddl__item[aria-checked="mixed"] .cb__mark {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.ddl__item[aria-checked="mixed"] .cb__mark svg { opacity: 1; }
+
+/* ---------- trailing part (галочка одиночного выбора / доп. значение) ---------- */
+.ddl__item-trail {
+  flex: none;
+  margin-left: auto;
+  padding-left: 12px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-inactive);
+  font: var(--type-body-s);
+  white-space: nowrap;
+}
+.ddl__item-check-single {
+  width: 18px;
+  height: 18px;
+  color: var(--primary);
+  opacity: 0;
+}
+.ddl__item-check-single :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+.ddl__item[aria-selected="true"] .ddl__item-check-single { opacity: 1; }
+
+/* ---------- подсветка совпадения (автокомплит) ---------- */
+.ddl__match { color: var(--text-primary); font-weight: 600; }
+
+/* =========================================================================
+   STATES
+   ========================================================================= */
+.ddl__item:hover,
+.ddl__item.is-hover { background: var(--ddl-item-hover); }
+
+.ddl__item:focus-visible,
+.ddl__item.is-focus {
+  outline: 2px solid var(--primary);       /* стандартный фокус ДС */
+  outline-offset: -2px;
+  background: var(--ddl-item-hover);
+}
+
+.ddl__item:active,
+.ddl__item.is-active { background: color-mix(in srgb, var(--c-swamp-500) 12%, var(--bg-popup)); }
+
+/* selected — заливка «выбранной строки» + усиленная подпись */
+.ddl__item[aria-selected="true"],
+.ddl__item--selected { background: var(--ddl-item-selected); }
+.ddl__item[aria-selected="true"] .ddl__item-label,
+.ddl__item--selected .ddl__item-label { color: var(--text-primary); font: var(--type-body-m-strong); }
+
+/* selected + hover / focus */
+.ddl__item[aria-selected="true"]:hover,
+.ddl__item[aria-selected="true"].is-hover,
+.ddl__item--selected:hover,
+.ddl__item--selected.is-hover,
+.ddl__item[aria-selected="true"]:focus-visible,
+.ddl__item[aria-selected="true"].is-focus { background: var(--ddl-item-selected-hover); }
+
+/* checkbox-строка: заливку выбора НЕ применяем — состояние несёт сам чекбокс,
+   поэтому у чекбокс-варианта selected = только hover-подложка */
+.ddl__item--checkbox[aria-checked="true"] { background: transparent; }
+.ddl__item--checkbox[aria-checked="true"]:hover,
+.ddl__item--checkbox[aria-checked="true"].is-hover { background: var(--ddl-item-hover); }
+.ddl__item--checkbox[aria-checked="true"] .ddl__item-label { color: var(--text-primary); font: var(--type-body-m); }
+
+/* ---------- «Выбрать всё» — первая строка множественного выбора ---------- */
+.ddl__item--all .ddl__item-label,
+.ddl__item--checkbox.ddl__item--all .ddl__item-label { font: var(--type-body-m-strong); }
+.ddl__item--all + .ddl__divider { margin-top: 0; }
+
+/* disabled */
+.ddl__item[aria-disabled="true"],
+.ddl__item.is-disabled {
+  color: var(--text-inactive);
+  cursor: default;
+  pointer-events: none;
+  background: transparent;
+}
+.ddl__item[aria-disabled="true"] .ddl__item-icon,
+.ddl__item.is-disabled .ddl__item-icon { color: var(--text-inactive); }
+.ddl__item[aria-disabled="true"] .ds-helper,
+.ddl__item.is-disabled .ds-helper { color: var(--text-inactive); }
+.ddl__item[aria-disabled="true"] .ddl__match,
+.ddl__item.is-disabled .ddl__match { color: var(--text-inactive); font-weight: 400; }
+.ddl__item[aria-disabled="true"] .cb__mark,
+.ddl__item.is-disabled .cb__mark { border-color: var(--disabled); }
+.ddl__item[aria-disabled="true"][aria-checked="true"] .cb__mark,
+.ddl__item.is-disabled[aria-checked="true"] .cb__mark { background: var(--disabled); border-color: var(--disabled); }
+
+/* ---------- danger (редкий кейс — деструктивная опция) ---------- */
+.ddl__item--danger { color: var(--error-dark); }
+.ddl__item--danger .ddl__item-icon { color: var(--error); }
+.ddl__item--danger:hover,
+.ddl__item--danger.is-hover { background: var(--error-bg-light); }
+
+/* =========================================================================
+   GROUP LABEL / DIVIDER
+   ========================================================================= */
+.ddl__group {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px var(--ddl-item-px) 4px;
+  background: var(--ddl-bg);
+  color: var(--text-inactive);
+  font: var(--type-body-xs);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  user-select: none;
+}
+/* Divider между группами — переиспользует токены компонента Divider
+   (--dvd-color / --dvd-thickness); фолбэки на случай отсутствия divider.css. */
+.ddl__divider {
+  height: 0;
+  margin: var(--ddl-pad-y) 0;
+  border: 0;
+  border-top: var(--dvd-thickness, 1px) solid var(--dvd-color, var(--border-light));
+}
+
+/* =========================================================================
+   SYSTEM STATE ROW — loading · empty · error
+   Единая строка с иконкой и сообщением вместо списка опций.
+   ========================================================================= */
+.ddl__state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--ddl-item-h);
+  padding: 14px var(--ddl-item-px);
+  color: var(--text-primary);
+  font: var(--type-body-m-strong);
+  text-wrap: pretty;
+}
+.ddl__state-icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-inactive);
+}
+.ddl__state-icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+/* строка с пояснением (ошибка) — иконка выравнивается по первой строке текста */
+.ddl__state:has(.ddl__state-sub) { align-items: flex-start; }
+.ddl__state:has(.ddl__state-sub) .ddl__state-icon { margin-top: -2px; }
+.ddl__state-text { min-width: 0; }
+.ddl__state-sub {
+  display: block;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+  margin-top: 2px;
+}
+
+/* loading */
+.ddl__state--loading { color: var(--text-inactive); font: var(--type-body-m); }
+.ddl__state--loading .ddl__state-icon { color: var(--text-inactive); }
+/* empty */
+.ddl__state--empty .ddl__state-icon { color: var(--text-secondary); }
+/* error */
+.ddl__state--error .ddl__state-icon { color: var(--error); }
+
+/* спиннер загрузки — общий Spinner: <span class="spin"> внутри .ddl__state-icon */
+.ddl__state-icon .spin {
+  width: 22px;
+  height: 22px;
+  border: 2.4px solid var(--border-primary);
+  border-top-color: var(--text-secondary);
+}
+
+/* «Создать» / свободный ввод — action-строка под списком (автокомплит) */
+.ddl__item--action { color: var(--primary); }
+.ddl__item--action .ddl__item-icon { color: var(--primary); }
+.ddl__item--action .ddl__item-label { white-space: normal; }
+.ddl__item--action strong { color: var(--text-primary); font-weight: 600; }
+
+/* =========================================================================
+   SCROLL — переполнение по высоте (по умолчанию видно ~7 опций)
+   ========================================================================= */
+.ddl--scroll {
+  max-height: var(--ddl-max-h, 296px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) transparent;
+}
+.ddl--scroll::-webkit-scrollbar { width: 8px; }
+.ddl--scroll::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 999px; border: 2px solid var(--ddl-bg); }
+.ddl--scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* =========================================================================
+   FLOATING — список, спозиционированный относительно поля (через JS).
+   Обёртка-anchor получает position:relative, список — position:absolute.
+   ========================================================================= */
+.ddl-anchor { position: relative; display: inline-flex; flex-direction: column; }
+
+.ddl.ddl--floating {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(.98);
+  transform-origin: var(--ddl-origin, top center);
+  transition: opacity .13s ease, transform .13s ease, visibility 0s linear .13s;
+}
+.ddl.ddl--floating.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  transition: opacity .13s ease, transform .13s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ddl.ddl--floating { transition: opacity .01s; transform: none; }
+  .ddl.ddl--floating.is-open { transform: none; }
+}
+/* pinned — всегда открытый список (для демонстраций в документации) */
+.ddl.ddl--floating.ddl--pinned {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
+}

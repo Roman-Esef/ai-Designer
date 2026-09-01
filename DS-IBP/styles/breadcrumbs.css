@@ -1,0 +1,111 @@
+/* =========================================================================
+   Design System — Breadcrumbs
+   Трейл ссылок, показывающий положение текущей страницы в иерархии разделов.
+   Состоит из ссылок Link (тон --muted, «Breadcrumbs_1») и текущей,
+   некликабельной крошки (тон --neutral, «Breadcrumbs_2»). Разделитель между
+   звеньями — символ «/», цвет которого совпадает с цветом Breadcrumbs_1
+   (все родительские звенья — muted, поэтому разделитель имеет единый цвет).
+
+   Zone:       компонент занимает всю ширину рабочей области и сам держит
+               зону 44px: padding 16px сверху / 12px снизу + 24px по бокам
+               (16 + 16 + 12 = 44). Поля совпадают с полями контентной
+               области экрана — крошки и контент выровнены по одной вертикали.
+   Size:       единственный — S (Body S, 14/16); второго размера нет.
+   States:     default · hover = focus (на ссылке-родителе, единое оформление) ·
+               condensed (срединные звенья схлопнуты в «…») ·
+               truncated (текущая крошка всегда обрезается многоточием,
+               никогда не переносится на вторую строку; полное имя — в тултипе)
+   Requires:   typography.css, colors.css, radius.css, link.css
+               (доп. для интерактива: context-menu.css — попап «…», tooltip.css)
+   ========================================================================= */
+
+.crumbs {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;                 /* зазор между звеном и разделителем — по 8px с каждой стороны */
+  margin: 0;
+  /* зона крошек: 16px сверху + 16px строка + 12px снизу = 44px;
+     24px по бокам — те же поля, что у контентной области экрана */
+  padding: 16px 24px 12px;
+  min-height: 44px;
+  width: 100%;
+  list-style: none;
+  font: var(--type-body-s); /* Body S — 14/16, единственный размер компонента */
+  letter-spacing: 0;
+  min-width: 0;
+  overflow: hidden;         /* трейл не переносится на вторую строку — лишнее схлопывается в «…» */
+}
+
+/* ---------- звено ---------- */
+.crumbs__item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: none;
+  max-width: 100%;
+}
+/* родительские звенья не переносятся и не растягиваются; длинное имя
+   обрезается многоточием (полное значение — в title) */
+.crumbs__item .link {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+/* разделитель «/» — генерируется между звеньями, не часть DOM (не читается
+   скринридером, см. раздел «Доступность»); цвет = Breadcrumbs_1 (muted) */
+.crumbs__item:not(:last-child)::after {
+  content: "/";
+  margin-left: 8px;
+  color: var(--text-inactive);
+  flex: none;
+}
+
+/* ---------- текущая страница — не ссылка ---------- */
+/* всегда однострочная, обрезается многоточием (никогда не переносится) —
+   полное название доступно через тултип, когда обрезка реально происходит */
+.crumbs__current {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+.crumbs__item--current { min-width: 0; flex: 0 1 auto; }
+
+/* ---------- схлопнутое звено «…» ---------- */
+.crumbs__more {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-inactive);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font: inherit;
+  /* высота строки зоны — ровно 16px, поэтому вертикального паддинга нет */
+  padding: 0 5px;
+  border-radius: var(--radius-xs);
+  flex: none;
+  line-height: 16px;
+  transition: color .12s ease, background-color .12s ease;
+}
+/* hover = focus — единое оформление, без отдельной обводки (как у ссылок) */
+.crumbs__more:hover,
+.crumbs__more:focus-visible,
+.crumbs__more[aria-expanded="true"] {
+  color: var(--text-secondary);
+  background: var(--tertiary-light);
+  outline: none;
+}
+
+/* попап со скрытыми звеньями — контекстное меню (переиспользует .menu /
+   .menu__item из styles/context-menu.css): список страниц, клик по строке
+   переходит на неё */
+.crumbs__popup.menu { min-width: 160px; max-width: 320px; padding: 6px 0; }
+.crumbs__popup .menu__item { min-height: 36px; font: var(--type-body-s); }

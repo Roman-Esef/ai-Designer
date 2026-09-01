@@ -1,0 +1,900 @@
+<!-- @dsCard group="Components" name="Tab" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tab — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:80ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:20px; }
+
+  
+
+  
+
+  /* ---------- демо-стадия (docs-split) ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+  .toggles { display:flex; flex-direction:column; gap:9px; }
+  .toggle { display:inline-flex; align-items:center; gap:11px; padding:9px 12px; border:1px solid var(--border-light); border-radius:9px; font: var(--type-body-m); color: var(--text-primary); cursor:pointer; user-select:none; background: var(--bg-tile); transition:.12s; }
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- matrices / grids ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .sizes-grid { display:grid; grid-template-columns: 120px repeat(2, 1fr); gap:18px 16px; align-items:center; min-width:480px; }
+  .sizes-grid .col-head { font: var(--type-body-s-strong); color: var(--primary); text-align:center; }
+  .sizes-grid .cell { display:flex; align-items:center; justify-content:center; padding:6px 0; }
+
+  /* two-column comparison */
+  .cols2 { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:20px; }
+  @media (max-width:680px){ .cols2{ grid-template-columns:1fr; } }
+  .demo-col__title { font: var(--type-h5-strong); color: var(--text-primary); margin:0 0 4px; }
+  .demo-col__sub { font: var(--type-body-s); color: var(--text-secondary); margin:0 0 18px; text-wrap:pretty; }
+  .demo-rowlabel { font: var(--type-body-xs); color: var(--text-inactive); margin-bottom:7px; }
+
+  /* mock surfaces (modal / page) */
+  .surface { border:1px solid var(--border-light); border-radius:12px; background:var(--bg-tile); padding:0; overflow:hidden; box-shadow:0 6px 26px -18px rgba(40,50,55,.4); min-width:0; }
+  .surface__cap { font:var(--type-body-xs); color:var(--text-inactive); margin:14px 2px 0; text-wrap:pretty; }
+  .mock-modal__head { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .mock-modal__title { font:var(--type-h5-strong); color:var(--text-primary); }
+  .mock-modal__x { color:var(--text-inactive); width:18px; height:18px; }
+  .mock-modal__body { display:flex; min-height:200px; }
+  .mock-modal__nav { padding:18px 14px; border-right:1px solid var(--border-light); flex:none; }
+  .mock-modal__content { flex:1; min-width:0; padding:22px 24px; font:var(--type-body-s); color:var(--text-inactive); }
+  .mock-page { padding:18px 22px; }
+  .mock-page__crumbs { font:var(--type-body-xs); color:var(--text-inactive); margin-bottom:8px; }
+  .mock-page__title { font:var(--type-h4-strong); color:var(--text-primary); margin:0 0 14px; }
+  .mock-page__content { margin-top:18px; font:var(--type-body-s); color:var(--text-inactive); }
+
+  /* anatomy */
+  .anat { display:grid; grid-template-columns: minmax(260px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:70px 44px; display:flex; justify-content:center; }
+  .anat-dia { position:relative; }
+  .anat-dia .tab { --tab-h:48px; --tab-font: var(--weight-semibold) 20px/1 var(--font-text); --tab-icon:24px; }
+  .anat-dia .mk { position:absolute; width:22px; height:22px; border-radius:50%; background:var(--text-primary); color:#fff; font:var(--type-body-xs); font-weight:600; display:flex; align-items:center; justify-content:center; transform:translate(-50%,-50%); }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+
+  /* state spec tables */
+  .spec { border:1px solid var(--border-light); border-radius:14px; overflow:hidden; }
+  .spec + .spec { margin-top:20px; }
+  .spec__row { display:grid; grid-template-columns: 130px 170px 1fr; align-items:center; gap:16px; padding:20px; border-bottom:1px solid var(--border-light); }
+  @media (max-width:720px){ .spec__row{ grid-template-columns:1fr; gap:14px; } }
+  .spec__cline { display:grid; grid-template-columns: 84px 18px 160px 1fr; align-items:center; gap:10px; font:var(--type-body-s); color:var(--text-secondary); }
+
+  /* reference tables */
+  .ref-table th, .ref-table td { text-align:left; padding:15px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  /* do / don't */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:28px 20px; flex:1; display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; min-height:96px; }
+  .guide-card__cap { padding:0 20px 18px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+  .guide-solo { max-width:460px; margin-top:22px; }
+
+  /* color reference */
+  
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- developer handoff ---------- */
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Tab">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.009</b></span><span>Обновлено <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Tab</h1>
+    <p class="lead">Таб — инструмент переключения между разными вьюхами одного экрана. По умолчанию <b>горизонтальный</b> таб подстраивается под размер контента, <b>вертикальный</b> — под размер контейнера. Размеры <b>M</b> и <b>S</b>, опциональные иконка и бейдж-счётчик.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">Табы переключают вьюхи в пределах одной страницы или модалки, не меняя контекст целиком. Горизонтальные — для разделов страницы и табов в шапке таблицы; вертикальные — для длинных списков разделов в модалках (фильтры, формы).</p>
+    <div class="panel">
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li><b>Горизонтальные табы.</b> Разделы страницы сделки, переключение вкладок над таблицей, табы внутри модалки.</li>
+        <li><b>Вертикальные табы.</b> Навигация по разделам формы или фильтра в модалке; бейдж показывает число применённых параметров.</li>
+        <li><b>Бейдж.</b> Опциональный счётчик: целое число с разбиением на разряды. На горизонтальных табах прижат к тексту, на вертикальных — к правому краю.</li>
+        <li>Один таб в группе всегда выбран. Группа из одного таба не имеет смысла.</li>
+      </ul>
+      <div class="cols2">
+        <div>
+          <p class="demo-rowlabel">Горизонтальные табы на странице</p>
+          <div class="surface">
+            <div class="mock-page">
+              <p class="mock-page__crumbs">Акционерные продукты / Текущий портфель ДИД</p>
+              <h3 class="mock-page__title">Сделки</h3>
+              <div id="use-horiz"></div>
+              <p class="mock-page__content">Таблица сделок выбранного раздела…</p>
+            </div>
+          </div>
+          <p class="surface__cap">Горизонтальный таб подстраивается под ширину контента.</p>
+        </div>
+        <div>
+          <p class="demo-rowlabel">Вертикальные табы в модалке</p>
+          <div class="surface">
+            <div class="mock-modal__head"><span class="mock-modal__title">Фильтр</span><i data-icon="close" class="mock-modal__x"></i></div>
+            <div class="mock-modal__body">
+              <div class="mock-modal__nav" id="use-vert"></div>
+              <div class="mock-modal__content">Поля выбранного раздела фильтра…</div>
+            </div>
+          </div>
+          <p class="surface__cap">Вертикальный таб подстраивается под ширину контейнера; бейдж прижат к правому краю.</p>
+        </div>
+      </div>
+    </div>
+  
+<div class="subsec" data-screen-label="Guidelines">
+    <h3>Правила</h3>
+    <p class="desc">Таб переключает вьюхи в пределах одного экрана. Каждая пара «так / не так» ниже раскрывает одну конкретную ситуацию — не смешивайте разные правила в одном сравнении.</p>
+    <div class="guide">
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="guide-good1"></div>
+        <p class="guide-card__cap">Короткие метки разделов одного экрана.</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad1"></div>
+        <p class="guide-card__cap">Длинные фразы-действия растягивают табы — это задача ссылок/кнопок.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good2"></span>Так</div>
+        <div class="guide-card__body" id="guide-good2"></div>
+        <p class="guide-card__cap">Группа из двух и более разделов — табам есть что переключать.</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad2"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad2"></div>
+        <p class="guide-card__cap">Один таб в группе бессмыслен — уберите табы или добавьте разделы.</p>
+      </div>
+    </div>
+    <p class="demo-rowlabel" style="margin-top:30px;">Дополнительно — без пары «не так»</p>
+    <div class="guide-solo">
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good3"></span>Так</div>
+        <div class="guide-card__body" id="guide-good3"></div>
+        <p class="guide-card__cap">Бейдж-счётчик показывает число элементов раздела — целое число, без парного антипаттерна.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Таб — это интерактивная зона с текстом и опциональными слотами, плюс индикатор выбора. Группа табов разделяет общий рейл: снизу — у горизонтальных, слева — у вертикальных.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div class="anat-dia" id="anat-diagram"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Контейнер / рейл</span><span class="d">общая линия группы (1px); индикатор выбранного таба лежит поверх неё</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Иконка</span><span class="d">ведущий слот слева — опционально</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Текст</span><span class="d">SB Sans Text, Regular во всех состояниях</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Бейдж</span><span class="d">счётчик-целое с разбиением на разряды — опционально</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Orientation">
+    <h3>Ориентация</h3>
+    <p class="desc"><b>Horizontal</b> — табы в ряд с общим нижним рейлом; ширина каждого таба тянется по контенту. <b>Vertical</b> — табы в столбец с общим левым рейлом; ширина таба равна ширине контейнера, бейдж прижат к правому краю. Попробуйте переключить — табы рабочие, можно ходить стрелками с клавиатуры.</p>
+    <div class="cols2">
+      <div class="panel">
+        <p class="demo-col__title">Horizontal</p>
+        <p class="demo-col__sub">Подстраивается под контент. Индикатор — снизу.</p>
+        <div id="orient-horiz"></div>
+      </div>
+      <div class="panel">
+        <p class="demo-col__title">Vertical</p>
+        <p class="demo-col__sub">Подстраивается под контейнер. Индикатор — слева.</p>
+        <div id="orient-vert" style="max-width:280px;"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Badge">
+    <h3>Бейдж</h3>
+    <p class="desc">Бейдж отображается опционально. В нём может быть только целое число, и оно показывается с разбиением на разряды (<code class="tok">1 234</code>). Минимальная ширина бейджа — <b>20 / 16px</b> для размеров M / S. На горизонтальных табах бейдж прижат к тексту, на вертикальных — к правому краю таба.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Разрядность · M и S</p>
+      <div class="matrix-wrap"><div class="sizes-grid" id="badge-grid"></div></div>
+    </div>
+    <div class="panel" style="margin-top:20px;">
+      <div class="cols2">
+        <div>
+          <p class="demo-rowlabel">Horizontal · бейдж у текста</p>
+          <div id="badge-align-h"></div>
+        </div>
+        <div>
+          <p class="demo-rowlabel">Vertical · бейдж у правого края</p>
+          <div id="badge-align-v"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Icon">
+    <h3>Иконка</h3>
+    <p class="desc">Слева к тексту можно добавить ведущую иконку — для табов-разделов с понятной семантикой. Отдельный кейс — таб только с иконкой (переключатель вида списка / сетки); такому табу обязателен <code class="tok">aria-label</code>.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Текст + иконка</p>
+      <div id="leading-demo" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Только иконка · переключатель вида</p>
+      <div id="leading-icononly"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Fitted">
+    <h3>Равная ширина (Fitted)</h3>
+    <p class="desc">Режим, в котором табы делят ширину контейнера поровну — для сегмент-переключателей с коротким набором опций (период, режим отображения). Это альтернатива контентной ширине горизонтальных табов.</p>
+    <div class="panel">
+      <div id="fitted-demo" style="max-width:440px;"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Два размера. <b>M</b> — базовый для страниц и модалок. <b>S</b> — для плотных мест и узких модалок. Высота таба и кегль текста зависят от размера.</p>
+    <div class="panel">
+      <div class="matrix-wrap"><div class="sizes-grid" id="sizes-grid"></div></div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden; margin-top:20px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.72fr 0.99fr 0.72fr 0.95fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Высота</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Кегль текста</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Иконка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Бейдж min-w</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Применение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="sizes-table"></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Сам таб не скруглён — форму задаёт маркер под активным табом. Радиусы есть только у маркера, счётчика и служебных элементов, и от размера (M / S) не зависят.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Таб — M / S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Маркер активного таба</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Бейдж-счётчик в табе</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стрелка прокрутки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Меню переполнения «Ещё»</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-popup</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пункт меню переполнения</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Текстовое содержимое таба — короткая метка и опциональный числовой бейдж-счётчик.</p>
+    <ul class="bullets">
+      <li><b>Метка</b> (<code class="tok">.tab__label</code>) — короткое существительное или номинативная фраза, называющая раздел («Сделки», «История»), не предложение и не глагол-действие — для действий есть Button;</li>
+      <li>регистр — sentence case, как в остальном интерфейсе; точку в конце не ставим;</li>
+      <li><b>Бейдж</b> (<code class="tok">.tab__badge</code>) — только целое число с разбиением на разряды (<code class="tok">1 234</code>), без единиц измерения и текста;</li>
+      <li>таб только с иконкой (без видимого текста) обязан иметь <code class="tok">aria-label</code> с названием раздела — иконка сама по себе не самодостаточна (см. «Доступность»);</li>
+      <li>при обрезке длинного текста вертикального таба полное значение дублируется тултипом (см. «Переполнение»).</li>
+    </ul>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="Overflow">
+    <h3>Переполнение</h3>
+    <p class="desc">Два паттерна для горизонтальных табов, когда их больше, чем помещается по ширине контейнера. <b>Скролл</b> — ряд прокручивается по горизонтали, скроллбар скрыт; по краям появляются стрелки, когда в эту сторону ещё есть куда скроллить, а выбранный таб подскролливается в зону видимости. <b>Fit + меню «Ещё»</b> — показываются только табы, помещающиеся целиком, остальные уходят в выпадающий список за иконкой из трёх точек. У вертикального таба слишком длинный текст обрезается многоточием с тултипом.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Горизонтальная прокрутка · стрелки или колесо/трекпад · контейнер уже содержимого</p>
+      <div id="overflow-demo" style="margin-bottom:30px; max-width:420px;"></div>
+      <p class="demo-rowlabel">Fit + меню «Ещё» · те же разделы, контейнер той же ширины</p>
+      <div id="overflow-fit" style="margin-bottom:30px; max-width:420px;"></div>
+      <p class="demo-rowlabel">Обрезка длинного текста · вертикальный таб</p>
+      <div id="overflow-trunc"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Невыбранные и выбранные табы проходят через Default и Hover = Focus, плюс Disabled — отдельного состояния нажатия (Active) нет. <b>Hover</b> и <b>Focus</b> визуально совпадают — единая заливка <code class="tok">--primary-bg</code> (Active · PrimaryBG), одинаковая для выбранного и невыбранного таба. Клик переводит таб в Selected, а заливка остаётся как при наведении, пока курсор не покинет таб — отдельного pressed-стейта не требуется. Бейдж при этом цвет не меняет: он одинаковый у выбранного и невыбранного таба во всех состояниях.</p>
+    <div id="state-specs"></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Группа табов — <code class="tok">role="tablist"</code>, каждый таб — <code class="tok">role="tab"</code> с <code class="tok">aria-selected</code>. В таб-порядке участвует только выбранный таб (roving <code class="tok">tabindex</code>) — у остальных <code class="tok">tabindex="-1"</code>, они достижимы стрелками.</p>
+    <div class="panel">
+      <ul class="bullets" style="margin-bottom:22px;">
+        <li>Стрелки <b>← →</b> у горизонтальной группы и <b>↑ ↓</b> у вертикальной переключают фокус на соседний таб и сразу выбирают его; <code class="tok">Home</code> / <code class="tok">End</code> — на первый/последний;</li>
+        <li><code class="tok">:focus-visible</code> показывает обводку 2px <code class="tok">--primary</code> с отступом −2px внутрь таба. Нажмите <b>Tab</b>, затем стрелки, чтобы увидеть:</li>
+      </ul>
+      <div id="a11y-demo" style="margin-bottom:22px;"></div>
+      <ul class="bullets">
+        <li>Disabled-таб исключён из таб-порядка (<code class="tok">tabIndex=-1</code>, <code class="tok">aria-disabled="true"</code>, <code class="tok">pointer-events:none</code>);</li>
+        <li>таб только с иконкой обязателен <code class="tok">aria-label</code> — без него скрин-ридер озвучит только «кнопка» без контекста;</li>
+        <li>панель, которую открывает таб, свяжите через <code class="tok">aria-controls</code> с id панели, а панель — <code class="tok">aria-labelledby</code> с id таба.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Текст таба набирается гарнитурой <b>SB Sans Text</b>, начертание <b>Regular</b> во всех состояниях, включая выбранный. Кегль зависит от размера; letter-spacing 0.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 px / Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 0.68fr 0.86fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 px / Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Невыбранный таб по умолчанию окрашен в <b>Text_Secondary</b> (текст и иконка), при наведении переходит на <b>Text_Primary</b>; бейдж — на StSystem_MidLight. Выбранный таб — текст на Text_Primary, индикатор и иконка на Primary (Emerald). Disabled — на рампе StDisabled.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Unselected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Unselected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Unselected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover fill</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Unselected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Рейл</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E1EDE7</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Selected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Индикатор</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Selected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Selected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover fill</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">40% #324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">24% #324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Бейдж</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-disabled-midlight</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-disabled-midlight)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8% #324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Бейдж</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system-midlight</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system-midlight)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">32% #7A9994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 0.9fr 1.44fr 0.77fr 0.95fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Бейдж</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead2">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/tab.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.55fr 0.55fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">S</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/tab.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Клик/Enter/Space по табу → снять tab--selected/aria-selected со всех, поставить на текущий,</span>
+<span class="tk-cm">//    tabIndex текущего = 0, у остальных = -1 (roving tabindex)</span>
+
+<span class="tk-cm">// 2. Клавиатура на [role="tablist"]:</span>
+<span class="tk-cm">//    ArrowRight/ArrowDown (horiz/vert) → следующий таб (зациклено), сразу активировать</span>
+<span class="tk-cm">//    ArrowLeft/ArrowUp     → предыдущий таб (зациклено), сразу активировать</span>
+<span class="tk-cm">//    Home / End            → первый / последний доступный (non-disabled) таб</span>
+
+<span class="tk-cm">// 3. Hover = Focus — единый визуальный стейт-слой (см. «Состояния»); клик не добавляет</span>
+<span class="tk-cm">//    отдельного pressed-состояния — заливка держится как hover, пока курсор не покинет таб</span>
+
+<span class="tk-cm">// 4. Overflow (Предложение): измерить ширину контейнера и суммарную ширину табов —</span>
+<span class="tk-cm">//    лишние уходят в «⋯»-меню, либо контейнер скроллится с появляющимися стрелками</span>
+<span class="tk-cm">//    (рабочий референс — makeOverflowTabs / makeScrollArrows в tab.page.js)</span>
+
+<span class="tk-cm">// 5. Disabled: pointer-events: none, tabIndex = -1, aria-disabled = true</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">wireTablist</code>, <code class="tok">makeOverflowTabs</code> в <code class="tok">tab.page.js</code>).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Скроллируемые табы</b> — горизонтальный скролл со стрелками при переполнении.</li>
+        <li><b>Закрываемые табы</b> — крестик на табе для сценариев вроде открытых документов/вкладок.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Tab</span>
+    <span>Horizontal / Vertical — M / S — Unselected / Selected / Disabled</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите таб: ориентация, размер, иконка, бейдж и состояние — превью и код обновляются мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/tab.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/tab.page.js"></script>
+<script>
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Ориентация': 'Вертикальный', 'Размер': 'S · 32', 'Selected': 'Выбран', 'Бейдж': 'Показывать бейдж' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- группа: горизонтальные табы, второй выбран -->
+<div class="tabs tabs--horiz" role="tablist">
+  <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1">
+    <span class="tab__label">Обзор</span>
+  </button>
+
+  <button type="button" class="tab tab--m tab--selected" role="tab" aria-selected="true" tabindex="0">
+    <span class="tab__icon"><i data-icon="layout-grid-01"></i></span>
+    <span class="tab__label">Сделки</span>
+    <span class="tab__badge">12</span>
+  </button>
+</div>
+
+<!-- рантайм: data-tabs на контейнере (roving tabindex, стрелки, Home/End) -->
+<div class="tabs tabs--horiz" role="tablist" data-tabs>…</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/tab.page.js)
+function makeTab(o) {
+  // o: { orient:'horiz'|'vert', size:'m'|'s', label, icon?, badge?, state:'default'|'hover'|'selected', disabled, standalone }
+  // button.tab.tab--<size>.tab--<orient>(.tab--selected)(.tab--disabled)(.tab--standalone)
+  //  → .tab__icon + .tab__label + .tab__badge; role="tab", roving tabindex
+}
+// Поведение — рантайм ДС: window.DSTabs.tabs(group) — стрелки по ориентации,
+// Home/End, подскролл выбранного; data-tabs — opt-in на контейнере.</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Tab
+   Инструмент переключения между разными вьюхами (вкладки).
+
+   Orientation: horizontal (horiz) · vertical (vert)
+   Sizes:       m (40) · s (32)
+   States:      default · hover (= focus, persists after click until pointer leaves) · selected · disabled
+   Slots:       leading icon (optional) · text · trailing badge / counter (optional)
+   Behaviour:   horiz tab подстраивается под контент, vert — под контейнер;
+                badge: на horiz прижат к тексту, на vert — к правому краю.
+   Requires:    typography.css, colors.css
+   ========================================================================= */
+
+/* ---------- group / tablist ----------------------------------------------- */
+.tabs {
+  --tab-indicator: var(--primary);          /* selected accent */
+  --tab-track: var(--border-light);          /* rail under/beside tabs */
+
+  display: flex;
+  position: relative;
+}
+
+/* horizontal: row of tabs, shared bottom rail */
+.tabs--horiz {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+  box-shadow: inset 0 -1px 0 0 var(--tab-track);   /* the rail */
+}
+.tabs--horiz.tabs--fill { width: 100%; }
+.tabs--horiz.tabs--fill .tab { flex: 1 1 0; justify-content: center; }
+
+/* vertical: column of tabs, shared left rail */
+.tabs--vert {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  box-shadow: inset 1px 0 0 0 var(--tab-track);
+}
+.tabs--vert .tab { width: 100%; }
+
+/* a group without a shared rail (standalone samples) */
+.tabs--bare { box-shadow: none; }
+
+/* horizontal overflow, pattern A → scroll the row, hide the scrollbar */
+.tabs-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tabs-scroll::-webkit-scrollbar { display: none; }
+.tabs-scroll .tabs--horiz { width: max-content; min-width: 100%; }
+
+/* wrapper adding prev/next arrow controls over a .tabs-scroll — arrows fade
+   in/out depending on whether there is more content to scroll to on that side */
+.tabs-scroll-wrap { position: relative; max-width: 100%; }
+.tabs-scroll__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-round);
+  background: var(--bg-tile);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(40, 50, 55, .16);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease, background-color .15s ease;
+  z-index: 5;
+  padding: 0;
+}
+.tabs-scroll__arrow.is-visible { opacity: 1; pointer-events: auto; }
+.tabs-scroll__arrow:hover { background: var(--primary-bg); }
+.tabs-scroll__arrow--left { left: -4px; }
+.tabs-scroll__arrow--right { right: -4px; }
+.tabs-scroll__arrow :is(svg,[data-icon]){ width: 16px; height: 16px; }
+
+/* horizontal overflow, pattern B → fit as many tabs as the container allows,
+   the rest collapse behind a "more" trigger that opens a dropdown menu */
+.tabs-overflow { position: relative; max-width: 100%; }
+.tabs-overflow .tabs--horiz { flex-wrap: nowrap; }
+.tabs-overflow .tab { flex: none; }
+
+.tab--more.is-menu-open { background: var(--primary-bg); color: var(--text-primary); }
+.tab--more.is-menu-open .tab__icon { color: var(--text-primary); }
+
+.tabs-overflow__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 6px;
+  background: var(--bg-tile);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-popup);
+  box-shadow: 0 10px 30px rgba(40, 50, 55, .16);
+}
+.tabs-overflow__menu.is-open { display: flex; }
+.tabs-overflow__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  margin: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text-primary);
+  font: var(--type-body-m);
+  letter-spacing: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .12s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.tabs-overflow__item:hover,
+.tabs-overflow__item:focus-visible { background: var(--primary-bg); outline: none; }
+.tabs-overflow__item[aria-checked="true"] { color: var(--primary); }
+.tabs-overflow__item .tab__icon { width: 20px; height: 20px; flex: none; color: var(--text-inactive); }
+.tabs-overflow__item[aria-checked="true"] .tab__icon { color: var(--primary); }
+.tabs-overflow__item .tab__label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tabs-overflow__item .tab__badge { flex: none; }
+
+/* =========================================================================
+   TAB — single item
+   ========================================================================= */
+.tab {
+  /* size tokens — overridden per size modifier */
+  --tab-h: 40px;
+  --tab-pad-x: 16px;
+  --tab-gap: 8px;
+  --tab-icon: 20px;
+  --tab-font: var(--type-body-m);
+  --tab-indicator-w: 2px;
+  --tab-badge-min: 20px;
+
+  /* colour tokens — default (unselected) */
+  --tab-text: var(--text-secondary);
+  --tab-fill: transparent;
+  --tab-mark: transparent;                   /* indicator colour */
+  --tab-icon-color: var(--text-secondary);
+
+  box-sizing: border-box;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tab-gap);
+  height: var(--tab-h);
+  padding: 0 var(--tab-pad-x);
+  border: 0;
+  margin: 0;
+  background: var(--tab-fill);
+  color: var(--tab-text);
+  font: var(--tab-font);
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color .15s ease, color .15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* text label — truncates with ellipsis when constrained */
+.tab__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* leading icon */
+.tab__icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tab-icon);
+  height: var(--tab-icon);
+  color: var(--tab-icon-color);
+}
+.tab__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* ---------- indicator (the moving accent bar) ----------------------------- */
+.tab::after {
+  content: "";
+  position: absolute;
+  background: var(--tab-mark);
+  border-radius: var(--radius-pill);
+  transition: background-color .15s ease;
+  pointer-events: none;
+}
+/* horiz: bar sits on the bottom rail, full tab width */
+.tabs--horiz .tab::after {
+  left: 0; right: 0; bottom: 0;
+  height: var(--tab-indicator-w);
+}
+/* vert: bar sits on the left rail, full tab height */
+.tabs--vert .tab::after {
+  left: 0; top: 0; bottom: 0;
+  width: var(--tab-indicator-w);
+}
+/* standalone tab (not in a .tabs group) — still draw its own indicator */
+.tab--standalone::after { content: ""; }
+
+/* =========================================================================
+   BADGE / counter slot
+   ========================================================================= */
+.tab__badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tab-badge-min);
+  height: var(--tab-badge-min);
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--st-system-midlight);     /* Swamp_400 32% — нейтральный счётчик */
+  color: var(--text-primary);
+  font: var(--weight-semibold) 11px/1 var(--font-text);
+  font-variant-numeric: tabular-nums;
+  transition: background-color .15s ease, color .15s ease;
+}
+.tab--s .tab__badge { font-size: 10px; }
+
+/* on vertical tabs the badge is pushed to the right edge */
+.tabs--vert .tab,
+.tab--vert {
+  justify-content: flex-start;
+}
+.tabs--vert .tab .tab__badge,
+.tab--vert .tab__badge {
+  margin-left: auto;
+}
+
+/* ---------- sizes --------------------------------------------------------- *
+   Size values assigned directly to properties (not via local --* overrides in
+   modifiers) so the DS compiler can register tokens cleanly. Slot dimensions
+   (icon / badge) get per-size descendant rules; indicator width is 2px for
+   both sizes = the root default, so no per-size indicator rule is needed. */
+.tab--m { height: 40px; padding: 0 16px; gap: 8px; font: var(--type-body-m); }
+.tab--m .tab__icon  { width: 20px; height: 20px; }
+.tab--m .tab__badge { min-width: 20px; height: 20px; }
+.tab--s { height: 32px; padding: 0 12px; gap: 6px; font: var(--type-body-s); }
+.tab--s .tab__icon  { width: 18px; height: 18px; }
+.tab--s .tab__badge { min-width: 16px; height: 16px; }
+
+/* ---------- горизонтальные паддинги по ориентации ---------------------------
+   Горизонтальный таб — 8px слева и справа: ряд табов должен читаться как ряд,
+   а не как набор далеко разнесённых кнопок. Вертикальный — 16px слева (текст
+   отбит от рейла) и 8px справа (бейдж прижат к краю). */
+.tabs--horiz .tab--m, .tab--horiz.tab--m,
+.tabs--horiz .tab--s, .tab--horiz.tab--s { padding: 0 8px; }
+.tabs--vert .tab--m, .tab--vert.tab--m,
+.tabs--vert .tab--s, .tab--vert.tab--s { padding: 0 8px 0 16px; }
+
+/* =========================================================================
+   STATES
+   ========================================================================= */
+
+/* hover = focus — единый стейт-слой заливки (Active · PrimaryBG), одинаковый
+   для unselected и selected табов. Клик не добавляет отдельного pressed-состояния —
+   после клика заливка держится как hover, пока курсор не покинет таб (нативное :hover). */
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])):hover,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-hover,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])):focus-visible,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-focus {
+  background: var(--primary-bg);              /* Active · PrimaryBG — Emerald_500 6% */
+  color: var(--text-primary);
+}
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])):hover .tab__icon,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-hover .tab__icon,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])):focus-visible .tab__icon,
+.tab:not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-focus .tab__icon {
+  color: var(--text-primary);
+}
+.tab:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+
+/* ---------- selected -------------------------------------------------------
+   Класс .tab--selected — форс-состояние витрины; на реальном табе состояние
+   несёт role="tab" + aria-selected="true" (roving-tabindex, RulesAudit W1).
+   [aria-current="true"] — тот же вид для scroll-spy якорных «табов»
+   (TableFilter: вертикальная навигация по разделам модалки, не role=tab). */
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]) { color: var(--text-primary); }
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]) .tab__icon { color: var(--primary); }
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"])::after { background: var(--tab-indicator, var(--primary)); }
+/* selected hover / focus — тот же Active · PrimaryBG, что и у unselected; бейдж не перекрашивается */
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]):not(.tab:is(.tab--disabled,[aria-disabled="true"])):hover,
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]):not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-hover,
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]):not(.tab:is(.tab--disabled,[aria-disabled="true"])):focus-visible,
+.tab:is(.tab--selected,[aria-selected="true"],[aria-current="true"]):not(.tab:is(.tab--disabled,[aria-disabled="true"])).is-focus {
+  background: var(--primary-bg);               /* Active · PrimaryBG */
+  color: var(--text-primary);
+}
+
+/* ---------- disabled -------------------------------------------------------
+   Класс .tab--disabled — форс-состояние витрины; реальный таб отключается
+   aria-disabled="true" (не нативный disabled — таб остаётся частью roving
+   tabindex, RulesAudit W1). */
+.tab:is(.tab--disabled,[aria-disabled="true"]) {
+  color: var(--text-inactive);
+  background: transparent;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.tab:is(.tab--disabled,[aria-disabled="true"]) .tab__icon { color: var(--text-inactive); }
+.tab:is(.tab--disabled,[aria-disabled="true"]) .tab__badge {
+  background: var(--st-disabled-midlight);    /* CGrey 8% */
+  color: var(--text-inactive);
+}
+.tab:is(.tab--disabled,[aria-disabled="true"]):is(.tab--selected,[aria-selected="true"])::after {
+  background: var(--st-disabled);             /* faded accent */
+}
+
+/* a disabled tab whose text is truncated still shows its tooltip */
+.tab:is(.tab--disabled,[aria-disabled="true"]).tab--has-tooltip { pointer-events: auto; }</script>
+</body>
+</html>

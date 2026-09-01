@@ -1,0 +1,453 @@
+<!-- @dsCard group="Components" name="NavTile" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NavTile — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/checkbox.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/illustration.css">
+<link rel="stylesheet" href="../../styles/nav-tile.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/input-pages.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<style>
+[data-screen-label="NavTile"] .demo-grid{grid-template-columns:repeat(auto-fill,minmax(460px,1fr))}
+/* демо-стадия (docs-split): растяжение на ширину панели демо;
+   padding/фон/min-height — из input-pages.css */
+.pg__stage { flex:1; width:100%; }
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="NavTile">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage" id="pg-stage"></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.007</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>NavTile</h1>
+    <p class="lead">Навигационная плитка главной страницы платформы: иллюстрация, название раздела и краткое описание. Клик по плитке — переход на страницу раздела. Вариант со ссылками добавляет быстрые переходы к подразделам. Иллюстрации — из библиотеки <a class="inl" href="../foundations/Illustrations.html">Иллюстрации</a>. Не путать с дашбордом: NavTile не показывает данные и графики — только вход в раздел.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc">NavTile живёт только на главной странице платформы и образует сетку разделов: минимальная ширина плитки — 400px, гэп между плитками — 16px. Плитки, не помещающиеся в ряд, переносятся на следующий (`auto-fill` / `minmax(400px, 1fr)`). Высота плиток в ряду выравнивается по самой высокой.</p>
+    <div class="panel" style="padding:28px;">
+      <div class="ntile-grid" id="use-grid"></div>
+      <p class="desc tight" style="margin:18px 0 0;">Сетка главной страницы: базовые плитки и плитка со ссылками, 2×2.</p>
+    </div>
+
+    <div class="subsec" data-screen-label="WhenToUse">
+      <h3>Когда использовать</h3>
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li>вход в основной раздел платформы с главной страницы — одна плитка = один раздел;</li>
+        <li>раздел с частыми подразделами — вариант со ссылками (быстрые переходы без промежуточной страницы).</li>
+      </ul>
+      <h3>Когда не использовать</h3>
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li>показ показателей, метрик и графиков — это дашборд (отдельная страница платформы), а не NavTile;</li>
+        <li>навигация внутри раздела — используйте <a class="inl" href="Tab.html">Tab</a> или <a class="inl" href="../organisms/NavPanel.html">NavPanel</a>;</li>
+        <li>карточка сущности со статусом и действиями — <a class="inl" href="../organisms/Tile.html">Tile</a>.</li>
+      </ul>
+      <p class="desc">Соседние компоненты: <a class="inl" href="../organisms/Tile.html">Tile</a> — карточка объекта данных в списках; <a class="inl" href="../organisms/NavPanel.html">NavPanel</a> — постоянная боковая навигация; NavTile — разовая точка входа с главной.</p>
+    </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Раскладка горизонтальная: слева вертикальный стек — название, описание, в варианте со ссылками — блок ссылок, прижатый к низу; справа — иллюстрация фиксированного размера 195×140, прижатая к правому краю плитки и центрированная по вертикали. Обязательно только название.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage" id="anat-diagram"></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Контейнер</span><span class="d"> — фон <code class="tok">--bg-tile</code>, рамка 1px <code class="tok">--border-light</code>, радиус <code class="tok">--radius-control</code> (8px), паддинг 24px, по умолчанию 483×253px</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Иллюстрация</span><span class="d"> — слот <code class="tok">.illu</code>, фиксированный размер 195×140, вплотную к правому краю и с отступом сверху (24px), из библиотеки <a class="inl" href="../foundations/Illustrations.html">Иллюстрации</a>; опциональна</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Название</span><span class="d"> — H4 Strong; в варианте со ссылками обёрнуто в ссылку <code class="tok">.ntile__title-link</code></span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Описание</span><span class="d"> — Body M, <code class="tok">--text-secondary</code>; 1–2 строки, опционально</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Ссылки</span><span class="d"> — до 4 ссылок <code class="tok">.link--accent .link--m</code>, только в варианте со ссылками</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Одна ось конфигурации — способ навигации.</p>
+
+    <div class="subsec" data-screen-label="VarBase">
+      <h3>Базовая</h3>
+      <p class="desc">Вся плитка — одна ссылка <code class="tok">&lt;a class="ntile"&gt;</code> на страницу раздела. Внутри интерактивных элементов нет.</p>
+      <div class="panel"><div class="demo-grid" id="var-base"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="VarLinks">
+      <h3>Со ссылками</h3>
+      <p class="desc">Контейнер — <code class="tok">&lt;div class="ntile ntile--links"&gt;</code>, НЕ ссылка (вложение <code class="tok">&lt;a&gt;</code> в <code class="tok">&lt;a&gt;</code> недопустимо). На страницу раздела ведёт название-ссылка; ниже — до 4 ссылок на подразделы, прижаты к низу плитки. Hover-подъём у контейнера отсутствует — реагируют только ссылки.</p>
+      <div class="panel"><div class="demo-grid" id="var-links"></div></div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Один размер — 442×188px по умолчанию (вне сетки), минимальная ширина 400px (не сжимается меньше). Внутри <code class="tok">.ntile-grid</code> ширина растягивается по колонке (`auto-fill, minmax(400px, 1fr)`, гэп 16px) — плитки, не помещающиеся в ряд, переносятся на следующий. Минимальная высота 188px; плитки одного ряда выравниваются по самой высокой.</p>
+    <div class="panel" style="padding:28px;"><div class="ntile-grid" id="sizes-demo"></div></div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Один размер тайла; радиус не меняется при hover и фокусе.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Тайл</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фокус-обводка ссылки-заголовка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xs</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Правила текста:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>название = название раздела в навигации, существительное 1–3 слова: «Сделки», не «Перейти к сделкам»;</li>
+      <li>описание — что внутри раздела, 1–2 строки без точки в конце; длиннее двух строк — обрезается многоточием;</li>
+      <li>ссылки — названия подразделов, до 4 штук; больше — оставить самые частые, остальное живёт внутри раздела;</li>
+      <li>иллюстрация — из библиотеки <a class="inl" href="../foundations/Illustrations.html">Иллюстрации</a>, одна на раздел, не декоративная иконка.</li>
+    </ul>
+    <div class="panel"><div class="demo-grid" id="content-demo"></div></div>
+  </section>
+
+  <!-- BEHAVIOR -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+
+    <div class="subsec" data-screen-label="Navigation">
+      <h3>Навигация</h3>
+      <p class="desc">Базовая плитка: клик в любую точку → переход на страницу раздела. Плитка со ссылками: клик по названию → страница раздела, клик по ссылке → подраздел; клик по фону плитки ничего не делает. Переход — обычная навигация в текущей вкладке.</p>
+    </div>
+
+    <div class="subsec" data-screen-label="Adaptive">
+      <h3>Адаптивность</h3>
+      <p class="desc">Сетка — `grid-template-columns: repeat(auto-fill, minmax(400px, 1fr))`, гэп 16px по умолчанию. Плитка не сжимается меньше 400px; не помещается в ряд — переносится на следующий, без брейкпоинтов и контейнерных запросов. Высота плитки растёт от контента; в ряду плитки выравниваются по самой высокой (grid stretch).</p>
+    </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Четыре состояния базовой плитки. У варианта со ссылками состояния контейнера отсутствуют — Hover/Focus живут на названии и ссылках. Disabled — раздел недоступен пользователю (нет прав или не подключён): плитка видна, но не кликабельна.</p>
+    <div class="panel" style="padding:28px;"><div class="states-row" id="states-demo"></div></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Базовая плитка — обычная ссылка <code class="tok">&lt;a&gt;</code>; имя ссылки — название раздела (описание — часть контента ссылки). Иллюстрация декоративна: <code class="tok">aria-hidden="true"</code>. Disabled — <code class="tok">aria-disabled="true"</code> без <code class="tok">href</code>, плитка исключается из Tab-обхода. Фокус — видимая обводка 2px <code class="tok">--primary</code>.</p>
+    <div class="panel" style="max-width:640px;">
+      <p class="desc tight" style="margin-bottom:18px;">Клавиатура</p>
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Tab</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">фокус на плитку; в варианте со ссылками — последовательно название, затем каждая ссылка</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Enter</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">переход по сфокусированной плитке / ссылке</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Название — гарнитура <b>SB Sans Display</b>, текст — <b>SB Sans Text</b>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.17fr 1.13fr 0.9fr 1.62fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.17fr 1.13fr 0.9fr 1.62fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Название</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-h4-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Display</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">22/24 · Semibold · Display</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-h4-strong)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.17fr 1.13fr 0.9fr 1.62fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Описание</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16/20 · Regular · Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.17fr 1.13fr 0.9fr 1.62fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Ссылки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16/20 · Regular · Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Только семантические токены.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-tile</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-tile)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Рамка · Default / Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E1EDE7</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Рамка · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#B8CCCC</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Тень · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--elevation-2</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Обводка фокуса · Focus</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Название · Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Название · Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Описание · Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 1.62fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Описание · Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры и поведение. CSS — <code class="tok">styles/nav-tile.css</code> + <code class="tok">styles/illustration.css</code>.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре (<code class="tok">getComputedStyle</code>).</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+    <div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Вариант выбирается по наличию ссылок подразделов:</span>
+<span class="tk-cm">//    links.length == 0 → корень &lt;a class="ntile" href=раздел&gt; (вся плитка — ссылка);</span>
+<span class="tk-cm">//    links.length &gt; 0  → корень &lt;div class="ntile ntile--links"&gt;,</span>
+<span class="tk-cm">//    href раздела уходит на обёртку названия .ntile__title-link.</span>
+<span class="tk-cm">//    Вкладывать &lt;a&gt; в &lt;a&gt; нельзя — поэтому контейнер меняет тег.</span>
+
+<span class="tk-cm">// 2. Disabled: убрать href (или отрендерить &lt;div&gt;), поставить aria-disabled="true".</span>
+<span class="tk-cm">//    tabindex не назначать — плитка выпадает из Tab-обхода сама.</span>
+
+<span class="tk-cm">// 3. Ссылок подразделов — максимум 4; лишние обрезать на уровне данных, не CSS.</span>
+
+<span class="tk-cm">// 4. Иллюстрация: слот .illu с aria-hidden="true"; пока SVG не передан,</span>
+<span class="tk-cm">//    слот пуст и CSS сам рисует заглушку c именем из data-illu.</span>
+
+<span class="tk-cm">// 5. Сетка — ответственность страницы: grid 12 колонок, gap 24px,</span>
+<span class="tk-cm">//    плитка span 3 (адаптив: 4 / 6 / 12). Высота ряда — grid stretch.</span></code></pre>
+    </div>
+  </section>
+
+  <!-- BACKLOG -->
+  <div class="backlog" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы вне текущей документации; собираются на существующих токенах:</p>
+    <ul class="bullets">
+      <li>бейдж-счётчик на плитке («Задачи · 12») — компонент Badge уже есть;</li>
+      <li>состояние Loading — скелетон плитки при подгрузке прав пользователя;</li>
+      <li>плитка «Все разделы» без иллюстрации — для хвоста сетки;</li>
+      <li>тултип на обрезанном описании.</li>
+    </ul>
+  </div>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · NavTile</span>
+    <span>base / links · illustration 195×140 right-center · tile 442×188 default · span 3 of 12 · radius 8 · hover / focus / disabled</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите плитку: вариант, наполнение и состояние.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/nav-tile.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-illustrations.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/nav-tile.page.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Вариант': 'Со ссылками' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- базовая -->
+<a class="ntile" href="/deals">
+  <span class="illu ntile__illu" data-illu="deals" aria-hidden="true"></span>
+  <h3 class="ntile__title">Сделки</h3>
+  <p class="ntile__desc">Кредитные линии, договоры и график платежей</p>
+</a>
+
+<!-- со ссылками -->
+<div class="ntile">
+  <span class="illu ntile__illu" data-illu="reports" aria-hidden="true"></span>
+  <a class="ntile__title-link" href="/reports"><h3 class="ntile__title">Отчётность</h3></a>
+  <p class="ntile__desc">Формы, выгрузки и регламентные отчёты</p>
+  <nav class="ntile__links" aria-label="Подразделы">
+    <a class="link link--accent link--s" href="/reports/reg">Регламентные</a>
+    <a class="link link--accent link--s" href="/reports/export">Выгрузки</a>
+  </nav>
+</div>
+
+<!-- сетка главной -->
+<div class="ntile-grid"> …плитки… </div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/nav-tile.page.js)
+function tile(o) {
+  // o: { variant: 'base'|'links', title, desc, illu, showIllu, showDesc, links[], state: 'default'|'hover'|'focus'|'disabled' }
+  // базовая → <a class="ntile"> (вся плитка — ссылка);
+  // со ссылками → <div class="ntile"> + .ntile__title-link + <nav class="ntile__links"> (до 4 ссылок);
+  // disabled → aria-disabled + is-disabled; hover/focus → is-hover / is-focus
+}
+// Иллюстрации — data-illu + ds-illustrations.js (SVG подставляет рантайм)</script>
+<script type="text/plain" id="src-code-css">/* ============================================================
+   NAVTILE — навигационная плитка главной страницы платформы.
+   Клик по плитке ведёт на страницу раздела. Вариант --links
+   добавляет список быстрых ссылок; кликабелен только заголовок.
+   Ширина: 3 колонки сетки из 12 (до 4 плиток в ряд).
+   Только токены ДС. Зависимости: colors, radius, shadow,
+   typography, link (вариант --links), illustration (слот).
+   ============================================================ */
+
+/* ---------- сетка плиток ----------
+   Контейнерные запросы: адаптив считается от РЕАЛЬНОЙ ширины сетки
+   (а не ширины окна) — корректно и на полноширинной главной странице,
+   и в узкой демо-панели документации. */
+.ntile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 16px;
+}
+
+/* ---------- плитка ----------
+   Горизонтальная раскладка: текст слева, иллюстрация справа —
+   фиксированного размера 195×140, прижата к правому краю и закреплена
+   от верха (не центр по вертикали) — при росте тайла остаётся на месте. */
+.ntile {
+  --ntile-pad: 32px;
+  --ntile-illu-w: 195px;
+  --ntile-illu-h: 140px;
+  min-width: 400px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 442px;
+  min-height: 188px;
+  padding: var(--ntile-pad);
+  padding-right: 160px; /* чуть меньше ширины иллюстрации — текст может чуть перекрывать картинку, это нормально */
+  background: var(--bg-tile);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-control);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+/* внутри адаптивной сетки плитка тянется на ширину колонки — 483×253 это размер по умолчанию вне сетки */
+.ntile-grid > .ntile { width: auto; }
+
+/* ---------- части ---------- */
+.ntile__illu {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--ntile-illu-w);
+  height: var(--ntile-illu-h);
+}
+.ntile__title {
+  font: var(--type-h4-strong);
+  color: var(--text-primary);
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ntile__desc {
+  font: var(--type-body-m);
+  color: var(--text-secondary);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+.ntile__links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* заголовок-ссылка в варианте --links */
+.ntile__title-link {
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-xs);
+}
+.ntile__title-link:hover .ntile__title { color: var(--primary); }
+.ntile__title-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- состояния (кликабельная плитка) ---------- */
+a.ntile:hover,
+a.ntile.is-hover {
+  border-color: var(--border-primary);
+  box-shadow: var(--elevation-2);
+}
+a.ntile:focus-visible,
+a.ntile.is-focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Disabled — раздел недоступен (нет прав / не подключён) */
+.ntile.is-disabled,
+.ntile[aria-disabled="true"] {
+  pointer-events: none;
+  border-color: var(--border-light);
+  box-shadow: none;
+}
+.ntile.is-disabled .ntile__title,
+.ntile[aria-disabled="true"] .ntile__title { color: var(--text-inactive); }
+.ntile.is-disabled .ntile__desc,
+.ntile[aria-disabled="true"] .ntile__desc { color: var(--text-inactive); }
+.ntile.is-disabled .ntile__illu,
+.ntile[aria-disabled="true"] .ntile__illu { filter: grayscale(1); opacity: .4; }</script>
+</body>
+</html>

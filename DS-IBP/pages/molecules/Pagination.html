@@ -1,0 +1,840 @@
+<!-- @dsCard group="Components" name="Pagination" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagination — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/dropdown-list.css">
+<link rel="stylesheet" href="../../styles/checkbox.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/divider.css">
+<link rel="stylesheet" href="../../styles/pagination.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  
+  .section > h3 { font: var(--type-h5-strong); margin:34px 0 8px; color: var(--text-primary); display:flex; align-items:center; gap:10px; }
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:82ch; text-wrap:pretty; }
+
+  
+  .panel.flush { padding: 0; overflow: hidden; }
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:20px; }
+  .row + .row { margin-top: 24px; }
+
+  
+
+  
+
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 30px; }
+  .demo-rowlabel { font: var(--type-body-xs); color: var(--text-inactive); margin-bottom:10px; }
+
+  /* ---------- демо-стадия (docs-split) ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:44px 30px; display:flex; align-items:flex-start; justify-content:center; border-radius:16px 16px 0 0;
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  #pg-preview { width:680px; max-width:100%; }
+  #pg-preview .pgn-row { border-top:none; border-radius:14px; border:1px solid var(--border-primary); background: var(--bg-popup); box-shadow: 0 1px 2px rgba(40,50,55,.06); }
+
+  /* раскладка конструктора — docs-split.css (.ctl-col / .toggles);
+     остатки старой flex-раскладки .pg__controls удалены (урок Pagination 30.08.2026) */
+  .pg__widthctl input[type=range] { width:100%; accent-color: var(--primary); }
+  .pg__widthctl .lbl b { color: var(--text-secondary); font-variant-numeric:tabular-nums; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+  .toggles { display:flex; flex-direction:column; gap:9px; }
+  .toggle { display:inline-flex; align-items:center; gap:11px; padding:9px 12px; border:1px solid var(--border-light); border-radius:9px; font: var(--type-body-m); color: var(--text-primary); cursor:pointer; user-select:none; background: var(--bg-tile); transition:.12s; }
+
+  .pg__code { margin-top:14px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- mock table ---------- */
+  .tbl { display:flex; flex-direction:column; }
+  .tbl__row { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; padding:14px 20px; font: var(--type-body-s); color: var(--text-primary); border-bottom:1px solid var(--border-light); }
+  .tbl__row--head { font: var(--type-body-xs); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.04em; background: var(--tertiary-light); }
+  .tbl__row--focus { background: var(--bgtable-row-focus); }
+  .tbl__status { color: var(--success-dark); }
+  .tbl--wide .tbl__row { grid-template-columns: repeat(8, 160px); width: max-content; }
+
+  /* ---------- horizontal scroll demo ---------- */
+  .demo-scroll { border:1px solid var(--border-light); border-radius:14px; overflow:hidden; background: var(--bg-tile); max-width:640px; }
+  .demo-scroll__body { overflow-x:auto; }
+  .demo-scroll__body::-webkit-scrollbar { height:8px; }
+  .demo-scroll__body::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius:999px; }
+
+  /* ---------- vertical scroll demo ---------- */
+  .demo-vscroll { position:relative; border:1px solid var(--border-light); border-radius:14px; overflow:hidden; background: var(--bg-tile); max-width:640px; height:260px; }
+  .demo-vscroll__body { height:100%; overflow-y:auto; }
+  .demo-vscroll__footer { position:sticky; bottom:0; left:0; box-shadow: 0 -6px 12px -10px rgba(40,50,55,.25); }
+
+  /* ---------- splitter master-detail demo ---------- */
+  .demo-split { --split-frac: 62%; display:flex; align-items:stretch; border:1px solid var(--border-light); border-radius:14px; overflow:hidden; background: var(--bg-tile); height:340px; }
+  .demo-split__pane { min-width:0; display:flex; flex-direction:column; }
+  .demo-split__pane--list { width: var(--split-frac); }
+  .demo-split__pane--detail { flex:1 1 auto; padding:24px 26px; overflow:auto; }
+  .demo-split__pane--list .tbl { flex:1 1 auto; overflow:auto; }
+  .demo-split__detailhead { font: var(--type-h6-strong); color: var(--text-primary); margin-bottom:16px; }
+  .demo-split__detailrow { display:flex; justify-content:space-between; gap:14px; padding:9px 0; border-bottom:1px solid var(--border-light); font: var(--type-body-s); color: var(--text-secondary); }
+  .demo-split__detailrow b { color: var(--text-primary); font-weight:600; }
+
+  /* ---------- windowing examples ---------- */
+  .window-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:14px 0; border-bottom:1px solid var(--border-light); flex-wrap:wrap; }
+  .window-row:last-child { border-bottom:none; }
+  .window-row__cap { font: var(--type-body-s); color: var(--text-secondary); flex:1 1 220px; }
+
+  /* ---------- compact demo ---------- */
+  .compact-demo { border:1px solid var(--border-light); border-radius:14px; padding:16px 18px; background: var(--bg-tile); }
+  .compact-demo + .compact-demo { margin-top:18px; }
+
+  /* ---------- adaptivity ---------- */
+  .adapt-resize {
+    resize: horizontal; overflow: hidden;
+    width: 560px; min-width: 280px; max-width: 100%;
+    border:1px solid var(--border-primary); border-radius:14px; background: var(--bg-tile);
+    padding-bottom: 2px;
+  }
+  .adapt-resize .pgn-row { border-top: none; border-radius:14px; }
+  .adapt-tiers { display:flex; flex-direction:column; gap:22px; }
+  .adapt-frame { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); }
+  .adapt-frame .pgn-row { border-top:none; }
+
+  /* ---------- button states grid ---------- */
+  .btn-states { display:flex; flex-wrap:wrap; gap:14px; }
+  .btnstate { width:104px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .btnstate__box { width:100%; height:64px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border-light); border-radius:12px; background: var(--bg-popup); }
+  .btnstate__cap { margin:0; font: var(--type-body-xs); color: var(--text-secondary); text-align:center; }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:flex; flex-direction:column; gap:32px; }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:64px 30px 46px; display:flex; justify-content:center; overflow-x:auto; }
+  .anat-dia { position:relative; }
+  .anat-dia .mk { position:absolute; width:22px; height:22px; border-radius:50%; background:var(--text-primary); color:#fff; font:var(--type-body-xs); font-weight:600; display:flex; align-items:center; justify-content:center; transform:translate(-50%,-50%); }
+  .anat__legend { list-style:none; margin:0; padding:0; display:grid; grid-template-columns: repeat(2, 1fr); gap:16px 28px; counter-reset:a; }
+  @media (max-width:720px){ .anat__legend { grid-template-columns:1fr; } }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+
+  /* ---------- state spec tables ---------- */
+  .spec { border:1px solid var(--border-light); border-radius:14px; overflow:hidden; }
+  .spec + .spec { margin-top:16px; }
+  .spec__row { display:grid; grid-template-columns: 230px 200px 1fr; align-items:center; gap:16px; padding:20px; }
+  @media (max-width:760px){ .spec__row{ grid-template-columns:1fr; gap:14px; } }
+  .spec__cline { display:grid; grid-template-columns: 130px 18px 160px 1fr; align-items:center; gap:10px; font:var(--type-body-s); color:var(--text-secondary); }
+  @media (max-width:560px){ .spec__cline{ grid-template-columns: 100px 16px 1fr; } .spec__cline .raw{ display:none; } }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:15px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  /* ---------- color reference ---------- */
+  
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- developer code panels ---------- */
+  .code-panel__name { font: var(--type-body-s-strong); color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Pagination">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <a class="crumb" href="../../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Дизайн-система</a>
+    <div class="meta"><span>Версия: <b>1.008</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Pagination</h1>
+    <p class="lead">Нижняя строка многостраничной таблицы: переключение страниц, выбор количества строк на странице и счётчик диапазона. Та же строка может нести панель массового действия над выбранными строками (Action panel) или информационную сводку (Pagi counters) — но сам пагинатор всегда справа. Один фиксированный размер, совпадающий с высотой строки таблицы.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">Пагинатор встраивается в нижнюю строку таблицы и занимает её целиком. Ячейка с пагинатором не имеет отдельного состояния Selected/Focus — она не является строкой данных. Появляется, когда общее число строк превышает размер одной страницы; при единственной странице показывается статичный счётчик без интерактива (см. «Контент»).</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Таблица с нижней строкой пагинатора</p>
+      <div class="tbl" id="use-table" style="border:1px solid var(--border-light); border-radius:12px; overflow:hidden;"></div>
+    </div>
+
+    <h3>Поведение при скролле таблицы</h3>
+    <p class="desc tight">Если у таблицы <b>горизонтальный скролл</b> — строка пагинатора в нём не участвует: она вынесена из прокручиваемой области и всегда во всю ширину контейнера. Если у таблицы <b>вертикальный скролл</b> — строка пагинатора накладывается поверх последних видимых ячеек (<code class="tok">position: sticky</code>, непрозрачный фон, тень снизу вверх).</p>
+    <div class="row" style="align-items:flex-start;">
+      <div>
+        <p class="demo-rowlabel">Горизонтальный скролл — пагинатор не скроллится</p>
+        <div class="demo-scroll" id="demo-hscroll"></div>
+      </div>
+      <div>
+        <p class="demo-rowlabel">Вертикальный скролл — пагинатор поверх ячеек</p>
+        <div class="demo-vscroll" id="demo-vscroll"></div>
+      </div>
+    </div>
+
+    <h3>В контейнере со Splitter (мастер-деталь)</h3>
+    <p class="desc tight">В таблицах с раскрывающимися подробностями (список слева + карточка объекта справа, разделены компонентом <code class="tok">Splitter</code>) строка пагинатора растягивается на ширину именно левой панели со списком — не всего контейнера. Перетащите сплиттер.</p>
+    <div class="demo-split" id="demo-split"></div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Строка состоит из левого информационного слота (опционально) и пагинатора справа: выбор размера страницы, счётчик диапазона и навигация — стрелки, номера, свёрнутый диапазон.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div class="anat-dia" id="anat-diagram"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Инфо-слот (опционально)</span><span class="d">Pagi counters — сводка вроде «Сумма дохода: …»</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Выбор размера страницы</span><span class="d">неинтерактивный текст «Показывать строк: N» + IconButton-M чеврон, открывающий DropdownList</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Счётчик диапазона</span><span class="d">«N из M» — текущая страница из общего числа страниц</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Стрелка «назад»</span><span class="d">disabled на первой странице</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Номер страницы</span><span class="d">default / hover / current</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Свёрнутый диапазон «…»</span><span class="d">не интерактивен — скрытые страницы между краем и текущей</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Стрелка «вперёд»</span><span class="d">disabled на последней странице</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Buttons">
+    <h3>Кнопки страниц и стрелки</h3>
+    <p class="desc">Навигация пагинатора собрана из трёх типов элементов: кнопка-номер страницы, кнопка-стрелка (prev/next) и неинтерактивный «…». Раздел описывает их структуру, состояния и поведение — отдельно от композиции строки, чтобы разработчик мог собрать кнопку как самостоятельный примитив.</p>
+
+    <div class="panel">
+      <div class="btn-states" id="btn-states"></div>
+    </div>
+
+    <h4>Структура</h4>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.26fr 0.72fr 2.61fr 2.48fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Тег</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Класс / ARIA</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Содержимое</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 0.72fr 2.61fr 2.48fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Номер страницы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">button</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">.pgn__num</code>, <code class="tok">aria-current</code>, <code class="tok">aria-label="Страница N"</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Номер (текст, tabular-nums), квадрат 32×32 px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 0.72fr 2.61fr 2.48fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стрелка prev/next</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">button</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">.pgn__arrow</code>, <code class="tok">aria-label</code>, <code class="tok">aria-disabled</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Иконка chevron 18 px, квадрат 32×32 px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 0.72fr 2.61fr 2.48fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Свёрнутый диапазон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">span</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">.pgn__ellipsis</code>, <code class="tok">aria-hidden="true"</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">«…» — не кнопка, не фокусируется</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+
+    <h4>Состояния</h4>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.26fr 2.16fr 2.61fr 1.35fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Состояние</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Когда</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Визуал</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">ARIA / DOM</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 2.16fr 2.61fr 1.35fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Default</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Обычный номер / стрелка</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Текст Text_Secondary, без заливки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">—</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 2.16fr 2.61fr 1.35fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Наведение (кроме current/disabled)</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Фон Tertiary_Light, текст Text_Primary</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">:hover</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 2.16fr 2.61fr 1.35fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Focus</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Клавиатурный фокус</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Кольцо 2px Primary, offset 1px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">:focus-visible</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 2.16fr 2.61fr 1.35fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Current</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Текущая страница</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Фон BGTable_RowFocus, текст Text_Primary, Strong</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">aria-current="page"</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.26fr 2.16fr 2.61fr 1.35fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled (стрелка)</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Граница диапазона (стр. 1 / последняя)</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Текст Text_Inactive, без реакций</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">aria-disabled="true"</code></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+
+    <h4>Поведение</h4>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:24px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.58fr 3.4fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Действие</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Результат</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Клик по номеру</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Callback <code class="tok">onChange(page)</code> с номером этой страницы</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Клик по текущей (current)</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Нет реакции — кнопка без обработчика</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Клик по стрелке</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">onChange(page ± 1)</code>; на границе диапазона — нет реакции</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">«…»</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Не кликабелен, не получает фокус</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Tab</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Фокус переходит по кнопкам по порядку; disabled-стрелки пропускаются</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Enter / Space</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Активируют сфокусированную кнопку (штатное поведение <code class="tok">button</code>)</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Один фиксированный размер: высота строки пагинатора равна высоте строки таблицы (единая сетка колонтитула), кнопки номеров и стрелок — квадрат 32&nbsp;px. Отдельных размерных модификаций (M/S/XS) у компонента нет — под разную плотность таблицы меняется не пагинатор, а высота строки, к которой он подстраивается через <code class="tok">--pgn-h</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 1.08fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Высота строки</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">56 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--pgn-h</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кнопка номера / стрелки</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">32 × 32 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--pgn-num-size</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Паддинг строки по X</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">20 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--pgn-pad-x</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.66fr 1.08fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Типографика номеров / range</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">Body S · 14/16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Один размер пагинатора. Радиус кнопок совпадает с Button M / S — строка под таблицей читается как ряд контролов.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кнопка номера страницы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кнопка-стрелка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Селект «строк на странице»</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Панель списка селекта</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-popup</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Размер страницы — фиксированный список вариантов: <b>5 · 10 · 15 · 20 · 50 · Все</b>. «Все» — отдельное состояние: выводит все строки на одной странице (при большом объёме данных предупредите пользователя, что это может быть медленно — см. «Для разработчиков»).</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <p class="demo-rowlabel">Открытый список выбора размера страницы</p>
+      <div id="content-pagesize" style="min-height:220px; display:flex; align-items:flex-start;"></div>
+    </div>
+
+    <h3>Как считаются видимые номера — свёртывание в «…»</h3>
+    <p class="desc tight">Правило: всегда видны первая и последняя страница и 1 страница вокруг текущей (сосед слева/справа). Остальные номера сворачиваются в «…» — но если под «…» скрывалась бы только одна страница, она показывается вместо многоточия (не бывает «дыры» в одну страницу).</p>
+    <div class="panel" id="content-windows"></div>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="Adaptivity">
+    <h3>Адаптивность</h3>
+    <p class="desc">Пагинатор перестраивается не по брейкпоинтам вьюпорта и не по фиксированным порогам ширины, а по <b>фактически доступному месту</b>: скрипт измеряет ширину строки и натуральную ширину инфо-сводки, после чего понижает уровень навигации, пока пара «сводка + пагинатор» не уложится в строку. Раскладка выбирается по правилу <b>максимума номеров</b>: если в одну строку рядом со сводкой помещается не худший уровень, чем в вертикали, — остаёмся в одну строку (колонтитул ниже); иначе строка складывается в вертикаль, где сводка и пагинатор получают всю ширину. Инфо-сводка никогда не обрезается и не выходит за границы своего слота, а пагинатор — за правый край строки.</p>
+    <p class="desc tight">Две независимые оси: <code class="tok">data-tier</code> на <code class="tok">.pgn</code> — уровень навигации; <code class="tok">data-layout</code> на <code class="tok">.pgn-row</code> — раскладка строки (<code class="tok">row</code> / <code class="tok">stack</code>). Поэтому пагинатор умеет стать компактным, оставаясь в одну строку со сводкой, — раньше compact включался только вместе с вертикалью, из-за чего стрелки успевали вылезти за границу.</p>
+
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:24px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.43fr 1.66fr 3.4fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Tier</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Номера страниц</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Требуемая ширина пагинатора</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Раскладка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.43fr 1.66fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">l</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Полный набор (до 7): 1 … 5 6 7 … 24</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">~610 px</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">pagesize + счётчик + nav в ряд</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.43fr 1.66fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Сокращённый (до 5): 1 … 6 … 24</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">~540 px</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">sibling 0 — соседей текущей страницы нет</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.43fr 1.66fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">sm</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Только текущая страница между стрелок: ‹ 6 ›</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">~405 px</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Края и «…» скрыты, номер остаётся кликабельным ориентиром</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.43fr 1.66fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">c</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Скрыты — счётчик «N из M» между стрелок</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">~360 px</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Пагинатор compact: номеров нет, счётчик переезжает в nav</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.43fr 1.66fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">stack</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">По доступной ширине строки</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Строка в столбик: сводка сверху во всю ширину, пагинатор снизу — здесь ему снова хватает места на номера</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 2.43fr 1.66fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Скрыты — счётчик «N из M» между стрелок</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Вертикаль + сам пагинатор в две строки: pagesize сверху, «‹ N из M ›» отдельной строкой</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <p class="desc tight">Требуемая ширина считается из реальных размеров частей (выбор размера страницы, счётчик, число кнопок), поэтому зависит от контента: длинный текст сводки или «Показывать строк: 15 000» сдвигает переход раньше. Значения в таблице — ориентир для набора по умолчанию.</p>
+
+    <h4>Живой ресайз</h4>
+    <p class="desc tight">Потяните за правый нижний угол рамки — пагинатор будет перестраиваться в реальном времени.</p>
+    <div class="adapt-resize" id="adapt-live"></div>
+
+    <h4>Уровни</h4>
+    <div class="panel adapt-tiers" id="adapt-tiers"></div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Номер страницы проходит Default → Hover → Current. Current не имеет hover — он уже визуально выделен и не кликабелен. Стрелки получают Disabled на границах диапазона (первая/последняя страница).</p>
+    <div id="state-specs"></div>
+
+    <h3>Composability — Action panel и Pagi counters</h3>
+    <p class="desc tight">Строка колонтитула модульна: справа всегда пагинатор (или ничего, если данные умещаются на одну страницу без «Все»), слева — по обстоятельствам: ничего или информационная сводка. Когда в таблице выбрана хотя бы одна строка, панель массового действия (Action panel) появляется отдельной строкой <b>над</b> строкой пагинатора — сам пагинатор остаётся на месте и работоспособен, обе панели видны одновременно.</p>
+    <div class="row" style="align-items:flex-start; flex-direction:column; gap:20px;">
+      <div style="width:100%;">
+        <p class="demo-rowlabel">Только пагинатор (по умолчанию)</p>
+        <div class="pgn-row" id="demo-plain" style="border:1px solid var(--border-light); border-radius:12px;"></div>
+      </div>
+      <div style="width:100%;">
+        <p class="demo-rowlabel">+ Pagi counters слева</p>
+        <div class="pgn-row" id="demo-info" style="border:1px solid var(--border-light); border-radius:12px;"></div>
+      </div>
+      <div style="width:100%;">
+        <p class="demo-rowlabel">Action panel над пагинатором — видны одновременно</p>
+        <div id="demo-bulk" style="border:1px solid var(--border-light); border-radius:12px; overflow:hidden;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc tight">Навигация обёрнута в <code class="tok">&lt;nav aria-label="Страницы"&gt;</code>; текущая страница помечена <code class="tok">aria-current="page"</code> и не является кнопкой-ссылкой на себя. Стрелки на границах — <code class="tok">aria-disabled="true"</code>, а не просто визуально приглушены. Каждый интерактивный элемент — фокусируемая кнопка со стандартным фокус-кольцом ДС (<code class="tok">2px solid var(--primary)</code>). Выбор размера страницы — обычный триггер DropdownList: <code class="tok">aria-haspopup="listbox"</code>, список — <code class="tok">role="listbox"</code>/<code class="tok">option</code>. Свёрнутый диапазон «…» не интерактивен и не должен получать фокус.</p>
+    <div class="panel"><div id="a11y-demo"></div></div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Номера страниц и служебный текст набираются гарнитурой <b>SB Sans Text</b>; текущая страница — тем же токеном, но strong.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Номер страницы (default)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Номер страницы (текущая)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s-strong)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Счётчик диапазона</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Триггер «Показывать строк»</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.35fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Счётчик Bulk-режима</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Номер страницы по умолчанию — вторичный серо-зелёный текст без заливки; при наведении — нейтральная заливка Tertiary_Light и текст темнее. Текущая страница подсвечена тем же токеном, что и выбранная/сфокусированная строка таблицы — <code class="tok">--bgtable-row-focus</code> — чтобы визуально читаться в общей системе таблицы. Стрелки повторяют цвет номеров, на границе — StInactive. Disabled — StInactive для текста, DisabledBG для фона текущей.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Номер страницы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Default текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Номер страницы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--tertiary-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--tertiary-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#EEF2F1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Номер страницы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Hover текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Номер страницы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Current фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bgtable-row-focus</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bgtable-row-focus)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#DEEDEC</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Номер страницы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Current текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стрелки / прочее</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стрелки / прочее</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Стрелки / прочее</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Разделитель строки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E1EDE7</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Pagesize</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст (лейбл)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Pagesize</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Значение</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.26fr 1.31fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Pagesize</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Значение</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#333F48</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Страница ДС собрана на чистых CSS-классах и vanilla JS — но всё ниже не привязано к стеку: команда, которая верстает компонент на React, может взять отсюда анатомию, точные размеры, алгоритм свёртывания номеров и цвета, не заглядывая в этот код построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения — токены ДС, измеренные через <code class="tok">getComputedStyle</code> на реально отрендеренном экземпляре; ссылки на переменные — в файле <code class="tok">styles/pagination.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:36px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить:</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/pagination.css</code>
+      <span class="req">— и <code class="tok">styles/dropdown-list.css</code> для выбора размера страницы, <code class="tok">styles/button.css</code> для кнопок Action panel.</span>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. totalPages — из общего числа строк и размера страницы («Все» = 1 страница)</span>
+totalPages = pageSize === <span class="tk-val">'all'</span> ? <span class="tk-val">1</span> : Math.ceil(totalRows / pageSize)
+page = clamp(page, <span class="tk-val">1</span>, totalPages)
+
+<span class="tk-cm">// 2. Свёртывание номеров в «…» — boundaryCount (края) + siblingCount (вокруг текущей),</span>
+<span class="tk-cm">//    по умолчанию оба = 1. Если бы «…» скрывало ровно 1 страницу — показать её вместо «…».</span>
+function pageWindow(current, total, siblingCount = <span class="tk-val">1</span>, boundaryCount = <span class="tk-val">1</span>) {
+  totalNumbers = boundaryCount*<span class="tk-val">2</span> + siblingCount*<span class="tk-val">2</span> + <span class="tk-val">3</span>
+  <span class="tk-attr">if</span> (total &lt;= totalNumbers) <span class="tk-attr">return</span> range(<span class="tk-val">1</span>, total)     <span class="tk-cm">// всё помещается — без «…»</span>
+
+  leftSibling  = max(current - siblingCount, <span class="tk-val">1</span>)
+  rightSibling = min(current + siblingCount, total)
+  showLeftEllipsis  = leftSibling  &gt; boundaryCount + <span class="tk-val">2</span>
+  showRightEllipsis = rightSibling &lt; total - boundaryCount - <span class="tk-val">1</span>
+  <span class="tk-cm">// комбинируем: [края] + [«…» либо доп. номера] + [соседи текущей] + [«…» либо доп. номера] + [края]</span>
+  <span class="tk-cm">// полную сборку веток см. ds-pagination.js → pageWindow()</span>
+}
+
+<span class="tk-cm">// 3. Пересчитывать pageWindow при смене page / totalRows / pageSize.</span>
+<span class="tk-cm">// 4. Компактный режим — по ширине контейнера строки (ResizeObserver),</span>
+<span class="tk-cm">//    не по брейкпоинту вьюпорта: строка может быть узкой в широком окне (виджет/сайдбар).</span>
+<span class="tk-cm">//    Порогов ширины нет: считаем требуемую ширину пагинатора на каждом уровне</span>
+<span class="tk-cm">//    (pagesize + счётчик + кнопки) и вычитаем натуральную ширину инфо-сводки:</span>
+<span class="tk-cm">//      avail = rowInnerWidth − infoWidth − rowGap</span>
+<span class="tk-cm">//      levels = [full(7) → short(5) → onlyCurrent(1) → compact(«N из M»)]</span>
+<span class="tk-cm">//      iRow   = первый уровень, у которого need(level) ≤ avail</span>
+<span class="tk-cm">//      iStack = первый уровень, у которого need(level) ≤ rowInnerWidth</span>
+<span class="tk-cm">//      iRow не хуже iStack → layout = 'row', иначе layout = 'stack'</span>
+<span class="tk-cm">//      (в вертикали сводка сверху во всю ширину, пагинатор снизу; крайний уровень — xs)</span>
+<span class="tk-cm">//      подъём к более полному набору требует запаса 24px — гистерезис против дребезга,</span>
+<span class="tk-cm">//      когда появление/исчезновение скроллбара меняет ширину на ~15px.</span>
+
+<span class="tk-cm">// 5. Массовый выбор строк таблицы добавляет панель НАД строкой пагинатора,</span>
+<span class="tk-cm">//    не заменяя её — обе видны и активны одновременно:</span>
+renderFooter({
+  bulkPanel: selectedCount &gt; <span class="tk-val">0</span> ? { count: selectedCount, actions } : <span class="tk-attr">null</span>,
+  pagerRow: { info, pager },
+})</code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм для реализации поверх вашего стека (в этом ДС — vanilla JS, см. <code class="tok">pagination.page.js</code>, функции <code class="tok">pageWindow</code> и <code class="tok">buildPager</code>, если нужен рабочий референс).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Переход «В начало / В конец»</b> — быстрые кнопки-стрелки к первой/последней странице.</li>
+        <li><b>Ввод номера страницы вручную</b> — поле для прямого перехода при большом количестве страниц.</li>
+        <li><b>Выпадающий список страниц при клике на троеточие «…»</b> в списке номеров страниц.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Pagination</span>
+    <span>Pager · Action panel · Pagi counters — Default / Hover / Current — Адаптив l/m/sm/c/xs</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите строку колонтитула: общее число строк, размер страницы, левый слот (пусто / инфо-сводка / массовый выбор), состояние. Кликайте по номерам страниц в превью — как в реальном пагинаторе. Сузьте превью сплиттером, чтобы увидеть компактный режим.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/pagination.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-pagination.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/pagination.page.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Левый слот': 'Инфо-сводка', 'Выбор размера страницы': 'Показывать выбор размера страницы' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><div class="pgn-row">
+  <!-- левый слот — опционален, пуст по умолчанию -->
+  <div class="pgn-row__left">
+    <div class="pgn-info">…</div>
+  </div>
+
+  <div class="pgn-row__right">
+    <div class="pgn">
+      <span class="pgn__pagesize"><span class="pgn__pagesize-label">Показывать строк: <b>50</b></span><button class="pgn__pagesize-btn" aria-haspopup="listbox"><i data-icon="chevron-down"></i></button></span>
+      <span class="pgn__range">3 из 16</span>
+
+      <nav class="pgn__nav" aria-label="Страницы">
+        <button class="pgn__arrow" aria-label="Предыдущая страница">‹</button>
+        <button class="pgn__num">1</button>
+        <button class="pgn__num" aria-current="page">3</button>
+        <span class="pgn__ellipsis" aria-hidden="true">…</span>
+        <button class="pgn__num">16</button>
+        <button class="pgn__arrow" aria-label="Следующая страница">›</button>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- есть выбранные строки таблицы — Action panel добавляется НАД строкой пагинатора, -->
+<!-- сама строка пагинатора (см. разметку выше) никуда не девается -->
+<div class="pgn-footer">
+  <div class="pgn-row pgn-row--bulk">
+    <div class="pgn-bulk">
+      <span class="pgn-bulk__count">Выбрано строк: <b>4</b></span>
+      <div class="pgn-bulk__actions">…</div>
+    </div>
+  </div>
+  <hr class="dvd dvd--h"><!-- разделитель Action panel / пагинатор -->
+  <div class="pgn-row">…<!-- обычная строка pagesize/range/nav --></div>
+</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/pagination.page.js)
+// Пагинатор строит общий рантайм: window.DSPagination (pager/row/footer/bulk/info)
+DSPagination.footer({
+  selectionCount: 0,                // >0 → Action panel (.pgn-bulk) над строкой
+  info: null,                       // {…} → инфо-сводка (.pgn-info) в левом слоте
+  pager: { total: 800, pageSize: 50, page: 3, showPageSize: true, onChange, onPageSizeChange }
+});
+// data-tier (l/m/sm/c/xs) и data-layout (row/stack) выставляет скрипт по доступной
+// ширине (ResizeObserver); инфо-сводка не обрезается никогда.</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Pagination
+   Панель переключения страниц многостраничной таблицы: селектор размера
+   страницы, счётчик диапазона, стрелки и номера страниц. Всегда занимает
+   всю ширину нижней строки таблицы; в скролле таблицы не участвует
+   (см. styles.md компонента и раздел «Использование» на странице).
+
+   Части:
+     .pgn-row          — строка-контейнер (левый + правый слот)
+     .pgn-info         — левый слот: информационная сводка (Pagi_counters)
+     .pgn-bulk         — альтернативное состояние строки: массовое действие
+                         над выбранными строками (Action_panel)
+     .pgn              — собственно пагинатор (правый слот)
+       .pgn__pagesize    — селектор «Показывать строк»
+       .pgn__range       — счётчик «N из M»
+       .pgn__nav         — стрелки + номера страниц
+       .pgn__arrow       — стрелка prev/next
+       .pgn__num         — кнопка номера страницы
+       .pgn__ellipsis    — «…» свёрнутый диапазон
+
+   Requires: typography.css, colors.css, radius.css, dropdown-list.css
+   ========================================================================= */
+
+:root {
+  --pgn-h:            56px;   /* высота строки — совпадает с высотой строки таблицы */
+  --pgn-pad-x:         20px;
+  --pgn-gap-section:   28px;  /* зазор между pagesize / range / nav */
+  --pgn-num-size:      32px;  /* сторона кнопки номера страницы / стрелки */
+  --pgn-num-gap:        2px;  /* зазор между кнопками номеров */
+  --pgn-radius:        var(--radius-control-s);
+}
+
+/* =========================================================================
+   ROW — строка нижнего колонтитула таблицы
+   ========================================================================= */
+.pgn-row {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  min-height: var(--pgn-h);
+  padding: 0 var(--pgn-pad-x);
+  background: var(--bg-tile);
+  border-top: 1px solid var(--border-light);
+}
+.pgn-row__left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: visible;   /* сводка не обрезается никогда: не влезает — строка складывается в вертикаль */
+}
+.pgn-row__right { flex: none; }
+
+/* строка целиком не участвует в горизонтальном скролле таблицы —
+   демонстрируется через position:sticky в мок-примерах на странице */
+.pgn-row--sticky { position: sticky; left: 0; }
+
+/* =========================================================================
+   PAGESIZE — «Показывать строк»: неинтерактивный текст + IconButton-чеврон.
+   Единственный интерактивный элемент селектора — чеврон-кнопка (IconButton,
+   размер M, тон нейтральный). Клик по чеврону открывает DropdownList.
+   ========================================================================= */
+.pgn__pagesize.ddl-anchor {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.pgn__pagesize-label { font: var(--type-body-s); color: var(--text-secondary); }
+.pgn__pagesize-label b { color: var(--text-primary); font-weight: 600; }
+/* чеврон — IconButton M: круглый стейт-слой 32px, translucent-рипл currentColor */
+.pgn__pagesize-btn {
+  flex: none;
+  width: var(--pgn-num-size);
+  height: var(--pgn-num-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color .12s ease, color .12s ease;
+}
+.pgn__pagesize-btn :is(svg,[data-icon]){ width: 20px; height: 20px; display: block; transition: transform .15s ease; }
+.pgn__pagesize-btn:hover  { background: color-mix(in srgb, currentColor 12%, transparent); }
+.pgn__pagesize-btn:active { background: color-mix(in srgb, currentColor 22%, transparent); }
+.pgn__pagesize-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.pgn__pagesize-btn.is-open svg { transform: rotate(180deg); }
+
+/* =========================================================================
+   PAGER — сам пагинатор: pagesize + range + nav в один ряд
+   ========================================================================= */
+.pgn {
+  display: flex;
+  align-items: center;
+  gap: var(--pgn-gap-section);
+  flex-wrap: nowrap;
+}
+
+/* =========================================================================
+   RANGE — счётчик «N из M»
+   ========================================================================= */
+.pgn__range {
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   NAV — стрелки + номера
+   ========================================================================= */
+.pgn__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--pgn-num-gap);
+}
+
+/* стрелки и номера — IconButton M, тон нейтральный: круглый стейт-слой 32px,
+   translucent-рипл currentColor (12% hover / 22% active), цвет Text_Secondary */
+.pgn__arrow {
+  flex: none;
+  width: var(--pgn-num-size);
+  height: var(--pgn-num-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color .12s ease, color .12s ease;
+}
+.pgn__arrow :is(svg,[data-icon]){ width: 20px; height: 20px; display: block; }
+.pgn__arrow:hover  { background: color-mix(in srgb, currentColor 12%, transparent); }
+.pgn__arrow:active { background: color-mix(in srgb, currentColor 22%, transparent); }
+.pgn__arrow:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.pgn__arrow:disabled,
+.pgn__arrow[aria-disabled="true"] { color: var(--text-inactive); cursor: default; pointer-events: none; background: transparent; }
+
+.pgn__num {
+  flex: none;
+  width: var(--pgn-num-size);
+  height: var(--pgn-num-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-secondary);
+  font: var(--type-body-s);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color .12s ease, color .12s ease;
+}
+.pgn__num:hover  { background: color-mix(in srgb, currentColor 12%, transparent); }
+.pgn__num:active { background: color-mix(in srgb, currentColor 22%, transparent); }
+.pgn__num:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* текущая страница */
+.pgn__num[aria-current="page"] {
+  background: var(--bgtable-row-focus);
+  color: var(--text-primary);
+  font: var(--type-body-s-strong);
+  cursor: default;
+}
+.pgn__num[aria-current="page"]:hover { background: var(--bgtable-row-focus); }
+
+.pgn__ellipsis {
+  flex: none;
+  width: var(--pgn-num-size);
+  height: var(--pgn-num-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-inactive);
+  font: var(--type-body-s);
+  user-select: none;
+}
+
+/* =========================================================================
+   MODIFIER — compact (узкий контейнер): скрыть номера страниц;
+   счётчик «N из M» переезжает внутрь nav — между стрелками
+   (рендерится там скриптом, см. renderNav), а внешний скрывается.
+   ========================================================================= */
+.pgn--compact .pgn__num,
+.pgn--compact .pgn__ellipsis { display: none; }
+.pgn--compact > .pgn__range { display: none; }
+.pgn__nav .pgn__range { padding: 0 8px; }
+
+/* =========================================================================
+   RESPONSIVE — адаптив по фактически доступному месту (не по порогам вьюпорта).
+   Скрипт (ds-pagination.js → fit) измеряет ширину строки и натуральную
+   ширину инфо-сводки, после чего выставляет две независимые оси:
+     data-tier на .pgn      — уровень навигации: l | m | sm | c | xs
+     data-layout на .pgn-row — раскладка строки: row | stack
+
+     l   — полный набор номеров (до 7)
+     m   — сокращённый набор (до 5): 1 … N … Last
+     sm  — между стрелок только текущая страница
+     c   — номера скрыты, между стрелок счётчик «N из M» (compact),
+           строка при этом ещё горизонтальная
+     xs  — compact + сам пагинатор переносится в две строки
+
+   Инфо-сводка никогда не обрезается: пока она с пагинатором не влезает
+   в одну строку — сокращается пагинатор; дальше строка идёт в stack.
+   ========================================================================= */
+
+/* stack — строка колонтитула перестраивается в вертикаль */
+.pgn-row[data-layout="stack"] {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.pgn-row[data-layout="stack"] .pgn-row__left { flex: none; width: 100%; overflow: visible; }
+.pgn-row[data-layout="stack"] .pgn-row__right { width: 100%; }
+.pgn-row[data-layout="stack"] .pgn { width: 100%; justify-content: space-between; }
+
+/* xs — сам пагинатор переносится в две строки */
+.pgn[data-tier="xs"] {
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+.pgn[data-tier="xs"] .pgn__nav {
+  flex: 1 0 100%;
+  justify-content: space-between;
+}
+
+/* =========================================================================
+   FOOTER — обёртка колонтитула: опциональная строка Action_panel НАД
+   обычной строкой пагинации (обе видны одновременно, не взаимоисключающие)
+   ========================================================================= */
+.pgn-footer { width: 100%; }
+
+/* =========================================================================
+   BULK — Action_panel: панель массового действия над выбранными строками.
+   Отдельная строка НАД строкой пагинатора — появляется, когда выбрана
+   хотя бы одна строка таблицы; пагинатор при этом остаётся видимым.
+   ========================================================================= */
+.pgn-bulk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.pgn-row--bulk { background: var(--bg-tile); }
+.pgn-bulk__count { font: var(--type-body-m); color: var(--text-secondary); white-space: nowrap; }
+.pgn-bulk__count b { color: var(--text-primary); font-weight: 600; }
+.pgn-bulk__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* =========================================================================
+   INFO — Pagi_counters: информационная сводка в левом слоте строки
+   ========================================================================= */
+.pgn-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  min-width: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.pgn-info__item b { color: var(--text-primary); font-weight: 600; }
+.pgn-info__warn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--warning-dark);
+}
+.pgn-info__warn :is(svg,[data-icon]){ width: 16px; height: 16px; flex: none; color: var(--warning); }</script>
+</body>
+</html>

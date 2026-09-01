@@ -1,0 +1,121 @@
+/* =========================================================================
+   Chart — графики данных: столбчатые, линейные, области, круговые,
+   точечные, водопад, спарклайн. Геометрию считает scripts/ds-chart.js,
+   этот файл задаёт токены, анатомию и цвет. Все значения — токены ДС.
+   Зависимости: colors.css, typography.css, radius.css, tooltip.css,
+   skeleton.css, alert.css, button.css, icon-button.css, segment-control.css.
+   ========================================================================= */
+
+.chart-host{--chart-h:220px;--chart-gap:12px;--chart-tick-fg:var(--text-inactive);--chart-grid:var(--border-light);--chart-axis:var(--border-primary);--chart-label-fg:var(--text-secondary);--chart-bar-r:var(--radius-2xs);--chart-line-w:2px;display:block;min-width:0;container-type:inline-size;container-name:chart}
+.chart-host[data-size="s"]{--chart-h:132px;--chart-gap:8px}
+.chart-host[data-size="l"]{--chart-h:320px;--chart-gap:16px}
+
+.chart{display:flex;flex-direction:column;gap:var(--chart-gap);min-width:0;font:var(--type-body-xs);color:var(--text-primary)}
+.chart--stretch{width:100%}
+
+/* ---------- шапка ---------- */
+.chart__head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-width:0}
+.chart__titles{display:flex;flex-direction:column;gap:2px;min-width:0}
+.chart__title{font:var(--type-body-m-strong);color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart__subtitle{font:var(--type-body-xs);color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart__toolbar{display:flex;align-items:center;gap:8px;flex:none}
+.chart-host[data-size="s"] .chart__title{font:var(--type-body-s-strong)}
+.chart-host[data-size="l"] .chart__title{font:var(--type-body-l-strong)}
+
+/* ---------- легенда ---------- */
+.chart__legend{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;min-width:0}
+.chart__legend--bottom{order:9}
+.chart__legend-item{display:inline-flex;flex:0 0 auto;align-items:center;gap:6px;min-height:20px;padding:2px 4px;border:0;border-radius:var(--radius-xs);background:none;cursor:pointer;font:var(--type-body-xs);color:var(--text-secondary);max-width:100%}
+.chart__legend-item:hover{background:var(--bgtable-row-hover);color:var(--text-primary)}
+.chart__legend-item:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.chart__legend-item[aria-pressed="false"]{color:var(--text-inactive)}
+.chart__legend-item[aria-pressed="false"] .chart__marker{background:var(--disabled)}
+.chart__legend-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart__legend-val{font:var(--type-body-xs);color:var(--text-primary);font-variant-numeric:tabular-nums}
+.chart__marker{flex:none;width:10px;height:10px;border-radius:var(--radius-2xs);background:var(--chart-c,var(--primary))}
+.chart__marker--line{width:14px;height:3px;border-radius:var(--radius-full)}
+.chart__marker--dot{width:8px;height:8px;border-radius:var(--radius-circle)}
+.chart__marker--dashed{background:repeating-linear-gradient(90deg,var(--chart-c,var(--primary)) 0 4px,transparent 4px 7px)}
+
+/* ---------- поле построения ---------- */
+.chart__plot{position:relative;min-width:0}
+.chart__svg{display:block;width:100%;height:var(--chart-h);touch-action:none}
+.chart__grid line{stroke:var(--chart-grid);stroke-width:1;shape-rendering:crispEdges}
+.chart__grid line.chart__zero{stroke:var(--chart-axis)}
+.chart__axis line{stroke:var(--chart-axis);stroke-width:1;shape-rendering:crispEdges}
+.chart__axis text,.chart__tick{font:var(--type-body-xs);fill:var(--chart-tick-fg)}
+.chart-host[data-size="l"] .chart__axis text{font:var(--type-body-s)}
+.chart__axis-title{font:var(--type-body-xs);fill:var(--text-secondary)}
+.chart__vlabel{font:var(--type-body-xs);fill:var(--chart-label-fg);font-variant-numeric:tabular-nums}
+
+/* серии */
+.chart__ser{transition:opacity .12s ease}
+.chart[data-hover] .chart__ser:not(.is-active){opacity:.28}
+.chart__bar{fill:var(--chart-c,var(--primary));rx:var(--chart-bar-r)}
+.chart__bar--forecast{fill:var(--chart-forecast,url(#chartHatch))}
+.chart__line{fill:none;stroke:var(--chart-c,var(--primary));stroke-width:var(--chart-line-w);stroke-linejoin:round;stroke-linecap:round}
+.chart__line--dashed{stroke-dasharray:6 4}
+.chart__area{fill:var(--chart-c,var(--primary));opacity:.16}
+.chart__dot{fill:var(--bg-tile);stroke:var(--chart-c,var(--primary));stroke-width:2}
+.chart__dot--solid{fill:var(--chart-c,var(--primary));stroke:none}
+.chart__dot.is-active{r:5}
+.chart__slice{stroke:var(--bg-tile);stroke-width:2}
+.chart__ref{stroke:var(--text-secondary);stroke-width:1;stroke-dasharray:4 4}
+.chart__ref-label{font:var(--type-body-xs);fill:var(--text-secondary)}
+.chart__gap-note{font:var(--type-body-xs);fill:var(--text-inactive)}
+.chart__hit{fill:transparent}
+.chart__band{fill:transparent}
+.chart__band.is-active{fill:var(--bgtable-row-hover)}
+
+/* курсор */
+.chart__cursor{position:absolute;top:0;width:1px;background:var(--border-dark);opacity:0;pointer-events:none;transition:opacity .1s ease}
+.chart__cursor.is-visible{opacity:1}
+
+/* тултип: контейнер — компонент Tooltip, строки — Chart */
+.chart__tip{position:absolute;z-index:5;pointer-events:none;max-width:280px}
+.chart__tip-title{display:block;font:var(--type-body-s-strong);margin-bottom:6px}
+.chart__tip-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:8px;padding:1px 0}
+.chart__tip-row .chart__marker{width:10px;height:10px}
+.chart__tip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-body-s);opacity:.82}
+.chart__tip-val{font:var(--type-body-s-strong);font-variant-numeric:tabular-nums;text-align:right}
+.chart__tip-total{margin-top:6px;padding-top:6px;border-top:1px solid color-mix(in srgb,var(--text-on-dark) 24%,transparent)}
+
+/* ---------- brush ---------- */
+.chart__brush{position:relative;height:36px;border-radius:var(--radius-xs);background:var(--bg-page);overflow:hidden;touch-action:none}
+.chart__brush-svg{display:block;width:100%;height:36px}
+.chart__brush-spark{fill:var(--st-grey-midlight);stroke:none}
+.chart__brush-spark.is-active{fill:var(--st-primary-mid)}
+.chart__brush-window{position:absolute;top:0;bottom:0;background:var(--primary-bg-semitransparent);border-left:2px solid var(--primary);border-right:2px solid var(--primary);cursor:grab}
+.chart__brush-window:active{cursor:grabbing}
+.chart__brush-handle{position:absolute;top:0;bottom:0;width:10px;cursor:ew-resize}
+.chart__brush-handle--l{left:-6px}
+.chart__brush-handle--r{right:-6px}
+
+/* ---------- служебные состояния ---------- */
+.chart__foot{display:flex;flex-direction:column;gap:8px}
+.chart__empty{display:flex;align-items:center;justify-content:center;height:var(--chart-h);border-radius:var(--radius-xs);background:var(--bg-page);font:var(--type-body-s);color:var(--text-inactive);text-align:center;padding:0 16px}
+.chart__calc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:var(--chart-h);border-radius:var(--radius-xs);background:var(--bg-page);text-align:center;padding:0 16px}
+.chart__calc-title{font:var(--type-body-s-strong);color:var(--text-primary)}
+.chart__calc-sub{font:var(--type-body-xs);color:var(--text-secondary)}
+.chart__sk{display:flex;flex-direction:column;justify-content:flex-end;gap:8px;height:var(--chart-h)}
+.chart__sk-bars{display:flex;align-items:flex-end;gap:8px;height:100%}
+.chart__sk-bars .sk-block{flex:1 1 0;min-width:0}
+
+/* ---------- спарклайн ---------- */
+.chart-host--spark{container-type:normal}
+.chart-host--spark .chart{gap:0}
+.chart--spark .chart__svg{height:24px}
+.chart__spark-dot{fill:var(--chart-c,var(--primary))}
+
+/* ---------- контейнерные брейкпоинты ---------- */
+@container chart (max-width: 420px){
+  .chart__legend{gap:2px 8px}
+  .chart__legend-val{display:none}
+}
+@container chart (max-width: 280px){
+  .chart__subtitle{display:none}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .chart__ser,.chart__cursor{transition:none}
+}

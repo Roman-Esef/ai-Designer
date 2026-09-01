@@ -1,0 +1,725 @@
+<!-- @dsCard group="Components" name="PageHeader" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PageHeader — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/chip.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/breadcrumbs.css">
+<link rel="stylesheet" href="../../styles/context-menu.css">
+<link rel="stylesheet" href="../../styles/tooltip.css">
+<link rel="stylesheet" href="../../styles/page-header.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+a{color:var(--link);} a:hover{color:var(--link-dark);}
+
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:82ch;text-wrap:pretty;}
+
+.subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:32px 0 14px;}
+
+/* контролы конструктора (вкладка «Конструктор») */
+.ctl--span{grid-column:1/-1;}
+.pg-range{width:100%;accent-color:var(--primary);}
+.ctl{display:flex;flex-direction:column;gap:10px;}
+.ctl.is-off{display:none;}
+.ctl>.lbl{font:600 11px/1 var(--font-text),sans-serif;color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+/* preview stage (демо в верхней панели) */
+.pg-stage-frame{flex:1;display:flex;align-items:flex-start;justify-content:flex-start;background:var(--bg-page);border:1px solid var(--border-light);border-radius:12px;padding:28px;min-height:260px;overflow:hidden;width:100%;}
+.pg-scale{flex:none;transform-origin:top left;}
+.pg-viewport{padding:0;flex:none;}
+.ws-cap{font:var(--type-body-xs);color:var(--text-inactive);margin:12px 0 0;text-wrap:pretty;}
+/* demo helpers */
+.demo-stack{display:flex;flex-direction:column;gap:28px;}
+.demo-item{display:flex;flex-direction:column;gap:10px;min-width:0;}
+.demo-item>.cap{font:var(--type-body-xs);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+.demo-item>.cap b{color:var(--text-secondary);}
+.stagebg{background:var(--bg-page);border:1px solid var(--border-light);border-radius:12px;padding:20px 24px;min-width:0;}
+.stagebg--white{background:var(--bg-tile);}
+/* anatomy */
+.anat{display:flex;flex-direction:column;gap:28px;}
+.anat__stage{background:color-mix(in srgb,var(--primary) 5%,#fff);border:1px solid var(--border-light);border-radius:14px;padding:52px 40px;overflow-x:auto;}
+.anat-dia{position:relative;width:100%;min-width:820px;}
+.mk{position:absolute;width:24px;height:24px;border-radius:50%;background:var(--text-primary);color:#fff;font:700 12px/24px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5;pointer-events:none;}
+.anat__legend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:18px 28px;}
+@media(max-width:760px){.anat__legend{grid-template-columns:1fr;}}
+.anat__legend li{display:flex;gap:12px;align-items:flex-start;}
+.anat__legend li .n{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font:700 12px/24px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;}
+/* guide */
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.guide{grid-template-columns:1fr;}}
+.guide-card{border-radius:12px;overflow:hidden;border:1px solid var(--border-light);background:var(--bg-tile);}
+.guide-card__tag{font:var(--type-body-s-strong);padding:12px 18px 0;}
+.guide-card__body{padding:14px 18px 18px;font:var(--type-body-s);color:var(--text-secondary);}
+/* colors */
+@media(max-width:700px){.cref{grid-template-columns:1fr;}}
+
+.cref-group>h3{font:var(--type-body-m-strong);margin:0;padding:14px 18px;border-bottom:1px solid var(--border-light);color:var(--text-primary);}
+.cref-row{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border-light);font:var(--type-body-s);color:var(--text-secondary);}
+/* ref table */
+.ref-table th,.ref-table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--border-light);font:var(--type-body-m);color:var(--text-primary);vertical-align:middle;}
+.rl-sample{position:absolute;top:-9999px;left:0;width:900px;}
+/* тестовая среда: экспериментальная раскладка заголовка (не часть компонента) */
+.phx{display:flex;flex-direction:column;gap:8px;width:100%;min-width:0;}
+.phx__return{margin-left:-8px;}
+.phx__row{display:flex;align-items:flex-start;gap:16px;min-width:0;}
+.phx__main{flex:0 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;}
+.phx__title-row{display:flex;align-items:center;gap:8px;max-width:100%;min-width:0;}
+.phx__title{flex:1 1 auto;min-width:0;font:var(--type-h3-strong);color:var(--text-primary);margin:0;text-wrap:pretty;overflow-wrap:break-word;}
+/* ширина подзаголовка не превышает ширину заголовка: 0-базовая ширина + min-width:100% */
+.phx__subtitle{width:0;min-width:100%;font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty;}
+.phx__chips{display:flex;align-items:center;gap:8px;flex:none;}
+.phx--stack .phx__row{flex-direction:column;align-items:flex-start;}
+.phx--stack .phx__actions{margin-left:0;width:100%;}
+.phx--stack .phx__actions .btn:not(.btn--icon-only){flex:1 1 auto;}
+.phx--chips-below .phx__chips{flex-wrap:wrap;}
+.phx__actions{flex:none;margin-left:auto;display:flex;align-items:center;gap:8px;}
+/* code blocks */
+
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="PageHeader">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg-stage-frame">
+          <div class="pg-scale" id="demo-scale">
+            <div class="pg-viewport" id="demo-viewport" style="width:1100px;">
+              <div id="demo-phead"></div>
+            </div>
+          </div>
+        </div>
+        <p class="ws-cap">Ползунок ширины меняет ширину контейнера заголовка. Ниже 1024px чипы и кнопка возврата переносятся отдельной строкой под подзаголовок (<code class="tok">.phead__extras</code>); ниже 720px компонент переключается в раскладку <code class="tok">.phead--stack</code>: actions переносятся вниз на всю ширину. Заголовок никогда не усекается — он становится многострочным.</p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+  <a class="crumb" href="../../index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Обзор компонентов
+  </a>
+  <div class="meta">
+    <span>Версия <b>1.008</b></span>
+    <span>Обновлено <b>21.08.2026</b></span>
+    <span>CSS <b>styles/page-header.css</b></span>
+    <span>Зависимости <b>button, icon-button, chip, badge, context-menu, tooltip, breadcrumbs</b></span>
+  </div>
+  <div class="eyebrow">Дизайн-система · Организмы</div>
+  <h1>PageHeader</h1>
+  <p class="lead">Заголовок страницы рабочей области: идентифицирует открытую сущность и несёт основные действия страницы. Состоит из независимых частей — Title, Chips, кнопка возврата, Subtitle, Actions — и адаптируется вплоть до мобильной версии.</p>
+</header>
+
+<!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#demo-phead),
+     контролы — во вкладку «Конструктор» нижней панели (см. в конце) -->
+
+<!-- 2. ИСПОЛЬЗОВАНИЕ -->
+<section class="section" id="usage" data-screen-label="Использование">
+  <h2>Использование</h2>
+  <p class="desc">PageHeader — заголовок страницы рабочей области. Один на страницу, всегда сверху, под строкой Breadcrumbs. Title заголовка — семантический h1 страницы и наименование открытой сущности: сделки, финансового инструмента, раздела.</p>
+
+  <div class="subsec">
+    <h3>Когда использовать</h3>
+    <p class="desc tight">Всегда: PageHeader — обязательный заголовок страницы рабочей области, отдельного обоснования он не требует. Редкие страницы без заголовка описываются как исключения индивидуально.</p>
+    <ul class="bullets">
+      <li>Основные действия страницы (выгрузка, расчёт, создание) живут в Header_Actions, а не в контенте.</li>
+      <li>Статус сущности — чипы после заголовка.</li>
+      <li>Возврат на уровень выше — кнопка Return.</li>
+    </ul>
+  </div>
+
+  <div class="subsec">
+    <h3>Когда не использовать</h3>
+    <ul class="bullets">
+      <li><b>Заголовок плашки</b> — TileHeader (компонент Tile), не PageHeader.</li>
+      <li><b>Шапка модального окна</b> — Modal_Top (компонент Modal).</li>
+      <li><b>Заголовок Popover</b> — собственный Header компонента Popover.</li>
+    </ul>
+  </div>
+
+  <div class="subsec">
+    <h3>Примеры в интерфейсе</h3>
+    <p class="desc">Типовые страницы продукта: список сущностей (Title + Actions), карточка сделки (Title + Edit + Chips + Actions + MenuButton), вложенная страница (Title + Return).</p>
+    <div class="panel demo-stack">
+      <div class="demo-item">
+        <div class="cap"><b>Список сущностей</b> · Title + Actions</div>
+        <div class="stagebg" id="ex-list"></div>
+      </div>
+      <div class="demo-item">
+        <div class="cap"><b>Карточка сделки</b> · Title + Edit + Chips + Subtitle + Actions</div>
+        <div class="stagebg" id="ex-deal"></div>
+      </div>
+      <div class="demo-item">
+        <div class="cap"><b>Вложенная страница</b> · Title + Return</div>
+        <div class="stagebg" id="ex-nested"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. АНАТОМИЯ -->
+<section class="section" id="anatomy" data-screen-label="Анатомия">
+  <h2>Анатомия</h2>
+  <p class="desc">Все части, кроме Title, опциональны и включаются независимо. Диаграмма показывает максимальный состав; ниже — расшифровка всех восьми частей.</p>
+  <div class="panel">
+    <div class="anat">
+      <div class="anat__stage">
+        <div class="anat-dia">
+          <div id="anat-phead"></div>
+          <span class="mk" style="left:3%;top:18%;">1</span>
+          <span class="mk" style="left:30%;top:18%;">2</span>
+          <span class="mk" style="left:36%;top:18%;">3</span>
+          <span class="mk" style="left:47%;top:18%;">4</span>
+          <span class="mk" style="left:60%;top:18%;">5</span>
+          <span class="mk" style="left:14%;top:78%;">6</span>
+          <span class="mk" style="left:84%;top:18%;">7</span>
+          <span class="mk" style="left:98%;top:18%;">8</span>
+        </div>
+      </div>
+      <ol class="anat__legend">
+        <li><span class="n">1</span><span><span class="k">Header_Title</span><span class="d">Наименование сущности, h1 страницы. Токен H3 Strong, многострочный, перенос в одну строку. Опциональная информационная иконка слева (24px).</span></span></li>
+        <li><span class="n">2</span><span><span class="k">Иконка слева · IconLeft</span><span class="d">Опциональная, информационная роль. 24px, цвет --text-inactive.</span></span></li>
+        <li><span class="n">3</span><span><span class="k">Edit · IconButton</span><span class="d">Опциональная кнопка справа от Title — переименование сущности (страницы типа «Сделка»).</span></span></li>
+        <li><span class="n">4</span><span><span class="k">Header_Title_Chips</span><span class="d">Один чип или список — статусы сущности. Chip ReadOnly S.</span></span></li>
+        <li><span class="n">5</span><span><span class="k">Header_Title_Button · Return</span><span class="d">Возврат на уровень выше иерархии. Button Outline XS. Обычно одна; в редких кейсах больше.</span></span></li>
+        <li><span class="n">6</span><span><span class="k">Header_Subtitle</span><span class="d">Опциональный. Body S; иконка слева или справа. Может быть кастомным — со встроенными мета-элементами и разделителями.</span></span></li>
+        <li><span class="n">7</span><span><span class="k">Header_Actions</span><span class="d">Основные действия страницы, кнопки M. Не больше трёх; остальные — в MenuButton.</span></span></li>
+        <li><span class="n">8</span><span><span class="k">MenuButton</span><span class="d">Кнопка «⋮» с контекстным меню — переполнение действий. Всегда последняя.</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 4. ВАРИАНТЫ -->
+<section class="section" id="variants" data-screen-label="Варианты">
+  <h2>Варианты</h2>
+  <p class="desc">Оси конфигурации независимы: Subtitle × Chips × Return × Actions дают 16 комбинаций (все они допустимы), плюс вариант Dashboard на подложке.</p>
+
+  <div class="subsec">
+    <h3>Чипы</h3>
+    <p class="desc">Один чип или список чипов — статус(ы) сущности страницы. Chip ReadOnly S, стоят сразу после Title/Edit.</p>
+    <div class="panel demo-stack">
+      <div class="demo-item"><div class="cap">Single Chip</div><div class="stagebg" id="v-chip-one"></div></div>
+      <div class="demo-item"><div class="cap">Chips</div><div class="stagebg" id="v-chip-list"></div></div>
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h3>Кнопка возврата</h3>
+    <p class="desc">Возврат на предыдущую страницу или уровень выше иерархии — например, со страницы сделки к таблице всех сделок. Button Outline XS с иконкой возврата и подписью, куда ведёт.</p>
+    <div class="panel demo-stack">
+      <div class="demo-item"><div class="cap">Title + Return</div><div class="stagebg" id="v-return"></div></div>
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h3>Подзаголовок</h3>
+    <p class="desc">Три вида: просто текст (Body S), текст с иконкой слева/справа, или кастомный — встроенные мета-элементы (иконка + значение, Body XS), например количество документов и версия.</p>
+    <div class="panel demo-stack">
+      <div class="demo-item"><div class="cap">Просто текст</div><div class="stagebg" id="v-sub-text"></div></div>
+      <div class="demo-item"><div class="cap">Текст с иконкой</div><div class="stagebg" id="v-sub-std"></div></div>
+      <div class="demo-item"><div class="cap">Кастомный · мета-элементы</div><div class="stagebg" id="v-sub-custom"></div></div>
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h3>Actions и MenuButton</h3>
+    <p class="desc">Справа — основные действия страницы: 0–3 кнопки M. Если действий больше трёх, лишние переносятся в MenuButton — кнопку «⋮», открывающую контекстное меню. MenuButton всегда последняя в ряду.</p>
+    <div class="panel demo-stack">
+      <div class="demo-item"><div class="cap">2 кнопки + MenuButton</div><div class="stagebg" id="v-act-2m"></div></div>
+      <div class="demo-item"><div class="cap">1 кнопка, без MenuButton</div><div class="stagebg" id="v-act-1"></div></div>
+      <div class="demo-item"><div class="cap">Только MenuButton</div><div class="stagebg" id="v-act-m"></div></div>
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h3>Dashboard · на подложке</h3>
+    <p class="desc">Заголовок ставится на белую подложку <code class="tok">--bg-tile</code> (радиус 8, паддинг 12/16) — на дашбордах и в кейсах, когда заголовок размещается на отдельной белой панели, отдельно от плотного контента. Состав частей тот же.</p>
+    <div class="panel demo-stack">
+      <div class="demo-item"><div class="cap">Dashboard = Yes</div><div class="stagebg" id="v-dash"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. РАЗМЕРЫ -->
+<section class="section" id="sizes" data-screen-label="Размеры">
+  <h2>Размеры</h2>
+  <p class="desc">PageHeader существует в одном размере. Высота складывается из строк: title-row (мин. 32px по строке Title) и опционального Subtitle; компонент тянется на всю ширину контентной области.</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Примечание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Title</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">28/32 · H3 Strong</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">многострочный, перенос по словам</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка слева</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">24×24</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">--text-inactive</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Edit</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">IconButton S · 24×24</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">глиф 20</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Чип</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Chip ReadOnly S · 24</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">gap между чипами 8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Return</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Button Outline XS · 24</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">иконка 16 + подпись</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Subtitle</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14/16 · Body S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">иконка 16</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кнопки Actions</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Button M · 40</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">gap 8; MenuButton — icon-only M</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор title-row ↔ subtitle</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 1.44fr 1.89fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор main ↔ actions</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div>
+  </div>
+
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">У обычного заголовка фона нет, поэтому нет и радиуса; плашка со скруглением появляется только в варианте Dashboard.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок страницы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Вариант Dashboard — плашка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-m</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+<!-- 6. КОНТЕНТ -->
+<section class="section" id="content" data-screen-label="Контент">
+  <h2>Контент</h2>
+  <p class="desc">Title — наименование сущности как в системе: номер + название («D-007. ПАО «Газпром»»), без точки в конце. Подпись Return называет, куда ведёт возврат («В сделку»), а не абстрактное «Назад». Тексты кнопок Actions — глагол действия («Выгрузить», «Рассчитать ОСЗ»).</p>
+  <div class="guide">
+    <div class="guide-card good"><div class="guide-card__bar"></div><div class="guide-card__tag">Так</div><div class="guide-card__body">«Плановые платежи по сделке» — Title называет содержимое страницы; Return «В сделку» говорит, куда вернёмся; в Actions максимум три кнопки, остальное в меню «⋮».</div></div>
+    <div class="guide-card bad"><div class="guide-card__bar"></div><div class="guide-card__tag">Не так</div><div class="guide-card__body">«Страница платежей» — канцелярит; Return «Назад» без адреса; пять кнопок в ряд — переполненный хэдер, действия не считываются.</div></div>
+    <div class="guide-card good"><div class="guide-card__bar"></div><div class="guide-card__tag">Так</div><div class="guide-card__body">Длинное наименование усечено многоточием, полное значение — в Tooltip по наведению. Чипы показывают только актуальные статусы (1–3).</div></div>
+    <div class="guide-card bad"><div class="guide-card__bar"></div><div class="guide-card__tag">Не так</div><div class="guide-card__body">Title в две строки на десктопе; шесть чипов-статусов подряд; иконка слева используется как декоративная, без информационной роли.</div></div>
+  </div>
+</section>
+
+<!-- 7. ПОВЕДЕНИЕ -->
+<section class="section" id="behavior" data-screen-label="Поведение">
+  <h2>Поведение</h2>
+
+  <div class="subsec">
+    <h3>Переполнение действий</h3>
+    <p class="desc">В Actions допускается не больше трёх кнопок. Если действий больше — сверх лимита они попадают в MenuButton: клик по «⋮» открывает контекстное меню со списком опций. Приоритетное действие остаётся кнопкой Accent, второстепенные уходят в меню первыми.</p>
+    <div class="panel demo-stack">
+      <div class="demo-item"><div class="cap">MenuButton · кликните «⋮» — меню открывается поверх страницы</div><div class="stagebg" id="b-menu"></div></div>
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h3>Многострочный заголовок</h3>
+    <p class="desc">Title не усекается: это заголовок страницы, его важно видеть целиком. Когда текст не помещается в строку, он переносится по словам на нужное число строк; Chips, Return и Actions при этом не сжимаются и остаются на своих местах.</p>
+    <div class="panel demo-stack">
+      <div class="demo-item"><div class="cap">Длинный Title · контейнер 640px</div><div class="stagebg" id="b-multiline" style="max-width:640px;"></div></div>
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h3>Редактирование заголовка</h3>
+    <p class="desc">Кнопка Edit присутствует на страницах сущностей типа «Сделка», где Title — редактируемое наименование. Переименование выполняется только через модальное окно: клик по Edit открывает модалку с полем ввода; инлайн-редактирования заголовка в продукте нет. После подтверждения Title обновляется.</p>
+  </div>
+
+  <div class="subsec">
+    <h3>Адаптивность</h3>
+    <p class="desc">Компонент адаптируется к ширине контентной области вплоть до мобильной версии: сначала второстепенные кнопки Actions сворачиваются в MenuButton, а чипы и кнопка возврата переносятся отдельной строкой под подзаголовок (<code class="tok">.phead__extras</code>); затем блок Actions переносится под заголовок на всю ширину. Заголовок на любой ширине показывается целиком и переносится на столько строк, сколько нужно.</p>
+    <div class="panel demo-stack">
+      <div class="demo-item"><div class="cap">≥ 1024 · полный ряд</div><div class="stagebg" id="b-ad-desktop"></div></div>
+      <div class="demo-item"><div class="cap">&lt; 1024 · чипы и Return отдельной строкой, второстепенные действия в меню</div><div class="stagebg" id="b-ad-tablet" style="max-width:720px;"></div></div>
+      <div class="demo-item"><div class="cap">&lt; 720 · мобильная раскладка .phead--stack</div><div class="stagebg" id="b-ad-mobile" style="max-width:375px;"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. СОСТОЯНИЯ -->
+<section class="section" id="states" data-screen-label="Состояния">
+  <h2>Состояния</h2>
+  <p class="desc">PageHeader собственных состояний не имеет — это статичный контейнер. Интерактивны и несут состояния только вложенные компоненты: Edit и MenuButton (IconButton/Button: hover, active, focus, disabled), Return и кнопки Actions (Button), информер чипа. Недоступное действие показывается disabled-кнопкой, а не скрывается — если оно в принципе применимо к сущности.</p>
+</section>
+
+<!-- 9. ДОСТУПНОСТЬ -->
+<section class="section" id="a11y" data-screen-label="Доступность">
+  <h2>Доступность</h2>
+  <ul class="bullets">
+    <li>Title — семантический <code class="tok">h1</code> страницы; на странице он один.</li>
+    <li>Иконка слева и иконки сабтайтла декоративны — <code class="tok">aria-hidden="true"</code>.</li>
+    <li>Edit — <code class="tok">aria-label="Переименовать"</code>; MenuButton — <code class="tok">aria-label</code> + <code class="tok">aria-haspopup="menu"</code> и <code class="tok">aria-expanded</code>.</li>
+    <li>Подпись Return называет, куда ведёт возврат; у icon-only варианта — aria-label с адресом.</li>
+    <li>Усечённый Title дублируется Tooltip'ом (роль tooltip, связь через aria-describedby) — полное значение доступно с клавиатуры.</li>
+    <li>Порядок фокуса: Edit → чипы (информеры) → Return → кнопки Actions → MenuButton.</li>
+  </ul>
+</section>
+
+<!-- 10. ТИПОГРАФИКА -->
+<section class="section" id="typography" data-screen-label="Типографика">
+  <h2>Типографика</h2>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.17fr 1.89fr 0.9fr 1.89fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.17fr 1.89fr 0.9fr 1.89fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Title</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-h3-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SemiBold 28/32 · SB Sans Display</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Bold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SemiBold 28/32 · SB Sans Display</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-h3-strong)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.17fr 1.89fr 0.9fr 1.89fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Subtitle</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular 14/16 · SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular 14/16 · SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.17fr 1.89fr 0.9fr 1.89fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Мета-элементы сабтайтла</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular 12/16 · SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular 12/16 · SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.17fr 1.89fr 0.9fr 1.89fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кнопки, чипы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Образец</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+<!-- 11. ЦВЕТА -->
+<section class="section" id="colors" data-screen-label="Цвета">
+  <h2>Цвета</h2>
+  <p class="desc">Собственного фона у компонента нет (кроме варианта Dashboard) — он лежит на фоне страницы. Кнопки, чипы и меню используют собственные цвета своих компонентов.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.66fr 1.17fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.66fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Title</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.66fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Subtitle</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.66fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Мета-элементы, иконка слева</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.66fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">IconLeft, иконки мета</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.66fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка сабтайтла, мета-ок</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--success</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--success)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#7CB342</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.66fr 1.17fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Вариант Dashboard</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Белая подложка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-tile</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-tile)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+<!-- 12. ДЛЯ РАЗРАБОТЧИКОВ -->
+<section class="section" id="dev" data-screen-label="Для разработчиков">
+  <h2>Для разработчиков</h2>
+  <p class="desc">Хендофф-пакет. Имена классов условны — важны сами элементы, их роли и состояния. Разработчики собирают компонент на React.</p>
+
+  <p class="subhead">Точные размеры (redline)</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.62fr 0.81fr 2.57fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Свойство</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен / описание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 0.81fr 2.57fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Шрифт Title</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-title">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-h3-strong</code> · 28/32</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 0.81fr 2.57fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Шрифт Subtitle</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-sub">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code> · 14/16</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 0.81fr 2.57fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор в title-row</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-rowgap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 0.81fr 2.57fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор title-row ↔ subtitle</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-maingap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 0.81fr 2.57fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор main ↔ actions</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-rootgap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 0.81fr 2.57fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Зазор кнопок Actions</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-actgap">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 0.81fr 2.57fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Мин. высота title-row</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-rowh">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">32px (строка H3)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.62fr 0.81fr 2.57fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Паддинг Dashboard-подложки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text" id="rl-dash">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12px / 16px · фон <code class="tok">--bg-tile</code> · радиус <code class="tok">--radius-m</code></span></span></div><div class="tc tc--separator"></div></div></div>
+  </div>
+  <div class="rl-sample" aria-hidden="true">
+    <div class="phead" id="rl-phead">
+      <div class="phead__main" id="rl-main">
+        <div class="phead__title-row" id="rl-row"><h2 class="phead__title" id="rl-title-el">Заголовок</h2></div>
+        <div class="phead__subtitle" id="rl-sub-el">Подзаголовок</div>
+      </div>
+      <div class="phead__actions" id="rl-acts"><button class="btn btn--outline btn--m"><span class="btn__label">A</span></button><button class="btn btn--accent btn--m"><span class="btn__label">B</span></button></div>
+    </div>
+    <div class="phead phead--dashboard" id="rl-dash-el"><div class="phead__main"><div class="phead__title-row"><h2 class="phead__title">З</h2></div></div></div>
+  </div>
+
+  <p class="subhead">Поведение (framework-agnostic)</p>
+  <div class="code-wrap">
+    <button class="copy-btn" data-copy="logic">Скопировать</button>
+    <code id="code-logic">// 1. Переполнение Actions
+//    видимых кнопок максимум 3; остальные действия — пункты меню.
+renderActions(actions):
+  visible = actions.filter(primaryFirst).slice(0, 3)
+  hidden  = actions.slice(visible.length)
+  if hidden.length > 0: append MenuButton(hidden)   // всегда последняя
+
+onMenuToggle():
+  open = !open
+  menuBtn.setAttribute('aria-expanded', String(open))
+  // меню — компонент ContextMenu, позиционирование от кнопки, край right
+
+// 2. Заголовок многострочный
+//    усечения нет: перенос по словам на нужное число строк,
+//    Tooltip с полным значением не требуется.
+
+// 3. Адаптивность (по ширине контентной области, не вьюпорта)
+layout(width):
+  if width < 1024: collapse secondary actions into MenuButton
+  if width < 720:  root.classList.add('phead--stack')
+                   // actions вниз на всю ширину; Title — без ограничения строк
+  else:            root.classList.remove('phead--stack')
+
+// 4. Редактирование Title (страницы типа «Сделка»)
+onEditClick():
+  открыть модальное окно переименования (инлайн-режима нет)
+  onModalSubmit(newName): title.textContent = newName</code>
+  </div>
+</section>
+
+<!-- БЭКЛОГ -->
+<section class="section" id="backlog" data-screen-label="Бэклог">
+  <h2>Бэклог</h2>
+  <ul class="bullets">
+    <li><b>Sticky-режим</b> — компактная закреплённая версия заголовка при прокрутке длинной страницы (Title XS + Actions).</li>
+    <li><b>Skeleton</b> — состояние загрузки наименования сущности (шиммер-плашка вместо Title/Subtitle).</li>
+    <li><b>Слот табов</b> — регламентированное место строки Tab под PageHeader (сейчас табы кладутся в контент страницы).</li>
+    <li><b>Переполнение чипов</b> — чип-счётчик «+N» по образцу InputAutocomplete, если статусов больше трёх.</li>
+  </ul>
+
+  <div class="subsec">
+    <h3>Тестовая среда</h3>
+    <p class="desc">Экспериментальная раскладка заголовка — живёт только в этом разделе и <b>не является частью компонента</b>. Отличия от основного PageHeader: кнопка возврата стоит <b>над</b> заголовком и выполнена транспарентной кнопкой; подзаголовок неразрывен с заголовком — чипы, не поместившиеся в строку заголовка, уходят <b>под</b> подзаголовок, а не над ним; ширина подзаголовка ограничена шириной заголовка, поэтому длинный подзаголовок переносится в две и более строки.</p>
+    <div class="panel demo-stack">
+      <div class="demo-item">
+        <div class="cap">Экспериментальный заголовок · <span id="phx-width-val">1200</span> px</div>
+        <input class="pg-range" id="phx-width" type="range" min="320" max="1600" step="10" value="1200" aria-label="Ширина контейнера экспериментального заголовка">
+        <div class="stagebg" style="overflow:auto;"><div id="phx-vp" style="width:1200px;"><div id="phx-demo"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · PageHeader</span>
+    <span>Заголовок страницы — Title · Chips · Return · Subtitle · Actions</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите заголовок: текст, иконка слева, кнопка редактирования, чипы, кнопка возврата, подзаголовок, действия и подложка. Ползунок меняет ширину контейнера — демо перестраивается вживую.</p>
+              <div class="pg__controls">
+                <div class="ctl-col">
+                  <div class="ctl">
+                    <div class="lbl">Заголовок</div>
+                    <div class="pg-text"><input id="ctl-title" type="text" placeholder="D-007. ПАО «Газпром»" maxlength="80"></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Чипы</div>
+                    <div class="pg-select"><select id="ctl-chips">
+                      <option value="none">Нет</option>
+                      <option value="one" selected>Один чип</option>
+                      <option value="list">Список чипов</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Подзаголовок</div>
+                    <div class="pg-select"><select id="ctl-sub">
+                      <option value="none">Нет</option>
+                      <option value="text">Просто текст</option>
+                      <option value="std">Текст с иконкой</option>
+                      <option value="custom" selected>Кастомный (мета-элементы)</option>
+                    </select></div>
+                  </div>
+                  <div class="ctl">
+                    <div class="lbl">Actions, кнопок</div>
+                    <div class="pg-select"><select id="ctl-actions">
+                      <option value="0">Нет</option>
+                      <option value="1">1 кнопка</option>
+                      <option value="2" selected>2 кнопки</option>
+                      <option value="3">3 кнопки</option>
+                    </select></div>
+                  </div>
+                </div>
+                <div class="toggles">
+                  <label class="pg-toggle"><input id="ctl-ico" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать иконку слева</span></label>
+                  <label class="pg-toggle"><input id="ctl-edit" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать кнопку редактирования</span></label>
+                  <label class="pg-toggle"><input id="ctl-return" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать кнопку возврата</span></label>
+                  <label class="pg-toggle"><input id="ctl-menu" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать кнопку-меню «⋮»</span></label>
+                  <label class="pg-toggle"><input id="ctl-dash" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать подложку dashboard</span></label>
+                  <div class="ctl">
+                    <div class="lbl">Ширина контейнера · <span id="ctl-width-val">1100</span> px</div>
+                    <input class="pg-range" id="ctl-width" type="range" min="320" max="1440" step="10" value="1100" aria-label="Ширина контейнера заголовка">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка и исходники PageHeader: HTML — из спеки, CSS — styles/page-header.css (полностью), JS — рантаймы оживления. Полный исходник рендера демо — в <code class="tok">scripts/page-header.page.js</code>.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main><!-- .page -->
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-menu.js"></script>
+<script src="../../scripts/ds-actions-overflow.js"></script>
+<script src="../../scripts/page-header.page.js"></script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html"><div class="phead">
+  <div class="phead__main">
+    <div class="phead__title-row">
+      <div class="phead__title-group"><!-- неразрывная группа: IconLeft + Title + Edit -->
+        <span class="phead__title-ico" aria-hidden="true"><i data-icon="drag-dots"></i></span>  <!-- опц. -->
+        <h1 class="phead__title">D-007. ПАО «Газпром»</h1>
+        <button class="ibtn ibtn--neutral ibtn--s phead__edit" aria-label="Переименовать"><i data-icon="edit"></i></button>  <!-- опц. -->
+      </div>
+      <div class="phead__chips"><span class="chip chip--rounded chip--s"><span class="chip__label">Черновик</span></span></div>  <!-- опц. -->
+      <span class="phead__return"><button class="btn btn--outline btn--xs"><i data-icon="flip-backward"></i><span class="btn__label">В сделку</span></button></span>  <!-- опц. -->
+    </div>
+    <div class="phead__subtitle">  <!-- опц.; стандартный ИЛИ кастомный -->
+      <span class="phead__subtitle-ico" aria-hidden="true"><i data-icon="check-circle-filled"></i></span>
+      Дата фактического погашения 12.01.2021
+      <!-- кастомный: <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="copy"></i></span>7</span>
+                      <span class="phead__meta"><span class="phead__meta-ico phead__meta-ico--ok"><i data-icon="check-circle"></i></span>Версия 12 (07.02.2021)</span> -->
+    </div>
+  </div>
+  <div class="phead__actions">  <!-- опц.; max 3 кнопки + MenuButton -->
+    <button class="btn btn--outline btn--m"><i data-icon="star"></i><span class="btn__label">В избранное</span></button>
+    <button class="btn btn--accent btn--m"><i data-icon="download"></i><span class="btn__label">Выгрузить</span></button>
+    <button class="btn btn--outline btn--m btn--icon-only" aria-label="Ещё действия" aria-haspopup="menu" aria-expanded="false"><i data-icon="more-dots"></i></button>
+  </div>
+</div>
+<!-- Dashboard: .phead--dashboard · Мобильная раскладка: .phead--stack --></script>
+
+<script type="text/plain" id="src-code-css">/* ============================================================
+   PageHeader — заголовок страницы
+   Части: Title (+IconLeft, +Edit) · Chips · Return · Subtitle · Actions (+MenuButton)
+   Зависимости: button, icon-button, chip, badge, context-menu, tooltip
+   ============================================================ */
+
+.phead{
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  width:100%;
+  min-width:0;
+}
+
+/* левая колонка: title-row + subtitle */
+.phead__main{
+  flex:1 1 auto;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+/* ---- Title row ---- */
+.phead__title-row{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  min-width:0;
+  min-height:32px;
+}
+.phead__title-ico{
+  flex:none;
+  width:24px;height:24px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--text-inactive);
+}
+.phead__title-ico :is(svg,[data-icon]){width:24px;height:24px;}
+/* IconLeft + Title + Edit — неразрывная группа: не переносятся отдельно от заголовка */
+.phead__title-group{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  flex:0 1 auto;
+}
+/* Title многострочный: заголовок страницы всегда виден целиком, усечения нет */
+.phead__title{
+  font:var(--type-h3-strong);
+  letter-spacing:0;
+  color:var(--text-primary);
+  margin:0;
+  min-width:120px;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  text-wrap:pretty;
+}
+/* Edit (IconButton S) — слот, стили из icon-button.css */
+.phead__edit{flex:none;}
+
+/* Chips — слот, чипы из chip.css */
+.phead__chips{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:none;
+  margin-left:4px;
+  min-width:0;
+}
+
+/* Return — кнопка возврата (Button Outline XS), слот */
+.phead__return{flex:none;margin-left:4px;}
+
+/* ---- Subtitle ---- */
+.phead__subtitle{
+  display:flex;
+  align-items:center;
+  gap:8px 12px;
+  flex-wrap:wrap;
+  min-width:0;
+  font:var(--type-body-s);
+  color:var(--text-secondary);
+}
+.phead__subtitle-ico{
+  flex:none;
+  width:16px;height:16px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--success);
+}
+.phead__subtitle-ico :is(svg,[data-icon]){width:16px;height:16px;}
+
+/* мета-элементы кастомного сабтайтла */
+.phead__meta{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font:var(--type-body-xs);
+  color:var(--text-inactive);
+  white-space:nowrap;
+}
+.phead__meta :is(svg,[data-icon]){width:16px;height:16px;}
+.phead__meta-ico{flex:none;display:inline-flex;color:var(--text-inactive);}
+.phead__meta-ico--ok{color:var(--success);}
+
+/* ---- Actions ---- */
+.phead__actions{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-left:auto;
+}
+
+/* ---- Extras: чипы и Return отдельной строкой (tablet/mobile) ---- */
+.phead__extras{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:2px;
+}
+.phead__extras .phead__chips,
+.phead__extras .phead__return{margin-left:0;}
+
+/* ---- Вариант: Dashboard (на белой подложке) ---- */
+.phead--dashboard{
+  background:var(--bg-tile);
+  border-radius:var(--radius-m);
+  padding:12px 16px;
+}
+
+/* ---- Адаптивная раскладка (мобильная): actions переносятся вниз ---- */
+.phead--stack{flex-direction:column;gap:12px;}
+.phead--stack .phead__actions{margin-left:0;width:100%;}
+.phead--stack .phead__actions .btn:not(.btn--icon-only){flex:1 1 auto;}</script>
+
+<script type="text/plain" id="src-code-js">/* PageHeader — статичная разметка; оживление — рантаймами ДС.
+   (page-header.page.js рендерит демо страницы; полный исходник — там же) */
+
+/* Переполнение действий: лишние кнопки уходят в меню «⋮» */
+var actions = document.querySelector('.phead__actions');
+window.DSActionsOverflow.bind(actions);
+
+/* Кнопка-меню «⋮» — DSMenu (меню открывается по клику, Esc/клик вне — закрытие) */
+/* Адаптив — CSS-брейкпоинты компонента: до 1024px чипы и Return уходят в
+   .phead__extras; до 720px — .phead--stack (actions на всю ширину). */</script>
+
+</body>
+</html>

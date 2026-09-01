@@ -1,0 +1,79 @@
+/* =========================================================================
+   Table — организм-контейнер таблицы/реестра.
+   Строки и ячейки — TableCell (.tbl/.tbl__row/.th/.tc), панель массовых
+   действий и постраничный переход — Pagination (.pgn-bulk/.pgn-row).
+   Table добавляет только: обёртку, Toolbar, липкую шапку при скролле
+   и состояния Loading/Empty всей таблицы.
+   Requires: table-cell.css, pagination.css. Только токены ДС (var(--*)).
+   ========================================================================= */
+
+.dtable {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-tile);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ */
+/*  TOOLBAR — заголовок + счётчик + фильтр/действия                    */
+/* ------------------------------------------------------------------ */
+.dtable__toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+  flex-wrap: wrap;
+}
+.dtable__toolbar-left { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; }
+.dtable__title-row { display: flex; align-items: baseline; gap: 10px; }
+.dtable__title { font: var(--type-h5-strong); color: var(--text-primary); margin: 0; white-space: nowrap; }
+.dtable__count { font: var(--type-body-s); color: var(--text-inactive); white-space: nowrap; }
+.dtable__toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ------------------------------------------------------------------ */
+/*  BODY — скролл-контейнер с липкой шапкой                            */
+/* ------------------------------------------------------------------ */
+.dtable__body { position: relative; overflow: auto; }
+.dtable__body .tbl { border: none; border-radius: 0; overflow: visible; }
+.dtable__body .th { position: sticky; top: 0; z-index: 3; }
+/* тень под шапкой появляется, только когда тело реально проскроллено вниз */
+.dtable--scrolled .dtable__body .th { box-shadow: 0 1px 0 var(--border-primary); }
+
+/* Теней по левому/правому краю при горизонтальном скролле у Table НЕТ
+   (убраны 27.08.2026): элемент-градиент позиционировался внутри скролл-
+   контейнера и уезжал вместе с колонками. Скрытый контент по бокам
+   обозначает сам скроллбар тела. */
+
+/* ------------------------------------------------------------------ */
+/*  FOOTER — Pagination (обычный ряд и ряд массового действия)          */
+/* ------------------------------------------------------------------ */
+.dtable__footer { border-top: 1px solid var(--border-light); }
+.dtable__footer .pgn-row { padding: 0 20px; }
+
+/* ------------------------------------------------------------------ */
+/*  EMPTY — пустая таблица (нет данных / нет результата фильтра)       */
+/* ------------------------------------------------------------------ */
+.dtable__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 56px 24px 60px;
+  text-align: center;
+}
+.dtable__empty .illu { width: 140px; height: 100px; margin-bottom: 8px; }
+.dtable__empty-title { font: var(--type-body-m-strong); color: var(--text-primary); margin: 0; }
+.dtable__empty-text { font: var(--type-body-s); color: var(--text-secondary); max-width: 38ch; margin: 0; text-wrap: pretty; }
+.dtable__empty .btn { margin-top: 8px; }
+
+/* ------------------------------------------------------------------ */
+/*  LOADING — тулбар/шапка временно неинтерактивны, строки — .tc--skeleton */
+/* ------------------------------------------------------------------ */
+.dtable[aria-busy="true"] .dtable__toolbar-right,
+.dtable[aria-busy="true"] .th__resize,
+.dtable[aria-busy="true"] .th__tools { pointer-events: none; opacity: .5; }

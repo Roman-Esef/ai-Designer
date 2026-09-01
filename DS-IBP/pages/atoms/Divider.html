@@ -1,0 +1,787 @@
+<!-- @dsCard group="Components" name="Divider" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Divider — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/divider.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:74ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:40px; }
+
+  
+
+  
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* select control */
+
+  /* ---------- variant cells ---------- */
+  .vgrid { display:grid; grid-template-columns: repeat(3, 1fr); gap:28px 24px; }
+  @media (max-width:820px){ .vgrid { grid-template-columns:1fr; } }
+  .vcell { display:flex; flex-direction:column; gap:14px; }
+  .vcap { display:flex; align-items:baseline; gap:12px; }
+  .vcap__name { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .vcap__tok { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color: var(--text-inactive); }
+  .vdemo { background: var(--bg-tile); border:1px solid var(--border-light); border-radius:12px; padding:14px 0; }
+  .vdesc { font: var(--type-body-s); color: var(--text-secondary); margin:0; text-wrap:pretty; }
+  .vrow { display:flex; align-items:center; gap:12px; padding:10px 16px; }
+  .vrow__av { width:24px; height:24px; border-radius:50%; background: var(--secondary-light); flex:none; }
+  .vrow__txt { font: var(--type-body-m); color: var(--text-primary); }
+
+  /* ---------- with text cells ---------- */
+  .tgrid { display:flex; flex-direction:column; gap:26px; }
+  .tcell { display:flex; flex-direction:column; gap:12px; }
+
+  /* ---------- weight cells ---------- */
+  .wgrid { display:grid; grid-template-columns: repeat(3, 1fr); gap:28px 24px; }
+  @media (max-width:820px){ .wgrid { grid-template-columns:1fr; } }
+  .wcell { display:flex; flex-direction:column; gap:14px; }
+
+  /* ---------- example: card / list ---------- */
+  .ex-card { background: var(--bg-tile); border:1px solid var(--border-light); border-radius:14px; overflow:hidden; }
+  .ex-row { display:flex; align-items:center; gap:14px; padding:14px 18px; }
+  .ex-av { width:36px; height:36px; border-radius:50%; background: var(--secondary-light); color: var(--secondary-dark); flex:none;
+    display:flex; align-items:center; justify-content:center; font: var(--type-body-s-strong); }
+  .ex-meta { display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .ex-name { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .ex-sub { font: var(--type-body-s); color: var(--text-secondary); }
+
+  /* example: menu */
+  .ex-menu { background: var(--bg-tile); border:1px solid var(--border-light); border-radius:11px; padding:6px; box-shadow: 0 10px 30px rgba(40,50,55,.12); }
+  .ex-mi { padding:9px 14px; border-radius:7px; font: var(--type-body-m); color: var(--text-primary); cursor:default; }
+  .ex-mi:hover { background: var(--bgtable-row-hover); }
+  .ex-mi--danger { color: var(--error-dark); }
+  .ex-menu .dvd { margin:6px 0; }
+
+  /* example: toolbar */
+  .ex-toolbar { display:inline-flex; align-items:stretch; gap:8px; padding:8px 10px; background: var(--bg-tile); border:1px solid var(--border-light); border-radius:12px; }
+  .ex-toolbar .dvd--v { min-height:auto; margin:2px 2px; }
+  .ex-ic { width:40px; height:40px; border-radius:8px; border:1px solid transparent; background:transparent; color: var(--text-secondary); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:.12s; }
+  .ex-ic:hover { background: var(--tertiary-light); color: var(--text-primary); }
+  .ex-ic svg { width:22px; height:22px; }
+
+  /* example: modal */
+  .ex-modal { width:100%; max-width:760px; background: var(--bg-tile); border:1px solid var(--border-light); border-radius:16px; overflow:hidden; box-shadow: 0 18px 50px rgba(40,50,55,.14); }
+  .ex-modal__head { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; }
+  .ex-modal__title { font: var(--type-h5-strong); color: var(--text-primary); }
+  .ex-modal__x { color: var(--text-inactive); display:inline-flex; cursor:pointer; }
+  .ex-modal__x svg { width:20px; height:20px; }
+  .ex-modal__body { display:flex; align-items:stretch; gap:0; padding:0; min-height:200px; }
+  .ex-modal__col { flex:1; padding:20px 22px; display:flex; flex-direction:column; gap:10px; }
+  .ex-modal__coltitle { font: var(--type-body-s-strong); color: var(--text-secondary); margin-bottom:4px; }
+  .ex-modal__line { margin:0; font: var(--type-body-m); color: var(--text-primary); }
+  .ex-modal__body .dvd--v { margin:0; }
+  .ex-modal__foot { display:flex; justify-content:flex-end; padding:16px 24px; }
+
+  /* example: key-value */
+  .kv { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 18px; }
+  .kv__k { font: var(--type-body-m); color: var(--text-secondary); }
+  .kv__v { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .kv-group { padding:6px 0; }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:24px 20px; flex:1; display:flex; align-items:center; justify-content:center; min-height:140px; }
+  .guide-card__cap { padding:0 20px 20px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  /* ---------- token table ---------- */
+  .tok-table { width:100%; border-collapse:collapse; }
+  .tok-table th, .tok-table td { text-align:left; padding:14px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); }
+  .tok-table th { font: var(--type-body-s-strong); color: var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; font-size:12px; }
+  .tok-table tr:last-child td { border-bottom:none; }
+  .tok-table code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; color: var(--primary); }
+  .tok-table .rt-num { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- developer handoff ---------- */
+  .subhead.mt { margin-top: 34px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Divider">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage" id="pg-stage"></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>2.001</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Divider</h1>
+    <p class="lead">Разделительная черта — тонкая линия, которая визуально отделяет одни части интерфейса от других. Используется как часть молекул (заголовки и подвалы модальных окон, списки, меню) и как самостоятельный компонент. Горизонтальный или вертикальный; цвет и толщина при смене ориентации сохраняются.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- USAGE (moved from Examples) -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc">Разделители встроены в другие компоненты — модальное окно выбора КНП: горизонтальные включены в шапку и подвал, вертикальные разделяют колонки. В списках уместен Inset-вариант, в меню — Full, в тулбаре — вертикальные линии между группами действий. Линию разделителя переиспользуют и молекулы: <a class="inl" href="../molecules/ContextMenu.html">Context Menu</a> (<code class="tok">.menu__divider</code>) и <a class="inl" href="../molecules/DropdownList.html">Select · DropdownList</a> (<code class="tok">.ddl__divider</code>) — обе берут цвет и толщину из токенов Divider (<code class="tok">--dvd-color</code> / <code class="tok">--dvd-thickness</code>), поэтому линия задаётся в одном месте.</p>
+
+    <div class="panel" style="display:flex; justify-content:center; padding:36px;">
+      <div id="ex-modal"></div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Список — Inset</p>
+        <div id="ex-list" style="display:flex; justify-content:center;"></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:240px;">
+        <p class="desc tight" style="margin-bottom:18px;">Меню — Full</p>
+        <div id="ex-menu" style="display:flex; justify-content:center;"></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:240px;">
+        <p class="desc tight" style="margin-bottom:18px;">Тулбар — вертикальные</p>
+        <div id="ex-toolbar" style="display:flex; justify-content:center; align-items:center; min-height:90px;"></div>
+      </div>
+    </div>
+  
+<div class="subsec" data-screen-label="WhenToUse">
+    <h3>Когда использовать</h3>
+    <p class="desc tight">Используйте разделитель, когда нужно:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>отделить независимые блоки контента, между которыми мало смыслового зазора;</li>
+      <li>сгруппировать строки в списке, меню или таблице;</li>
+      <li>разграничить колонки или панели по горизонтали — вертикальной линией.</li>
+    </ul>
+    <p class="desc">Разделитель — вспомогательный, неинтерактивный элемент. Если блоки уже разнесены отступами или заключены в карточки, линия не нужна — лишние разделители создают визуальный шум. Сначала пробуйте разделить контент пробелом, и только потом — линией.</p>
+  </div>
+
+<div class="subsec" data-screen-label="Guidelines">
+    <h3>Рекомендации</h3>
+    <p class="desc">Не ставьте разделитель между каждой строкой — это создаёт «забор» и снижает читаемость. Группируйте связанные строки пробелом и разделяйте линией только сами группы.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad2"></span>Не так</div>
+        <div class="guide-card__body" id="over-bad"></div>
+        <p class="guide-card__cap">Линия после каждой строки дробит контент и мешает сканированию.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good2"></span>Так</div>
+        <div class="guide-card__body" id="over-good"></div>
+        <p class="guide-card__cap">Строки сгруппированы пробелом, линия делит только группы.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Базовый разделитель — линия толщиной 1px на токене цвета. Линия рисуется бордером, поэтому без проблем переключается в пунктир. Содержит охранные отступы сверху и снизу, чтобы не прилипать к контенту.</p>
+    <div class="panel">
+      <div class="anat" style="display:grid; grid-template-columns: minmax(280px,1fr) minmax(240px,360px); gap:40px; align-items:center;">
+        <div style="background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:44px; display:flex; justify-content:center;" id="anat-diagram"></div>
+        <ul class="anat__legend" style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a;">
+          <li style="display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary);"><span class="n" style="flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center;">1</span><span><span style="font: var(--type-body-m-strong); color: var(--text-primary);">Линия</span><span style="font: var(--type-body-s); color: var(--text-secondary);"> — 1px, токен --border-light / --border-primary</span></span></li>
+          <li style="display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary);"><span class="n" style="flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center;">2</span><span><span style="font: var(--type-body-m-strong); color: var(--text-primary);">Охранные отступы</span><span style="font: var(--type-body-s); color: var(--text-secondary);"> — симметричный зазор до контента</span></span></li>
+          <li style="display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary);"><span class="n" style="flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center;">3</span><span><span style="font: var(--type-body-m-strong); color: var(--text-primary);">Подпись</span><span style="font: var(--type-body-s); color: var(--text-secondary);"> — опционально, Body S, по центру/краям</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Orientation">
+    <h3>Ориентация</h3>
+    <p class="desc">Разделитель может быть горизонтальным или вертикальным. Цвет и толщина линии при смене ориентации сохраняются. Горизонтальный тянется на всю ширину контейнера, вертикальный — на всю высоту строки (минимум 16px).</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Горизонтальный — <code class="tok">.dvd--h</code></p>
+        <div id="orient-h" style="display:flex; justify-content:center;"></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Вертикальный — <code class="tok">.dvd--v</code></p>
+        <div id="orient-v" style="display:flex; justify-content:center;"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Variants">
+    <h3>Варианты отступов</h3>
+    <p class="desc">Для горизонтального разделителя есть три варианта по отступам — по аналогии с Material Design. <b>Full</b> делит независимые блоки на всю ширину; <b>Inset</b> сдвигает линию вправо, выравнивая её по тексту строки с иконкой или аватаром; <b>Middle</b> отступает с обеих сторон для лёгкого деления внутри блока.</p>
+    <div class="panel">
+      <div class="vgrid" id="variants"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="WithText">
+    <h3>Разделитель с подписью</h3>
+    <p class="desc">Линия может нести короткую подпись — название группы, дату в ленте или «или» между альтернативными действиями. Подпись выравнивается по центру или прижимается к краю.</p>
+    <div class="panel">
+      <div class="tgrid" id="with-text"></div>
+    </div>
+    <p class="desc" style="margin-top:28px;">Частый случай — разделитель «или» между основным и альтернативным действием.</p>
+    <div class="panel" style="display:flex; justify-content:center; padding:40px 34px;">
+      <div id="with-text-or"></div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Weight">
+    <h3>Толщина и контраст</h3>
+    <p class="desc">По умолчанию линия — 1px на светлом токене <code class="tok">--border-light</code>. Для более заметной границы между крупными зонами используйте контрастную линию <code class="tok">--border-primary</code>. Для деления длинной страницы на независимые разделы — толстый блок-секцию 8px.</p>
+    <div class="panel">
+      <div class="wgrid" id="weight"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Геометрия разделителя задаётся толщиной линии и отступами; собственных размеров у компонента нет. Значения измерены на живом экземпляре.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.7fr .6fr 1.1fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.7fr .6fr 1.1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Толщина линии (по умолчанию)</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="sz-thickness">—</span></span></div>
+          <div class="tc"><code class="tok">--dvd-thickness</code></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.7fr .6fr 1.1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Толщина контрастной линии</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="sz-thickness-strong">—</span></span></div>
+          <div class="tc"><code class="tok">--dvd-thickness</code></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.7fr .6fr 1.1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Толщина блока-секции</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="sz-section">—</span></span></div>
+          <div class="tc"><code class="tok">--dvd-section</code></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.7fr .6fr 1.1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Отступ Inset / Middle</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="sz-inset">—</span></span></div>
+          <div class="tc"><code class="tok">--dvd-inset</code></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.7fr .6fr 1.1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Мин. длина вертикальной линии</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="sz-vmin">—</span></span></div>
+          <div class="tc"><code class="tok">--dvd-vmin</code></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.7fr .6fr 1.1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Зазор у подписи</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="sz-label-gap">—</span></span></div>
+          <div class="tc"><code class="tok">--dvd-label-gap</code></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+  
+<div class="subsec" data-screen-label="Spacing">
+    <h3>Отступы</h3>
+    <p class="desc">Разделитель сам по себе не задаёт вертикальный ритм — отступы до контента задаёт окружение. Держите зазор сверху и снизу симметричным, иначе линия «прилипает» к одному из блоков и связь читается неверно.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body" id="space-bad"></div>
+        <p class="guide-card__cap">Линия вплотную к нижнему блоку — выглядит как его граница, а не как разделение.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="space-good"></div>
+        <p class="guide-card__cap">Симметричные отступы — линия одинаково отделяет оба блока.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Единственный текстовый контент разделителя — подпись у разделителя с текстом (см. «Разделитель с подписью» выше). Правила:</p>
+    <ul class="bullets">
+      <li>подпись — одно-два слова: название группы («Сегодня», «Ранее»), служебное слово («или») или короткая метаданных («Ещё 12 сделок»);</li>
+      <li>без точки в конце, строчные буквы, кроме имён собственных;</li>
+      <li>подпись не переносится на несколько строк (<code class="tok">white-space: nowrap</code>) — держите её короткой, иначе она выйдет за контейнер;</li>
+      <li>сам разделитель без подписи не несёт текста и содержимого — только визуальное разделение.</li>
+    </ul>
+  </section>
+
+  <!-- BEHAVIOR (STUB) -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Не применимо: специфического поведения (позиционирование, анимация, адаптивность) у компонента нет.</p>
+  </section>
+
+    <!-- Состояния (STUB) -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Не применимо: у компонента нет интерактивных состояний.</p>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Горизонтальный разделитель — это нативный <code class="tok">&lt;hr&gt;</code>, который уже имеет роль <code class="tok">separator</code>. Вертикальному и текстовому разделителю на <code class="tok">&lt;div&gt;</code> присваивается <code class="tok">role="separator"</code>, а вертикальному — ещё и <code class="tok">aria-orientation="vertical"</code>. Чисто декоративную линию (например, фоновую границу карточки) можно скрыть от скринридера через <code class="tok">aria-hidden="true"</code>, чтобы не засорять навигацию.</p>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Подпись разделителя набирается гарнитурой <b>SB Sans Text</b> токеном <code class="tok">--type-body-s</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.3fr 1.2fr 1.1fr .9fr 1fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Не применимо — компонент не содержит собственного текста</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены границ и текста. Никаких собственных цветов.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Линия</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Линия по умолчанию</span></span></div>
+          <div class="tc"><code class="tok">--border-light</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-light)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#E1EDE7</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Линия</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Контрастная линия</span></span></div>
+          <div class="tc"><code class="tok">--border-primary</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-primary)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#B8CCCC</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Линия</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Блок-секция</span></span></div>
+          <div class="tc"><code class="tok">--tertiary</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--tertiary)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#E5ECEB</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.2fr 1.4fr 1.1fr .7fr .8fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Подпись разделителя</span></span></div>
+          <div class="tc"><code class="tok">--text-secondary</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead" style="font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px;">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/divider.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+        <div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;">
+          <div class="th th--separator"></div>
+          <div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Толщина линии</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-thickness">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Толщина контрастной линии</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-thickness-strong">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Толщина блока-секции</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-section">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Отступ Inset / Middle</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-inset">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Мин. длина вертикальной линии</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-vmin">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text">Зазор у подписи</span></span></div>
+          <div class="tc"><span class="tc__row"><span class="tc__text" id="dv-label-gap">—</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/divider.css</code>
+    </div>
+
+    <p class="subhead">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Компонент полностью декларативен — нет состояний, фокуса или взаимодействия</span>
+
+<span class="tk-cm">// 2. Горизонтальный &lt;hr&gt; имеет встроенную роль separator — дополнительный role не нужен;</span>
+<span class="tk-cm">//    вертикальный на &lt;div&gt; требует явный role="separator" + aria-orientation="vertical"</span>
+
+<span class="tk-cm">// 3. Выбор варианта отступа (только горизонтальный): Full — независимые блоки,</span>
+<span class="tk-cm">//    Inset — если слева есть иконка/аватар и линию надо выровнять по тексту,</span>
+<span class="tk-cm">//    Middle — лёгкое деление внутри одного блока</span>
+
+<span class="tk-cm">// 4. С подписью: два сегмента линии (::before / ::after) гибко растягиваются по краям;</span>
+<span class="tk-cm">//    выравнивание left/right/center задаёт flex-basis короткого сегмента = --dvd-inset</span>
+
+<span class="tk-cm">// 5. Декоративные разделители (например, граница карточки вместо &lt;hr&gt;) —</span>
+<span class="tk-cm">//    aria-hidden="true", чтобы не засорять навигацию скрин-ридера</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функция <code class="tok">makeDivider</code> в <code class="tok">divider.page.js</code>).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Разделитель с иконкой</b> — вариант <code class="tok">.dvd-text</code> с иконкой вместо/вместе с текстом (например, «или» + иконка).</li>
+        <li><b>Анимированное появление</b> — fade-in при динамической вставке секции, разделённой Divider.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Divider</span>
+    <span>Horizontal · Vertical — Full / Inset / Middle / Section · с подписью</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите разделитель: ориентация, вариант, толщина, пунктир и подпись — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/divider.page.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Ориентация': 'Вертикальный', 'Контрастная линия': 'Показывать контрастную линию', 'Пунктир': 'Показывать пунктир', 'С подписью': 'Показывать подпись' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- горизонтальный: нативный <hr>, уже имеет role=separator -->
+<hr class="dvd dvd--h">
+
+<!-- варианты отступов (только горизонтальный) -->
+<hr class="dvd dvd--h dvd--inset">   <!-- Inset -->
+<hr class="dvd dvd--h dvd--middle">  <!-- Middle -->
+<hr class="dvd dvd--h dvd--section"> <!-- блок-секция 8px -->
+
+<!-- вертикальный: <div>, role/aria вручную -->
+<div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
+
+<!-- с подписью (только горизонтальный) -->
+<div class="dvd-text" role="separator">
+  <span class="dvd-text__label">или</span>
+</div>
+
+<!-- чисто декоративная линия (напр. граница карточки) — скрыть от скрин-ридера -->
+<hr class="dvd dvd--h" aria-hidden="true"></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/divider.page.js)
+function makeDiv(o) {
+  // o: { orientation:'h'|'v', variant:'full'|'inset'|'middle'|'section', strong?, dashed?, withText?, align }
+  // hr.dvd.dvd--<variant>(.dvd--strong)(.dvd--dashed)(.dvd--with-text) → текст подписи .dvd__label
+  // горизонтальный с подписью: линия | текст | линия; vertical — без подписи
+}</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Divider (Разделитель)
+   Тонкая разделительная линия для визуального отделения частей интерфейса.
+   Использует только семантические токены цвета и типографики.
+   ========================================================================= */
+
+:root {
+  /* component tokens */
+  --dvd-color:        var(--border-light);    /* линия по умолчанию  */
+  --dvd-color-strong: var(--border-primary);  /* контрастная линия   */
+  --dvd-thickness:    1px;                     /* толщина линии       */
+  --dvd-section:      8px;                     /* толщина блока-секции */
+  --dvd-inset:        16px;                    /* отступ inset        */
+  --dvd-label-gap:    12px;                    /* зазор у подписи     */
+  --dvd-vmin:         16px;                    /* мин. длина вертик.  */
+}
+
+/* ----------------------------------------------------------------------- *
+   Base — линия рисуется бордером, чтобы поддержать solid и dashed
+ * ----------------------------------------------------------------------- */
+.dvd {
+  border: 0;
+  margin: 0;
+  flex: none;
+  align-self: stretch;
+  background: none;
+}
+
+/* Horizontal (по умолчанию) */
+.dvd--h {
+  width: 100%;
+  height: 0;
+  border-top: var(--dvd-thickness) solid var(--dvd-color);
+}
+
+/* Vertical */
+.dvd--v {
+  width: 0;
+  align-self: stretch;
+  min-height: var(--dvd-vmin);
+  border-left: var(--dvd-thickness) solid var(--dvd-color);
+}
+
+/* ----------------------------------------------------------------------- *
+   Colour modifiers
+ * ----------------------------------------------------------------------- */
+.dvd--strong.dvd--h { border-top-color: var(--dvd-color-strong); }
+.dvd--strong.dvd--v { border-left-color: var(--dvd-color-strong); }
+
+/* ----------------------------------------------------------------------- *
+   Style modifiers
+ * ----------------------------------------------------------------------- */
+.dvd--dashed.dvd--h { border-top-style: dashed; }
+.dvd--dashed.dvd--v { border-left-style: dashed; }
+
+/* ----------------------------------------------------------------------- *
+   Inset modifiers (only meaningful for horizontal dividers)
+ * ----------------------------------------------------------------------- */
+.dvd--inset.dvd--h    { width: calc(100% - var(--dvd-inset));        margin-left: var(--dvd-inset); }
+.dvd--middle.dvd--h   { width: calc(100% - var(--dvd-inset) * 2);    margin-inline: var(--dvd-inset); }
+
+/* ----------------------------------------------------------------------- *
+   Section divider — толстый блок для крупного группирования
+ * ----------------------------------------------------------------------- */
+.dvd--section.dvd--h {
+  height: var(--dvd-section);
+  border-top: 0;
+  background: var(--tertiary);
+}
+.dvd--section.dvd--v {
+  width: var(--dvd-section);
+  border-left: 0;
+  background: var(--tertiary);
+}
+
+/* ----------------------------------------------------------------------- *
+   Divider with label / content
+   <div class="dvd-text"><span class="dvd-text__label">…</span></div>
+ * ----------------------------------------------------------------------- */
+.dvd-text {
+  display: flex;
+  align-items: center;
+  gap: var(--dvd-label-gap);
+  width: 100%;
+}
+.dvd-text::before,
+.dvd-text::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 0;
+  border-top: var(--dvd-thickness) solid var(--dvd-color);
+}
+.dvd-text--strong::before,
+.dvd-text--strong::after { border-top-color: var(--dvd-color-strong); }
+.dvd-text--dashed::before,
+.dvd-text--dashed::after { border-top-style: dashed; }
+
+.dvd-text__label {
+  flex: 0 1 auto;
+  min-width: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* alignment — короткий сегмент с прижатой стороны */
+.dvd-text--left::before  { flex: 0 0 var(--dvd-inset); }
+.dvd-text--right::after   { flex: 0 0 var(--dvd-inset); }</script>
+</body>
+</html>

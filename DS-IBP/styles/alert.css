@@ -1,0 +1,157 @@
+/* =========================================================================
+   Alert — компонент подкачки: инлайновое (встроенное в контент) сообщение
+   о состоянии. В отличие от Toast / SnackBar не всплывает, а занимает место
+   в потоке страницы и остаётся, пока пользователь его не закроет или не
+   исчезнет причина. Четыре тона (Info · Warning · Error · Success), один
+   размер (M), опциональные части: иконка, заголовок, текст, кнопки,
+   действия (свернуть / закрыть).
+
+   Только токены ДС. Кнопки и ссылки внутри Алерта красятся штатными
+   тоновыми классами ДС: .btn--<tone> и .link--<tone> (совпадают с тоном
+   плашки). Ре-скоупа --primary/--link больше нет.
+   Зависимости: button.css, link.css (для .alert__buttons), icons — <i data-icon>.
+   ========================================================================= */
+
+.alert {
+  /* тон по умолчанию — Info; тоновые модификаторы переопределяют акцент/фон */
+  --alert-accent:  var(--info);
+  --alert-surface: var(--info-bg);
+
+  /* размер по умолчанию — M */
+  --alert-pad:      16px;
+  --alert-pad-x:    20px;
+  --alert-gap:      8px;
+  --alert-icon:     20px;
+  --alert-body-gap: 2px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--alert-gap);
+  padding: var(--alert-pad) var(--alert-pad-x);
+  border-radius: var(--radius-m);
+  background: var(--alert-surface);
+  color: var(--text-primary);
+}
+
+/* ---------- тоны ---------- *
+   Тон задаёт акцент (иконка, кнопки действий) и фон плашки. Кнопки и ссылки
+   внутри — штатными классами .btn--<tone>/.link--<tone>, не через ре-скоуп.
+   Скоуп --* живёт и на классе .alert--<тон>, и на [data-alert-tone] — два равноправных
+   источника: класс работает сам по себе, атрибут оставлен для совместимости
+   (и как разрешённый data-скоуп компилятора). */
+.alert--info,
+[data-alert-tone="info"]    { --alert-accent: var(--info);    --alert-surface: var(--info-bg); }
+.alert--warning,
+[data-alert-tone="warning"] { --alert-accent: var(--warning); --alert-surface: var(--warning-bg); }
+.alert--error,
+[data-alert-tone="error"]   { --alert-accent: var(--error);   --alert-surface: var(--error-bg-light); }
+.alert--success,
+[data-alert-tone="success"] { --alert-accent: var(--success); --alert-surface: var(--success-bg); }
+
+/* ---------- иконка (Alert_Icon) ---------- */
+.alert__icon {
+  flex: none;
+  width: var(--alert-icon);
+  height: var(--alert-icon);
+  color: var(--alert-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.alert__icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* ---------- тело ---------- */
+.alert__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--alert-body-gap);
+  /* совмещение с иконкой по верхней строке заголовка/текста */
+  padding-top: 0;
+}
+
+.alert__title {
+  font: var(--type-body-m-strong);
+  color: var(--text-primary);
+  margin: 0;
+  text-wrap: pretty;
+}
+.alert__text {
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  margin: 4px 0 0;
+  text-wrap: pretty;
+}
+/* зазор перед кнопками чуть больше, чем между заголовком и текстом */
+.alert__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* ---------- действия (Alert_Actions): свернуть / закрыть ---------- *
+   Кнопки действий — IconButton размера M (см. icon-button.css): габарит 20px,
+   выровнены по верхней границе вместе с иконкой и заголовком. */
+.alert__actions {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* поворот шеврона у свёрнутого Алерта — форс-класс для витрины; на реальной
+   кнопке рантайм пишет aria-expanded, читаем его напрямую (RulesAudit W1). */
+.alert__collapse > i,
+.alert__collapse > svg { transition: transform .15s ease; }
+.alert--collapsed .alert__collapse > i,
+.alert--collapsed .alert__collapse > svg,
+.alert__collapse[aria-expanded="false"] > i,
+.alert__collapse[aria-expanded="false"] > svg { transform: rotate(180deg); }
+.alert--collapsed .alert__text,
+.alert--collapsed .alert__buttons { display: none; }
+
+/* ---------- раскладка «в строку» (Alert_Row) ---------- *
+   Для алертов на всю ширину страницы/контентной области: текст и опциональные
+   обычные кнопки — в одну строку, кнопки прижаты вправо. Кнопок действий
+   (свернуть/закрыть) в этой раскладке нет. Экономит высоту.
+   Иконка остаётся у верхней границы рядом с заголовком (align-items у .alert
+   уже flex-start — здесь не переопределяется); по центру выравнивается
+   только блок кнопок (align-self на .alert__buttons ниже). Рамка 1px и
+   радиус 8px в цвете тона (16% непрозрачности) — отличает раскладку «в
+   строку» от базовой заливки без обводки. */
+.alert--row { border: 1px solid color-mix(in srgb, var(--alert-accent) 16%, transparent); }
+.alert--row .alert__body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  /* 2 строки явно — иначе grid-row:1/-1 у кнопок резолвится по явной
+     (не фактической/implicit) сетке и не растягивается на заголовок+текст */
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 12px;
+}
+.alert--row .alert__title,
+.alert--row .alert__text { grid-column: 1; }
+.alert--row .alert__buttons { grid-column: 2; grid-row: 1 / -1; margin: 0; align-self: center; }
+
+/* ---------- встроенный в контейнер (Alert_Flush) ---------- *
+   Алерт внутри Плитки/Модалки встраивается между шапкой и контентной областью:
+   без скруглений и без отступа от краёв (грани совпадают с гранями контейнера).
+   Контейнер гасит свой горизонтальный паддинг отрицательным margin. */
+.alert--flush { border-radius: 0; }
+
+/* ---------- размер (единственный — M) ---------- */
+.alert--m { padding: 16px 20px; gap: 8px; }
+.alert--m .alert__icon { width: 20px; height: 20px; }
+
+/* ---------- кнопки/ссылки внутри Алерта — в тон ---------- */
+/* Штатные тоновые классы: .btn--<tone> на кнопках и .link--<tone> на ссылках
+   внутри .alert__buttons (совпадают с тоном плашки — см. alert.page.js). */
+
+@media (prefers-reduced-motion: reduce) {
+  .alert__collapse > i,
+  .alert__collapse > svg,
+  .alert__act { transition: none; }
+}

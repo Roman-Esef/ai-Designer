@@ -1,0 +1,738 @@
+<!-- @dsCard group="Components" name="Spinner" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spinner — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/spinner.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<style>
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:40px; }
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stage.is-dark { background: var(--c-cgrey-800); }
+  .pg__stagebox { width:100%; max-width:380px; display:flex; align-items:center; justify-content:center; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(280px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:54px 44px; display:flex; justify-content:center; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary); }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .anat__legend li .t .d { font: var(--type-body-s); color: var(--text-secondary); }
+
+  /* ---------- composition / matrix rows ---------- */
+  .compo-list, .matrix { display:flex; flex-direction:column; gap:22px; }
+  .compo-row, .matrix-row { display:grid; grid-template-columns: 200px 1fr; gap:28px; align-items:center; }
+  @media (max-width:640px){ .compo-row, .matrix-row { grid-template-columns:1fr; } }
+  .compo-row .ch, .matrix-row .rn { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .compo-row .cd, .matrix-row .rd { font: var(--type-body-s); color: var(--text-secondary); margin-top:2px; }
+  .compo-row + .compo-row, .matrix-row + .matrix-row { padding-top:22px; border-top:1px solid var(--border-light); }
+  .matrix-wrap { overflow-x:auto; }
+  .matrix-cell { display:flex; align-items:center; min-height:32px; }
+  .matrix-cell.dark { background: var(--c-cgrey-800); border-radius: var(--radius-xl); padding:14px 18px; max-width:fit-content; }
+
+  /* ---------- tone scale ---------- */
+  .tone-grid { display:flex; flex-direction:column; gap:0; }
+  .tone-row { display:grid; grid-template-columns: 140px 1fr; gap:24px; align-items:center; padding:14px 0; border-top:1px solid var(--border-light); }
+  .tone-row:first-child { border-top:none; padding-top:0; }
+  .tone-row .tn { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .tone-row .td2 { font: var(--type-body-s); color: var(--text-secondary); margin-top:2px; }
+  .tone-row.dark { background: var(--c-cgrey-800); border-radius: var(--radius-xl); padding:16px 18px; border-top:none; }
+  .tone-row.dark .tn { color: var(--text-on-dark); }
+  .tone-row.dark .td2 { color: rgba(255,255,255,.6); }
+
+  /* ---------- overlay demo card ---------- */
+  .ov-card { position:relative; width:100%; max-width:320px; border:1px solid var(--border-light); border-radius: var(--radius-xl); background:var(--bg-tile); padding:22px; display:flex; flex-direction:column; gap:10px; overflow:hidden; }
+  .ov-card__line { height:12px; border-radius:var(--radius-xs); background: var(--st-disabled-midlight); }
+  .ov-card__line.w1 { width:60%; }
+  .ov-card__line.w2 { width:90%; }
+  .ov-card__line.w3 { width:75%; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+  .ref-table code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.85em; }
+
+  /* ---------- developer handoff ---------- */
+  .badge-proposal { display:inline-block; font: var(--type-button-xs); letter-spacing:.06em; text-transform:uppercase; color: var(--text-secondary); background: var(--c-cgrey-100); border:1px solid var(--border-light); padding:3px 9px; border-radius:999px; margin-left:12px; vertical-align:middle; }
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead2 { font: var(--type-body-m-strong); color: var(--text-primary); margin:34px 0 16px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Spinner">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage" id="pg-stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.001</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Spinner</h1>
+    <p class="lead">Круговой индикатор загрузки неопределённой длительности: стоит там, где нужен компактный самодостаточный признак «идёт процесс» — рядом с текстом, вместо контента области или поверх неё. Семь тонов, четыре размера, опциональная подпись и блокирующий оверлей.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- WHEN TO USE -->
+  <section class="section" data-screen-label="WhenToUse">
+    <h2>Использование</h2>
+    <p class="desc tight">Используйте Spinner, когда:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>длительность процесса заранее неизвестна, а сам процесс — секунды, не минуты (сохранение формы, ожидание ответа сервера, обновление списка);</li>
+      <li>нужен компактный самодостаточный индикатор рядом с текстом или вместо иконки — без бара, под который пришлось бы выделять отдельную полосу в разметке;</li>
+      <li>нужно заблокировать конкретную область экрана на время обновления, не трогая остальной интерфейс — режим <b>Оверлей</b>.</li>
+    </ul>
+    <p class="desc">Не используйте Spinner, если доля выполнения известна — линейный индикатор с реальным значением (<code class="tok">value</code>) даёт пользователю больше информации, чем «просто крутится»; см. <a class="inl" href="../atoms/ProgressBar.html">ProgressBar</a>. Круговой индикатор с процентом внутри (например, для аватара или миниатюры файла) — отдельная задача, она в бэклоге ProgressBar, а не форма этого компонента: Spinner всегда неопределённый и не несёт числового значения. Для загрузки внутри кнопки не собирайте Spinner отдельно — состояние <code class="tok">.btn--loading</code> уже включает свой спиннер, см. <a class="inl" href="../atoms/Buttons.html">Buttons</a>. Если под загрузкой уже известна структура будущего контента (карточка, строка таблицы), предпочтительнее сохраняющий разметку скелетон-паттерн — самостоятельного компонента Skeleton в ДС пока нет (см. «Бэклог»).</p>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Один элемент с двухцветной обводкой: неподвижный трек и вращающийся сегмент-индикатор. Подпись — опциональный слот рядом или под кольцом, не часть самого кольца.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div id="anat-diagram"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Трек</span><span class="d"> — неподвижное кольцо на всю окружность, нейтральный <code class="tok">--border-light</code> независимо от тона</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Индикатор</span><span class="d"> — вращающийся сегмент кольца (обрыв обводки сверху), цвет = тон</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Подпись</span><span class="d"> — опционально, рядом или под кольцом; общий текстовый слот, не завязан на LabelHelper</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+
+    <div class="subsec" data-screen-label="Tone">
+      <h3>Тон</h3>
+      <p class="desc">Шесть тонов на локальных статусных токенах — тот же набор, что у ProgressBar, плюс <b>Inverse</b> для использования на тёмных и цветных заливках, где нейтральный трек на <code class="tok">--border-light</code> потерялся бы.</p>
+      <div class="panel"><div class="tone-grid" id="tone-grid"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Composition">
+      <h3>Состав</h3>
+      <p class="desc">Голое кольцо, кольцо с подписью (в строку или столбиком) и блокирующий оверлей поверх контента области.</p>
+      <div class="panel"><div class="compo-list" id="compo-list"></div></div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Четыре размера — от инлайн-использования рядом с мелким текстом до акцентного индикатора в оверлее. Толщина кольца растёт вместе с диаметром, чтобы пропорция не «истончалась» на крупных размерах. Значения ниже измерены на живом экземпляре.</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="row" id="size-stage" style="align-items:center; gap:36px;"></div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" id="size-table" style="border:none;border-radius:0;"></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Спиннер круглый во всех размерах.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кольцо — XL / L / M / S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <ul class="bullets">
+      <li><b>Подпись</b> — короткая фраза о процессе в процессе, а не статичный ярлык: «Сохранение…», «Загрузка данных…», «Обновление списка…»; глагол в форме процесса (на «-ние»/«-ка»), не инфинитив и не результат.</li>
+      <li>Не указывайте в подписи процент или счётчик — Spinner неопределённый по смыслу; если он появился, значит нужен ProgressBar, а не Spinner с текстом-заглушкой.</li>
+      <li>Подпись оверлея — так же кратка, но может уточнять область: «Обновление таблицы…», «Применение фильтра…» — пользователь должен понимать, что именно блокировано, а не весь экран.</li>
+      <li>Без подписи — <code class="tok">aria-label</code> обязателен на самом кольце (см. «Доступность»), даже когда текстового слота нет визуально.</li>
+    </ul>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила анимации, позиционирования оверлея и адаптивности под системные настройки.</p>
+
+    <div class="subsec" data-screen-label="Rotation">
+      <h3>Вращение</h3>
+      <ul class="bullets">
+        <li>Постоянное вращение на <code class="tok">transform: rotate()</code>, не через пошаговое изменение угла из JS — анимация не должна зависеть от кадров основного потока.</li>
+        <li>Компонент не имеет состояния «остановлено» и не принимает значение — он либо показан (идёт процесс), либо убран из DOM/скрыт, когда процесс завершился.</li>
+        <li><code class="tok">prefers-reduced-motion</code>: длительность цикла увеличивается вдвое (0.8с → 1.6с), а не отключается — полное исчезновение вращения убрало бы единственный сигнал «идёт процесс».</li>
+      </ul>
+    </div>
+
+    <div class="subsec" data-screen-label="Overlay">
+      <h3>Оверлей — блокирующий режим</h3>
+      <ul class="bullets">
+        <li><code class="tok">.spin-overlay</code> позиционируется <code class="tok">position:absolute; inset:0</code> — родительский контейнер обязан иметь <code class="tok">position:relative</code> (или иной контекст позиционирования), иначе оверлей растянется на ближайшего позиционированного предка, а не на нужную область.</li>
+        <li>Фон оверлея — лёгкая вуаль поверх <code class="tok">--bg-page</code> (82% непрозрачности): контент под ней остаётся угадываемым, в отличие от тёмного <code class="tok">--modal-scrim</code> у Modal, который блокирует весь экран визуально и по смыслу.</li>
+        <li>Оверлей не является модальным диалогом: фокус не перехватывается, Esc не закрывает — под ним нет действия пользователя, только ожидание.</li>
+        <li><code class="tok">z-index</code> оверлея локальный (относительно родителя), не часть общей шкалы модалок/тостов/меню ДС — он не должен и не может перекрыть их.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">У самого индикатора одно состояние — он либо показан и вращается, либо не показан. Ниже — типовые контексты применения, а не состояния в смысле Hover/Active.</p>
+    <div class="panel"><div class="matrix" id="matrix"></div></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="Accessibility">
+    <h2>Доступность</h2>
+    <ul class="bullets">
+      <li>Корневой элемент несёт <code class="tok">role="status"</code>, не <code class="tok">role="progressbar"</code> — у Spinner нет числового значения, которое требовали бы <code class="tok">aria-valuenow/min/max</code>.</li>
+      <li>Если рядом нет видимой подписи — обязателен <code class="tok">aria-label</code> на кольце («Загрузка», «Сохранение…»); с подписью кольцо получает <code class="tok">aria-hidden="true"</code>, а роль и подпись несёт обёртка <code class="tok">.spin-group</code>.</li>
+      <li>Оверлей — <code class="tok">role="status"</code> + <code class="tok">aria-live="polite"</code> на обёртке, чтобы скринридер объявил и начало, и конец блокировки области (после её удаления из DOM).</li>
+      <li>Тон не несёт самостоятельного смысла статуса (в отличие от ProgressBar) — Spinner всегда означает «идёт процесс», выбор тона — это только адаптация под фон, а не сигнал успеха/ошибки.</li>
+      <li>Анимация уважает <code class="tok">prefers-reduced-motion</code> (см. «Поведение»); компонент не интерактивен и не входит в таб-порядок.</li>
+    </ul>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Само кольцо не содержит текста. Подпись рядом с кольцом и подпись оверлея набираются гарнитурой SB Sans Text на разных начертаниях.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="border:none;border-radius:0;" id="typo-tbl"></div>
+    </div>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Трек — всегда нейтральный <code class="tok">--border-light</code>, кроме тона Inverse, где он строится полупрозрачным поверх <code class="tok">--text-on-dark</code>. Индикатор — базовый цвет локальной статусной рампы, тот же набор токенов, что у тонов ProgressBar.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" id="color-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
+    </div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры и поведение как алгоритм — не привязан к стеку.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/spinner.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" id="dev-spec-table" style="border:none;border-radius:0;"></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/spinner.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+    <div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Никогда не рендерить aria-valuenow/процент — Spinner всегда неопределённый.</span>
+<span class="tk-cm">//    Если появилось известное значение, это ProgressBar, не Spinner.</span>
+
+<span class="tk-cm">// 2. Вращение — только transform: rotate(360deg) в CSS-анимации, не через</span>
+<span class="tk-cm">//    покадровое обновление угла из JS: анимация не должна зависеть от того,</span>
+<span class="tk-cm">//    свободен ли основной поток в момент кадра.</span>
+
+<span class="tk-cm">// 3. Показ/скрытие: компонент монтируется на время процесса и размонтируется</span>
+<span class="tk-cm">//    (или скрывается) по его завершении — у него нет самостоятельного состояния</span>
+<span class="tk-cm">//    "остановлено", в отличие от ProgressBar, где Complete/Empty — валидные состояния.</span>
+
+<span class="tk-cm">// 4. Оверлей: перед монтированием .spin-overlay убедиться, что ближайший</span>
+<span class="tk-cm">//    позиционированный предок — это и есть блокируемая область, а не случайный</span>
+<span class="tk-cm">//    родитель выше по дереву (иначе оверлей растянется не туда).</span>
+<span class="tk-cm">//    aria-live="polite" на оверлее объявляет и начало, и конец блокировки —</span>
+<span class="tk-cm">//    второе объявление сработает, только когда оверлей реально удалён из DOM,</span>
+<span class="tk-cm">//    а не просто скрыт через visibility/opacity.</span>
+
+<span class="tk-cm">// 5. prefers-reduced-motion: animation-duration ×2, не отключение анимации.</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм поверх вашего стека (рабочий референс на vanilla JS — функция <code class="tok">makeSpin</code> в коде этой страницы).</p>
+  </section>
+
+  <!-- BACKLOG -->
+  <section class="section" data-screen-label="Proposals">
+    <h2>Бэклог<span class="badge-proposal">Предложение</span></h2>
+    <p class="desc">Компонент закрывает индикатор неопределённой длительности. Смежные задачи, которые сознательно не входят в эту версию:</p>
+    <ul class="bullets">
+      <li><b>Skeleton</b> — самостоятельный переиспользуемый примитив (строки/блоки + шиммер), который сохраняет разметку будущего контента вместо Spinner/оверлея. Сейчас шиммер существует только как локальный <code class="tok">.modal__skeleton</code> внутри Modal — не переиспользуемый компонент. См. общий бэклог ДС (раздел «Недостающие компоненты», P2).</li>
+      <li><b>Круговой ProgressBar с известным значением</b> — кольцо с процентом внутри (аватары, миниатюры файлов, виджеты дашборда). Другая задача и другая разметка: у Spinner нет значения по определению. Уже описано в бэклоге <a class="inl" href="../atoms/ProgressBar.html">ProgressBar</a>.</li>
+      <li><b>Составной Upload-индикатор с отменой/повтором</b> — carточка загрузки файла с действиями. Требует состояний ошибки — отдельный организм поверх Spinner/ProgressBar, не расширение этого компонента.</li>
+    </ul>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Spinner</span>
+    <span>XS / S / M / L — Accent / Success / Warning / Error / Info / System / Inverse — Оверлей</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите спиннер: тон, размер, подпись и режим оверлея — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script>
+function dsTbl(headers, rows, widths) {
+  const w = widths || headers.map(() => '1fr');
+  const grid = ['8px', ...w, '8px'].join(' ');
+  const thCells = headers.map(h => '<div class="th"><span class="th__label">' + h + '</span></div>').join('');
+  const head = '<div class="tbl__row" style="grid-template-columns:' + grid + ';"><div class="th th--separator"></div>' + thCells + '<div class="th th--separator"></div></div>';
+  const body = rows.map(r => {
+    const cells = r.map((c, i) => {
+      const numeric = c && c.numeric;
+      const text = c && typeof c === 'object' ? c.html : c;
+      return '<div class="tc' + (numeric ? ' tc--numbers' : '') + '"><span class="tc__row"><span class="tc__text">' + text + '</span></span></div>';
+    }).join('');
+    return '<div class="tbl__row" style="grid-template-columns:' + grid + ';"><div class="tc tc--separator"></div>' + cells + '<div class="tc tc--separator"></div></div>';
+  }).join('');
+  return head + body;
+}
+/* ================= Spinner factory ================= */
+function makeSpin(o = {}) {
+  const { tone = 'accent', size = 'm', label = null, stack = false, ariaLabel = null } = o;
+  if (!label) {
+    const el = document.createElement('span');
+    el.className = `spin spin--${size} spin--${tone}`;
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-label', ariaLabel || 'Загрузка');
+    return el;
+  }
+  const wrap = document.createElement('div');
+  wrap.className = 'spin-group' + (stack ? ' spin-group--stack' : '') + (tone === 'inverse' ? ' spin-group--inverse' : '');
+  wrap.setAttribute('role', 'status');
+  const ring = document.createElement('span');
+  ring.className = `spin spin--${size} spin--${tone}`;
+  ring.setAttribute('aria-hidden', 'true');
+  const lab = document.createElement('span'); lab.className = 'spin-group__label'; lab.textContent = label;
+  wrap.append(ring, lab);
+  return wrap;
+}
+function makeOverlay(o = {}) {
+  const { tone = 'accent', size = 'l', label = null } = o;
+  const ov = document.createElement('div'); ov.className = 'spin-overlay';
+  ov.setAttribute('role', 'status'); ov.setAttribute('aria-live', 'polite');
+  const ring = document.createElement('span'); ring.className = `spin spin--${size} spin--${tone}`; ring.setAttribute('aria-hidden', 'true');
+  ov.appendChild(ring);
+  if (label) { const l = document.createElement('span'); l.className = 'spin-overlay__label'; l.textContent = label; ov.appendChild(l); }
+  return ov;
+}
+function makeOverlayCard(spinOpts) {
+  const card = document.createElement('div'); card.className = 'ov-card';
+  card.innerHTML = '<div class="ov-card__line w1"></div><div class="ov-card__line w2"></div><div class="ov-card__line w3"></div>';
+  card.appendChild(makeOverlay(spinOpts));
+  return card;
+}
+
+/* ---------- PLAYGROUND ---------- */
+(function () {
+  const state = { tone: 'accent', size: 'm', label: true, labelText: 'Сохранение…', stack: false, overlay: false };
+  const controls = document.getElementById('pg-controls');
+  const stage = document.getElementById('pg-stage');
+  const preview = document.getElementById('pg-preview');
+  const codeEl = document.getElementById('pg-code');
+
+  function select(label, options, getCur, onPick) {
+    const wrap = document.createElement('div'); wrap.className = 'ctl';
+    const l = document.createElement('div'); l.className = 'lbl'; l.textContent = label; wrap.appendChild(l);
+    const box = document.createElement('div'); box.className = 'pg-select';
+    const sel = document.createElement('select');
+    options.forEach(([val, txt]) => { const op = document.createElement('option'); op.value = val; op.textContent = txt; if (val === getCur()) op.selected = true; sel.appendChild(op); });
+    sel.addEventListener('change', () => { onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+  /* Бинарные опции — селекты: docs-split.js конвертирует их в свитчи ДС (урок Л4) */
+  function ctlToggle(label, key) {
+    const wrap = document.createElement('div'); wrap.className = 'ctl';
+    const l = document.createElement('div'); l.className = 'lbl'; l.textContent = label; wrap.appendChild(l);
+    const box = document.createElement('div'); box.className = 'pg-select';
+    const sel = document.createElement('select');
+    [['no', 'Нет'], ['yes', 'Да']].forEach(([v, t]) => {
+      const op = document.createElement('option'); op.value = v; op.textContent = t;
+      if ((v === 'yes') === !!state[key]) op.selected = true;
+      sel.appendChild(op);
+    });
+    sel.addEventListener('change', () => { state[key] = sel.value === 'yes'; render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  controls.appendChild(select('Тон',
+    [['accent', 'Accent'], ['success', 'Success'], ['warning', 'Warning'], ['error', 'Error'], ['info', 'Info'], ['system', 'System'], ['inverse', 'Inverse']],
+    () => state.tone, v => state.tone = v));
+  controls.appendChild(select('Размер',
+    [['xs', 'XS'], ['s', 'S'], ['m', 'M'], ['l', 'L']],
+    () => state.size, v => state.size = v));
+
+  const tLabel = ctlToggle('Подпись', 'label');
+  const tStack = ctlToggle('Подпись снизу', 'stack');
+  const tOverlay = ctlToggle('Демо оверлея', 'overlay');
+  controls.appendChild(tLabel);
+  controls.appendChild(tStack);
+  controls.appendChild(tOverlay);
+
+  function render() {
+    tStack.classList.toggle('is-off', !state.label || state.overlay);
+    tLabel.classList.toggle('is-off', state.overlay);
+    stage.classList.toggle('is-dark', state.tone === 'inverse');
+
+    preview.innerHTML = '';
+    let code;
+    if (state.overlay) {
+      preview.appendChild(makeOverlayCard({ tone: state.tone === 'inverse' ? 'accent' : state.tone, size: 'l', label: state.labelText }));
+      code = '<div class="spin-overlay" role="status" aria-live="polite"><span class="spin spin--l spin--' + (state.tone === 'inverse' ? 'accent' : state.tone) + '" aria-hidden="true"></span><span class="spin-overlay__label">' + state.labelText + '</span></div>';
+    } else if (state.label) {
+      preview.appendChild(makeSpin({ tone: state.tone, size: state.size, label: state.labelText, stack: state.stack }));
+      code = '<div class="spin-group' + (state.stack ? ' spin-group--stack' : '') + '" role="status"><span class="spin spin--' + state.size + ' spin--' + state.tone + '" aria-hidden="true"></span><span class="spin-group__label">' + state.labelText + '</span></div>';
+    } else {
+      preview.appendChild(makeSpin({ tone: state.tone, size: state.size }));
+      code = '<span class="spin spin--' + state.size + ' spin--' + state.tone + '" role="status" aria-label="Загрузка"></span>';
+    }
+    codeEl.innerHTML = '<code>' + code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code>';
+  }
+  render();
+})();
+
+/* ---------- ANATOMY DIAGRAM ---------- */
+(function () {
+  document.getElementById('anat-diagram').appendChild(makeSpin({ tone: 'accent', size: 'l' }));
+})();
+
+/* ---------- TONE GRID ---------- */
+(function () {
+  const g = document.getElementById('tone-grid');
+  const tones = [
+    ['accent', 'Accent', 'По умолчанию — нейтральный процесс на светлом фоне', false],
+    ['success', 'Success', 'Процесс завершает положительное действие (например, после подтверждения)', false],
+    ['warning', 'Warning', 'Процесс сопровождает рискованное действие', false],
+    ['error', 'Error', 'Повторная попытка после ошибки', false],
+    ['info', 'Info', 'Информационное обновление без оценки «хорошо/плохо»', false],
+    ['system', 'System', 'Фоновый системный процесс', false],
+    ['inverse', 'Inverse', 'На тёмных и насыщенных заливках — трек и индикатор строятся на --text-on-dark', true],
+  ];
+  tones.forEach(([tone, name, desc, dark]) => {
+    const row = document.createElement('div'); row.className = 'tone-row' + (dark ? ' dark' : '');
+    const tn = document.createElement('div');
+    tn.innerHTML = '<div class="tn">' + name + '</div><div class="td2">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.className = 'matrix-cell';
+    cell.appendChild(makeSpin({ tone, size: 'm' }));
+    row.appendChild(tn); row.appendChild(cell);
+    g.appendChild(row);
+  });
+})();
+
+/* ---------- COMPOSITION LIST ---------- */
+(function () {
+  const host = document.getElementById('compo-list');
+  const defs = [
+    ['Голое кольцо', 'Инлайн рядом с иконкой/текстом или внутри маленького слота — без подписи, но с aria-label', () => makeSpin({ tone: 'accent', size: 'm' })],
+    ['С подписью, в строку', 'Кольцо + текст рядом — стандартная форма для карточек и панелей', () => makeSpin({ tone: 'accent', size: 'm', label: 'Загрузка данных…' })],
+    ['С подписью, столбиком', 'Кольцо над текстом — для центрированных пустых состояний в процессе загрузки', () => makeSpin({ tone: 'accent', size: 'l', label: 'Загрузка…', stack: true })],
+    ['Оверлей', 'Блокирует конкретную область на время обновления, контент под вуалью остаётся угадываемым', () => makeOverlayCard({ tone: 'accent', size: 'l', label: 'Обновление…' })],
+  ];
+  defs.forEach(([title, desc, build]) => {
+    const row = document.createElement('div'); row.className = 'compo-row';
+    const head = document.createElement('div');
+    head.innerHTML = '<div class="ch">' + title + '</div><div class="cd">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.className = 'matrix-cell';
+    cell.appendChild(build());
+    row.appendChild(head); row.appendChild(cell);
+    host.appendChild(row);
+  });
+})();
+
+/* ---------- SIZES ---------- */
+(function () {
+  const stage = document.getElementById('size-stage');
+  [['xs', 'XS — 16px'], ['s', 'S — 20px'], ['m', 'M — 24px'], ['l', 'L — 32px']].forEach(([size, cap]) => {
+    const wrap = document.createElement('div'); wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:12px;';
+    wrap.appendChild(makeSpin({ tone: 'accent', size }));
+    const label = document.createElement('div');
+    label.style.cssText = 'font:var(--type-body-s);color:var(--text-secondary);';
+    label.textContent = cap;
+    wrap.appendChild(label);
+    stage.appendChild(wrap);
+  });
+})();
+
+/* ---------- STATES / CONTEXTS MATRIX ---------- */
+(function () {
+  const m = document.getElementById('matrix');
+  const rows = [
+    ['Standalone', 'Кольцо само по себе — единственный признак процесса на экране', () => makeSpin({ tone: 'accent', size: 'l' })],
+    ['Инлайн с текстом', 'Рядом с подписью, компактный размер, в строке интерфейса', () => makeSpin({ tone: 'accent', size: 's', label: 'Сохранение…' })],
+    ['На тёмной заливке', 'Тон Inverse — трек и индикатор видны поверх насыщенного фона', () => { const c = document.createElement('div'); c.className = 'matrix-cell dark'; c.appendChild(makeSpin({ tone: 'inverse', size: 'm', label: 'Загрузка…' })); return c; }],
+    ['Блокирующий оверлей', 'Поверх области, которая сейчас обновляется', () => makeOverlayCard({ tone: 'accent', size: 'm', label: 'Обновление…' })],
+  ];
+  rows.forEach(([name, desc, build]) => {
+    const row = document.createElement('div'); row.className = 'matrix-row';
+    const rn = document.createElement('div');
+    rn.innerHTML = '<div class="rn">' + name + '</div><div class="rd">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.style.maxWidth = '340px';
+    const built = build();
+    if (built.classList.contains('matrix-cell') || built.classList.contains('ov-card')) cell.appendChild(built);
+    else { const wrap = document.createElement('div'); wrap.className = 'matrix-cell'; wrap.appendChild(built); cell.appendChild(wrap); }
+    row.appendChild(rn); row.appendChild(cell);
+    m.appendChild(row);
+  });
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function () {
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue) {
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r, g, b, a = 1, m = v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m) { r = +m[1]*255; g = +m[2]*255; b = +m[3]*255; if (m[4] !== undefined) a = +m[4]; }
+    else { const n = v.match(/[\d.]+/g); if (!n) return cssValue; r = +n[0]; g = +n[1]; b = +n[2]; if (n[3] !== undefined) a = +n[3]; }
+    const hx = n => Math.round(n).toString(16).padStart(2, '0').toUpperCase();
+    let s = '#' + hx(r) + hx(g) + hx(b); if (a < 1) s += ' · ' + Math.round(a * 100) + '%'; return s;
+  }
+  const rows = [
+    ['Трек', 'Фон — тона Accent…System', '--border-light'],
+    ['Трек', 'Фон — тон Inverse', '--text-on-dark (28%)'],
+    ['Индикатор — тон', 'Accent', '--primary'],
+    ['Индикатор — тон', 'Success', '--st-green'],
+    ['Индикатор — тон', 'Warning', '--st-orange'],
+    ['Индикатор — тон', 'Error', '--st-red'],
+    ['Индикатор — тон', 'Info', '--st-lblue'],
+    ['Индикатор — тон', 'System', '--st-system'],
+    ['Индикатор — тон', 'Inverse', '--text-on-dark'],
+    ['Текст', 'Подпись', '--text-secondary'],
+    ['Текст', 'Подпись — на Inverse', '--text-on-dark'],
+  ];
+  const varFor = tok => tok.includes('(') ? tok.split(' ')[0] : tok;
+  document.getElementById('color-table').innerHTML = dsTbl(
+    ['Раздел', 'Роль', 'Токен', 'Образец', 'Hex'],
+    rows.map(([section, role, tok]) => [section, role,
+      '<code class="tok">' + tok + '</code>',
+      '<span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(' + varFor(tok) + ')"></span>',
+      resolveHex('var(' + varFor(tok) + ')')]),
+    ['0.9fr', '1.3fr', '1.4fr', '0.7fr', '0.9fr']);
+  probe.remove();
+})();
+
+/* ---------- DEV: redline measured from live component ---------- */
+(function () {
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  const sizes = { xs: makeSpin({ size: 'xs' }), s: makeSpin({ size: 's' }), m: makeSpin({ size: 'm' }), l: makeSpin({ size: 'l' }) };
+  const group = makeSpin({ size: 'm', label: 'X' });
+  Object.values(sizes).forEach(el => host.appendChild(el));
+  host.appendChild(group);
+
+  const px = v => { const n = parseFloat(v); return Number.isNaN(n) ? v : (Math.round(n * 10) / 10) + ' px'; };
+  const dims = {};
+  ['xs', 's', 'm', 'l'].forEach(k => {
+    const cs = getComputedStyle(sizes[k]);
+    dims[k] = { d: px(cs.width), bw: px(cs.borderTopWidth) };
+  });
+  const dur = getComputedStyle(sizes.m).animationDuration;
+  const groupGap = getComputedStyle(group).columnGap || getComputedStyle(group).gap;
+  host.remove();
+
+  const sizeRows = [
+    ['XS', dims.xs.d, dims.xs.bw, 'Инлайн в компактном тексте, значки таблиц'],
+    ['S', dims.s.d, dims.s.bw, 'Инлайн рядом с обычным текстом'],
+    ['M', dims.m.d, dims.m.bw, 'По умолчанию — карточки, панели, формы'],
+    ['L', dims.l.d, dims.l.bw, 'Standalone, столбиковая подпись, оверлей'],
+  ];
+  const sizeTb = document.getElementById('size-table');
+  sizeTb.innerHTML = dsTbl(['Размер','Диаметр','Толщина кольца','Где применять'], sizeRows.map(([s, d, bw, use]) => ['<b>'+s+'</b>', {html:d, numeric:true}, {html:bw, numeric:true}, use]), ['0.6fr','0.8fr','1fr','1.8fr']);
+
+  const devRows = [
+    ['Диаметр — XS / S / M / L', dims.xs.d + ' / ' + dims.s.d + ' / ' + dims.m.d + ' / ' + dims.l.d],
+    ['Толщина кольца — XS / S / M / L', dims.xs.bw + ' / ' + dims.s.bw + ' / ' + dims.m.bw + ' / ' + dims.l.bw],
+    ['Радиус кольца', '--radius-circle (50%)'],
+    ['Длительность цикла вращения', dur],
+    ['Зазор кольцо ↔ подпись', px(groupGap)],
+  ];
+  document.getElementById('dev-spec-table').innerHTML = dsTbl(['Параметр','Значение'], devRows.map(([p, v]) => [p, {html:v, numeric:true}]), ['1.8fr','1fr']);
+  document.getElementById('typo-tbl').innerHTML = dsTbl(['Часть','Образец','Токен','Размер / интерлиньяж'], [
+    ['Подпись (.spin-group__label)', '<span style="font:var(--type-body-s);color:var(--text-secondary);">Сохранение…</span>', '<code>--type-body-s</code>', {html:'14 / 20', numeric:true}],
+    ['Подпись оверлея (.spin-overlay__label)', '<span style="font:var(--type-body-s-strong);color:var(--text-secondary);">Обновление таблицы…</span>', '<code>--type-body-s-strong</code>', {html:'14 / 20', numeric:true}]
+  ], ['1.4fr','1.4fr','1fr','0.8fr']);
+})();
+
+/* ---------- DEV: copy-to-clipboard ---------- */
+(function () {
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try { await navigator.clipboard.writeText(text); }
+      catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Подпись': 'Показывать подпись', 'Подпись снизу': 'Подпись снизу', 'Демо оверлея': 'Показывать демо оверлея' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- голое кольцо -->
+<span class="spin spin--m spin--accent" role="status" aria-label="Загрузка"></span>
+
+<!-- с подписью -->
+<div class="spin-group" role="status">
+  <span class="spin spin--m spin--accent" aria-hidden="true"></span>
+  <span class="spin-group__label">Сохранение…</span>
+</div>
+
+<!-- оверлей — родитель обязан быть position:relative -->
+<div class="spin-overlay" role="status" aria-live="polite">
+  <span class="spin spin--l spin--accent" aria-hidden="true"></span>
+  <span class="spin-overlay__label">Обновление…</span>
+</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function makeSpin(o) {
+  // o: { tone, size:'xs'|'s'|'m'|'l', label?, stack? }
+  // span.spin.spin--<tone>(.spin--<size>) → .spin__arc (анимированный трек)
+  // с подписью: .spin + .spin__label (рядом или снизу — stack)
+}
+function makeOverlay(o) { /* .spin-overlay → затемнение + спиннер по центру */ }
+function makeOverlayCard(o) { /* оверлей с карточкой состояния */ }</script>
+<script type="text/plain" id="src-code-css">/* Spinner — круговой индикатор загрузки неопределённой длительности. Токены — colors.css, radius.css. */
+.spin{display:inline-block;flex:none;box-sizing:border-box;border-radius:var(--radius-circle);border-style:solid;border-color:var(--border-light);border-top-color:var(--primary);animation:spin-rotate .8s linear infinite}
+.spin--xs{width:16px;height:16px;border-width:2px}
+.spin--s{width:20px;height:20px;border-width:2px}
+.spin--m{width:24px;height:24px;border-width:3px}
+.spin--l{width:32px;height:32px;border-width:3px}
+.spin--accent{border-top-color:var(--primary)}
+.spin--success{border-top-color:var(--st-green)}
+.spin--warning{border-top-color:var(--st-orange)}
+.spin--error{border-top-color:var(--st-red)}
+.spin--info{border-top-color:var(--st-lblue)}
+.spin--system{border-top-color:var(--st-system)}
+.spin--inverse{border-color:color-mix(in srgb, var(--text-on-dark) 28%, transparent);border-top-color:var(--text-on-dark)}
+@keyframes spin-rotate{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation-duration:1.6s}}
+
+/* режим currentColor — переиспользуется во встроенных состояниях загрузки других
+   компонентов (Button/IconButton/Toast): кольцо наследует цвет текста хоста вместо
+   тонового индикатора, без отдельного трека. flex:none — эти контексты всегда flex-строка. */
+.spin--current{border:2px solid currentColor;border-top-color:transparent;opacity:.9;flex:none}
+
+/* состав: спиннер + подпись, в строку или столбиком */
+.spin-group{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.spin-group--stack{display:inline-flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.spin-group__label{font:var(--type-body-s);color:var(--text-secondary);min-width:0;overflow-wrap:break-word}
+.spin-group--inverse .spin-group__label{color:var(--text-on-dark)}
+
+/* локальный блокирующий оверлей поверх контента, который сейчас перезагружается.
+   Родитель должен быть position:relative (или иначе создавать контекст позиционирования) —
+   оверлей растягивается на inset:0 родителя, а не всего экрана: это отличает его от
+   полноэкранного --modal-scrim у Modal. z-index — локальный (относительно родителя), не часть
+   глобальной шкалы модалок/тостов/меню. */
+.spin-overlay{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:color-mix(in srgb, var(--bg-page) 82%, transparent);border-radius:inherit}
+.spin-overlay__label{font:var(--type-body-s-strong);color:var(--text-secondary);max-width:90%;text-align:center;overflow-wrap:break-word}</script>
+</body>
+</html>

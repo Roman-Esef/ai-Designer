@@ -1,0 +1,152 @@
+/* =========================================================================
+   Design System — Radiobutton
+   Shape: 20px alignment area (matches Body M line-height) · круглый шейп 16px —
+          готовые SVG-иконки пака System (radio-button-unchecked/checked),
+          currentColor задаёт цвет всей формы.
+   States: unselected · selected
+           ×  default · hover · focus · pressed · disabled · error
+   Label: Body M (SB Sans Text) · Helper: общий компонент подкачки (Body XS),
+   рендерится классом .ds-helper — см. label-helper.css.
+   Requires: typography.css, colors.css, label-helper.css
+   ========================================================================= */
+
+.rb {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.rb--disabled,
+.rb:has(.rb__input:disabled) { cursor: default; pointer-events: none; }
+
+/* visually-hidden native input (keeps it accessible / focusable) */
+.rb__input {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+  margin: 0;
+}
+
+/* 20px alignment box — matches Body M line-height (20px),
+   centers the 16px round mark, leaving the 2px empty area all round. */
+.rb__box {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 16px круглый шейп — готовая иконка пака System (radio-button-unchecked/checked),
+   currentColor управляет цветом всей формы (рамка + точка — единый SVG-путь) */
+.rb__mark {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-circle);
+  box-sizing: border-box;
+  display: flex;
+  overflow: hidden;
+  color: var(--border-dark);
+  transition: color .15s ease, box-shadow .15s ease, outline-color .15s ease;
+}
+.rb__mark :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; transform: scale(1.2); }
+
+/* ---------- selected (иконка radio-button-checked: рамка + точка) ---------
+   Класс — форс-состояние витрины; нативный .rb__input:checked даёт тот же
+   цвет без класса — см. RulesAudit W1. */
+.rb--selected .rb__mark,
+.rb__input:checked ~ .rb__box .rb__mark { color: var(--primary); }
+
+/* ---------- hover --------------------------------------------------------- */
+.rb:hover .rb__mark,
+.rb--hover .rb__mark {
+  color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-bg-light);
+}
+.rb:hover.rb--selected .rb__mark,
+.rb--hover.rb--selected .rb__mark,
+.rb:hover:has(.rb__input:checked) .rb__mark {
+  color: var(--primary-dark);
+}
+
+/* ---------- pressed ------------------------------------------------------- */
+/* a larger state layer halo (Material-style) on press */
+.rb:active .rb__mark,
+.rb--pressed .rb__mark {
+  box-shadow: 0 0 0 6px var(--primary-bg);
+}
+
+/* ---------- focus (keyboard) ---------------------------------------------- */
+.rb__input:focus-visible + .rb__box .rb__mark,
+.rb--focus .rb__mark {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- error / invalid ----------------------------------------------- */
+/* a required group left unselected, or a group that failed validation */
+.rb--error .rb__mark {
+  color: var(--error);
+  box-shadow: none;
+}
+.rb:hover.rb--error .rb__mark,
+.rb--hover.rb--error .rb__mark {
+  color: var(--error-dark);
+  box-shadow: 0 0 0 4px var(--error-bg);
+}
+.rb--error .ds-helper { color: var(--error); }
+
+/* ---------- content (label + helper) -------------------------------------- */
+.rb__content { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rb__label  { font: var(--type-body-m);  color: var(--text-primary); }
+/* Хелпер — общий компонент подкачки (не собственный класс), см. label-helper.css → .ds-helper */
+.rb--no-content .rb__content { display: none; }
+
+/* required marker — asterisk after the label */
+.rb__req { color: var(--error); margin-left: 2px; }
+
+/* ---------- disabled ------------------------------------------------------- */
+.rb--disabled .rb__mark,
+.rb__input:disabled ~ .rb__box .rb__mark { color: var(--disabled); box-shadow: none; }
+.rb--disabled .rb__label,
+.rb--disabled .ds-helper,
+.rb__input:disabled ~ .rb__content .rb__label,
+.rb__input:disabled ~ .rb__content .ds-helper { color: var(--text-inactive); }
+
+/* ---------- group ---------------------------------------------------------
+   Radiobuttons всегда образуют группы. Внутри группы активная (кликабельная)
+   область вытягивается на всю высоту строки; выравнивание всегда по левому краю. */
+.rb-group { display: flex; flex-direction: column; }
+.rb-group__title {
+  font: var(--type-h6-strong);
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.rb-group__items { display: flex; flex-direction: column; }
+.rb-group .rb { padding: 6px 0; }
+.rb-group--indent .rb-group__items { padding-left: 28px; }
+
+/* horizontal layout — используйте, когда пространство по вертикали ограничено */
+.rb-group--horizontal .rb-group__items {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0 24px;
+}
+
+/* group-level error message (Body XS, error color) */
+.rb-group__error {
+  font: var(--type-body-xs);
+  color: var(--error);
+  margin: 6px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.rb-group__error :is(svg,[data-icon]){ width: 14px; height: 14px; flex: none; }

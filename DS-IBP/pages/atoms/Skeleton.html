@@ -1,0 +1,653 @@
+<!-- @dsCard group="Components" name="Skeleton" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skeleton — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/skeleton.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<style>
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:40px; }
+  .badge-proposal { display:inline-block; font: var(--type-button-xs); letter-spacing:.06em; text-transform:uppercase; color: var(--text-secondary); background: var(--c-cgrey-100); border:1px solid var(--border-light); padding:3px 9px; border-radius:999px; margin-left:12px; vertical-align:middle; }
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:380px; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(280px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:54px 44px; display:flex; justify-content:center; width:100%; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary); }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .anat__legend li .t .d { font: var(--type-body-s); color: var(--text-secondary); }
+
+  /* ---------- composition / matrix rows ---------- */
+  .compo-list, .matrix { display:flex; flex-direction:column; gap:22px; }
+  .compo-row, .matrix-row { display:grid; grid-template-columns: 220px 1fr; gap:28px; align-items:center; }
+  @media (max-width:640px){ .compo-row, .matrix-row { grid-template-columns:1fr; } }
+  .compo-row .ch, .matrix-row .rn { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .compo-row .cd, .matrix-row .rd { font: var(--type-body-s); color: var(--text-secondary); margin-top:2px; }
+  .compo-row + .compo-row, .matrix-row + .matrix-row { padding-top:22px; border-top:1px solid var(--border-light); }
+  .matrix-wrap { overflow-x:auto; }
+  .matrix-cell { display:flex; align-items:center; min-height:32px; width:100%; }
+
+  /* card demo (real content vs skeleton) */
+  .demo-card { border:1px solid var(--border-light); border-radius: var(--radius-xl); background:var(--bg-tile); padding:18px 20px; display:flex; align-items:center; gap:14px; width:100%; max-width:320px; }
+  .demo-card__avatar { width:40px; height:40px; border-radius:50%; background:var(--c-swamp-100); color:var(--text-primary); display:flex; align-items:center; justify-content:center; font:var(--type-body-m-strong); flex:none; }
+  .demo-card__body { min-width:0; display:flex; flex-direction:column; gap:6px; }
+  .demo-card__title { font:var(--type-body-m-strong); color:var(--text-primary); }
+  .demo-card__sub { font:var(--type-body-s); color:var(--text-secondary); }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+  .ref-table code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.85em; }
+
+  /* ---------- developer handoff ---------- */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead2 { font: var(--type-body-m-strong); color: var(--text-primary); margin:34px 0 16px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Skeleton">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.001</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Skeleton</h1>
+    <p class="lead">Плейсхолдер загрузки, повторяющий геометрию будущего контента: строка текста (<code class="tok">.sk-line</code>), форма (<code class="tok">.sk-block</code>) и шиммер прямо на существующем элементе (<code class="tok">.sk-surface</code>) с общим шиммером. Показывает структуру раньше данных — макет не прыгает, когда контент приходит.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- WHEN TO USE -->
+  <section class="section" data-screen-label="WhenToUse">
+    <h2>Использование</h2>
+    <p class="desc tight">Используйте Skeleton, когда:</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li>структура будущего контента известна заранее — карточка, строка таблицы, тайл сущности — и важно не дать макету «прыгнуть», когда данные придут;</li>
+      <li>загрузка длится дольше мгновения, но контента достаточно много, чтобы голое кольцо смотрелось потерянным на фоне пустой области;</li>
+      <li>нужно дать пользователю ощущение прогресса чтения интерфейса, а не абстрактного ожидания.</li>
+    </ul>
+    <p class="desc">Не используйте Skeleton для одной мелкой детали (иконка, кнопка) — там достаточно <a class="inl" href="../atoms/Spinner.html">Spinner</a> или состояния <code class="tok">.btn--loading</code>. Не используйте, если структура контента заранее не известна или сильно варьируется от загрузки к загрузке — угаданная геометрия, которая не совпадёт с реальным содержимым, обманывает ожидание сильнее, чем нейтральный Spinner. Для полного блокирования произвольной области — оверлей Spinner, не Skeleton поверх невидимого контента.</p>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Три примитива с общим шиммером: Line — плейсхолдер строки текста, Block — плейсхолдер формы (аватар, миниатюра, иконка), Surface — тот же шиммер прямо на существующем элементе (без замены разметки, размер и радиус — его собственные). Из них собирается любая композиция.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div id="anat-diagram" style="width:100%; max-width:300px;"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Block</span><span class="d"> — ведущая форма: круг (аватар) или прямоугольник (иконка/миниатюра), размер задаёт контекст</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Line — Title</span><span class="d"> — 20px, самая заметная строка (имя, заголовок)</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Line — Body</span><span class="d"> — 16px, основной текст</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Surface</span><span class="d"> — шиммер на реальном элементе (<code class="tok">.sk-surface</code>): ведущая иконка/аватар компонента, содержимое скрыто, свой размер и радиус сохраняются</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Шиммер</span><span class="d"> — движущийся блик поверх сплошной заливки, общий для Line, Block и Surface</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+
+    <div class="subsec" data-screen-label="LineHeight">
+      <h3>Высота строки</h3>
+      <p class="desc">Три высоты приблизительно соответствуют типографической роли строки, которую заменяет плейсхолдер.</p>
+      <div class="panel"><div class="compo-list" id="line-list"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="BlockShape">
+      <h3>Форма блока</h3>
+      <p class="desc">Прямоугольная (по умолчанию), скруглённая (миниатюры/картинки) и круглая (аватар) — размер всегда задаётся контекстом, не компонентом.</p>
+      <div class="panel"><div class="compo-list" id="block-list"></div></div>
+    </div>
+
+    <div class="subsec" data-screen-label="Composition">
+      <h3>Состав</h3>
+      <p class="desc">Отдельная строка, стопка строк (<code class="tok">.sk-group</code>), строка с ведущим блоком (<code class="tok">.sk-row</code>) — по образцу карточки/тайла сущности — и Surface там, где плейсхолдер накладывается прямо на существующий элемент, а не заменяет его.</p>
+      <div class="panel"><div class="compo-list" id="compo-list"></div></div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">У Line — фиксированная шкала высот; ширина всегда задаётся снаружи (<code class="tok">--sk-w</code>). У Block нет собственного размера — он всегда равен размеру реального элемента, который заменяет (аватар 40px, иконка 24px и т.д.). Значения ниже измерены на живом экземпляре.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" id="size-table" style="border:none;border-radius:0;"></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус плейсхолдера задан типом, а не высотой. Подменяя реальный элемент, выбирайте форму, совпадающую с ним.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Line — любая высота</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xs</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Block</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Block Rounded</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xl</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Block Circle</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <ul class="bullets">
+      <li>Skeleton не содержит текста — только геометрию. Ширина строк (<code class="tok">--sk-w</code>) подбирается под ожидаемую длину реального контента.</li>
+      <li>Не делайте все строки одной ширины — набор из разных, слегка случайных ширин (60–100%) читается как текст, а не как решётка одинаковых плашек.</li>
+      <li>Последняя строка абзаца обычно короче остальных (60–75%) — так же, как последняя строка настоящего текста.</li>
+      <li>Skeleton всегда занимает то же место, что займёт реальный контент — не сжимайте и не растягивайте его контейнер отдельно от финальной вёрстки.</li>
+    </ul>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила анимации и замены на реальный контент.</p>
+    <ul class="bullets">
+      <li>Шиммер — движение <code class="tok">background-position</code> слева направо, <code class="tok">1.6s ease infinite</code>; не анимируются <code class="tok">opacity</code>/<code class="tok">transform</code> — это дешевле для рендера и не создаёт лишнего визуального шума.</li>
+      <li>Все элементы Skeleton на экране используют одну и ту же анимацию без задержки — при одновременном монтировании они естественно остаются в одной фазе, синхронизировать вручную не требуется.</li>
+      <li><code class="tok">prefers-reduced-motion</code>: длительность увеличивается вдвое (1.6с → 3.2с), а не отключается — иначе плейсхолдер выглядит как финальная, а не временная поверхность.</li>
+      <li>Реальный контент заменяет Skeleton в том же месте DOM — без сдвига макета; размеры плейсхолдера должны примерно совпадать с размерами будущего содержимого.</li>
+    </ul>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">У самого примитива одно состояние — он показан, пока данные не пришли, и убирается из DOM целиком после загрузки. Ниже — типовой переход на примере карточки.</p>
+    <div class="panel"><div class="matrix" id="matrix"></div></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="Accessibility">
+    <h2>Доступность</h2>
+    <ul class="bullets">
+      <li>Отдельные <code class="tok">.sk-line</code>/<code class="tok">.sk-block</code> несут <code class="tok">aria-hidden="true"</code> — они декоративны и не несут смысла для скринридера.</li>
+      <li>Контейнер, в котором идёт загрузка, несёт <code class="tok">aria-busy="true"</code>; если пользователь не увидит визуальную замену сразу (например, длинный список), добавьте <code class="tok">role="status" aria-live="polite"</code> с текстом-статусом (может быть визуально скрытым).</li>
+      <li>Тон шиммера не меняется — Skeleton всегда нейтрален, он не сообщает об ошибке или успехе (для этого — состояния самого компонента после загрузки).</li>
+      <li>Уважает <code class="tok">prefers-reduced-motion</code> (см. «Поведение»); элементы не интерактивны и не входят в таб-порядок.</li>
+    </ul>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc tight">Не применимо — Skeleton не содержит текста; высоты строк лишь ориентируются на типографическую шкалу (см. «Размеры»).</p>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Один и тот же нейтральный дуэт токенов для Line и Block, независимо от контекста использования — Skeleton не тонируется.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" id="color-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
+    </div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры и поведение как алгоритм — не привязан к стеку.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/skeleton.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" id="dev-spec-table" style="border:none;border-radius:0;"></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/skeleton.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+    <div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Ширины строк — не константа: подмешивать случайный разброс (например,</span>
+<span class="tk-cm">//    60–100% с шагом), чтобы группа строк не выглядела решёткой одинаковых плашек.</span>
+<span class="tk-cm">//    Последняя строка абзаца — короче остальных (60–75%).</span>
+
+<span class="tk-cm">// 2. Skeleton заменяется целиком, одним снимком — не подменяйте отдельные строки</span>
+<span class="tk-cm">//    по мере прихода полей одного и того же объекта: мигание хуже короткого ожидания.</span>
+
+<span class="tk-cm">// 3. Анимируется только background-position (шиммер), не opacity/transform —</span>
+<span class="tk-cm">//    дешевле для рендера при большом числе одновременных плейсхолдеров (таблица).</span>
+
+<span class="tk-cm">// 4. prefers-reduced-motion: animation-duration ×2, не отключение.</span>
+
+<span class="tk-cm">// 5. Контейнер во время загрузки — aria-busy="true"; длинный список/таблица —</span>
+<span class="tk-cm">//    дополнительно role="status" aria-live="polite" с (возможно скрытым) текстом статуса.</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">skLine</code>/<code class="tok">skBlock</code> в коде этой страницы).</p>
+  </section>
+
+  <!-- BACKLOG -->
+  <section class="section" data-screen-label="Proposals">
+    <h2>Бэклог<span class="badge-proposal">Предложение</span></h2>
+    <p class="desc">Компонент закрывает переиспользуемый примитив. Смежная работа, не входящая в эту версию:</p>
+    <ul class="bullets">
+      <li><b>EmptyState</b> — соседняя P2-задача бэклога ДС: что показать, когда данные пришли, но их нет (не путать с загрузкой).</li>
+    </ul>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Skeleton</span>
+    <span>Line (Title/Body/Caption) · Block (Rect/Rounded/Circle) · Group · Row</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите плейсхолдер: тип строки, форма блока, состав — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script>
+function dsTbl(headers, rows, widths) {
+  const w = widths || headers.map(() => '1fr');
+  const grid = ['8px', ...w, '8px'].join(' ');
+  const thCells = headers.map(h => '<div class="th"><span class="th__label">' + h + '</span></div>').join('');
+  const head = '<div class="tbl__row" style="grid-template-columns:' + grid + ';"><div class="th th--separator"></div>' + thCells + '<div class="th th--separator"></div></div>';
+  const body = rows.map(r => {
+    const cells = r.map((c, i) => {
+      const numeric = c && c.numeric;
+      const text = c && typeof c === 'object' ? c.html : c;
+      return '<div class="tc' + (numeric ? ' tc--numbers' : '') + '"><span class="tc__row"><span class="tc__text">' + text + '</span></span></div>';
+    }).join('');
+    return '<div class="tbl__row" style="grid-template-columns:' + grid + ';"><div class="tc tc--separator"></div>' + cells + '<div class="tc tc--separator"></div></div>';
+  }).join('');
+  return head + body;
+}
+/* ================= Skeleton factory ================= */
+function skLine(o = {}) {
+  const { variant = 'body', w = '100%' } = o;
+  const el = document.createElement('span');
+  el.className = 'sk-line' + (variant !== 'body' ? ' sk-line--' + variant : '');
+  el.setAttribute('aria-hidden', 'true');
+  el.style.setProperty('--sk-w', typeof w === 'number' ? w + 'px' : w);
+  return el;
+}
+function skBlock(o = {}) {
+  const { shape = 'rect', w = 40, h = 40 } = o;
+  const el = document.createElement('span');
+  el.className = 'sk-block' + (shape !== 'rect' ? ' sk-block--' + shape : '');
+  el.setAttribute('aria-hidden', 'true');
+  el.style.setProperty('--sk-w', typeof w === 'number' ? w + 'px' : w);
+  el.style.setProperty('--sk-h', typeof h === 'number' ? h + 'px' : h);
+  return el;
+}
+function skGroup(lines) {
+  const g = document.createElement('div'); g.className = 'sk-group';
+  lines.forEach(l => g.appendChild(skLine(l)));
+  return g;
+}
+function skRow(blockOpts, lines) {
+  const row = document.createElement('div'); row.className = 'sk-row'; row.setAttribute('aria-busy', 'true');
+  row.appendChild(skBlock(blockOpts));
+  row.appendChild(skGroup(lines));
+  return row;
+}
+function skSurface(el) {
+  el.classList.add('sk-surface');
+  el.setAttribute('aria-hidden', 'true');
+  return el;
+}
+
+/* ---------- PLAYGROUND ---------- */
+(function () {
+  const state = { mode: 'row' };
+  const controls = document.getElementById('pg-controls');
+  const preview = document.getElementById('pg-preview');
+  const codeEl = document.getElementById('pg-code');
+
+  function select(label, options, getCur, onPick) {
+    const wrap = document.createElement('div'); wrap.className = 'ctl';
+    const l = document.createElement('div'); l.className = 'lbl'; l.textContent = label; wrap.appendChild(l);
+    const box = document.createElement('div'); box.className = 'pg-select';
+    const sel = document.createElement('select');
+    options.forEach(([val, txt]) => { const op = document.createElement('option'); op.value = val; op.textContent = txt; if (val === getCur()) op.selected = true; sel.appendChild(op); });
+    sel.addEventListener('change', () => { onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  controls.appendChild(select('Пример',
+    [['line', 'Одна строка'], ['group', 'Абзац (группа строк)'], ['row', 'Строка с аватаром'], ['card', 'Карточка данных']],
+    () => state.mode, v => state.mode = v));
+
+  const SAMPLES = {
+    line: { build: () => skLine({ variant: 'title', w: '60%' }), code: '<span class="sk-line sk-line--title" style="--sk-w:60%" aria-hidden="true"></span>' },
+    group: { build: () => skGroup([{ variant: 'title', w: '45%' }, { w: '100%' }, { w: '82%' }, { w: '65%' }]), code: '<div class="sk-group">\n  <span class="sk-line sk-line--title" style="--sk-w:45%"></span>\n  <span class="sk-line" style="--sk-w:100%"></span>\n  <span class="sk-line" style="--sk-w:82%"></span>\n  <span class="sk-line" style="--sk-w:65%"></span>\n</div>' },
+    row: { build: () => skRow({ shape: 'circle', w: 40, h: 40 }, [{ variant: 'title', w: '48%' }, { w: '72%' }]), code: '<div class="sk-row" aria-busy="true">\n  <span class="sk-block sk-block--circle" style="--sk-w:40px;--sk-h:40px"></span>\n  <div class="sk-group">\n    <span class="sk-line sk-line--title" style="--sk-w:48%"></span>\n    <span class="sk-line" style="--sk-w:72%"></span>\n  </div>\n</div>' },
+    card: { build: () => {
+      const card = document.createElement('div'); card.className = 'demo-card'; card.setAttribute('aria-busy', 'true');
+      card.appendChild(skBlock({ shape: 'circle', w: 40, h: 40 }));
+      card.appendChild(skGroup([{ variant: 'title', w: '70%' }, { w: '90%' }]));
+      return card;
+    }, code: '<div class="demo-card" aria-busy="true">\n  <span class="sk-block sk-block--circle" style="--sk-w:40px;--sk-h:40px"></span>\n  <div class="sk-group">\n    <span class="sk-line sk-line--title" style="--sk-w:70%"></span>\n    <span class="sk-line" style="--sk-w:90%"></span>\n  </div>\n</div>' },
+  };
+
+  function render() {
+    preview.innerHTML = '';
+    const s = SAMPLES[state.mode];
+    preview.appendChild(s.build());
+    codeEl.innerHTML = '<code>' + s.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code>';
+  }
+  render();
+})();
+
+/* ---------- ANATOMY DIAGRAM ---------- */
+(function () {
+  document.getElementById('anat-diagram').appendChild(skRow({ shape: 'circle', w: 48, h: 48 }, [{ variant: 'title', w: '55%' }, { w: '85%' }]));
+})();
+
+/* ---------- LINE HEIGHT LIST ---------- */
+(function () {
+  const host = document.getElementById('line-list');
+  const defs = [
+    ['Title — 20px', 'Заголовок, имя, самая заметная строка', () => skLine({ variant: 'title', w: '70%' })],
+    ['Body — 16px (по умолчанию)', 'Основной текст, подпись значения', () => skLine({ w: '100%' })],
+    ['Caption — 12px', 'Мета-текст: дата, вторичная подпись', () => skLine({ variant: 'caption', w: '40%' })],
+  ];
+  defs.forEach(([title, desc, build]) => {
+    const row = document.createElement('div'); row.className = 'compo-row';
+    const head = document.createElement('div'); head.innerHTML = '<div class="ch">' + title + '</div><div class="cd">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.className = 'matrix-cell'; cell.appendChild(build());
+    row.appendChild(head); row.appendChild(cell);
+    host.appendChild(row);
+  });
+})();
+
+/* ---------- BLOCK SHAPE LIST ---------- */
+(function () {
+  const host = document.getElementById('block-list');
+  const defs = [
+    ['Rect (по умолчанию)', 'Иконка, миниатюра без скругления, ячейка таблицы', () => skBlock({ w: 40, h: 40 })],
+    ['Rounded', 'Превью изображения, миниатюра файла', () => skBlock({ shape: 'rounded', w: 40, h: 40 })],
+    ['Circle', 'Аватар пользователя/сущности', () => skBlock({ shape: 'circle', w: 40, h: 40 })],
+  ];
+  defs.forEach(([title, desc, build]) => {
+    const row = document.createElement('div'); row.className = 'compo-row';
+    const head = document.createElement('div'); head.innerHTML = '<div class="ch">' + title + '</div><div class="cd">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.className = 'matrix-cell'; cell.appendChild(build());
+    row.appendChild(head); row.appendChild(cell);
+    host.appendChild(row);
+  });
+})();
+
+/* ---------- COMPOSITION LIST ---------- */
+(function () {
+  const host = document.getElementById('compo-list');
+  const defs = [
+    ['Одна строка', 'Значение поля, короткая подпись', () => skLine({ w: '55%' })],
+    ['Группа строк (.sk-group)', 'Абзац — заголовок + 2–3 строки текста убывающей длины', () => skGroup([{ variant: 'title', w: '45%' }, { w: '100%' }, { w: '65%' }])],
+    ['Строка с блоком (.sk-row)', 'Ведущий аватар/иконка + стопка строк — тайл сущности, строка списка', () => skRow({ shape: 'circle', w: 36, h: 36 }, [{ variant: 'title', w: '50%' }, { w: '75%' }])],
+    ['Surface (.sk-surface)', 'Шиммер прямо на реальном элементе — своя форма и размер (лидирующая иконка Entity, аватар без подмены разметки)', () => { const av = document.createElement('div'); av.className = 'demo-card__avatar'; av.style.background = ''; return skSurface(av); }],
+  ];
+  defs.forEach(([title, desc, build]) => {
+    const row = document.createElement('div'); row.className = 'compo-row';
+    const head = document.createElement('div'); head.innerHTML = '<div class="ch">' + title + '</div><div class="cd">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.className = 'matrix-cell'; cell.appendChild(build());
+    row.appendChild(head); row.appendChild(cell);
+    host.appendChild(row);
+  });
+})();
+
+/* ---------- SIZE TABLE ---------- */
+(function () {
+  const rows = [
+    ['Title', '20px', '--radius-xs (4px)', 'Заголовок / имя'],
+    ['Body', '16px', '--radius-xs (4px)', 'Основной текст (по умолчанию)'],
+    ['Caption', '12px', '--radius-xs (4px)', 'Мета-текст'],
+  ];
+  document.getElementById('size-table').innerHTML = dsTbl(['Строка','Высота','Радиус','Роль'], rows.map(([n, h, r, use]) => ['<b>'+n+'</b>', {html:h, numeric:true}, {html:r, numeric:true}, use]), ['1fr','0.8fr','1fr','1.6fr']);
+})();
+
+/* ---------- STATES: card before/after ---------- */
+(function () {
+  const m = document.getElementById('matrix');
+  const rows = [
+    ['Загрузка', 'Skeleton занимает точное место будущей карточки', () => {
+      const c = document.createElement('div'); c.className = 'demo-card'; c.setAttribute('aria-busy', 'true');
+      c.appendChild(skBlock({ shape: 'circle', w: 40, h: 40 }));
+      c.appendChild(skGroup([{ variant: 'title', w: '70%' }, { w: '90%' }]));
+      return c;
+    }],
+    ['Загружено', 'Реальный контент заменяет плейсхолдер в том же месте DOM', () => {
+      const c = document.createElement('div'); c.className = 'demo-card';
+      const av = document.createElement('div'); av.className = 'demo-card__avatar'; av.textContent = 'МК';
+      const body = document.createElement('div'); body.className = 'demo-card__body';
+      body.innerHTML = '<div class="demo-card__title">Мария Ковалёва</div><div class="demo-card__sub">Ведущий аналитик</div>';
+      c.append(av, body);
+      return c;
+    }],
+  ];
+  rows.forEach(([name, desc, build]) => {
+    const row = document.createElement('div'); row.className = 'matrix-row';
+    const rn = document.createElement('div'); rn.innerHTML = '<div class="rn">' + name + '</div><div class="rd">' + desc + '</div>';
+    const cell = document.createElement('div'); cell.style.maxWidth = '340px'; cell.appendChild(build());
+    row.appendChild(rn); row.appendChild(cell);
+    m.appendChild(row);
+  });
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function () {
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue) {
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r, g, b, a = 1, m = v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m) { r = +m[1]*255; g = +m[2]*255; b = +m[3]*255; if (m[4] !== undefined) a = +m[4]; }
+    else { const n = v.match(/[\d.]+/g); if (!n) return cssValue; r = +n[0]; g = +n[1]; b = +n[2]; if (n[3] !== undefined) a = +n[3]; }
+    const hx = n => Math.round(n).toString(16).padStart(2, '0').toUpperCase();
+    let s = '#' + hx(r) + hx(g) + hx(b); if (a < 1) s += ' · ' + Math.round(a * 100) + '%'; return s;
+  }
+  const rows = [
+    ['шиммер', 'база', '--st-disabled-light'],
+    ['шиммер', 'пик волны', '--st-disabled-midlight'],
+  ];
+  document.getElementById('color-table').innerHTML = dsTbl(
+    ['Раздел', 'Роль', 'Токен', 'Образец', 'Hex'],
+    rows.map(([section, role, tok]) => [section, role,
+      '<code class="tok">' + tok + '</code>',
+      '<span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(' + tok + ')"></span>',
+      resolveHex('var(' + tok + ')')]),
+    ['0.7fr', '1.1fr', '1.5fr', '0.7fr', '0.9fr']);
+  probe.remove();
+})();
+
+/* ---------- DEV: redline measured from live component ---------- */
+(function () {
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  const title = skLine({ variant: 'title' }), body = skLine({}), caption = skLine({ variant: 'caption' });
+  const group = skGroup([{ variant: 'title', w: '50%' }, { w: '90%' }]);
+  host.append(title, body, caption, group);
+
+  const px = v => { const n = parseFloat(v); return Number.isNaN(n) ? v : (Math.round(n * 10) / 10) + ' px'; };
+  const D = {
+    title: px(getComputedStyle(title).height),
+    bodyH: px(getComputedStyle(body).height),
+    caption: px(getComputedStyle(caption).height),
+    radius: getComputedStyle(body).borderRadius,
+    groupGap: px(getComputedStyle(group).rowGap || getComputedStyle(group).gap),
+  };
+  host.remove();
+
+  const devRows = [
+    ['Высота строки — Title / Body / Caption', D.title + ' / ' + D.bodyH + ' / ' + D.caption],
+    ['Радиус строки', D.radius],
+    ['Зазор между строками в .sk-group', D.groupGap],
+    ['Длительность цикла шиммера', '1.6s (reduced-motion: 3.2s)'],
+  ];
+  document.getElementById('dev-spec-table').innerHTML = dsTbl(['Параметр','Значение'], devRows.map(([p, v]) => [p, {html:v, numeric:true}]), ['1.8fr','1fr']);
+})();
+
+/* ---------- DEV: copy-to-clipboard ---------- */
+(function () {
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try { await navigator.clipboard.writeText(text); }
+      catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = {};</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- строка -->
+<span class="sk-line sk-line--title" style="--sk-w:60%" aria-hidden="true"></span>
+
+<!-- группа строк (абзац) -->
+<div class="sk-group">
+  <span class="sk-line sk-line--title" style="--sk-w:45%"></span>
+  <span class="sk-line" style="--sk-w:100%"></span>
+  <span class="sk-line" style="--sk-w:65%"></span>
+</div>
+
+<!-- строка с ведущим блоком (аватар + строки) -->
+<div class="sk-row" aria-busy="true">
+  <span class="sk-block sk-block--circle" style="--sk-w:40px;--sk-h:40px"></span>
+  <div class="sk-group">
+    <span class="sk-line sk-line--title" style="--sk-w:48%"></span>
+    <span class="sk-line" style="--sk-w:72%"></span>
+  </div>
+</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function skLine(o) {   // span.sk-line(.sk-line--<variant>) — строка текста (title/subtitle/body)
+  // o: { variant:'body'|'title'|'subtitle', w:'100%'|'60%'|… }
+}
+function skBlock(o) {  // span.sk-block(.sk-block--circle) — блок (иконка/аватар)
+  // o: { shape:'rect'|'circle', w, h }
+}
+function skGroup(lines) { /* .sk-group — колонка линий */ }
+function skRow(blockOpts, lines) { /* .sk-row — блок + колонка линий */ }
+// Скелетон — только анимация shimmer (--sk-anim); форма — .sk-line/.sk-block</script>
+<script type="text/plain" id="src-code-css">/* Skeleton — переиспользуемый плейсхолдер загрузки: Line (текстовая строка), Block (геометрическая форма) и Surface (шиммер прямо на существующем элементе — свой размер/радиус сохраняются) + общий шиммер. Токены — colors.css, radius.css. */
+.sk-line,.sk-block,.sk-surface{background:linear-gradient(90deg, var(--st-disabled-light) 25%, var(--st-disabled-midlight) 37%, var(--st-disabled-light) 63%);background-size:400% 100%;animation:sk-shimmer 1.6s ease infinite}
+.sk-line{display:block;height:var(--sk-h, 16px);width:var(--sk-w, 100%);border-radius:var(--radius-xs)}
+.sk-line--title{height:20px}
+.sk-line--caption{height:12px}
+.sk-block{display:block;width:var(--sk-w, 100%);height:var(--sk-h, 100%);border-radius:var(--radius-s)}
+.sk-block--rounded{border-radius:var(--radius-xl)}
+.sk-block--circle{border-radius:var(--radius-circle)}
+.sk-surface{position:relative;overflow:hidden;color:transparent}
+.sk-surface>*{visibility:hidden}
+@keyframes sk-shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+@media (prefers-reduced-motion: reduce){.sk-line,.sk-block,.sk-surface{animation-duration:3.2s}}
+
+/* композиция: стопка строк / строка с ведущим блоком (аватар/иконка) + строками */
+.sk-group{display:flex;flex-direction:column;gap:8px}
+.sk-row{display:flex;align-items:center;gap:12px}
+.sk-row .sk-group{flex:1;min-width:0}</script>
+</body>
+</html>

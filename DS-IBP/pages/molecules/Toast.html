@@ -1,0 +1,731 @@
+<!-- @dsCard group="Components" name="Toast" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toast — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/toast.css">
+<link rel="stylesheet" href="../../styles/spinner.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:80ch; text-wrap:pretty; }
+  .addon.proposal { color: var(--warning-dark); background: var(--warning-bg); }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:20px; }
+  .row + .row { margin-top: 24px; }
+
+  
+
+  
+
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 30px; }
+  .demo-rowlabel { font: var(--type-body-xs); color: var(--text-inactive); margin-bottom:10px; }
+
+  /* ---------- демо-стадия (docs-split) ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:0; display:flex; align-items:stretch; justify-content:stretch; }
+  .pg__stagebox { width:100%; display:flex; align-items:stretch; justify-content:stretch; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+  .toggles { display:flex; flex-direction:column; gap:9px; }
+  .toggle { display:inline-flex; align-items:center; gap:11px; padding:9px 12px; border:1px solid var(--border-light); border-radius:9px; font: var(--type-body-m); color: var(--text-primary); cursor:pointer; user-select:none; background: var(--bg-tile); transition:.12s; }
+
+  .pg__code { margin-top:14px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- mock work-area surface (контекст для тостов) ---------- */
+  .worksurface { position:relative; overflow:hidden; border-radius:12px; border:1px solid var(--border-light); background: var(--bg-page); min-height:300px; }
+  .worksurface--tall { min-height:340px; }
+  .ws-topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 18px; background: var(--bg-tile); border-bottom:1px solid var(--border-light); }
+  .ws-topbar__title { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .ws-topbar__meta { font: var(--type-body-xs); color: var(--text-inactive); }
+  .ws-rows { padding:14px 18px; display:flex; flex-direction:column; gap:9px; }
+  .ws-row { height:12px; border-radius:var(--radius-xs); background: color-mix(in srgb, var(--c-swamp-400) 14%, transparent); }
+  .ws-row:nth-child(2){ width:92%; } .ws-row:nth-child(3){ width:78%; } .ws-row:nth-child(4){ width:86%; }
+  .ws-row:nth-child(5){ width:70%; } .ws-row:nth-child(6){ width:88%; } .ws-row:nth-child(7){ width:64%; }
+  .ws-cap { font:var(--type-body-xs); color:var(--text-inactive); margin:14px 2px 0; text-wrap:pretty; }
+
+  .replay { display:inline-flex; align-items:center; gap:7px; border:1px solid var(--border-primary); background:var(--bg-tile); color:var(--text-primary); font:var(--type-button-s); border-radius:8px; padding:7px 13px; cursor:pointer; transition:.12s; }
+  .replay:hover { border-color: var(--primary); color: var(--primary); }
+  .replay svg { width:15px; height:15px; }
+  .replay i { display:contents; }
+
+  /* two-column comparison */
+  .cols2 { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:20px; }
+  @media (max-width:680px){ .cols2{ grid-template-columns:1fr; } }
+  .demo-col__title { font: var(--type-h6-strong); color: var(--text-primary); margin:0 0 4px; }
+  .demo-col__sub { font: var(--type-body-s); color: var(--text-secondary); margin:0 0 14px; text-wrap:pretty; }
+
+  /* anatomy */
+  .anat { display:grid; grid-template-columns: minmax(260px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:70px 44px; display:flex; justify-content:center; }
+  .anat-dia { position:relative; }
+  .anat-dia .mk { position:absolute; width:22px; height:22px; border-radius:50%; background:var(--text-primary); color:#fff; font:var(--type-body-xs); font-weight:600; display:flex; align-items:center; justify-content:center; transform:translate(-50%,-50%); z-index:3; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+
+  /* state spec tables */
+  .spec { border:1px solid var(--border-light); border-radius:14px; overflow:hidden; }
+  .spec + .spec { margin-top:16px; }
+  .spec__row { display:grid; grid-template-columns: 210px 260px 1fr; align-items:center; gap:16px; padding:20px; }
+  @media (max-width:820px){ .spec__row{ grid-template-columns:1fr; gap:14px; } }
+  .spec__state small { display:block; font:var(--type-body-s); color:var(--text-secondary); font-weight:400; margin-top:3px; }
+  .spec__cline { display:grid; grid-template-columns: 160px 18px 1fr; align-items:center; gap:10px; font:var(--type-body-s); color:var(--text-secondary); }
+
+  /* reference tables */
+  .ref-table th, .ref-table td { text-align:left; padding:15px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  /* do / don't */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:28px 20px; flex:1; display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; min-height:96px; }
+  .guide-card__cap { padding:0 20px 18px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* color reference */
+  
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* differentiation cards */
+  .diff { display:grid; grid-template-columns: repeat(2, 1fr); gap:18px; }
+  @media (max-width:760px){ .diff { grid-template-columns:1fr; } }
+  .diff__card { border:1px solid var(--border-light); border-radius:14px; padding:22px 22px 24px; background: var(--bg-tile); display:flex; flex-direction:column; gap:14px; }
+  .diff__card h4 { font: var(--type-h6-strong); color: var(--text-primary); margin:0; display:flex; align-items:center; gap:8px; }
+  .diff__card .diff__stage { min-height:120px; border-radius:10px; overflow:hidden; }
+
+  /* ---------- developer code panels ---------- */
+  .code-panel__name { font: var(--type-body-s-strong); color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; }
+
+  .callout { border:1px solid var(--border-light); border-left:3px solid var(--warning); background: var(--warning-bg); border-radius:10px; padding:18px 22px; }
+  .callout p { margin:0; font:var(--type-body-s); color:var(--text-primary); text-wrap:pretty; }
+  .callout p + p { margin-top:8px; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Toast">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <a class="crumb" href="../../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Дизайн-система</a>
+    <div class="meta"><span>Версия: <b>1.006</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Toast</h1>
+    <p class="lead">Тёмная пилюля-уведомление, всплывающая у верхней границы рабочей области по центру, — индикатор запуска <b>фонового</b> или <b>блокирующего</b> процесса. Два режима: <b>ToastBar</b> (фоновый, авто-скрытие, стек до трёх) и <b>ToastLoader</b> (блокирующий, со спиннером и затемнением). Ведущий слот — спиннер или статус-иконка (взаимоисключающие); тоны Neutral · Success · Error · Info.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">Toast сообщает о запуске серверного процесса, результат которого отложен во времени, либо подтверждает инициированное пользователем действие. Он не требует реакции и не содержит действий — только информирует.</p>
+    <div class="panel">
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li><b>Фоновый процесс (ToastBar).</b> На сервере запущен процесс, результат которого придёт позже: «Процесс запущен», «Запущена маршрутизация».</li>
+        <li><b>Подтверждение действия.</b> Индикация того, что действие пользователя принято системой.</li>
+        <li><b>Блокирующий процесс (ToastLoader).</b> На сервере запущен процесс, который блокирует работу системы, — с затемнением и спиннером: «Выполняется маршрутизация».</li>
+        <li><b>Не используем</b> для сообщений, требующих решения или действия пользователя (это модалка / снэкбар с кнопкой), и для постоянных статусов (это Chip / Badge).</li>
+      </ul>
+      <div class="cols2">
+        <div>
+          <p class="demo-col__title">ToastBar — фоновый процесс</p>
+          <p class="demo-col__sub">Слой под снэкбаром, без затемнения. Скрывается сам по таймауту.</p>
+          <div class="worksurface" id="use-bar"></div>
+        </div>
+        <div>
+          <p class="demo-col__title">ToastLoader — блокирующий процесс</p>
+          <p class="demo-col__sub">Слой над снэкбаром, затемнение 25%, спиннер. Скрывается по событию с сервера.</p>
+          <div class="worksurface" id="use-loader"></div>
+        </div>
+      </div>
+    </div>
+  
+<div class="subsec" data-screen-label="BarVsLoader">
+    <h3>ToastBar и ToastLoader — в чём разница</h3>
+    <p class="desc">Один компонент, два режима. Выбор — по тому, блокирует ли процесс работу пользователя.</p>
+    <div class="diff">
+      <div class="diff__card">
+        <h4>ToastBar <span class="addon" style="margin:0;">фоновый</span></h4>
+        <p>Процесс идёт в фоне, система доступна. Слой <b>под</b> снэкбаром, <b>без</b> затемнения. Показывается до трёх штук стеком. Скрывается по таймауту 3&nbsp;сек (без лоадера) или по событию с сервера (с лоадером). Текст — глагол <b>совершенного</b> вида.</p>
+        <div class="diff__stage" id="diff-bar"></div>
+      </div>
+      <div class="diff__card">
+        <h4>ToastLoader <span class="addon" style="margin:0;">блокирующий</span></h4>
+        <p>Процесс блокирует работу системы. Слой <b>над</b> снэкбаром, затемнение <b>25%</b>, спиннер. Одновременно — только один. Если появляется ToastLoader, он <b>замещает весь</b> ToastBar. Скрывается по событию с сервера. Текст — глагол <b>несовершенного</b> вида.</p>
+        <div class="diff__stage" id="diff-loader"></div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Тост — тёмная пилюля с необязательным ведущим слотом (спиннер <b>или</b> статус-иконка — взаимоисключающие) и текстом сообщения. Ведущий слот выровнен по верхней строке текста — при переносе остаётся сверху слева.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div class="anat-dia" id="anat-diagram"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Пилюля (контейнер)</span><span class="d">тёмная плашка StGrey (CGrey_700), радиус 8px, мягкая тень Elevation_2</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Ведущий слот (опционально)</span><span class="d">спиннер (0.7&nbsp;с linear) <b>или</b> статус-иконка (check-circle / alert, тон Success / Error / Info) — 20&nbsp;px, не оба сразу</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Текст сообщения</span><span class="d">белый, SB Sans Text; при переносе выравнивается по левому краю под первой строкой</span></span></li>
+        </ul>
+      </div>
+      <p class="ws-cap">Максимальная ширина тоста — 60% от ширины рабочей области. При её достижении текст переносится на строку ниже и выравнивается с иконкой слева сверху.</p>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Content">
+    <h3>Ведущий слот</h3>
+    <p class="desc">Слева от текста — необязательный слот: спиннер, статус-иконка или ничего. Спиннер и иконка <b>взаимоисключают</b> друг друга — одновременно показывается только одно. Переход «процесс → результат» — это замена спиннера на иконку во времени (см. «Переход Loading → Success»), а не оба глифа сразу.</p>
+    <div class="panel">
+      <div class="cols2" style="gap:26px 20px;">
+        <div><p class="demo-rowlabel">Без слота — просто индикация запуска</p><div id="content-none"></div></div>
+        <div><p class="demo-rowlabel">Спиннер — процесс идёт</p><div id="content-spinner"></div></div>
+        <div><p class="demo-rowlabel">Статус-иконка — результат процесса</p><div id="content-icon"></div></div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- РАЗМЕРЫ -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+  
+<div class="subsec" data-screen-label="Width">
+    <h3>Ширина и перенос текста</h3>
+    <p class="desc">Ширина зависит от контента, высота фиксирована для одной строки. Максимум — <b>60%</b> от ширины рабочей области; при достижении предела текст переносится, а ведущий слот прижимается к верхней строке.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Короткий текст — ширина по контенту</p>
+      <div id="width-short" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Длинный текст — упирается в 60% и переносится (слот сверху слева)</p>
+      <div class="worksurface" id="width-wrap" style="min-height:150px;"></div>
+    </div>
+  </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Один размер, один радиус: не зависит от длины текста и наличия действия.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Плашка тоста</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--toast-radius (--radius-control)</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- TEXTOVKA -->
+  <section class="section" data-screen-label="Textovka">
+    <h2>Контент</h2>
+    <p class="desc">Название короткое и понятное, однозначно описывает суть процесса. Формулируйте так, чтобы вид глагола отражал режим тоста.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad1"></div>
+        <p class="guide-card__cap">ToastBar без лоадера — глагол несовершенного вида читается как «ещё не сделано».</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="guide-good1"></div>
+        <p class="guide-card__cap">ToastBar без лоадера — глагол совершенного вида: действие принято, процесс запущен.</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad2"></span>Не так</div>
+        <div class="guide-card__body" id="guide-bad2"></div>
+        <p class="guide-card__cap">ToastLoader — совершенный вид противоречит идущему процессу.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good2"></span>Так</div>
+        <div class="guide-card__body" id="guide-good2"></div>
+        <p class="guide-card__cap">ToastLoader — глагол несовершенного вида: процесс в моменте.</p>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:20px;">
+      <ul class="bullets">
+        <li><b>ToastBar без лоадера</b> → совершенный вид: «Процесс запущен», «Сделка ООО «Ромашка» маршрутизирована».</li>
+        <li><b>ToastLoader (со спиннером)</b> → несовершенный вид: «Выполняется маршрутизация».</li>
+        <li><b>Success</b> → совершенный вид результата: «Маршрутизация завершена».</li>
+        <li><b>Error</b> → указывает на неуспех прямо: «Не удалось запустить процесс».</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="Stack">
+    <h3>Стек и переполнение</h3>
+    <p class="desc">Тосты добавляются по одному — новый появляется <b>сверху</b>. Одновременно показывается <b>не более трёх</b>. Что происходит с четвёртым при лимите — в исходной документации не описано; ниже — предлагаемое поведение.</p>
+    <div class="panel">
+      <div class="cols2">
+        <div>
+          <p class="demo-col__title">Single</p>
+          <p class="demo-col__sub">Один тост.</p>
+          <div id="stack-single"></div>
+        </div>
+        <div>
+          <p class="demo-col__title">Stack — до трёх</p>
+          <p class="demo-col__sub">Новые добавляются сверху, самый ранний — снизу.</p>
+          <div id="stack-multi"></div>
+        </div>
+      </div>
+      <p class="subhead mt">Переполнение стека</p>
+      <p class="desc tight">Когда в стеке уже три тоста, а приходит четвёртый — он добавляется <b>сверху</b>, а самый ранний (<b>нижний</b>) уходит фейдом вниз (принцип FIFO, «окно» из трёх). Тосты с лоадером не вытесняются по таймауту — они ждут события с сервера, поэтому в очередь на вытеснение попадают только тосты без лоадера.</p>
+      <div class="worksurface worksurface--tall" id="stack-overflow"></div>
+      <div class="row" style="margin-top:16px; gap:12px;">
+        <button class="replay" type="button" id="overflow-add"><i data-icon="add"></i>Добавить тост</button>
+        <button class="replay" type="button" id="overflow-reset"><i data-icon="refresh"></i>Сбросить</button>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Position">
+    <h3>Позиционирование и затемнение</h3>
+    <p class="desc">Тост появляется в отдельном слое, горизонтально — по центру рабочей области, по вертикали — у верхней границы. Вокруг всего компонента — <b>охранное поле 24&nbsp;px</b> (сверху и по бокам), чтобы тост не касался краёв. ToastBar живёт в слое под снэкбаром и <b>не затемняет</b> подложку; ToastLoader — в слое над снэкбаром с затемнением 25%.</p>
+    <div class="panel">
+      <div class="cols2">
+        <div>
+          <p class="demo-col__title">ToastBar — без затемнения</p>
+          <p class="demo-col__sub">Слой с ToastBar не затемняем. Пользователь продолжает работать.</p>
+          <div class="worksurface" id="pos-bar"></div>
+        </div>
+        <div>
+          <p class="demo-col__title">ToastLoader — затемнение 25%</p>
+          <p class="demo-col__sub">Охранное поле 24&nbsp;px, подложка затемнена на 25%.</p>
+          <div class="worksurface" id="pos-loader"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="Animation">
+    <h3>Анимация</h3>
+    <p class="desc">Тосты добавляются в бар по одному — линейной анимацией сверху. Удаляются фейдом вниз. При <code class="tok">prefers-reduced-motion: reduce</code> остаётся только смена прозрачности, спиннер замедляется до 1.6&nbsp;с.</p>
+    <div class="panel">
+      <div class="row" style="gap:16px;">
+        <div id="anim-demo" style="min-width:230px; min-height:44px; display:flex; align-items:center;"></div>
+        <button class="replay" type="button" id="anim-replay"><i data-icon="refresh"></i>Проиграть заново</button>
+      </div>
+    </div>
+  </div>
+  
+<div class="subsec" data-screen-label="Timing">
+    <h3>Тайминги</h3>
+    <p class="desc">Явные значения длительностей и кривых — чтобы поведение было воспроизводимо в коде.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.99fr 0.72fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Событие</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Длительность</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Кривая</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Примечание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="timing-table"></div></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- STATES / TONES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Тост не реагирует на наведение и фокус — он информативный, не интерактивный. «Состояние» здесь — это тон результата процесса. Neutral и Loading были в исходной документации; Success и Error добавлены как недостающие финальные состояния фонового процесса.</p>
+    <div id="state-specs"></div>
+
+    <p class="subhead mt">Переход Loading → Success</p>
+    <p class="desc tight">Тост с лоадером по завершении процесса не исчезает резко: спиннер сменяется галочкой Success, тост держится ещё ~1&nbsp;сек и уходит фейдом вниз. Так пользователь успевает считать результат.</p>
+    <div class="panel">
+      <div class="row" style="gap:16px;">
+        <div id="transition-demo"></div>
+        <button class="replay" type="button" id="transition-replay"><i data-icon="refresh"></i>Проиграть переход</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Тост не фокусируется и не участвует в порядке табуляции — он появляется и исчезает сам. Чтобы скринридер озвучил сообщение, тост объявляется через ARIA live-region.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.63fr 0.86fr 0.72fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Режим / тон</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">role</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">aria-live</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Почему</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="a11y-table"></div></div>
+    </div>
+    <div class="panel" style="margin-top:20px;">
+      <ul class="bullets">
+        <li>Спиннер и статус-иконка декоративны — <code class="tok">aria-hidden="true"</code>; состояние передаёт текст сообщения.</li>
+        <li>Смысл не кодируется одним цветом: Success и Error различаются иконкой (галочка / знак ошибки), а не только тоном.</li>
+        <li>ToastLoader затемняет и блокирует подложку — на время блокировки фокус не должен уходить в задизейбленную область под затемнением.</li>
+        <li>Тост не должен нести критическую информацию, которую нельзя пропустить: он исчезает сам и недоступен после скрытия.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Единственный текстовый слой пилюли набирается гарнитурой <b>SB Sans Text</b>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.76fr 1.03fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.76fr 1.03fr 0.99fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст сообщения (.toast__msg)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Пилюля — тёмный фон <b>StGrey</b> (CGrey_700, #333F48), текст белый (Text_OnDark). Тень — Elevation_2. Статус-иконки берут семантические токены раздела <b>Situative</b> (светлые рампы, читаемые на тёмном фоне): Success — Success_Light (LightGreen_400), Error — Error_Light (Red_200), Info — Info_Light (LightBlue_400). Затемнение ToastLoader — StGrey 25%.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.17fr 1.13fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.17fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-grey</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-grey)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#333F48</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.17fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.17fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Тень</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.17fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статус-иконки (Situative)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Success</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--success-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--success-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#9CCC65</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.17fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статус-иконки (Situative)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E57373</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.17fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Статус-иконки (Situative)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Info</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--info-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--info-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#29B6F6</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.17fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">ToastLoader</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Затемнение (25%)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">color-mix(in</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.17fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Спиннер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Обводка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Страница ДС собрана на чистом CSS + vanilla JS, но всё ниже не привязано к стеку: команда, которая верстает Toast на React, берёт отсюда анатомию, точные размеры, тайминги, тоны и логику слоя/стека.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены через <code class="tok">getComputedStyle()</code> с реального экземпляра — токены ДС из <code class="tok">styles/toast.css</code>, не хардкод.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:36px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 1.17fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен / источник</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить:</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/shadow.css</code>
+      <code class="tok">styles/toast.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Очередь и лимит: одновременно видно не более MAX = 3 тостов.</span>
+<span class="tk-cm">//    ToastBar — стек; ToastLoader — единичный и замещает весь ToastBar.</span>
+MAX = 3
+
+<span class="tk-attr">function</span> pushToast(toast):
+  <span class="tk-attr">if</span> toast.kind == <span class="tk-val">'loader'</span>:            <span class="tk-cm">// блокирующий</span>
+    clearAllBars()                     <span class="tk-cm">// ToastLoader замещает весь ToastBar</span>
+    showScrim(0.25); showLoader(toast) <span class="tk-cm">// затемнение + слой над снэкбаром</span>
+    <span class="tk-attr">return</span>
+  <span class="tk-cm">// bar: новый добавляем СВЕРХУ; при переполнении вытесняем самый ранний (нижний) без лоадера</span>
+  visibleBars.unshift(toast); animateIn(toast)  <span class="tk-cm">// новый сверху, linear</span>
+  <span class="tk-attr">if</span> visibleBars.length &gt; MAX:
+    dismiss(oldestDismissableBar())    <span class="tk-cm">// нижний уходит фейдом вниз, FIFO-окно из трёх</span>
+
+<span class="tk-cm">// 2. Авто-скрытие: тост БЕЗ лоадера — по таймауту 3с; тост С лоадером —</span>
+<span class="tk-cm">//    только по приходящему с сервера событию (успех / ошибка).</span>
+<span class="tk-attr">function</span> onShown(toast):
+  <span class="tk-attr">if</span> !toast.hasLoader: setTimeout(() =&gt; dismiss(toast), 3000)
+
+<span class="tk-cm">// 3. Loader → Success: по событию сервера спиннер меняется на галочку,</span>
+<span class="tk-cm">//    тост держится ~1с и уходит фейдом вниз.</span>
+<span class="tk-attr">function</span> onServerDone(toast, result):
+  toast.setTone(result.ok ? <span class="tk-val">'success'</span> : <span class="tk-val">'error'</span>)
+  toast.swapSpinnerToIcon()
+  setTimeout(() =&gt; dismiss(toast), 1000)
+
+<span class="tk-cm">// 4. dismiss = класс .toast--leave (фейд вниз), удаление узла по animationend.</span>
+<span class="tk-cm">// 5. reduced-motion: только opacity, без translateY; спиннер 1.6с.</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм поверх вашего стека. Рабочий референс — <code class="tok">toast.page.js</code>, функции <code class="tok">makeToast</code>, <code class="tok">playEnterLeave</code> и логика раздела «Стек и переполнение».</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Действие внутри тоста</b> — кнопка отмены/повтора рядом с сообщением — сейчас только текст + спиннер/иконка.</li>
+        <li><b>Прогресс в тосте</b> — процентный индикатор для длительных фоновых операций.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Toast</span>
+    <span>ToastBar / ToastLoader — Neutral / Loading / Success / Error — Single / Stack</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите тост: режим, тон, ведущий слот, текст и показ (single / stack). Превью и код обновляются мгновенно. Кнопка <b>«Проиграть»</b> в превью показывает анимацию появления и скрытия.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/toast.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-notify.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/toast.page.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Режим': 'ToastLoader (блокирующий)', 'Показ': 'Стек (3)' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- Слой: позиционирует стек по центру у верхней границы рабочей области -->
+<div class="toast-layer toast-layer--bar">
+  <div class="toast-stack">
+
+    <!-- Тост с лоадером: role="alert" — процесс, о котором важно узнать сразу -->
+    <div class="toast toast--enter" role="status" aria-live="polite">
+      <span class="toast__lead">
+        <span class="spin spin--current" aria-hidden="true"></span>
+      </span>
+      <span class="toast__msg">Выполняется маршрутизация</span>
+    </div>
+
+    <!-- Success: статус-иконка вместо / после спиннера, тон --success -->
+    <div class="toast toast--success" role="status" aria-live="polite">
+      <span class="toast__lead">
+        <span class="toast__icon" aria-hidden="true"><i data-icon="check-circle"></i></span>
+      </span>
+      <span class="toast__msg">Маршрутизация завершена</span>
+    </div>
+  </div>
+</div>
+
+<!-- ToastLoader — затемняющий слой + слой над снэкбаром -->
+<div class="toast-scrim"></div>
+<div class="toast-layer toast-layer--loader">…</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/toast.page.js)
+// Тост строит общий рантайм: window.DSToast.make({ … }) — стек ≤3, авто-скрытие,
+// loader со скримом, переход loading → success (спиннер → статус-иконка)
+const spec = {
+  kind: 'bar',                       // 'bar' (фоновый) | 'loader' (блокирующий, .toast-scrim)
+  tone: 'neutral',                   // neutral/success/error/info (статус-иконка по тону)
+  lead: 'auto',                      // 'auto' | 'none' | 'spinner' | 'icon'
+  message: 'Процесс запущен',
+  show: 'single'                     // 'single' | 'stack' (до 3)
+};
+// .toast-layer(.--bar|.--loader) > .toast-stack > .toast(.--success/--error/--info)(.--enter/--leave)</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Toast
+   Индикатор запуска фонового / блокирующего процесса. Тёмная «пилюля»,
+   всплывающая по верхней границе рабочей области по центру.
+
+   Роли:      bar (фоновый, авто-скрытие) · loader (блокирующий, затемнение)
+   Ведущий слот: none · spinner (loader) · status icon  (взаимоисключающие)
+   Тоны:      neutral · success · error · info
+   Показ:     single · stack (≤ 3) с переполнением
+
+   Requires: typography.css, colors.css, radius.css
+   (опц. shadow.css для --elevation-2, icons — currentColor SVG)
+   ========================================================================= */
+
+:root {
+  /* геометрия пилюли — токены, а не хардкод */
+  --toast-bg:      var(--st-grey);              /* StGrey · CGrey_700 #333F48         */
+  --toast-fg:      var(--text-on-dark);         /* текст — белый                      */
+  --toast-radius:  var(--radius-control);       /* 8px                                */
+  --toast-pad-y:   11px;
+  --toast-pad-x:   16px;
+  --toast-gap:     8px;                          /* зазор ведущий-слот ↔ текст         */
+  --toast-icon:    16px;                         /* размер иконки / спиннера           */
+  --toast-shadow:  var(--elevation-2);           /* 0 10px 30px rgba(40,50,55,.16)     */
+  --toast-maxw:    60%;                           /* макс. ширина = 60% рабочей области */
+  --toast-guard:   24px;                          /* охранное поле вокруг компонента    */
+
+  --toast-stack-gap: 8px;                         /* зазор между тостами в стеке        */
+  --toast-scrim:  color-mix(in srgb, var(--st-grey) 25%, transparent); /* затемнение 25% */
+
+  /* акцентные тона иконок — семантические токены Situative (светлые рампы) */
+  --toast-icon-success: var(--success-light);    /* LightGreen_400 #9CCC65 */
+  --toast-icon-error:   var(--error-light);      /* Red_200 #E57373        */
+  --toast-icon-info:    var(--info-light);       /* LightBlue_400 #29B6F6  */
+}
+
+/* ---------- базовая пилюля ------------------------------------------------- */
+.toast {
+  display: inline-flex;
+  align-items: flex-start;               /* иконка выравнивается по верхней строке текста */
+  gap: var(--toast-gap);
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--toast-pad-y) var(--toast-pad-x);
+  border-radius: var(--toast-radius);
+  background: var(--toast-bg);
+  color: var(--toast-fg);
+  box-shadow: var(--toast-shadow);
+  font: var(--type-body-s);
+  letter-spacing: 0;
+  text-align: left;
+}
+
+/* ведущий слот — спиннер и/или статус-иконка; выше текста при переносе */
+.toast__lead {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* центрируем слот по высоте первой строки текста.
+     Фолбэк для браузеров без единицы lh: 16/14 — line-height/font-size --type-body-s. */
+  height: calc(1em * 16 / 14);
+  height: 1lh;
+}
+.toast__lead:empty { display: none; }
+
+/* статус-иконка */
+.toast__icon { flex: none; width: var(--toast-icon); height: var(--toast-icon); display: block; color: var(--toast-fg); }
+.toast__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+
+/* сообщение */
+.toast__msg {
+  min-width: 0;
+  color: var(--toast-fg);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- спиннер — общий Spinner: <span class="spin spin--current"> в .toast__lead ------ */
+.toast__lead .spin { width: var(--toast-icon); height: var(--toast-icon); }
+
+/* ---------- тоны статус-иконки --------------------------------------------- */
+.toast--success .toast__icon { color: var(--toast-icon-success); }
+.toast--error   .toast__icon { color: var(--toast-icon-error); }
+.toast--info    .toast__icon { color: var(--toast-icon-info); }
+
+/* ---------- стек тостов ---------------------------------------------------- */
+.toast-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--toast-stack-gap);
+  max-width: var(--toast-maxw);
+}
+.toast-stack > .toast { max-width: 100%; }
+
+/* ---------- анимации ------------------------------------------------------- */
+/* добавляется линейной анимацией сверху */
+@keyframes toast-in  { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+/* удаляется фейдом вниз */
+@keyframes toast-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(12px); } }
+
+.toast--enter { animation: toast-in .18s linear both; }
+.toast--leave { animation: toast-out .2s ease-in both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast--enter { animation: toast-in .18s linear both; }
+  .toast--leave { animation: toast-out .2s ease-in both; }
+  @keyframes toast-in  { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes toast-out { from { opacity: 1; } to { opacity: 0; } }
+}
+
+/* =========================================================================
+   Раскладка слоя: тост позиционируется по верхней границе рабочей области,
+   горизонтально — по центру. Используется внутри position:relative контейнера.
+   ========================================================================= */
+.toast-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  /* охранное поле 24px вокруг всего компонента (сверху и по бокам) */
+  padding: var(--toast-guard);
+  pointer-events: none;              /* тост не перехватывает клики */
+  z-index: 40;
+}
+/* ToastBar — слой ПОД снэкбаром; ToastLoader — слой НАД снэкбаром */
+.toast-layer--bar    { z-index: 40; }
+.toast-layer--loader { z-index: 60; }
+
+/* затемняющий слой для ToastLoader (25%) */
+.toast-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--toast-scrim);
+  z-index: 55;
+  pointer-events: none;
+}</script>
+</body>
+</html>

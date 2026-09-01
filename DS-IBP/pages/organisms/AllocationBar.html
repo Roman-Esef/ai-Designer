@@ -1,0 +1,627 @@
+<!-- @dsCard group="Components" name="AllocationBar" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AllocationBar — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/link.css">
+<link rel="stylesheet" href="../../styles/alert.css">
+<link rel="stylesheet" href="../../styles/tooltip.css">
+<link rel="stylesheet" href="../../styles/allocation-bar.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+.section > p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:76ch;text-wrap:pretty}
+.row{display:flex;flex-wrap:wrap;align-items:flex-start;gap:40px}
+.subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:0 0 16px}
+.subhead.mt{margin-top:34px}
+.code-panel__name{color:rgba(255,255,255,.72);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;letter-spacing:.02em;font-weight:600}
+
+/* playground-контролы (конструктор нижней панели) */
+.ctl{display:flex;flex-direction:column;gap:8px}
+.ctl > .lbl{font:var(--type-body-s-strong);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.05em;font-size:11px}
+
+/* демо-сетки */
+.demo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.demo-grid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:860px){.demo-grid--2{grid-template-columns:1fr}}
+.demo-grid--sizes{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:1180px){.demo-grid--sizes{grid-template-columns:1fr}}
+.demo-grid--sizes .demo{overflow-x:auto}
+.demo{display:flex;flex-direction:column;gap:12px;min-width:0}
+.demo__cap{font:var(--type-body-s-strong);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;font-size:11px;margin:0}
+.demo__note{font:var(--type-body-s);color:var(--text-inactive);margin:0;text-wrap:pretty}
+.demo__box{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-control);padding:16px;min-width:0}
+.demo__box--page{background:var(--bg-page)}
+.cbox{border:1px dashed var(--border-primary);border-radius:var(--radius-control);padding:16px;position:relative;background:var(--bg-tile)}
+.cbox__tag{position:absolute;top:-9px;left:12px;background:var(--bg-tile);padding:0 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--text-inactive)}
+
+/* анатомия */
+.anat{display:grid;grid-template-columns:minmax(320px,1fr) minmax(280px,420px);gap:44px;align-items:start}
+@media (max-width:900px){.anat{grid-template-columns:1fr}}
+.anat__stage{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:14px;padding:32px}
+.anat__legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;counter-reset:a}
+.anat__legend li{display:flex;gap:14px;align-items:flex-start;font:var(--type-body-m);color:var(--text-primary)}
+.anat__legend li .n{counter-increment:a;flex:none;width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font:var(--type-body-s-strong);display:flex;align-items:center;justify-content:center}
+.anat__legend li .n::before{content:counter(a)}
+.anat__legend li .t .k{font:var(--type-body-m-strong);color:var(--text-primary)}
+
+/* таблицы */
+.content-table,.ref-table,.dev-table{width:100%;border-collapse:collapse}
+.content-table th,.content-table td,.ref-table th,.ref-table td,.dev-table th,.dev-table td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--border-light);font:var(--type-body-m);color:var(--text-primary);vertical-align:middle}
+.content-table th,.ref-table th,.dev-table th{font:var(--type-body-s-strong);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;font-size:12px}
+.content-table tr:last-child td,.ref-table tr:last-child td,.dev-table tr:last-child td{border-bottom:none}
+.content-table td.dsc,.ref-table td.dsc{color:var(--text-secondary);font:var(--type-body-s)}
+kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text-primary);background:var(--bgtable-row-focus);border:1px solid var(--border-primary);border-radius:var(--radius-xs);padding:1px 7px}
+.sw{display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle}
+</style>
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="AllocationBar">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage" id="pg-stage"></div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <div class="meta"><span>Версия: <b>1.001</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Организмы</p>
+    <h1>AllocationBar</h1>
+    <p class="lead">Итоговое числовое значение и его разбивка по составляющим: заголовок с суммой, стек-бар распределения и список позиций с долями. Компонент не знает предметной области — «Кредит», «РЕПО» и «Комиссия» приходят снаружи как данные. Служебные состояния собраны из <a class="inl" href="../molecules/Alert.html">Alert</a>, кнопка раскрытия — <a class="inl" href="../atoms/Buttons.html">Button</a> Transparent XS, цвета сегментов — только токены <code class="tok">--chart-*</code> из <a class="inl" href="../foundations/Colors.html">Colors</a>.</p>
+  </header>
+
+  <!-- PLAYGROUND: конструктор переехал во вкладку «Конструктор» нижней панели,
+       демо — в верхнюю панель сплиттера (id="pg-stage", id="pg-controls" ниже) -->
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">AllocationBar отвечает на вопрос «из чего складывается это число». Ставится в <a class="inl" href="Tile.html">Tile</a> на карточке сделки, в тело <a class="inl" href="Modal.html">Modal</a> с финансовыми метриками, в сайдбар детализации. Компонент read-only: не сортирует, не фильтрует и не редактирует значения.</p>
+
+    <div class="demo-grid demo-grid--2" style="margin-bottom:24px;">
+      <div class="demo">
+        <p class="demo__cap">В плитке карточки сделки</p>
+        <div class="demo__box" id="use-tile"></div>
+      </div>
+      <div class="demo">
+        <p class="demo__cap">В модальном окне финансовых метрик</p>
+        <div class="demo__box" id="use-modal"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:20px;">
+      <ul class="rules">
+        <li><b>Когда использовать.</b> Есть одно итоговое число и 1–12 слагаемых, сумма которых имеет смысл: структура обеспечения, состав задолженности, распределение лимита.</li>
+        <li><b>Когда не использовать.</b> Значения не складываются в осмысленный итог (тогда — <a class="inl" href="Entity.html">Entity</a> или список <a class="inl" href="../molecules/ReadOnlyField.html">ReadOnlyField</a>); нужен клик по позиции с переходом в детализацию (оборачивайте компонент, не меняйте его); показателей больше 12 — распределение перестаёт читаться в баре.</li>
+        <li><b>Против <a class="inl" href="../atoms/ProgressBar.html">ProgressBar</a>.</b> ProgressBar показывает <i>одну</i> величину относительно максимума («85% готово»). AllocationBar показывает <i>состав</i> целого: сегменты не соревнуются, а делят 100%.</li>
+        <li><b>Против <a class="inl" href="Tile.html">Tile</a>.</b> Tile — контейнер с шапкой и подложкой; AllocationBar собственного фона не имеет и живёт внутри плитки, модалки или ячейки.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Три обязательных блока по вертикали с зазором 8px: шапка, бар, список. Подвал появляется, только если сумма позиций расходится с итогом.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage" id="anat-stage"></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">.albar-host</span><span class="d"> — хост с <code class="tok">container-type: inline-size</code>. Без него контейнерные запросы не работают и компонент останется в базовой раскладке</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.albar__head</span><span class="d"> — заголовок (+ опц. подзаголовок и иконка предупреждения) слева, итог справа; выравнивание по базовой линии</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.albar__total</span><span class="d"> — итог, Body M Strong; единица измерения (<code class="tok">.albar__unit</code>) — Body XS, цвет <code class="tok">--text-inactive</code></span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.albar__bar</span><span class="d"> — стек-бар 8px, радиус pill, зазор сегментов 2px, трек <code class="tok">--st-grey-light</code>. <code class="tok">role="img"</code> + текстовая сводка в <code class="tok">aria-label</code></span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.albar__row</span><span class="d"> — строка позиции: маркер 8px · название · процент · значение. Числовые колонки выровнены по правому краю, tabular-nums</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">.albar__foot</span><span class="d"> — подвал: Alert ДС при partial (warning) или overflow (error). В штатном случае отсутствует</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Две независимые оси конфигурации: плотность данных (что показываем в строке) и количество позиций.</p>
+
+    <h3>Режимы отображения</h3>
+    <p class="desc tight">Флаги <code class="tok">showPercent</code> и <code class="tok">showProgressBar</code> дают четыре комбинации. По умолчанию включены оба.</p>
+    <div class="demo-grid demo-grid--2" style="margin-bottom:32px;">
+      <div class="demo"><p class="demo__cap">Полный — по умолчанию</p><div class="demo__box" id="var-full"></div><p class="demo__note">Рекомендуемый режим: и доля, и абсолютное значение.</p></div>
+      <div class="demo"><p class="demo__cap">Без процентов</p><div class="demo__box" id="var-no-pct"></div><p class="demo__note">Когда важны рубли, а не доли.</p></div>
+      <div class="demo"><p class="demo__cap">Без бара</p><div class="demo__box" id="var-no-bar"></div><p class="demo__note">Для плотных мест и печати.</p></div>
+      <div class="demo"><p class="demo__cap">Минимальный</p><div class="demo__box" id="var-min"></div><p class="demo__note">Текстовая сводка — ячейка таблицы, узкий сайдбар.</p></div>
+    </div>
+
+    <h3>Количество позиций</h3>
+    <p class="desc tight">Компонент стабилен от 1 до 12 позиций. Свыше <code class="tok">maxVisibleItems</code> (по умолчанию 5) список сворачивается под кнопку «Показать ещё N» — <b>внутреннего скролла у компонента нет</b>: вложенный скролл ломает прокрутку страницы и прячет данные.</p>
+    <div class="demo-grid" style="margin-bottom:20px;">
+      <div class="demo"><p class="demo__cap">1 позиция</p><div class="demo__box" id="var-c1"></div></div>
+      <div class="demo"><p class="demo__cap">2 позиции</p><div class="demo__box" id="var-c2"></div></div>
+      <div class="demo"><p class="demo__cap">3 позиции</p><div class="demo__box" id="var-c3"></div></div>
+      <div class="demo"><p class="demo__cap">5 позиций — граница maxVisibleItems</p><div class="demo__box" id="var-c5"></div></div>
+      <div class="demo"><p class="demo__cap">8 позиций — сворачивание</p><div class="demo__box" id="var-c8"></div><p class="demo__note">В баре отрисованы все восемь сегментов, в списке — первые пять. После раскрытия список не сворачивается обратно в этом сеансе.</p></div>
+    </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc tight">Пропса размера нет. Раскладка определяется <b>шириной контейнера</b> (<code class="tok">@container albar</code>), а не вьюпорта: один и тот же виджет на широком мониторе в узком сайдбаре ведёт себя как на мобильном. Высота бара — <b>всегда 8px</b>, ни на каком брейкпоинте не утончается.</p>
+
+    <div class="demo-grid demo-grid--sizes" style="margin-bottom:24px;">
+      <div class="demo">
+        <p class="demo__cap">Широкий — &gt; 480px (база)</p>
+        <div class="cbox" style="min-width:520px;max-width:520px;"><span class="cbox__tag">container: 520px</span><div id="size-wide"></div></div>
+        <p class="demo__note">Строка в один ряд: название · процент · значение. Итог Body M Strong (16/20), строки Body S (14/16).</p>
+      </div>
+      <div class="demo">
+        <p class="demo__cap">Средний — 320–480px</p>
+        <div class="cbox" style="max-width:400px;"><span class="cbox__tag">container: 400px</span><div id="size-mid"></div></div>
+        <p class="demo__note">Итог Body S Strong (14/16), строки Body XS (12/16); числовые колонки ужимаются до 56 / 80px.</p>
+      </div>
+      <div class="demo">
+        <p class="demo__cap">Узкий — &lt; 320px</p>
+        <div class="cbox" style="max-width:280px;"><span class="cbox__tag">container: 280px</span><div id="size-narrow"></div></div>
+        <p class="demo__note">Колонка процентов скрывается, строка переходит в два ряда: название сверху, значение снизу.</p>
+      </div>
+      <div class="demo">
+        <p class="demo__cap">Очень узкий — &lt; 200px</p>
+        <div class="cbox" style="max-width:190px;"><span class="cbox__tag">container: 190px</span><div id="size-tiny"></div></div>
+        <p class="demo__note">Остаются только заголовок и итог; бар и список скрыты. Ниже 160px компонент использовать нельзя — покажите одно число.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.4fr 1.13fr 2.61fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Брейкпоинт</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Итог</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Строки</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Что меняется</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.4fr 1.13fr 2.61fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">&gt; 480px</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Body M Strong · 16/20</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Body S · 14/16</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Базовая раскладка, % 64px, значение 96px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.4fr 1.13fr 2.61fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">320–480px</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Body S Strong · 14/16</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Body XS · 12/16</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Числовые колонки 56 / 80px</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.4fr 1.13fr 2.61fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">&lt; 320px</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Body S Strong · 14/16</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Body XS · 12/16</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">% скрыт, строка в два ряда, значение — Secondary</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.9fr 1.4fr 1.13fr 2.61fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">&lt; 200px</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Body S Strong · 14/16</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Бар и список скрыты, шапка в колонку</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Пропса размера нет: радиусы одинаковы во всех раскладках контейнера.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Полоса</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px, пилюля</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Строка легенды — стейт-слой</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-xs</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Точка-маркер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Блок «Расчёт»</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Локаль ru-RU через <code class="tok">Intl.NumberFormat</code>: разделитель разрядов — неразрывный пробел, десятичный — запятая. Все числовые колонки — <code class="tok">tabular-nums</code>, чтобы цифры не «прыгали» при обновлении данных.</p>
+
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:24px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.8fr 1.17fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Данные</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Формат</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Пример</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.8fr 1.17fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Итог</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Два знака после запятой</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">1 000 000 000,00</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.8fr 1.17fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Итог, компактный формат</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">format: "compact"</code> — от 10 тыс.</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">1,5 млрд</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.8fr 1.17fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Значение позиции</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Два знака после запятой</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">350 000 000,00</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.8fr 1.17fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Процент</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Всегда два знака</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">35,00%</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.49fr 1.8fr 1.17fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Нет данных</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Длинное тире, цвет Inactive</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+
+    <h3>Переполнение текста</h3>
+    <div class="demo-grid demo-grid--2" style="margin-bottom:24px;">
+      <div class="demo"><p class="demo__cap">Длинный подзаголовок</p><div class="demo__box" id="cnt-long"></div><p class="demo__note">Заголовок и подзаголовок — одна строка с усечением и тултипом по <code>title</code>. Перенос в две строки не используется: ломает вертикальный ритм.</p></div>
+      <div class="demo"><p class="demo__cap">Большое число — компактный формат</p><div class="demo__box" id="cnt-big"></div><p class="demo__note">Свыше 999 999 999 переключайтесь на <code class="tok">format: "compact"</code>, иначе итог вытеснит заголовок.</p></div>
+      <div class="demo"><p class="demo__cap">Смешанные длины названий</p><div class="demo__box" id="cnt-mixed"></div><p class="demo__note">Колонка названий обрезается по доступной ширине и не растягивается под самое длинное значение; числовые колонки остаются на месте.</p></div>
+    </div>
+
+    <h3>Иконографика</h3>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Маркер позиции</b> — круг 8px в цвете сегмента, не иконка. Единственная графика внутри строки.</li>
+        <li><b>Иконка предупреждения в шапке</b> (<code class="tok">.albar__warn</code>) — <code class="tok">alert-triangle-filled</code> 16px в тоне <code class="tok">--warning</code>, между заголовком и итогом; всегда с тултипом, объясняющим причину. Пример — «Просроченная задолженность на сумму 123 млн. руб.».</li>
+        <li><b>Иконки состояний</b> приходят из Alert ДС и отдельно не настраиваются.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BEHAVIOR -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+
+    <h3>Связь бара и списка</h3>
+    <p class="desc tight">Наведение на сегмент подсвечивает свою строку и приглушает остальные до <code class="tok">opacity .4</code> — и наоборот. Переход 150ms ease. Сегменты — decorative graphics, не интерактивные элементы: для клика оборачивайте их в <code class="tok">&lt;button&gt;</code> на уровне продукта.</p>
+    <div class="demo__box" style="max-width:560px;margin-bottom:32px;" id="beh-hover"></div>
+
+    <h3>Минимальная ширина сегмента</h3>
+    <p class="desc tight">Сегмент тоньше 2px неразличим. ResizeObserver добивает каждый ненулевой сегмент до <code class="tok">min-width: 2px</code>, а остаток ширины перераспределяет пропорционально между остальными. Позиция со значением 0 сегмента не получает вовсе, но в списке остаётся.</p>
+    <div class="demo__box" style="max-width:560px;margin-bottom:32px;" id="beh-tiny-seg"></div>
+
+    <h3>Ограниченная высота контейнера</h3>
+    <p class="desc tight">Приоритет при нехватке высоты: <b>итог не обрезается никогда</b> → бар исчезает вторым → строки исчезают первыми.</p>
+    <div class="demo-grid" style="margin-bottom:32px;">
+      <div class="demo"><p class="demo__cap">A — влезает не весь список</p><div class="demo__box" style="height:140px;overflow:hidden;" id="beh-h-a"></div><p class="demo__note">Список уходит под fade-градиент, под ним — ссылка «Ещё N позиций». Скрытые строки остаются доступны скринридеру (<code>mask</code>, не <code>display:none</code>).</p></div>
+      <div class="demo"><p class="demo__cap">B — только шапка и бар</p><div class="demo__box" style="height:70px;overflow:hidden;" id="beh-h-b"></div><p class="demo__note">Детализация скрыта; сводка по позициям доступна тултипом на баре.</p></div>
+      <div class="demo"><p class="demo__cap">C — только шапка</p><div class="demo__box" style="height:48px;overflow:hidden;" id="beh-h-c"></div><p class="demo__note">Ниже 48px компонент использовать нельзя.</p></div>
+    </div>
+
+    <h3>Растяжение</h3>
+    <p class="desc tight">По умолчанию <code class="tok">max-width: 600px</code>. В резиновой сетке включайте <code class="tok">.albar--stretch</code>: бар и шапка занимают всю ширину, а содержимое строк остаётся в окне 600px от левого края — иначе название и значение расходятся по краям и связь между ними теряется.</p>
+    <div class="demo__box demo__box--page" style="margin-bottom:8px;" id="beh-stretch"></div>
+
+    <h3>Динамическое изменение размера</h3>
+    <div class="panel">
+      <ul class="rules">
+        <li>Пересчёт сегментов — через <code class="tok">ResizeObserver</code> на корне компонента, не по <code class="tok">resize</code> окна.</li>
+        <li><b>Структурные</b> изменения (скрытие колонки процентов, переход строки в два ряда) — мгновенно, без transition.</li>
+        <li><b>Размерные</b> (прозрачность сегментов, hover-подсветка) — 150ms ease. При <code class="tok">prefers-reduced-motion</code> анимации и шиммер отключаются.</li>
+        <li>Пока контейнер скрыт (закрытый аккордеон, неактивный таб), ширина равна 0 — пересчёт произойдёт на первом ненулевом ресайзе после раскрытия.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc tight">Пять взаимоисключающих значений <code class="tok">status</code> и три производных от данных признака: <code class="tok">partial</code> (сумма меньше итога), <code class="tok">overflow</code> (больше) и нулевая позиция.</p>
+
+    <div class="demo-grid demo-grid--2" style="margin-bottom:24px;">
+      <div class="demo"><p class="demo__cap">Loaded</p><div class="demo__box" id="st-loaded"></div></div>
+      <div class="demo"><p class="demo__cap">Loading — быстрый (&lt; 3 сек)</p><div class="demo__box" id="st-loading"></div><p class="demo__note">Полный скелетон: итог, бар и три строки. Шиммер 1,4s linear.</p></div>
+      <div class="demo"><p class="demo__cap">Loading — долгий расчёт (≥ 3 сек)</p><div class="demo__box" id="st-loading-slow"></div><p class="demo__note">Скелетон остаётся у итога и бара, вместо строк — плашка «Данные рассчитываются». Пользователь понимает, что ожидание ожидаемо.</p></div>
+      <div class="demo"><p class="demo__cap">Error</p><div class="demo__box" id="st-error"></div><p class="demo__note">Alert Error с кнопкой «Повторить» (Button Outline XS в тоне алерта). Код ошибки и стек в интерфейс не выводим.</p></div>
+      <div class="demo"><p class="demo__cap">Empty</p><div class="demo__box" id="st-empty"></div><p class="demo__note">Итог — прочерк, вместо списка строка «Нет данных» цветом Inactive. Плашка не используется: отсутствие данных — не ошибка.</p></div>
+      <div class="demo"><p class="demo__cap">Partial — сумма меньше итога</p><div class="demo__box" id="st-partial"></div><p class="demo__note">Нераспределённый остаток виден в баре серым сегментом, в подвале — Alert Warning с точной долей.</p></div>
+      <div class="demo"><p class="demo__cap">Overflow — сумма больше итога</p><div class="demo__box" id="st-overflow"></div><p class="demo__note">Бар нормализуется по сумме, подвал — Alert Error: это дефект данных, а не оформления.</p></div>
+      <div class="demo"><p class="demo__cap">Позиция со значением 0</p><div class="demo__box" id="st-zero"></div><p class="demo__note">Строка отображается, сегмента в баре нет. Если <b>все</b> значения нулевые — компонент уходит в Empty.</p></div>
+      <div class="demo"><p class="demo__cap">Предупреждение в шапке</p><div class="demo__box" id="st-warn"></div><p class="demo__note">Признак поверх любого состояния: данные корректны, но требуют внимания.</p></div>
+    </div>
+  </section>
+
+  <!-- A11Y -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <div class="row">
+      <div class="panel" style="flex:1;min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Клавиатура</p>
+        <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.03fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Tab</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Фокус получают только кнопка «Показать ещё» и кнопки внутри Alert. Строки и сегменты из таб-порядка исключены — компонент read-only</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.03fr 3.4fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>Enter</kbd> / <kbd>Space</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Раскрывает свёрнутый список или запускает повтор загрузки</span></span></div><div class="tc tc--separator"></div></div></div>
+      </div>
+      <div class="panel" style="flex:1;min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Скринридер и цвет</p>
+        <ul class="bullets">
+          <li>бар — <code class="tok">role="img"</code> с <code class="tok">aria-label</code>, перечисляющим все позиции и доли;</li>
+          <li>доля никогда не кодируется только цветом — рядом с маркером всегда название и число;</li>
+          <li>строки под fade-градиентом скрыты маской, а не <code class="tok">display: none</code>, и остаются в дереве доступности;</li>
+          <li>Alert подвала наследует <code class="tok">role="alert"</code> / <code class="tok">aria-live</code> от тона (error и warning — assertive);</li>
+          <li>усечённые заголовок и название позиции дублируются в <code>title</code>;</li>
+          <li>кнопка «Показать ещё» — минимум 44×44px по тач-таргету в любом контейнере.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Весь текст — SB Sans Text. Собственных размеров компонент не вводит, значения ниже — базовый брейкпоинт (&gt; 480px).</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.9fr 1.35fr 1.17fr 1.08fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Цвет</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.9fr 1.35fr 1.17fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок (.albar__label)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.9fr 1.35fr 1.17fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Подзаголовок (.albar__sublabel)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.9fr 1.35fr 1.17fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Итог (.albar__total)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m-strong)">1 279,00</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.9fr 1.35fr 1.17fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Единица (.albar__unit)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">руб.</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.9fr 1.35fr 1.17fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Название позиции (.albar__name)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Кредит</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.9fr 1.35fr 1.17fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Процент (.albar__pct)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">35,00%</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.9fr 1.35fr 1.17fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Значение (.albar__val)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">350 000 000,00</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.89fr 1.35fr 0.9fr 1.35fr 1.17fr 1.08fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Пустое состояние (.albar__empty)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Нет данных</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc tight">Сегменты и маркеры — только палитра <code class="tok">--chart-*</code> (12 токенов, Local в <code class="tok">colors.css</code>). Цвет назначается по индексу позиции в порядке ниже; палитра <b>не циклится</b> — с 13-й позиции объединяйте остаток в одну виртуальную позицию «Прочее». Если для сущности важна консистентность между экранами, передавайте токен явно.</p>
+
+    <div class="demo__box" style="max-width:560px;margin-bottom:24px;" id="col-all"></div>
+
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:24px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">01</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-red</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-red)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#F99290</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">02</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-orange</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-orange)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#F9A580</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">03</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-yellow</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-yellow)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFD081</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">04</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-shiny-green</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-shiny-green)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#8CCB5E</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">05</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-pastel-green</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-pastel-green)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#76E385</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">06</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-turquoise</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-turquoise)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#31D4A8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">07</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-light-blue</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-light-blue)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#7DCAFA</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">08</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-blue</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-blue)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#5B9CFA</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">09</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-indigo</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-indigo)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#8D87F9</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">10</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-purple</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-purple)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#CB88F8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">11</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-pale-purple</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-pale-purple)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#F58BD8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Палитра сегментов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-pink-purple</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-pink-purple)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#EC7390</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Бар</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек (пустая часть)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-grey-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--st-grey-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #333F48</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Бар</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Нераспределённый остаток</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-grey-midlight</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--st-grey-midlight)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">32% #333F48</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Строка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон при наведении</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bgtable-row-hover</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--bgtable-row-hover)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Swamp A400</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Служебное</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Плашка «Данные рассчитываются»</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-page</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--bg-page)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#F5F7F7</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Служебное</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Скелетон — база / блик</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-cgrey-100</code> / <code class="tok">--c-cgrey-50</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--c-cgrey-100)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E8EDED / #FBFBFB</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.22fr 1.8fr 1.71fr 0.77fr 1.22fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Служебное</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Иконка предупреждения</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--warning</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--warning)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Amber</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+
+    <h3>Доменный маппинг продукта</h3>
+    <p class="desc tight">В финансовых метриках сделки за каждой позицией закреплён свой токен — цвет «Кредита» одинаков во всех виджетах. Это прикладное соглашение, а не правило ДС: компонент принимает токен через <code class="tok">items[].color</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Позиция</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Код</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Кредит</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>LOAN</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-indigo</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-indigo)"></span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фондирующий кредит</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>LOAN_LIABILITY</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-pastel-green</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-pastel-green)"></span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Внутригрупповой кредит</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>INTRA_GROUP_LOAN</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-blue</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-blue)"></span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">РЕПО</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>REPO</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-light-blue</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-light-blue)"></span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Акции</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>SHARES</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-shiny-green</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-shiny-green)"></span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Облигации</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>BONDS</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-turquoise</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-turquoise)"></span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Корп. контроль</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>CORPORATE_CONTROL</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-red</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-red)"></span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Доп. доходность</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>ADD_INCOME</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-orange</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-orange)"></span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Комиссия</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>COMMISSION</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-yellow</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-yellow)"></span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.58fr 1.31fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Дебиторская задолженность</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>ACCOUNTS_RECEIVABLE</code></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--chart-purple</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--chart-purple)"></span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </section>
+
+  <!-- DEV -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры и алгоритмы. Не привязан к стеку.</p>
+
+    <p class="subhead">Точные размеры (redline) <span class="req">— измерено на живом экземпляре через getComputedStyle</span></p>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.84fr 0.81fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-redline"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить:</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/allocation-bar.css</code>
+      <code class="tok">styles/alert.css</code>
+      <code class="tok">styles/button.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+    <div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Ветвление по состоянию — до любых расчётов.
+//    Ветки взаимоисключающие, не оверлеи поверх loaded.
+if status == 'loading'                      -> скелетон (fast) | скелетон + плашка расчёта (slow)
+if status == 'error'                        -> шапка без итога + Alert error + «Повторить»
+if status == 'empty' or items пуст
+   or все items[].value == 0                -> шапка, итог = '—', строка «Нет данных»
+else                                        -> обычный рендер</span>
+
+<span class="tk-cm">// 2. Нормализация позиций и назначение цвета.</span>
+for i, it in items:
+  it.percent = it.percent ?? (total > 0 ? it.value / total * 100 : 0)
+  it.color   = it.color   ?? PALETTE[i]        <span class="tk-cm">// 12 токенов --chart-*, без цикла</span>
+sum = Σ it.percent
+partial  = sum &lt; 99.5      <span class="tk-cm">// подвал Alert warning + серый сегмент остатка</span>
+overflow = sum &gt; 100.5     <span class="tk-cm">// подвал Alert error, бар нормализуется по sum</span>
+
+<span class="tk-cm">// 3. Минимальная ширина сегмента (после каждого ресайза, через ResizeObserver
+//    на корне; дебаунс кадром requestAnimationFrame).</span>
+w = ширина бара; MIN = 2px
+для сегментов, чья доля * w &lt; MIN:  flexBasis = MIN; flexGrow = 0
+остальным: flexGrow = (доля / доля_остальных) * (w − MIN * количество_добитых)
+
+<span class="tk-cm">// 4. Двунаправленная подсветка.</span>
+onEnter(node):  root.dataset.hover = node.id            <span class="tk-cm">// CSS гасит всё до .4</span>
+                строка и сегмент с этим id -> .is-active <span class="tk-cm">// возвращает 1</span>
+onLeave():      удалить root.dataset.hover
+
+<span class="tk-cm">// 5. Сворачивание списка.</span>
+collapsed = items.length &gt; maxVisibleItems (5) and not expanded
+в баре отрисованы ВСЕ сегменты, в списке — первые maxVisibleItems
+клик по «Показать ещё N» -> expanded = true (обратно в этом сеансе не сворачивается)</code></pre>
+    </div>
+    <p class="dev-note">Рабочий референс на vanilla JS — <code class="tok">window.AllocationBar.make(cfg)</code> в <code class="tok">scripts/allocation-bar.page.js</code>. Форматтеры <code class="tok">fmtNumber</code> / <code class="tok">fmtPercent</code> / <code class="tok">fmtCompact</code> экспортируются оттуда же.</p>
+  </section>
+
+  <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Позиция «Прочее»</b> — готовая свёртка 13-й и далее позиций в одну виртуальную с тултипом-расшифровкой. Сейчас это правило описано, но лежит на стороне продукта.</li>
+        <li><b>Сравнение с предыдущим периодом</b> — дельта рядом с итогом (<code>+234 567,89</code>), как в блоке «Переоценка по PE» в продукте.</li>
+        <li><b>Кликабельные позиции</b> — опциональный drill-down: строка как <code>&lt;button&gt;</code> с состояниями hover/focus, без изменения read-only-дефолта.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · AllocationBar</span>
+    <span>Итог + стек-бар + список позиций · 12 токенов палитры · контейнерные брейкпоинты 480 / 320 / 200</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите разбивку: количество позиций, ширина контейнера, состояние и соотношение суммы позиций с итогом. Ширина контейнера — главный параметр: от неё зависит вся раскладка. Демо обновляется наверху, панель настроек — две колонки.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка и исходники AllocationBar: HTML — из спеки, CSS — styles/allocation-bar.css (полностью), JS — публичное API <code class="tok">window.AllocationBar</code>. Полный исходник JS живёт в <code class="tok">scripts/allocation-bar.page.js</code>.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/allocation-bar.page.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+
+<!-- самодостаточные подписи свитчеров конструктора (общий слой docs-split.js) -->
+<script>
+window.DS_SPLIT_SWITCH_LABELS = {
+  'Проценты':              'Показывать проценты',
+  'Прогресс-бар':          'Показывать прогресс-бар',
+  'Иконка предупреждения': 'Показывать иконку предупреждения'
+};
+</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html"><div class="albar-host">
+  <div class="albar">
+    <div class="albar__head">
+      <div class="albar__titles">
+        <div class="albar__label">ВБС по сделке на 25.02.2026, руб.</div>
+        <div class="albar__sublabel">опционально</div>
+      </div>
+      <span class="albar__warn" title="Просроченная задолженность"><i data-icon="alert-triangle-filled"></i></span>
+      <div class="albar__total"><span>1 000 000 000,00</span><span class="albar__unit">руб.</span></div>
+    </div>
+    <div class="albar__bar" role="img" aria-label="Распределение: Кредит 35,00%, …">
+      <div class="albar__seg" data-id="kr" style="background:var(--chart-indigo);flex-grow:35"></div>
+      <div class="albar__seg albar__seg--rest" style="flex-grow:5"></div>
+    </div>
+    <div class="albar__list">
+      <div class="albar__row" data-id="kr">
+        <span class="albar__dot" style="background:var(--chart-indigo)"></span>
+        <span class="albar__name">Кредит</span>
+        <span class="albar__pct">35,00%</span>
+        <span class="albar__val">350 000 000,00</span>
+      </div>
+    </div>
+    <button class="btn btn--transparent btn--xs albar__more"><span class="btn__label">Показать ещё 3</span></button>
+    <div class="albar__foot"><div class="alert alert--warning alert--m">…</div></div>
+  </div>
+</div></script>
+
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   AllocationBar — итог + стек-бар распределения + список позиций.
+   Адаптив — контейнерные запросы: компонент знает ширину СВОЕГО контейнера.
+   Хост .albar-host обязан быть container-type: inline-size.
+   ========================================================================= */
+
+.albar-host{container-type:inline-size;container-name:albar}
+
+.albar{display:flex;flex-direction:column;gap:8px;max-width:var(--albar-max-w,600px);font:var(--type-body-s);color:var(--text-primary);font-variant-numeric:tabular-nums}
+
+/* ---------- шапка ---------- */
+.albar__head{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.albar__titles{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
+.albar__label{font:var(--type-body-xs);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.albar__sublabel{font:var(--type-body-xs);color:var(--text-inactive);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.albar__total{display:flex;align-items:baseline;gap:4px;flex:0 0 auto;white-space:nowrap;font:var(--type-body-m-strong);color:var(--text-primary)}
+.albar__unit{font:var(--type-body-xs);color:var(--text-inactive)}
+.albar__total--empty{font:var(--type-body-m);color:var(--text-inactive)}
+.albar__warn{display:inline-flex;align-items:center;align-self:center;flex:0 0 auto;color:var(--warning)}
+.albar__warn :is(svg,[data-icon]){width:16px;height:16px}
+
+/* ---------- бар ---------- */
+.albar__bar{display:flex;gap:2px;height:8px;min-height:8px;border-radius:var(--radius-pill);overflow:hidden;background:var(--st-grey-light)}
+.albar__seg{height:100%;flex:0 0 0;min-width:2px;transition:opacity .15s ease}
+.albar__seg--rest{background:var(--st-grey-midlight)}
+
+/* ---------- список позиций ---------- */
+.albar__list{display:flex;flex-direction:column}
+.albar__row{display:grid;grid-template-columns:8px 1fr auto auto;align-items:center;gap:8px;min-height:24px;padding:2px 0;border-radius:var(--radius-xs)}
+.albar__dot{width:8px;height:8px;border-radius:var(--radius-round);justify-self:center}
+.albar__name{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.albar__pct{min-width:64px;text-align:right;color:var(--text-secondary)}
+.albar__val{min-width:96px;text-align:right;color:var(--text-primary)}
+.albar__row:hover{background:var(--bgtable-row-hover)}
+.albar__more{align-self:flex-start;margin-top:4px}
+
+/* двунаправленная связь строка ↔ сегмент */
+.albar[data-hover] .albar__seg,.albar[data-hover] .albar__row{opacity:.4}
+.albar[data-hover] .albar__seg.is-active,.albar[data-hover] .albar__row.is-active{opacity:1}
+
+/* ---------- служебные состояния ---------- */
+.albar__empty{font:var(--type-body-s);color:var(--text-inactive)}
+.albar__calc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 16px;border-radius:var(--radius-control);background:var(--bg-page);text-align:center}
+.albar__calc-title{font:var(--type-body-s);color:var(--text-primary)}
+.albar__calc-sub{font:var(--type-body-xs);color:var(--text-secondary)}
+.albar__foot .alert{width:100%}
+
+/* скелетон загрузки */
+.albar__sk{background:linear-gradient(90deg,var(--c-cgrey-100) 0%,var(--c-cgrey-50) 50%,var(--c-cgrey-100) 100%);background-size:200% 100%;border-radius:var(--radius-xs);animation:albar-shimmer 1.4s linear infinite}
+@keyframes albar-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.albar__sk--total{width:96px;height:16px}
+.albar__sk--bar{height:8px;border-radius:var(--radius-pill)}
+.albar__sk--name{height:12px;width:56%}
+.albar__sk--num{height:12px;width:96px;justify-self:end}
+.albar__row--sk{grid-template-columns:8px 1fr auto;pointer-events:none}
+.albar__dot--sk{background:var(--c-cgrey-100)}
+@media (prefers-reduced-motion:reduce){.albar__sk{animation:none}.albar__seg{transition:none}}
+
+/* ---------- контейнерные запросы ---------- */
+/* Средний — 320–480px: компактнее шрифты и числовые колонки */
+@container albar (max-width:480px){
+  .albar{font:var(--type-body-xs)}
+  .albar__total{font:var(--type-body-s-strong)}
+  .albar__total--empty{font:var(--type-body-s)}
+  .albar__pct{min-width:56px}
+  .albar__val{min-width:80px}
+}
+/* Узкий — <320px: колонка процентов скрыта, строка в два ряда */
+@container albar (max-width:320px){
+  .albar__row{grid-template-columns:8px 1fr;grid-template-rows:auto auto;row-gap:2px;padding:6px 0}
+  .albar__name{grid-column:2;grid-row:1}
+  .albar__pct{display:none}
+  .albar__val{grid-column:2;grid-row:2;min-width:0;text-align:left;color:var(--text-secondary)}
+  .albar__row--sk{grid-template-columns:8px 1fr}
+  .albar__sk--num{width:72px;justify-self:start}
+}
+/* Очень узкий — <200px: только шапка + триггер разворота */
+@container albar (max-width:200px){
+  .albar__bar,.albar__list,.albar__foot{display:none}
+  .albar__head{flex-direction:column;align-items:stretch;gap:4px}
+  .albar__expand{display:inline-flex}
+}
+.albar__expand{display:none;align-self:flex-start}
+
+/* ---------- ограничение по высоте ---------- */
+.albar-host[data-height]{position:relative;overflow:hidden}
+.albar-host[data-height] .albar{height:100%}
+/* A — влезает не весь список: fade + ссылка «Ещё N» */
+.albar-host[data-height="A"] .albar__list{overflow:hidden;mask-image:linear-gradient(to bottom,#000 68%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,#000 68%,transparent 100%)}
+/* B — влезают только шапка и бар */
+.albar-host[data-height="B"] .albar__list,.albar-host[data-height="B"] .albar__foot{display:none}
+/* C — влезает только шапка */
+.albar-host[data-height="C"] .albar__list,.albar-host[data-height="C"] .albar__bar,.albar-host[data-height="C"] .albar__foot{display:none}
+
+/* ---------- растяжение ---------- */
+.albar--stretch{max-width:none}
+.albar--stretch .albar__row{padding-right:max(0px,calc(100% - 600px))}
+
+/* ---------- печать ---------- */
+@media print{.albar__bar{display:none!important}.albar__more{display:none!important}.albar__row{break-inside:avoid}}</script>
+
+<script type="text/plain" id="src-code-js">/* AllocationBar — публичное API (полный исходник: scripts/allocation-bar.page.js) */
+window.AllocationBar = {
+  make: make,           /* (cfg) → DOM-узел .albar-host */
+  palette: PALETTE,     /* 12 токенов --chart-* в порядке назначения */
+  fmtNumber: fmtNumber, /* ru-RU, 2 знака */
+  fmtPercent: fmtPercent,
+  fmtCompact: fmtCompact
+};
+
+/* Пример использования */
+var host = AllocationBar.make({
+  label: 'ВБС по сделке на 25.02.2026, руб.',
+  total: 1000000000,
+  items: [
+    { label: 'Кредит', value: 600000000, percent: 60, color: '--chart-indigo' },
+    { label: 'Акции',  value: 400000000, percent: 40, color: '--chart-shiny-green' }
+  ],
+  showPercent: true,
+  showProgressBar: true,
+  maxVisibleItems: 5
+});
+document.body.appendChild(host);</script>
+
+</body>
+</html>

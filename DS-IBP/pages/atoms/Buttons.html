@@ -1,0 +1,1235 @@
+<!-- @dsCard group="Components" name="Buttons" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Button — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/spinner.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:70ch; text-wrap:pretty; }
+
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:20px; }
+  .row + .row { margin-top: 22px; }
+
+  .label { font: var(--type-body-s); color: var(--text-inactive); margin:0 0 14px; }
+
+  /* sizes spec */
+  .size-item { display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
+  .size-tag { font: var(--type-body-s-strong); color: var(--text-secondary); }
+  .size-tag span { color: var(--text-inactive); font: var(--type-body-s); }
+  .sizes { display:flex; gap:48px; flex-wrap:wrap; align-items:flex-end; }
+
+  /* padding spec table */
+  .spec-table { width:100%; border-collapse:collapse; }
+  .spec-table th, .spec-table td { text-align:left; padding:14px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); }
+  .spec-table th { font: var(--type-body-s-strong); color: var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; font-size:12px; }
+  .spec-table td.num { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+  .spec-table tr:last-child td { border-bottom:none; }
+  .spec-table .px { color: var(--text-inactive); font-size:13px; }
+
+  /* inline token chip */
+
+  /* reference table (typography) */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+  .ref-table .rt-size { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .ref-table .rt-sample { color: var(--text-primary); }
+
+  /* color reference — grouped cards */
+  
+  @media (max-width:900px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw.alpha::before { content:""; position:absolute; inset:0; z-index:0;
+    background-image:
+      linear-gradient(45deg,#d9e0e0 25%,transparent 25%),linear-gradient(-45deg,#d9e0e0 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#d9e0e0 75%),linear-gradient(-45deg,transparent 75%,#d9e0e0 75%);
+    background-size:8px 8px; background-position:0 0,0 4px,4px -4px,-4px 0; }
+  .cref-sw .cf { position:absolute; inset:0; z-index:1; }
+
+  /* states matrix */
+  .matrix { display:grid; grid-template-columns: 150px repeat(4, 1fr); gap:18px 20px; align-items:center; }
+  .matrix .col-head { font: var(--type-body-m); color: var(--text-secondary); text-align:left; }
+  .matrix .grouphdr { grid-column:1 / -1; font: var(--type-h6-strong); color: var(--text-primary); margin-top:10px; }
+  .matrix .rowname.sub { font: var(--type-body-m); color: var(--text-secondary); }
+  .matrix .cell { display:flex; }
+
+  /* fullwidth demo */
+  .fw-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; }
+  @media (max-width:760px){ .fw-grid{ grid-template-columns:1fr; } }
+
+  /* big grid (legacy) */
+  .grid-wrap { overflow-x:auto; padding-bottom:8px; }
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:460px; display:flex; align-items:center; justify-content:center; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* select control (used when options don't fit one segmented row) */
+
+  /* chevron dropdown menu */
+  .dropdown { position:relative; display:inline-flex; }
+  .dropdown .btn__chevron { transition: transform .15s ease; }
+  .dropdown.is-open .btn__chevron { transform: rotate(180deg); }
+  .dropdown__menu {
+    position:absolute; top:calc(100% + 6px); left:0; z-index:30;
+    min-width:200px; padding:6px;
+    background: var(--bg-popup); border:1px solid var(--border-light); border-radius:11px;
+    box-shadow:0 10px 30px rgba(40,50,55,.16);
+  }
+  .dropdown__menu[hidden] { display:none; }
+  .dropdown--right .dropdown__menu { left:auto; right:0; }
+  .dropdown__item {
+    display:flex; align-items:center; gap:10px; width:100%;
+    padding:9px 12px; border:none; background:transparent; border-radius:7px;
+    font: var(--type-body-m); color: var(--text-primary); cursor:pointer; text-align:left;
+  }
+  .dropdown__item svg { width:18px; height:18px; color: var(--text-secondary); flex:none; }
+  .dropdown__item:hover { background: var(--bgtable-row-hover); }
+  .dropdown__item:active { background: var(--bgtable-row-focus); }
+  .typecols { display:grid; grid-template-columns: 44px repeat(3, auto); gap:0 56px; min-width:min-content; }
+  .typecols .th { font: var(--type-h5-strong); color: var(--text-primary); padding:0 0 20px; }
+  .typecols .sz { display:flex; align-items:center; justify-content:center; }
+  .typecols .sz .badge { font: var(--type-body-s-strong); color: var(--text-primary); background: var(--tertiary); padding:6px 9px; border-radius:6px; letter-spacing:.05em; }
+  .tone-grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:18px 20px; align-items:center; }
+  .tone-grid__head { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.04em; font-size:11px; }
+  .tone-grid__cell { display:flex; }
+  @media (max-width:820px){ .tone-grid { grid-template-columns: repeat(5, minmax(120px,1fr)); overflow-x:auto; } }
+  .stack { display:flex; flex-direction:column; gap:10px; padding:14px 0 26px; }
+  .stack .pair { display:flex; gap:10px; align-items:center; }
+
+  /* loader demo */
+  .loader-demo { display:flex; flex-direction:column; gap:18px; }
+  .loader-demo .lrow { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .loader-demo .lrow .tag { font: var(--type-body-s); color: var(--text-inactive); width:140px; }
+  .hint { font: var(--type-body-s); color: var(--text-inactive); margin-top:14px; }
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 30px; }
+
+  /* content rules list */
+  .rules { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:12px; }
+  .rules li { font: var(--type-body-m); color: var(--text-primary); padding-left:26px; position:relative; text-wrap:pretty; }
+  .rules li::before { content:""; position:absolute; left:2px; top:9px; width:7px; height:7px; border-radius:50%; background: var(--primary); }
+  .rules li b { color: var(--text-primary); }
+
+  /* ---------- developer handoff ---------- */
+  .code-panel__name { font: var(--type-body-s-strong); color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; }
+
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Button">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.011</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Button</h1>
+    <p class="lead">Кнопка инициирует действие. Три типа, три размера, состояния Default / Hover / Active / Disabled, лоадер и режим Fullwidth. Модификатор Тон (<code class="tok">--error</code> / <code class="tok">--warning</code> / <code class="tok">--success</code> / <code class="tok">--info</code>) комбинируется с любым типом — Error для деструктивных действий (диалог подтверждения удаления), остальные тоны переиспользуются в Alert и SnackBar. Текст кнопок набран токенами Button&nbsp;M&nbsp;/&nbsp;S&nbsp;/&nbsp;XS (SB Sans Screen).</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND (interactive — always first) -->
+  
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">Тип кнопки отражает вес действия. На одной области экрана — только один Accent; рядом с ним второстепенные действия — Outline, третичные — Transparent. Справа от текста может быть либо шеврон (кнопка-меню), либо иконка — но не одновременно.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.95fr 3.15fr 2.61fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Тип</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Типичные места</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 3.15fr 2.61fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Главное действие экрана или сценария — одно на экран/модалку</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Сабмит формы, «Применить» в модальном окне</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 3.15fr 2.61fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Outline</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Второстепенное действие рядом с главным</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">«Отмена» рядом с «Применить», «Скачать» на тайле</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 3.15fr 2.61fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Transparent</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Третичное действие, не спорящее с контентом</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Экшены в таблицах, тулбары, группы действий</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </section>
+
+  <!-- STRUCTURE -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Кнопка может содержать иконку слева и/или справа от текста, и/или сам текст. Иконки допускаются с обеих сторон одновременно.</p>
+    <div class="panel"><div class="row" id="struct-row"></div></div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Type">
+    <h3>Type</h3>
+    <p class="desc">Свойство Type определяет общий вид кнопки: <b>Accent</b>, <b>Outline</b>, <b>Transparent</b>.</p>
+    <div class="panel"><div class="row" id="type-row"></div></div>
+  </div>
+
+<div class="subsec" data-screen-label="Tone">
+    <h3>Тон</h3>
+    <p class="desc">Модификатор, а не отдельный тип — комбинируется с Accent / Outline / Transparent и меняет цвет на токены одного из четырёх тонов палитры <code class="tok">Situative</code>: <b>Error</b>, <b>Warning</b>, <b>Success</b>, <b>Info</b>. Те же самые кнопки переиспользуются в <a class="inl" href="../molecules/Alert.html">Alert</a> и <a class="inl" href="../organisms/SnackBar.html">SnackBar</a> — тон кнопки совпадает с тоном компонента. Error — тон для деструктивного действия в диалоге подтверждения (например «Удалить» в confirm-модалке, см. <a class="inl" href="../organisms/Modal.html">Modal</a>); класс <code class="tok">.btn--danger</code> сохранён как алиас <code class="tok">.btn--error</code> для обратной совместимости. Не применяйте тон к обычному «Удалить» в подвале формы — там кнопка остаётся Transparent, деструктивность подтверждает отдельный диалог, а не цвет.</p>
+    <div class="panel"><div class="tone-grid" id="tone-grid"></div></div>
+  </div>
+
+<div class="subsec" data-screen-label="Menu">
+    <h3>Кнопка с меню (chevron)</h3>
+    <p class="desc">Если кнопка содержит шеврон — она открывает контекстное меню. Клик по самой кнопке только показывает меню; действия выполняются исключительно по пунктам меню. Справа может быть либо шеврон, либо иконка — но не одновременно. Нажмите, чтобы открыть.</p>
+    <div class="panel"><div class="row" id="menu-row"></div></div>
+  </div>
+
+<div class="subsec" data-screen-label="Fullwidth">
+    <h3>Fullwidth</h3>
+    <p class="desc">Кнопки со свойством Fullwidth заполняют весь контейнер: боковые паддинги убираются, контент центрируется. Кнопки, содержащие только иконку, не растягиваются.</p>
+    <div class="panel"><div class="fw-grid" id="fw-row"></div></div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc tight">Три размера. Ширина зависит от контента, высота фиксирована.<br>
+      <b>M&nbsp;— 40</b> · кнопки в модальных окнах &nbsp;·&nbsp; <b>S&nbsp;— 32</b> · в таблицах, на тайлах &nbsp;·&nbsp; <b>XS&nbsp;— 24</b> · фильтры и экшены на одном уровне с фильтром.</p>
+    <div class="panel"><div class="sizes" id="sizes-row"></div></div>
+  
+<div class="subsec" data-screen-label="Padding">
+    <h3>Отступы</h3>
+    <p class="desc">Боковой padding зависит от наличия иконки/шеврона у соответствующего края кнопки: сторона со значком уже, сторона с текстом — шире. Высота, радиус и padding icon-only не меняются.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.72fr 1.44fr 1.66fr 1.4fr 1.31fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Высота</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Padding — только текст</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Padding — сторона с иконкой</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Отступ иконка ↔ текст</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Padding (icon-only)</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.72fr 1.44fr 1.66fr 1.4fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">40</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">16</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">12</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.72fr 1.44fr 1.66fr 1.4fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">32</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">12</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">10</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">6</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">6</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.72fr 1.44fr 1.66fr 1.4fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">6</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">4</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">4</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиус зависит только от размера кнопки: тип (Accent / Outline / Transparent), наличие иконки, шеврон и состояние Loader его не меняют.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Icon-only — любой размер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">как у размера: 8 / 8 / 6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control / --radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc">Текст кнопки — короткая глагольная формулировка действия. Ширина кнопки следует за текстом, поэтому правило одно: короче текст — лучше.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Глагол действия:</b> «Применить», «Скачать PDF», «Создать копию» — 1–3 слова, без точки в конце.</li>
+        <li><b>Без переноса и обрезки:</b> текст набирается в одну строку (<code class="tok">white-space: nowrap</code>). Если не помещается — сокращайте формулировку, а не кнопку.</li>
+        <li><b>Sentence case:</b> заглавная — только первая буква и имена собственные.</li>
+        <li><b>Текст стабилен:</b> при переходе в Loader формулировка не меняется.</li>
+        <li><b>Icon-only:</b> кнопке без текста обязателен <code class="tok">aria-label</code> с названием действия.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="Loader">
+    <h3>Loader</h3>
+    <p class="desc">Сообщает, что идёт процесс, вызванный кликом. На время процесса кнопка переходит в Disabled. Если в кнопке есть иконка — лоадер заменяет её (при иконках с обеих сторон заменяется левая). Если иконок нет — лоадер появляется слева от текста и увеличивает ширину. В IconOnly иконка заменяется лоадером. Нажмите на любую кнопку, чтобы увидеть.</p>
+    <div class="panel">
+      <div class="loader-demo">
+        <div class="lrow"><span class="tag">С иконкой</span><span id="ld1"></span></div>
+        <div class="lrow"><span class="tag">Только текст</span><span id="ld2"></span></div>
+        <div class="lrow"><span class="tag">Иконки с двух&nbsp;сторон</span><span id="ld3"></span></div>
+        <div class="lrow"><span class="tag">IconOnly</span><span id="ld4"></span></div>
+      </div>
+      <p class="hint">hasLoader=Yes удерживает кнопку в Disabled, пока процесс не завершится.</p>
+    </div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Default, Hover, Active, Disabled — для каждого типа.</p>
+    <div class="panel"><div class="matrix" id="matrix"></div></div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Кнопка — нативный <code class="tok">&lt;button type="button"&gt;</code>: Enter и Space работают из коробки. Фокус — <code class="tok">outline: 2px var(--primary)</code> с отступом 2px, только по <code class="tok">:focus-visible</code>. Disabled задаётся атрибутом <code class="tok">disabled</code>. В состоянии Loader кнопка не интерактивна (<code class="tok">pointer-events: none</code>) — дополнительно ставьте <code class="tok">aria-busy="true"</code> и держите её disabled до конца процесса. Icon-only обязана иметь <code class="tok">aria-label</code>. Кнопка с шевроном получает <code class="tok">aria-haspopup="menu"</code> и <code class="tok">aria-expanded</code>; меню — <code class="tok">role="menu"</code> с пунктами <code class="tok">role="menuitem"</code>, Esc закрывает меню и возвращает фокус на кнопку. Спиннер замедляется при <code class="tok">prefers-reduced-motion</code>.</p>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Текст кнопок набран гарнитурой <b>SB Sans Screen</b>. Размер текста привязан к размеру кнопки через токены <code class="tok">--type-button-*</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.17fr 1.08fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.17fr 1.08fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-button-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Screen</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 24</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-button-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.17fr 1.08fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-button-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Screen</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-button-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.68fr 1.17fr 1.08fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-button-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Screen</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-button-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены из палитры; hex резолвится из живого значения токена. Заливки Hover/Active у Outline и Transparent и Active у Accent — производные от <code class="tok">--primary</code> через <code class="tok">color-mix</code> (<code class="tok">--btn-hover-bg</code>, <code class="tok">--btn-active-bg</code>, <code class="tok">--btn-pale</code>); Hover у Accent — самостоятельный токен <code class="tok">--primary-dark</code>. Модификатор Тон (Error/Warning/Success/Info) переопределяет эти же роли токенами палитры <code class="tok">Situative</code> — таблица ниже.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#007A6D</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Active</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--btn-pale</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст / иконка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Accent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--disabled)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#BEC5C8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст / граница · Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--bg-tile</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--bg-tile)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--btn-hover-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Active</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--btn-active-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Граница · Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--disabled)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#BEC5C8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Outline</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст · Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Transparent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст / иконка · Default</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Transparent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--btn-hover-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Transparent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фон · Active</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--btn-active-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">—</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.95fr 1.58fr 1.13fr 0.77fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Transparent</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст · Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Эта страница ДС собрана на чистых CSS-классах и vanilla JS — но всё ниже не привязано к стеку: команда, которая верстает компонент на React (или любом другом фреймворке), может взять отсюда анатомию, точные размеры, состояния и цвета, не заглядывая в этот код построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/button.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:36px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.6fr 0.6fr 0.6fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">S</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">XS</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/button.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Loader — спиннер занимает место ЛЕВОЙ иконки:</span>
+<span class="tk-cm">//    есть левая иконка → заменить её на .spin (правая иконка/шеврон остаются)</span>
+<span class="tk-cm">//    нет левой иконки → вставить спиннер перед .btn__label (ширина кнопки растёт)</span>
+<span class="tk-cm">//    icon-only → заменить иконку на спиннер</span>
+<span class="tk-cm">// На время загрузки: .btn--loading + disabled + aria-busy="true";</span>
+<span class="tk-cm">// текст кнопки не меняется, по завершении вернуть исходный состав.</span>
+
+<span class="tk-cm">// React: loading — просто пропс, состав рендерится декларативно:</span>
+leftSlot = loading ? Spinner : iconLeft
+
+<span class="tk-cm">// 2. Кнопка-меню (шеврон):</span>
+<span class="tk-cm">//    клик по кнопке ТОЛЬКО открывает/закрывает меню — действие не выполняет</span>
+<span class="tk-cm">//    действия выполняются исключительно по пунктам меню</span>
+<span class="tk-cm">//    клик вне меню и Esc — закрывают; aria-expanded синхронизируется</span>
+<span class="tk-cm">//    при открытом меню шеврон поворачивается на 180° (transform .15s ease)</span>
+<span class="tk-cm">//    справа либо шеврон, либо иконка — никогда оба (шеврон имеет приоритет)</span>
+
+<span class="tk-cm">// 3. Состояния hover/active — чистый CSS (:hover/:active);</span>
+<span class="tk-cm">//    классы .is-hover/.is-active существуют только для спецификаций в документации.</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который нужно реализовать поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">makeBtn</code>, <code class="tok">attachLoader</code> и <code class="tok">makeDropdown</code> в коде этой страницы).</p>
+
+    </section>
+
+      <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Split-действие с подтверждением</b> — двухфазная кнопка (Accent → Error) для опасных действий на месте, без модалки.</li>
+        <li><b>Кнопка с двумя иконками</b> — одновременно слева и справа — сейчас описана только пара «иконка + текст» или «текст + шеврон».</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Button</span>
+    <span>Accent · Outline · Transparent — M / S / XS</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите кнопку: переключайте тип, размер, состояние, иконки и текст — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script>
+/* ---------- icons ---------- */
+const ICONS = {
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>',
+  star:     '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.9 5.9 6.6.9-4.8 4.6 1.1 6.6L12 18.9 6.2 21l1.1-6.6L2.5 9.3l6.6-.9z"/></svg>',
+  plus:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  chevron:  '<svg class="btn__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+};
+/* подставляем иконки из библиотеки ДС */
+(function(){ const L=window.DS_ICONS||{}; const m={download:'download',star:'star-filled',plus:'add'};
+  for(const k in m){ if(L[m[k]]) ICONS[k]=L[m[k]]; }
+  if(L['chevron-down']) ICONS.chevron=L['chevron-down'].replace('<svg','<svg class="btn__chevron"');
+})();
+
+/* ---------- button factory ---------- */
+function makeBtn(o = {}) {
+  const { type='accent', size='m', text='Button', lead=null, trail=null,
+          chevron=false, iconOnly=null, disabled=false, force=null, fullwidth=false } = o;
+  // right side is EITHER a chevron OR a trailing icon — never both. Chevron wins.
+  const trailIcon = chevron ? null : trail;
+  const b = document.createElement('button');
+  b.className = 'btn btn--' + type + ' btn--' + size;
+  if (iconOnly) b.classList.add('btn--icon-only');
+  if (fullwidth) b.classList.add('btn--fullwidth');
+  if (disabled) b.disabled = true;
+  if (force) b.classList.add('is-' + force);
+
+  let html = '';
+  if (iconOnly) {
+    html = ICONS[iconOnly];
+  } else {
+    if (lead) html += ICONS[lead];
+    html += '<span class="btn__label">' + text + '</span>';
+    if (trailIcon) html += ICONS[trailIcon];
+    if (chevron) html += ICONS.chevron;
+  }
+  b.innerHTML = html;
+  return b;
+}
+function appendBtns(target, list) {
+  const el = typeof target === 'string' ? document.getElementById(target) : target;
+  list.forEach(o => el.appendChild(makeBtn(o)));
+}
+
+/* ---------- dropdown (chevron → context menu) ---------- */
+const MENU_ITEMS = [
+  { label:'Скачать PDF',          icon:'download' },
+  { label:'Добавить в избранное', icon:'star' },
+  { label:'Создать копию',        icon:'plus' },
+];
+function makeDropdown(btn, items=MENU_ITEMS){
+  const wrap = document.createElement('span'); wrap.className = 'dropdown';
+  const menu = document.createElement('div'); menu.className = 'dropdown__menu'; menu.hidden = true; menu.setAttribute('role','menu');
+  items.forEach(it=>{
+    const mi = document.createElement('button'); mi.type='button'; mi.className='dropdown__item';
+    mi.innerHTML = (it.icon ? ICONS[it.icon] : '') + '<span>' + it.label + '</span>';
+    mi.addEventListener('click', e => { e.stopPropagation(); close(); /* действие выполняется здесь */ });
+    menu.appendChild(mi);
+  });
+  function onDoc(e){ if(!wrap.contains(e.target)) close(); }
+  function open(){ menu.hidden=false; wrap.classList.add('is-open'); document.addEventListener('click', onDoc); }
+  function close(){ menu.hidden=true; wrap.classList.remove('is-open'); document.removeEventListener('click', onDoc); }
+  // клик по кнопке только показывает меню — действия только по пунктам меню
+  btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); if(btn.disabled) return; menu.hidden ? open() : close(); });
+  wrap.appendChild(btn); wrap.appendChild(menu);
+  return wrap;
+}
+
+/* ---------- TYPE ---------- */
+appendBtns('type-row', [
+  { type:'accent',      lead:'star', text:'Button' },
+  { type:'outline',     lead:'star', text:'Button' },
+  { type:'transparent', lead:'star', text:'Button' },
+]);
+
+/* ---------- TONE (модификатор поверх любого типа: Error/Warning/Success/Info) ---------- */
+(function(){
+  const el = document.getElementById('tone-grid');
+  if (!el) return;
+  const tones = [
+    { cls:'',        label:'Default' },
+    { cls:'error',   label:'Error/Danger' },
+    { cls:'warning', label:'Warning' },
+    { cls:'success', label:'Success' },
+    { cls:'info',    label:'Info' },
+  ];
+  const types = ['accent','outline','transparent'];
+  tones.forEach(t=>{
+    const h = document.createElement('div');
+    h.className = 'tone-grid__head';
+    h.textContent = t.label;
+    el.appendChild(h);
+  });
+  types.forEach(type=>{
+    tones.forEach(t=>{
+      const cell = document.createElement('div');
+      cell.className = 'tone-grid__cell';
+      const b = makeBtn({ type, text:'Button' });
+      if (t.cls) b.classList.add('btn--' + t.cls);
+      cell.appendChild(b);
+      el.appendChild(cell);
+    });
+  });
+})();
+
+/* ---------- MENU / CHEVRON ---------- */
+['accent','outline','transparent'].forEach(t=>{
+  const b = makeBtn({ type:t, lead:'download', text:'Действия', chevron:true });
+  document.getElementById('menu-row').appendChild(makeDropdown(b));
+});
+
+/* ---------- STRUCTURE ---------- */
+appendBtns('struct-row', [
+  { lead:'star', text:'Применить' },
+  { text:'Применить' },
+  { text:'Применить', trail:'star' },
+  { lead:'star', text:'Применить', trail:'star' },
+  { iconOnly:'star' },
+]);
+
+/* ---------- SIZES ---------- */
+(function(){
+  const data = [ ['M','40','m'], ['S','32','s'], ['XS','24','xs'] ];
+  const wrap = document.getElementById('sizes-row');
+  data.forEach(([name,h,sz])=>{
+    const item = document.createElement('div'); item.className='size-item';
+    item.appendChild(makeBtn({ size:sz, text:'Применить' }));
+    const tag = document.createElement('div'); tag.className='size-tag';
+    tag.innerHTML = name + ' &nbsp;<span>'+h+' px</span>';
+    item.appendChild(tag);
+    wrap.appendChild(item);
+  });
+})();
+
+/* ---------- FULLWIDTH ---------- */
+appendBtns('fw-row', [
+  { type:'accent', lead:'star', text:'Button', fullwidth:true },
+  { type:'outline', text:'Button', fullwidth:true },
+  { type:'transparent', text:'Button', trail:'star', fullwidth:true },
+  { type:'accent', lead:'star', text:'Button', fullwidth:true, disabled:true },
+  { type:'outline', text:'Button', fullwidth:true, disabled:true },
+  { type:'transparent', text:'Button', trail:'star', fullwidth:true, disabled:true },
+]);
+
+/* ---------- STATES MATRIX ---------- */
+(function(){
+  const m = document.getElementById('matrix');
+  const heads = ['', 'Default','Hover','Active','Disabled'];
+  heads.forEach((h,i)=>{
+    const d=document.createElement('div');
+    d.className = i===0 ? 'rowname' : 'col-head';
+    d.textContent = h; m.appendChild(d);
+  });
+  function rowBlock(rowLabel, type, sub){
+    const name=document.createElement('div');
+    name.className='rowname'+(sub?' sub':''); name.textContent=rowLabel; m.appendChild(name);
+    [null,'hover','active','disabled'].forEach(state=>{
+      const cell=document.createElement('div'); cell.className='cell';
+      cell.appendChild(makeBtn({
+        type, text:'Применить',
+        force: state && state!=='disabled' ? state : null,
+        disabled: state==='disabled'
+      }));
+      m.appendChild(cell);
+    });
+  }
+  const g=document.createElement('div'); g.className='grouphdr'; g.textContent='Accent'; m.appendChild(g);
+  rowBlock('Default','accent');
+  const g2=document.createElement('div'); g2.className='grouphdr'; g2.textContent='Outline'; m.appendChild(g2);
+  rowBlock('Default','outline');
+  const g3=document.createElement('div'); g3.className='grouphdr'; g3.textContent='Transparent'; m.appendChild(g3);
+  rowBlock('Default','transparent');
+})();
+
+/* ---------- LOADER ---------- */
+/* Replaces the LEADING icon with a spinner, leaving any trailing icon/chevron
+   intact. If there is no leading icon, the spinner is inserted to the left of
+   the text (increasing width). IconOnly: the icon is replaced by the spinner. */
+function attachLoader(btn){
+  const original = btn.innerHTML;
+  btn.addEventListener('click', ()=>{
+    if (btn.classList.contains('btn--loading')) return;
+    btn.classList.add('btn--loading');
+    const spinner = document.createElement('span');
+    spinner.className = 'spin spin--current';
+
+    if (btn.classList.contains('btn--icon-only')) {
+      btn.innerHTML = '';
+      btn.appendChild(spinner);
+    } else {
+      const label = btn.querySelector('.btn__label');
+      const firstSvg = btn.querySelector('svg');
+      const hasLeadingIcon = firstSvg && label &&
+        (firstSvg.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING);
+      if (hasLeadingIcon) {
+        firstSvg.replaceWith(spinner);      // swap leading icon → spinner
+      } else {
+        btn.insertBefore(spinner, label);   // no leading icon → spinner before text
+      }
+    }
+    setTimeout(()=>{ btn.classList.remove('btn--loading'); btn.innerHTML = original; }, 1900);
+  });
+}
+(function(){
+  const b1 = makeBtn({ type:'accent', lead:'download', text:'Применить' });
+  document.getElementById('ld1').appendChild(b1); attachLoader(b1);
+  const b2 = makeBtn({ type:'outline', text:'Применить' });
+  document.getElementById('ld2').appendChild(b2); attachLoader(b2);
+  const b3 = makeBtn({ type:'accent', lead:'download', text:'Применить', trail:'star' });
+  document.getElementById('ld3').appendChild(b3); attachLoader(b3);
+  const b4 = makeBtn({ type:'accent', iconOnly:'download' });
+  document.getElementById('ld4').appendChild(b4); attachLoader(b4);
+})();
+
+/* ---------- PLAYGROUND ---------- */
+(function(){
+  const state = {
+    type:'accent', size:'m', state:'default', tone:'none',
+    lead:true, text:true, trail:false, chevron:true, loader:false, fullwidth:false,
+  };
+  const controls = document.getElementById('pg-controls');
+  const preview  = document.getElementById('pg-preview');
+  const codeEl   = document.getElementById('pg-code');
+
+    function select(label, options, getCur, onPick){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    options.forEach(([val,txt])=>{ const o=document.createElement('option'); o.value=val; o.textContent=txt; if(val===getCur()) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{ onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+  /* Бинарные опции — селекты: docs-split.js конвертирует их в свитчи ДС
+     (label.pg-toggle) в правую колонку; подпись статична (урок Л4). */
+  function ctlToggle(label, key){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    [['no','Нет'],['yes','Да']].forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; if((v==='yes')===!!state[key]) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{
+      const nv = sel.value==='yes';
+      state[key] = nv;
+      // right side is EITHER chevron OR trailing icon — keep them mutually exclusive
+      if (nv && key==='trail')   { state.chevron=false; if(chevronSel) chevronSel.value='no'; }
+      if (nv && key==='chevron') { state.trail=false;   if(trailSel) trailSel.value='no'; }
+      render();
+    });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  // Тип и Состояние не помещаются в один ряд сегментами → выпадающие списки
+  controls.appendChild(select('Тип', [['accent','Accent'],['outline','Outline'],['transparent','Transparent']],
+    ()=>state.type, v=>state.type=v));
+  controls.appendChild(select('Тон', [['none','Без тона'],['error','Error'],['warning','Warning'],['success','Success'],['info','Info']],
+    ()=>state.tone, v=>state.tone=v));
+  controls.appendChild(select('Размер', [['m','M'],['s','S'],['xs','XS']], ()=>state.size, v=>state.size=v));
+  controls.appendChild(select('Состояние', [['default','Default'],['hover','Hover'],['active','Active'],['disabled','Disabled']],
+    ()=>state.state, v=>state.state=v));
+
+  const trailSel = ctlToggle('Иконка справа','trail');
+  const chevronSel = ctlToggle('Шеврон','chevron');
+  controls.appendChild(ctlToggle('Иконка слева','lead'));
+  controls.appendChild(ctlToggle('Текст','text'));
+  controls.appendChild(trailSel);
+  controls.appendChild(chevronSel);
+  controls.appendChild(ctlToggle('Лоадер','loader'));
+  controls.appendChild(ctlToggle('Fullwidth','fullwidth'));
+
+  function syncToggleAvailability(){
+    // when text is off → button is icon-only; text-related toggles disabled
+    const iconOnly = !state.text;
+    [trailSel, chevronSel].forEach(c=> c.classList.toggle('is-off', iconOnly));
+  }
+
+  function applyLoader(btn){
+    if(!state.loader) return;
+    btn.classList.add('btn--loading');
+    const spinner=document.createElement('span'); spinner.className='spin spin--current';
+    if (btn.classList.contains('btn--icon-only')){ btn.innerHTML=''; btn.appendChild(spinner); return; }
+    const label=btn.querySelector('.btn__label');
+    const firstSvg=btn.querySelector('svg');
+    const hasLeading = firstSvg && label && (firstSvg.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING);
+    if (hasLeading) firstSvg.replaceWith(spinner); else if(label) btn.insertBefore(spinner,label);
+  }
+
+  function render(){
+    syncToggleAvailability();
+    const o = { type:state.type, size:state.size, fullwidth:state.fullwidth };
+    if (!state.text){
+      o.iconOnly = state.lead ? 'download' : (state.trail ? 'star' : 'download');
+    } else {
+      o.text='Button';
+      if (state.lead)  o.lead='download';
+      if (state.trail) o.trail='star';
+      if (state.chevron) o.chevron=true;
+    }
+    if (state.state==='disabled') o.disabled=true;
+    else if (state.state==='hover')  o.force='hover';
+    else if (state.state==='active') o.force='active';
+
+    const btn=makeBtn(o);
+    if (state.tone!=='none') btn.classList.add('btn--'+state.tone);
+    applyLoader(btn);
+    preview.innerHTML='';
+    // chevron → interactive dropdown (when not loading/disabled/fullwidth)
+    if (state.text && state.chevron && state.state!=='disabled' && !state.loader && !state.fullwidth){
+      preview.appendChild(makeDropdown(btn));
+    } else {
+      preview.appendChild(btn);
+    }
+
+    // code string
+    const cls=['btn','btn--'+state.type,'btn--'+state.size];
+    if (state.tone!=='none') cls.push('btn--'+state.tone);
+    if (o.iconOnly) cls.push('btn--icon-only');
+    if (state.fullwidth) cls.push('btn--fullwidth');
+    if (state.loader) cls.push('btn--loading');
+    let attrs='';
+    if (state.state==='disabled') attrs+=' disabled';
+    else if (state.state==='hover') attrs+=' /* :hover */';
+    else if (state.state==='active') attrs+=' /* :active */';
+    codeEl.innerHTML = '<code>&lt;button class="'+cls.join(' ')+'"'+attrs+'&gt;</code>';
+  }
+
+  render();
+})();
+
+/* ---------- TYPOGRAPHY REFERENCE ---------- */
+(function(){
+  const rows = [
+    ['M',  'Button M',  '--type-button-m',  'SB Sans Screen', 'Regular', '16 / 24', 'ds-button-m'],
+    ['S',  'Button S',  '--type-button-s',  'SB Sans Screen', 'Regular', '14 / 20', 'ds-button-s'],
+    ['XS', 'Button XS', '--type-button-xs', 'SB Sans Screen', 'Regular', '12 / 16', 'ds-button-xs'],
+  ];
+  const tb = document.querySelector('#typo-table tbody');
+  tb.innerHTML = rows.map(([sz,name,tok,font,weight,sl,cls])=>`
+    <tr>
+      <td class="rt-size">${sz}</td>
+      <td class="rt-sample"><span class="${cls}">Button</span></td>
+      <td class="rt-tok"><code>${tok}</code></td>
+      <td>${font}</td>
+      <td>${weight}</td>
+      <td class="rt-num">${sl}</td>
+    </tr>`).join('');
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function(){
+  // resolve any CSS color (incl. color-mix) to #RRGGBB / rgba
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue){
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r,g,b,a=1;
+    let m = v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m){ r=+m[1]*255; g=+m[2]*255; b=+m[3]*255; if(m[4]!==undefined) a=+m[4]; }
+    else { const n=v.match(/[\d.]+/g); if(!n) return cssValue; r=+n[0]; g=+n[1]; b=+n[2]; if(n[3]!==undefined) a=+n[3]; }
+    const hx = (n)=>Math.round(n).toString(16).padStart(2,'0').toUpperCase();
+    let s = '#'+hx(r)+hx(g)+hx(b);
+    if (a<1) s += ' · '+Math.round(a*100)+'%';
+    return s;
+  }
+  const groups = [
+    { name:'Accent', rows:[
+      ['Фон · Default',   '--primary',      false],
+      ['Фон · Hover',     '--primary-dark', false],
+      ['Фон · Active',    '--btn-pale',     false],
+      ['Текст / иконка',  '--text-on-dark', false],
+      ['Фон · Disabled',  '--disabled',     false],
+    ]},
+    { name:'Outline', rows:[
+      ['Текст / граница · Default', '--primary',        false],
+      ['Фон',                       '--bg-tile',        false],
+      ['Фон · Hover',               '--btn-hover-bg',   false],
+      ['Фон · Active',              '--btn-active-bg',  false],
+      ['Граница · Disabled',        '--disabled',       false],
+      ['Текст · Disabled',          '--text-inactive',  false],
+    ]},
+    { name:'Transparent', rows:[
+      ['Текст / иконка · Default', '--primary',        false],
+      ['Фон · Hover',              '--btn-hover-bg',   false],
+      ['Фон · Active',             '--btn-active-bg',  false],
+      ['Текст · Disabled',         '--text-inactive',  false],
+    ]},
+  ];
+  const root = document.getElementById('color-ref');
+  root.innerHTML = groups.map(g=>`
+    <section class="cref-group">
+      <h3>${g.name}</h3>
+      <div class="cref-rows">
+        ${g.rows.map(([role,tok,alpha])=>`
+          <div class="cref-row">
+            <div class="cref-sw${alpha?' alpha':''}"><div class="cf" style="background:var(${tok});"></div></div>
+            <div class="cref-meta"><p class="role">${role}</p><p class="tname">${tok}</p></div>
+            <div class="cref-hex">${resolveHex('var('+tok+')')}</div>
+          </div>`).join('')}
+      </div>
+    </section>`).join('');
+
+  const toneTbody = document.querySelector('#tone-color-table tbody');
+  if (toneTbody) {
+    const tones = [
+      ['Error',   '--error',   '--error-dark',   '--error-light'],
+      ['Warning', '--warning', '--warning-dark', '--warning-light'],
+      ['Success', '--success', '--success-dark', '--success-light'],
+      ['Info',    '--info',    '--info-dark',    '--info-light'],
+    ];
+    toneTbody.innerHTML = tones.map(([name, base, dark, light])=>`
+      <tr>
+        <td>${name}</td>
+        <td>${resolveHex('var('+base+')')} <code class="tok">${base}</code></td>
+        <td>${resolveHex('var('+dark+')')} <code class="tok">${dark}</code></td>
+        <td>${resolveHex('var('+light+')')} <code class="tok">${light}</code></td>
+        <td>${resolveHex('var('+base+')')} <code class="tok">${base}</code></td>
+        <td>${resolveHex('color-mix(in srgb, var('+base+') 10%, #fff)')}</td>
+        <td>${resolveHex('var(--text-on-dark)')} <code class="tok">--text-on-dark</code></td>
+      </tr>`).join('');
+  }
+  probe.remove();
+})();
+/* ---------- DEV: redline measured from live component ---------- */
+(function(){
+  const tbody = document.querySelector('#dev-spec-table');
+  if(!tbody) return;
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  function measure(sz){
+    const b  = makeBtn({ size:sz, lead:'download', text:'Применить', chevron:true });
+    const t  = makeBtn({ size:sz, text:'Применить' });
+    const io = makeBtn({ size:sz, iconOnly:'download' });
+    host.appendChild(b); host.appendChild(t); host.appendChild(io);
+    const cs = getComputedStyle(b);
+    const icon = b.querySelector('svg:not(.btn__chevron)');
+    const chev = b.querySelector('.btn__chevron');
+    return {
+      h:      parseFloat(cs.height),
+      pxIcon: parseFloat(cs.paddingLeft),
+      pxText: parseFloat(getComputedStyle(t).paddingLeft),
+      gap:    parseFloat(cs.columnGap),
+      iop:    parseFloat(getComputedStyle(io).paddingLeft),
+      icon:   parseFloat(getComputedStyle(icon).width),
+      chev:   parseFloat(getComputedStyle(chev).width),
+      rad:    parseFloat(cs.borderTopLeftRadius),
+      bw:     parseFloat(cs.borderTopWidth),
+      fs:     parseFloat(cs.fontSize),
+      lh:     parseFloat(cs.lineHeight),
+    };
+  }
+  const d = { m:measure('m'), s:measure('s'), xs:measure('xs') };
+  host.remove();
+  const r = n => Math.round(n*10)/10;
+  const rows = [
+    ['Высота', z => r(d[z].h)+' px'],
+    ['Padding — только текст', z => r(d[z].pxText)+' px'],
+    ['Padding — сторона с иконкой', z => r(d[z].pxIcon)+' px'],
+    ['Зазор иконка ↔ текст (gap)', z => r(d[z].gap)+' px'],
+    ['Padding icon-only (по X)', z => r(d[z].iop)+' px'],
+    ['Иконка', z => r(d[z].icon)+' px'],
+    ['Шеврон (80% иконки)', z => r(d[z].chev)+' px'],
+    ['Радиус скругления', z => r(d[z].rad)+' px'],
+    ['Граница', z => r(d[z].bw)+' px'],
+    ['Типографика (кегль / интерлиньяж)', z => r(d[z].fs)+' / '+r(d[z].lh)+' px'],
+  ];
+  tbody.innerHTML = rows.map(([label, fn]) =>
+    `<div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.6fr 0.6fr 0.6fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${label}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('m')}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('s')}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${fn('xs')}</span></span></div><div class="tc tc--separator"></div></div>`
+  ).join('');
+})();
+
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Иконка слева': 'Показывать иконку слева', 'Текст': 'Показывать текст', 'Иконка справа': 'Показывать иконку справа', 'Шеврон': 'Показывать шеврон', 'Лоадер': 'Показывать лоадер', 'Fullwidth': 'На всю ширину' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- иконка слева и/или текст и/или иконка справа; справа — иконка ИЛИ шеврон, не оба -->
+<button type="button" class="btn btn--accent btn--m">
+  <i data-icon="check"></i>                <!-- иконка слева, 20/18/16 px -->
+  <span class="btn__label">Применить</span>
+</button>
+
+<!-- Тон: Error/Warning/Success/Info — модификатор поверх любого типа; .btn--danger = алиас .btn--error -->
+<button type="button" class="btn btn--accent btn--m btn--error"><span class="btn__label">Удалить</span></button>
+<button type="button" class="btn btn--outline btn--m" aria-haspopup="menu" aria-expanded="false">
+  <span class="btn__label">Действия</span>
+  <i class="btn__chevron" data-icon="chevron-down"></i>
+</button>
+
+<!-- icon-only: квадратный паддинг, обязателен aria-label -->
+<button type="button" class="btn btn--outline btn--s btn--icon-only" aria-label="Скачать">
+  <i data-icon="download"></i>
+</button>
+
+<!-- loading: спиннер на месте левой иконки, кнопка удерживается в disabled -->
+<button type="button" class="btn btn--accent btn--m btn--loading" disabled aria-busy="true">
+  <span class="spin spin--current"></span>
+  <span class="btn__label">Применить</span>
+</button></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function makeBtn(o) {
+  // o: { type:'accent'|'outline'|'transparent', tone?, size:'m'|'s'|'xs',
+  //       state, text?, lead?, trail?, chevron?, loader?, fullwidth? }
+  // button.btn.btn--<type>(.btn--<size>)(.btn--<tone>)(.btn--icon-only)(.btn--loading)(.btn--fullwidth)
+  //   → .btn__label (+ .btn__icon/.btn__trail/.btn__chevron, спиннер при loader)
+  // load: btn--loading → .spin.spin--current (заменяет ведущую иконку)
+}
+function makeDropdown(o) { /* … стрелка-кнопка + контекстное меню (DSMenu) … */ }</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Button
+   Types:  accent · outline · transparent
+   Sizes:  m (40) · s (32) · xs (24)
+   States: default · hover · active · disabled · loading
+   Text uses the Button M/S/XS typography tokens (SB Sans Screen).
+   Requires: typography.css, colors.css
+   ========================================================================= */
+
+:root {
+  /* derived button tints (from --primary) */
+  --btn-hover-bg:  color-mix(in srgb, var(--primary) 10%, #fff);
+  --btn-active-bg: color-mix(in srgb, var(--primary) 18%, #fff);
+  --btn-pale:      color-mix(in srgb, var(--primary) 45%, #fff);
+}
+
+.btn {
+  /* layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* высота/паддинги/gap задаются размерным классом .btn--m|--s|--xs (обязателен) */
+  border-radius: var(--radius-control);
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  min-width: 0; /* позволяет сжиматься до эллипсиса внутри flex-родителя (ButtonGroup fullwidth, тулбар) */
+
+  /* type — overridden per size below */
+  font: var(--type-button-m);
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* icons */
+.btn svg { flex: none; display: block; }
+.btn__label { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* ---------- sizes ---------------------------------------------------------- *
+   Размеры — прямыми свойствами (не через --btn-* в модификаторе), чтобы
+   компилятор чисто регистрировал токены. Иконка/спиннер/шеврон — per-size.
+   Шеврон: повышенная специфичность (.btn.btn--m ...), чтобы перебить
+   per-size `svg`-правило независимо от тега элемента (0,3,0 > 0,2,1). */
+.btn--m  { height: 40px; padding: 0 16px; gap: 8px; border-radius: var(--radius-control);   font: var(--type-button-m); }
+.btn--s  { height: 32px; padding: 0 12px; gap: 6px; border-radius: var(--radius-control);   font: var(--type-button-s); }
+.btn--xs { height: 24px; padding: 0 8px;  gap: 4px; border-radius: var(--radius-control-s); font: var(--type-button-xs); }
+/* сторона с иконкой/шевроном/спиннером у́же стороны с текстом (:first-child/:last-child,
+   кроме .btn__label); icon-only ниже переопределяет обе стороны симметрично */
+.btn--m:has(>:first-child:not(.btn__label))  { padding-left: 12px; }
+.btn--m:has(>:last-child:not(.btn__label))   { padding-right: 12px; }
+.btn--s:has(>:first-child:not(.btn__label))  { padding-left: 10px; }
+.btn--s:has(>:last-child:not(.btn__label))   { padding-right: 10px; }
+.btn--xs:has(>:first-child:not(.btn__label)) { padding-left: 6px; }
+.btn--xs:has(>:last-child:not(.btn__label))  { padding-right: 6px; }
+/* размер глифа задаёт слот и покрывает обе формы разметки — вставленный
+   <svg> и <i data-icon> (ds-icons.js). Менять одну на другую можно без правки CSS. */
+.btn--m :is(svg,[data-icon]){ width: 20px; height: 20px; }
+.btn--s :is(svg,[data-icon]){ width: 18px; height: 18px; }
+.btn--xs :is(svg,[data-icon]){ width: 16px; height: 16px; }
+.btn--m .spin  { width: 20px; height: 20px; }
+.btn--s .spin  { width: 18px; height: 18px; }
+.btn--xs .spin { width: 16px; height: 16px; }
+.btn.btn--m .btn__chevron  { width: calc(20px * .8); height: calc(20px * .8); }
+.btn.btn--s .btn__chevron  { width: calc(18px * .8); height: calc(18px * .8); }
+.btn.btn--xs .btn__chevron { width: calc(16px * .8); height: calc(16px * .8); }
+/* открытое меню — шеврон разворачивается на 180°: реагирует на aria-expanded,
+   который пишет рантайм (ds-menu.js/ds-popover.js), классов не нужно (RulesAudit W1) */
+.btn__chevron { transition: transform .15s ease; }
+.btn[aria-expanded="true"] .btn__chevron { transform: rotate(180deg); }
+
+/* icon-only: square-ish, padding per size (mirror --btn-iconpad) */
+.btn--icon-only { gap: 0; }
+.btn--m.btn--icon-only  { padding: 0 8px; }
+.btn--s.btn--icon-only  { padding: 0 6px; }
+.btn--xs.btn--icon-only { padding: 0 4px; }
+
+/* ---------- type: ACCENT --------------------------------------------------- */
+.btn--accent {
+  background: var(--primary);
+  color: var(--text-on-dark);
+  border-color: var(--primary);
+}
+.btn--accent svg { color: var(--text-on-dark); }
+.btn--accent:hover  { background: var(--primary-dark); border-color: var(--primary-dark); }
+.btn--accent:active { background: var(--btn-pale);     border-color: var(--btn-pale); }
+
+/* ---------- type: OUTLINE -------------------------------------------------- */
+.btn--outline {
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.btn--outline svg { color: var(--primary); }
+.btn--outline:hover  { background: var(--btn-hover-bg); }
+.btn--outline:active { background: var(--btn-active-bg); color: var(--btn-pale); border-color: var(--btn-pale); }
+.btn--outline:active svg { color: var(--btn-pale); }
+
+/* ---------- type: TRANSPARENT ---------------------------------------------- */
+.btn--transparent {
+  background: transparent;
+  color: var(--primary);
+  border-color: transparent;
+}
+.btn--transparent svg { color: var(--primary); }
+.btn--transparent:hover  { background: var(--btn-hover-bg); }
+.btn--transparent:active { background: var(--btn-active-bg); color: var(--btn-pale); }
+.btn--transparent:active svg { color: var(--btn-pale); }
+
+/* ---------- state: DISABLED ------------------------------------------------ */
+.btn:disabled,
+.btn--disabled { cursor: default; pointer-events: none; }
+
+.btn--accent:disabled,      .btn--accent.btn--disabled {
+  background: var(--disabled); border-color: var(--disabled); color: var(--text-on-dark);
+}
+.btn--accent:disabled svg,  .btn--accent.btn--disabled svg { color: var(--text-on-dark); }
+
+.btn--outline:disabled,     .btn--outline.btn--disabled {
+  background: transparent; border-color: var(--disabled); color: var(--text-inactive);
+}
+.btn--outline:disabled svg, .btn--outline.btn--disabled svg { color: var(--text-inactive); }
+
+.btn--transparent:disabled, .btn--transparent.btn--disabled {
+  background: transparent; color: var(--text-inactive);
+}
+.btn--transparent:disabled svg, .btn--transparent.btn--disabled svg { color: var(--text-inactive); }
+
+/* ---------- modifier: TONE (Error · Warning · Success · Info) -------------
+   Комбинируется с любым из трёх типов — меняет только цвет на токены тона
+   из палитры Situative, форма/размер/паддинги не трогаются. Используются
+   на Alert и SnackBar (см. alert.css/snackbar.css) и для деструктивных
+   действий (Error, диалог подтверждения удаления).
+   .btn--danger сохранён как алиас .btn--error для обратной совместимости
+   (Modal, TableFilter уже используют это имя). */
+.btn--error.btn--accent, .btn--danger.btn--accent {
+  background: var(--error); border-color: var(--error); color: var(--text-on-dark);
+}
+.btn--error.btn--accent svg, .btn--danger.btn--accent svg { color: var(--text-on-dark); }
+.btn--error.btn--accent:hover,  .btn--danger.btn--accent:hover  { background: var(--error-dark); border-color: var(--error-dark); }
+.btn--error.btn--accent:active, .btn--danger.btn--accent:active { background: var(--error-light); border-color: var(--error-light); }
+
+.btn--error.btn--outline, .btn--danger.btn--outline { color: var(--error); border-color: var(--error); }
+.btn--error.btn--outline svg, .btn--danger.btn--outline svg { color: var(--error); }
+.btn--error.btn--outline:hover,  .btn--danger.btn--outline:hover  { background: var(--error-bg-light); }
+.btn--error.btn--outline:active, .btn--danger.btn--outline:active { background: var(--error-bg); color: var(--error-dark); border-color: var(--error-dark); }
+.btn--error.btn--outline:active svg, .btn--danger.btn--outline:active svg { color: var(--error-dark); }
+
+.btn--error.btn--transparent, .btn--danger.btn--transparent { color: var(--error); }
+.btn--error.btn--transparent svg, .btn--danger.btn--transparent svg { color: var(--error); }
+.btn--error.btn--transparent:hover,  .btn--danger.btn--transparent:hover  { background: var(--error-bg-light); }
+.btn--error.btn--transparent:active, .btn--danger.btn--transparent:active { background: var(--error-bg); color: var(--error-dark); }
+.btn--error.btn--transparent:active svg, .btn--danger.btn--transparent:active svg { color: var(--error-dark); }
+
+/* Warning */
+.btn--warning.btn--accent { background: var(--warning); border-color: var(--warning); color: var(--text-on-dark); }
+.btn--warning.btn--accent svg { color: var(--text-on-dark); }
+.btn--warning.btn--accent:hover  { background: var(--warning-dark); border-color: var(--warning-dark); }
+.btn--warning.btn--accent:active { background: var(--warning-light); border-color: var(--warning-light); }
+
+.btn--warning.btn--outline { color: var(--warning); border-color: var(--warning); }
+.btn--warning.btn--outline svg { color: var(--warning); }
+.btn--warning.btn--outline:hover  { background: var(--warning-bg); }
+.btn--warning.btn--outline:active { background: color-mix(in srgb, var(--warning) 18%, var(--warning-bg)); color: var(--warning-dark); border-color: var(--warning-dark); }
+.btn--warning.btn--outline:active svg { color: var(--warning-dark); }
+
+.btn--warning.btn--transparent { color: var(--warning); }
+.btn--warning.btn--transparent svg { color: var(--warning); }
+.btn--warning.btn--transparent:hover  { background: var(--warning-bg); }
+.btn--warning.btn--transparent:active { background: color-mix(in srgb, var(--warning) 18%, var(--warning-bg)); color: var(--warning-dark); }
+.btn--warning.btn--transparent:active svg { color: var(--warning-dark); }
+
+/* Success */
+.btn--success.btn--accent { background: var(--success); border-color: var(--success); color: var(--text-on-dark); }
+.btn--success.btn--accent svg { color: var(--text-on-dark); }
+.btn--success.btn--accent:hover  { background: var(--success-dark); border-color: var(--success-dark); }
+.btn--success.btn--accent:active { background: var(--success-light); border-color: var(--success-light); }
+
+.btn--success.btn--outline { color: var(--success); border-color: var(--success); }
+.btn--success.btn--outline svg { color: var(--success); }
+.btn--success.btn--outline:hover  { background: var(--success-bg); }
+.btn--success.btn--outline:active { background: color-mix(in srgb, var(--success) 18%, var(--success-bg)); color: var(--success-dark); border-color: var(--success-dark); }
+.btn--success.btn--outline:active svg { color: var(--success-dark); }
+
+.btn--success.btn--transparent { color: var(--success); }
+.btn--success.btn--transparent svg { color: var(--success); }
+.btn--success.btn--transparent:hover  { background: var(--success-bg); }
+.btn--success.btn--transparent:active { background: color-mix(in srgb, var(--success) 18%, var(--success-bg)); color: var(--success-dark); }
+.btn--success.btn--transparent:active svg { color: var(--success-dark); }
+
+/* Info */
+.btn--info.btn--accent { background: var(--info); border-color: var(--info); color: var(--text-on-dark); }
+.btn--info.btn--accent svg { color: var(--text-on-dark); }
+.btn--info.btn--accent:hover  { background: var(--info-dark); border-color: var(--info-dark); }
+.btn--info.btn--accent:active { background: var(--info-light); border-color: var(--info-light); }
+
+.btn--info.btn--outline { color: var(--info); border-color: var(--info); }
+.btn--info.btn--outline svg { color: var(--info); }
+.btn--info.btn--outline:hover  { background: var(--info-bg); }
+.btn--info.btn--outline:active { background: color-mix(in srgb, var(--info) 18%, var(--info-bg)); color: var(--info-dark); border-color: var(--info-dark); }
+.btn--info.btn--outline:active svg { color: var(--info-dark); }
+
+.btn--info.btn--transparent { color: var(--info); }
+.btn--info.btn--transparent svg { color: var(--info); }
+.btn--info.btn--transparent:hover  { background: var(--info-bg); }
+.btn--info.btn--transparent:active { background: color-mix(in srgb, var(--info) 18%, var(--info-bg)); color: var(--info-dark); }
+.btn--info.btn--transparent:active svg { color: var(--info-dark); }
+
+/* forced states (документация) — Error/Danger */
+.btn--error.btn--accent.is-hover,  .btn--danger.btn--accent.is-hover  { background: var(--error-dark); border-color: var(--error-dark); }
+.btn--error.btn--accent.is-active, .btn--danger.btn--accent.is-active { background: var(--error-light); border-color: var(--error-light); }
+.btn--error.btn--outline.is-hover,  .btn--danger.btn--outline.is-hover  { background: var(--error-bg-light); }
+.btn--error.btn--outline.is-active, .btn--danger.btn--outline.is-active { background: var(--error-bg); color: var(--error-dark); border-color: var(--error-dark); }
+.btn--error.btn--transparent.is-hover,  .btn--danger.btn--transparent.is-hover  { background: var(--error-bg-light); }
+.btn--error.btn--transparent.is-active, .btn--danger.btn--transparent.is-active { background: var(--error-bg); color: var(--error-dark); }
+
+/* forced states — Warning/Success/Info */
+.btn--warning.btn--accent.is-hover  { background: var(--warning-dark); border-color: var(--warning-dark); }
+.btn--warning.btn--accent.is-active { background: var(--warning-light); border-color: var(--warning-light); }
+.btn--warning.btn--outline.is-hover  { background: var(--warning-bg); }
+.btn--warning.btn--outline.is-active { background: color-mix(in srgb, var(--warning) 18%, var(--warning-bg)); color: var(--warning-dark); border-color: var(--warning-dark); }
+.btn--warning.btn--transparent.is-hover  { background: var(--warning-bg); }
+.btn--warning.btn--transparent.is-active { background: color-mix(in srgb, var(--warning) 18%, var(--warning-bg)); color: var(--warning-dark); }
+
+.btn--success.btn--accent.is-hover  { background: var(--success-dark); border-color: var(--success-dark); }
+.btn--success.btn--accent.is-active { background: var(--success-light); border-color: var(--success-light); }
+.btn--success.btn--outline.is-hover  { background: var(--success-bg); }
+.btn--success.btn--outline.is-active { background: color-mix(in srgb, var(--success) 18%, var(--success-bg)); color: var(--success-dark); border-color: var(--success-dark); }
+.btn--success.btn--transparent.is-hover  { background: var(--success-bg); }
+.btn--success.btn--transparent.is-active { background: color-mix(in srgb, var(--success) 18%, var(--success-bg)); color: var(--success-dark); }
+
+.btn--info.btn--accent.is-hover  { background: var(--info-dark); border-color: var(--info-dark); }
+.btn--info.btn--accent.is-active { background: var(--info-light); border-color: var(--info-light); }
+.btn--info.btn--outline.is-hover  { background: var(--info-bg); }
+.btn--info.btn--outline.is-active { background: color-mix(in srgb, var(--info) 18%, var(--info-bg)); color: var(--info-dark); border-color: var(--info-dark); }
+.btn--info.btn--transparent.is-hover  { background: var(--info-bg); }
+.btn--info.btn--transparent.is-active { background: color-mix(in srgb, var(--info) 18%, var(--info-bg)); color: var(--info-dark); }
+
+/* ---------- modifier: FULLWIDTH -------------------------------------------- */
+.btn--fullwidth { width: 100%; }
+.btn--fullwidth.btn--icon-only { width: auto; }   /* icon-only never stretches */
+
+/* ---------- forced states (for documentation/specimens) -------------------- */
+.btn--accent.is-hover       { background: var(--primary-dark); border-color: var(--primary-dark); }
+.btn--accent.is-active      { background: var(--btn-pale); border-color: var(--btn-pale); }
+.btn--outline.is-hover      { background: var(--btn-hover-bg); }
+.btn--outline.is-active     { background: var(--btn-active-bg); color: var(--btn-pale); border-color: var(--btn-pale); }
+.btn--outline.is-active svg { color: var(--btn-pale); }
+.btn--transparent.is-hover  { background: var(--btn-hover-bg); }
+.btn--transparent.is-active { background: var(--btn-active-bg); color: var(--btn-pale); }
+.btn--transparent.is-active svg { color: var(--btn-pale); }
+
+/* ---------- state: LOADING ------------------------------------------------- */
+/* While loading the button is non-interactive (treated as disabled).
+   Индикатор — общий компонент Spinner (styles/spinner.css): <span class="spin spin--current">,
+   размер задают правила выше (.btn--m/s/xs .spin). */
+.btn--loading { pointer-events: none; }</script>
+</body>
+</html>

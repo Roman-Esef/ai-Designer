@@ -1,0 +1,129 @@
+/* ============================================================
+   SNACKBAR — стек уведомлений в правом верхнем углу экрана.
+   z-index 9900 — поверх Modal (900) и ToastBar (800),
+   ниже ToastLoader (9999).
+   Requires: typography.css, colors.css, radius.css, shadow.css, button.css
+   ============================================================ */
+
+/* --- фиксированный слой ----------------------------------------- */
+.snackbar-layer {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9900;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+/* --- карточка ---------------------------------------------------- */
+.snack {
+  width: 100%;
+  background: var(--bg-tile);
+  border-radius: var(--radius-card);
+  box-shadow: var(--elevation-2);
+  padding: 14px 12px 14px 16px;
+  display: grid;
+  grid-template-columns: 20px 1fr 20px;
+  column-gap: 10px;
+  align-items: start;
+  pointer-events: all;
+  animation: snack-in .2s ease both;
+}
+
+.snack--leave { animation: snack-out .2s ease forwards; }
+
+@keyframes snack-in  { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+@keyframes snack-out { to   { opacity: 0; transform: translateX(14px); } }
+
+/* --- тона -------------------------------------------------------- */
+.snack--info    { background: var(--info-bg); }
+.snack--warning { background: var(--warning-bg); }
+.snack--error   { background: var(--error-bg-light); }
+.snack--success { background: var(--success-bg); }
+
+/* --- иконка тона ------------------------------------------------- */
+.snack__icon {
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px; flex: none;
+}
+.snack__icon :is(svg,[data-icon]){ width: 20px; height: 20px; display: block; }
+.snack--info    .snack__icon { color: var(--info); }
+.snack--warning .snack__icon { color: var(--warning); }
+.snack--error   .snack__icon { color: var(--error); }
+.snack--success .snack__icon { color: var(--success); }
+
+/* --- тело -------------------------------------------------------- */
+.snack__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-top: 1px; }
+
+/* заголовок: Body S, --text-primary */
+.snack__title { font: var(--type-body-s); color: var(--text-primary); line-height: 1.4; }
+
+/* счётчик дублей ×N */
+.snack__dupe {
+  display: inline-flex; align-items: center; justify-content: center;
+  font: var(--type-body-xs); font-weight: 600; line-height: 1;
+  padding: 2px 6px; border-radius: var(--radius-pill); margin-left: 6px; vertical-align: middle;
+}
+.snack--info    .snack__dupe { color: var(--info-dark);    background: color-mix(in srgb, var(--info)    20%, transparent); }
+.snack--warning .snack__dupe { color: var(--warning-dark); background: color-mix(in srgb, var(--warning) 20%, transparent); }
+.snack--error   .snack__dupe { color: var(--error-dark);   background: color-mix(in srgb, var(--error)   20%, transparent); }
+.snack--success .snack__dupe { color: var(--success-dark); background: color-mix(in srgb, var(--success) 20%, transparent); }
+
+/* текст: Body XS, --text-secondary */
+.snack__text { font: var(--type-body-xs); color: var(--text-secondary); line-height: 1.5; text-wrap: pretty; }
+
+/* кнопки действий */
+.snack__buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+/* Кнопки и ссылки внутри снека красятся штатными тоновыми классами ДС:
+   .btn--<tone> и .link--<tone> (совпадают с тоном снека). Локальная подмена
+   --primary / --link-fg убрана — ре-скоупа переменных больше нет. */
+
+/* --- кнопка закрытия --------------------------------------------- */
+.snack__close {
+  appearance: none; border: none; background: none; padding: 2px;
+  cursor: pointer; border-radius: var(--radius-xs);
+  display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; flex: none; margin-top: 1px;
+  opacity: .65; transition: opacity .15s;
+}
+.snack__close :is(svg,[data-icon]){ width: 16px; height: 16px; display: block; }
+.snack__close:hover { opacity: 1; }
+.snack__close:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; opacity: 1; }
+.snack--info    .snack__close { color: var(--info); }
+.snack--warning .snack__close { color: var(--warning); }
+.snack--error   .snack__close { color: var(--error); }
+.snack--success .snack__close { color: var(--success); }
+
+/* --- overflow pill «+N» ------------------------------------------ */
+.snack-more {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 10px 10px 16px;
+  background: var(--bg-tile); border: 1px solid var(--border-light);
+  border-radius: var(--radius-card); box-shadow: var(--elevation-2);
+  font: var(--type-body-s); color: var(--text-secondary);
+  pointer-events: all; animation: snack-in .2s ease both;
+}
+.snack-more__count { font-weight: 600; color: var(--text-primary); }
+.snack-more__actions { display: flex; align-items: center; gap: 2px; }
+.snack-more__btn {
+  appearance: none; border: none; background: none; padding: 4px; cursor: pointer;
+  border-radius: var(--radius-xs); color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center; transition: color .12s;
+}
+.snack-more__btn :is(svg,[data-icon]){ width: 16px; height: 16px; }
+.snack-more__btn:hover { color: var(--text-primary); }
+.snack-more__btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* --- reduced motion ---------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .snack              { animation: snk-fi .15s ease both; }
+  .snack--leave       { animation: snk-fo .15s ease forwards; }
+  .snack-more         { animation: snk-fi .15s ease both; }
+}
+@keyframes snk-fi { from { opacity: 0; } to { opacity: 1; } }
+@keyframes snk-fo { to   { opacity: 0; } }

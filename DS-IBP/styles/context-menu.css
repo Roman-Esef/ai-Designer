@@ -1,0 +1,254 @@
+/* =========================================================================
+   Design System — Context Menu (Контекстное меню)
+   Всплывающее меню действий, возникающее при нажатии на кнопку действий
+   (kebab «три точки» или дропдаун), в заголовке таблицы, строке таблицы
+   или карточке.
+
+   Container:  .menu
+   Item:       .menu__item  (+ --danger · --selected)
+   Parts:      .menu__label · .menu__divider · .menu__sub
+   States:     hover · focus · active · disabled · selected
+   Выбранный пункт помечается галочкой СПРАВА (trailing) — подписи всех
+   пунктов остаются выровнены независимо от наличия ведущих иконок.
+
+   Tokens (локальные, наследуются от семантических токенов ДС):
+     --menu-bg          — фон контейнера
+     --menu-radius      — радиус контейнера
+     --menu-min/max     — мин/макс ширина
+     --menu-item-h      — высота пункта
+     --menu-item-hover  — фон пункта в hover
+     --menu-shadow      — тень контейнера
+   Requires: typography.css, colors.css, radius.css
+   ========================================================================= */
+
+.menu {
+  --menu-bg:          var(--bg-popup);            /* #FFFFFF */
+  --menu-radius:      var(--radius-popup);        /* 12px    */
+  --menu-min:         180px;
+  --menu-max:         320px;
+  --menu-pad-y:       6px;                         /* верт. паддинг контейнера */
+  --menu-item-h:      40px;
+  --menu-item-px:     12px;
+  --menu-item-gap:    10px;
+  --menu-icon:        20px;
+  --menu-item-hover:  var(--tertiary);                                       /* #E5ECEB — нейтральный серый */
+  --menu-item-active: color-mix(in srgb, var(--c-swamp-500) 16%, var(--bg-popup));  /* нейтральный, чуть темнее hover */
+  --menu-shadow:      0 10px 30px rgba(40, 50, 55, .16);
+
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-direction: column;
+  min-width: var(--menu-min);
+  max-width: var(--menu-max);
+  padding: var(--menu-pad-y) 0;
+  background: var(--menu-bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--menu-radius);
+  box-shadow: var(--menu-shadow);
+  letter-spacing: 0;
+  z-index: 40;
+}
+
+/* =========================================================================
+   ITEM
+   ========================================================================= */
+.menu__item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--menu-item-gap);
+  width: 100%;
+  min-height: var(--menu-item-h);
+  padding: 0 var(--menu-item-px);
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: var(--type-body-m);              /* Body M — 16/20 */
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color .12s ease, color .12s ease;
+}
+
+.menu__item-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* по умолчанию — одна строка с многоточием */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* перенос длинных пунктов на 2+ строки */
+.menu__item--wrap { min-height: var(--menu-item-h); align-items: flex-start; padding-top: 9px; padding-bottom: 9px; }
+.menu__item--wrap .menu__item-label { white-space: normal; text-wrap: pretty; }
+
+/* leading icon */
+.menu__item-icon {
+  flex: none;
+  width: var(--menu-icon);
+  height: var(--menu-icon);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+.menu__item-icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+/* trailing hint (горячая клавиша / доп. значение) */
+.menu__item-hint {
+  flex: none;
+  margin-left: auto;
+  padding-left: 12px;
+  color: var(--text-inactive);
+  font: var(--type-body-s);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* trailing caret (подменю) */
+.menu__item-caret {
+  flex: none;
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  color: var(--text-inactive);
+}
+.menu__item-caret :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+/* trailing check (выбранный пункт) — СПРАВА, чтобы подписи оставались
+   выровнены в меню как с ведущими иконками, так и без них */
+.menu__item-check {
+  flex: none;
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  color: var(--primary);
+  opacity: 0;
+}
+.menu__item-check :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+/* ---------- states -------------------------------------------------------- */
+.menu__item:hover,
+.menu__item.is-hover { background: var(--menu-item-hover); }
+
+.menu__item:focus-visible,
+.menu__item.is-focus {
+  outline: 2px solid var(--primary);   /* стандартный фокус ДС */
+  outline-offset: -2px;
+  background: var(--menu-item-hover);
+}
+
+.menu__item:active,
+.menu__item.is-active { background: var(--menu-item-active); }
+
+.menu__item[aria-disabled="true"],
+.menu__item.is-disabled {
+  color: var(--text-inactive);
+  cursor: default;
+  pointer-events: none;
+}
+.menu__item[aria-disabled="true"] .menu__item-icon,
+.menu__item.is-disabled .menu__item-icon { color: var(--text-inactive); }
+
+/* selected */
+.menu__item[aria-checked="true"] .menu__item-check,
+.menu__item--selected .menu__item-check { opacity: 1; }
+.menu__item[aria-checked="true"] .menu__item-label,
+.menu__item--selected .menu__item-label { color: var(--text-primary); font: var(--type-body-m-strong); }
+
+/* ---------- danger (деструктивное действие) ------------------------------- */
+.menu__item--danger { color: var(--error-dark); }
+.menu__item--danger .menu__item-icon { color: var(--error); }
+.menu__item--danger:hover,
+.menu__item--danger.is-hover { background: var(--error-bg-light); }
+.menu__item--danger:active,
+.menu__item--danger.is-active { background: var(--error-bg); }
+.menu__item--danger:focus-visible,
+.menu__item--danger.is-focus { background: var(--error-bg-light); outline: 2px solid var(--error); outline-offset: -2px; }
+
+/* =========================================================================
+   GROUP LABEL / DIVIDER
+   ========================================================================= */
+.menu__label {
+  padding: 8px var(--menu-item-px) 4px;
+  color: var(--text-inactive);
+  font: var(--type-body-xs);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  user-select: none;
+}
+/* Divider между группами — переиспользует токены компонента Divider
+   (--dvd-color / --dvd-thickness), линия рисуется бордером как у .dvd--h;
+   фолбэки на случай, если divider.css не подключён на странице. */
+.menu__divider {
+  height: 0;
+  margin: var(--menu-pad-y) 0;
+  border: 0;
+  border-top: var(--dvd-thickness, 1px) solid var(--dvd-color, var(--border-light));
+}
+
+/* =========================================================================
+   SCROLL — переполнение по высоте
+   ========================================================================= */
+.menu--scroll {
+  max-height: var(--menu-max-h, 280px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) transparent;
+}
+.menu--scroll::-webkit-scrollbar { width: 8px; }
+.menu--scroll::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 999px; border: 2px solid var(--menu-bg); }
+.menu--scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* =========================================================================
+   SUBMENU — вложенное меню (flyout)
+   ========================================================================= */
+.menu__item--sub { position: relative; }
+.menu__sub {
+  position: absolute;
+  top: -6px;
+  left: 100%;
+  margin-left: 2px;
+}
+/* нет места справа — flyout разворачивается влево (ds-menu.js) */
+.menu__sub--left { left: auto; right: 100%; margin-left: 0; margin-right: 2px; }
+
+/* =========================================================================
+   FLOATING — меню, спозиционированное относительно триггера (через JS).
+   Триггер-обёртка получает position:relative, меню — position:absolute.
+   Появление/скрытие через .is-open.
+   ========================================================================= */
+.menu-anchor { position: relative; display: inline-flex; }
+
+.menu.menu--floating {
+  position: absolute;
+  opacity: 0;
+  /* закрытое меню выключено из раскладки полностью: visibility:hidden оставляет
+     его в потоке прокрутки, и на узком экране страница получает горизонтальный
+     скролл от невидимой панели (карточка сделки, 21.08.2026). display:none в
+     переходе — с allow-discrete, чтобы анимация появления сохранилась. */
+  display: none;
+  visibility: hidden;
+  transform: scale(.97);
+  transform-origin: var(--menu-origin, top center);
+  transition: opacity .13s ease, transform .13s ease, visibility 0s linear .13s, display .13s allow-discrete;
+}
+.menu.menu--floating.is-open {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  transition: opacity .13s ease, transform .13s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu.menu--floating { transition: opacity .01s; transform: none; }
+  .menu.menu--floating.is-open { transform: none; }
+}
+
+/* pinned — всегда открытое позиционированное меню (для демонстраций) */
+.menu.menu--floating.menu--pinned {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
+}
+

@@ -1,0 +1,1187 @@
+<!-- @dsCard group="Components" name="Radiobutton" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radiobutton — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/radio.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:74ch; text-wrap:pretty; }
+
+  
+  .row { display:flex; flex-wrap:wrap; align-items:flex-start; gap:40px; }
+
+  
+
+  ol.steps { margin:0; padding:0 0 0 2px; list-style:none; counter-reset:s; display:flex; flex-direction:column; gap:10px; }
+  ol.steps li { position:relative; padding-left:34px; font: var(--type-body-m); color: var(--text-primary); }
+  ol.steps li .k { font: var(--type-body-m-strong); }
+  ol.steps li::before { counter-increment:s; content:counter(s); position:absolute; left:0; top:-1px; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+
+  /* inline token chip */
+
+  /* ---------- playground ---------- */
+  @media (max-width:820px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center; 
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:420px; display:flex; align-items:center; justify-content:center; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+
+  .pg__code { margin-top:4px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* select control */
+
+  /* ---------- states matrix ---------- */
+  .matrix-wrap { overflow-x:auto; }
+  .matrix { display:grid; grid-template-columns: 150px repeat(6, 1fr); gap:24px 18px; align-items:center; min-width:660px; }
+  .matrix .col-head { font: var(--type-body-s-strong); color: var(--text-secondary); text-align:center; }
+  .matrix .cell { display:flex; justify-content:center; }
+
+  /* ---------- composition grid ---------- */
+  .compo { display:grid; grid-template-columns: 170px repeat(3, 1fr); gap:26px 24px; align-items:center; }
+  @media (max-width:720px){ .compo { grid-template-columns: 120px 1fr 1fr; } .compo .col3 { display:none; } }
+
+  /* ---------- anatomy ---------- */
+  .anat { display:grid; grid-template-columns: minmax(280px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:40px 44px; display:flex; justify-content:center; }
+  .anat__diagram { position:relative; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; font: var(--type-body-m); color: var(--text-primary); }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); }
+
+  /* ---------- group demo card ---------- */
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card__body { padding:20px 20px 0; flex:1; }
+  .guide-card__cap { padding:16px 20px 20px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- reference tables ---------- */
+  .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
+
+  @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
+  
+  .cref-group > h3 { font: var(--type-h5-strong); margin:0; color: var(--text-primary); padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .cref-row { display:grid; grid-template-columns: 36px 1fr auto; gap:14px; align-items:center; padding:9px 22px; }
+  .cref-sw .cf { position:absolute; inset:0; }
+
+  /* ---------- size spec ---------- */
+  @media (max-width:720px){ .size-spec { grid-template-columns:1fr; } }
+  .size-spec__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:44px; display:flex; justify-content:center; align-items:center; }
+
+  /* ---------- developer handoff ---------- */
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 34px; }
+  .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+    <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Radiobutton">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>2.007</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>Radiobutton</h1>
+    <p class="lead">Радиокнопка позволяет выбрать всего один пункт из списка взаимоисключающих вариантов. Используется только в составе группы. Два состояния выбора — Unselected / Selected — и интерактивные состояния Default / Hover / Focus / Pressed / Disabled / Error.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND (interactive — always first) -->
+  
+
+  <!-- WHEN TO USE -->
+  <section class="section" data-screen-label="WhenToUse">
+    <h2>Использование</h2>
+    <p class="desc">Используется только в составе группы радиокнопок и не может использоваться как единственная доступная опция — в этом случае используйте <a class="inl" href="../atoms/Checkbox.html">Чекбокс</a>.</p>
+    <p class="desc">Группу радиокнопок используют, когда вариантов выбора немного — 2–5. Может использоваться в тайлах, таблицах, модальных окнах, в формах и на стандартных страницах.</p>
+    <p class="desc">Используется для переключения с одной настройки на другую. Часто может выступать в качестве механизма фильтрации.</p>
+    <p class="desc">Если пунктов слишком много (от 5 до 15) или они не помещаются в ограниченном пространстве — используйте <a class="inl" href="../molecules/DropdownList.html">Выпадающий список</a>.</p>
+    <p class="desc">Если нужно дать возможность выбрать один или несколько пунктов — используйте <a class="inl" href="../atoms/Checkbox.html">Чекбокс</a>.</p>
+  
+</section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">У иконки радиокнопки есть охранное поле: компонент иконки имеет размер 20×20 px, а сам круглый шейп внутри него — 16×16 px. В группе сверху может быть заголовок.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage">
+          <div class="anat__diagram" id="anat-diagram"></div>
+        </div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Заголовок группы</span><span class="d"> — опционально, H6 Strong</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Радиокнопка</span><span class="d"> — круглый шейп 16px в охранном поле 20px</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Название радиокнопки</span><span class="d"> — Body M, справа от шейпа</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Хелпер</span><span class="d"> — опционально, Body XS, общий компонент подкачки — см. <a class="inl" href="../atoms/LabelHelper.html">Label / Helper</a></span></span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="desc" style="margin-top:28px;">Группы радиокнопок могут быть вертикальными или горизонтальными. По умолчанию группы вертикальные. Используйте горизонтальную группу, когда пространство по вертикали ограничено.</p>
+    <div class="panel" style="display:flex; gap:48px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:220px;">
+        <p class="desc tight" style="margin-bottom:14px;">Вертикальная (по умолчанию)</p>
+        <div id="layout-v"></div>
+      </div>
+      <div style="flex:1; min-width:260px;">
+        <p class="desc tight" style="margin-bottom:14px;">Горизонтальная</p>
+        <div id="layout-h"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ВАРИАНТЫ -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Оси конфигурации компонента — каждая описана отдельным подразделом.</p>
+  
+<div class="subsec" data-screen-label="Composition">
+    <h3>Состав</h3>
+    <p class="desc">Вспомогательные части — название и хелпер — опциональны. Радиокнопка рендерится без названия (icon-only — например, в ячейке таблицы), с названием и с хелпером. Шейп всегда выровнен по первой строке текста.</p>
+    <div class="panel">
+      <div class="compo" id="compo"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">У радиокнопки один размер. Геометрия шейпа привязана к интерлиньяжу Body M (20px): видимый шейп — 16px в охранном поле 20px, чтобы центрироваться по первой строке названия. Значения ниже измерены на живом экземпляре.</p>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="size-spec">
+        <div class="size-spec__stage" id="size-stage"></div>
+        <ul class="bullets">
+          <li>Охранное поле 20px совпадает с интерлиньяжем Body M — шейп ровно ложится на строку.</li>
+          <li>Видимый круг 16px — готовая SVG-иконка пака System (radio-button-unchecked/checked), без самодельной рамки/точки.</li>
+          <li>Зазор шейп ↔ название — 8px; название ↔ хелпер — 2px.</li>
+          <li>Горизонтальная группа: зазор между пунктами — 24px.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.7fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Источник</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="size-table"></div></div>
+    </div>
+  
+<div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Радиокнопка всегда круглая — этим её шейп отличается от чекбокса (2px).</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Шейп — единственный размер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Точка выбора</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc tight">Текстовый контент радиокнопки — название, опциональный хелпер и заголовок группы. Краткий свод правил (подробно — в разделах ниже):</p>
+    <ul class="bullets" style="margin-bottom:26px;">
+      <li><b>Название</b> (Body M, справа от шейпа) — с заглавной буквы, без пунктуации в конце; чётко и кратко описывает эффект выбора;</li>
+      <li><b>Хелпер</b> (Body XS под названием) — поясняет неочевидный эффект выбора; общий компонент — см. <a class="inl" href="../atoms/LabelHelper.html">Label / Helper</a>;</li>
+      <li><b>Заголовок группы</b> (H6 Strong) — добавляется для ясности или чтобы вынести повторяющиеся в пунктах слова; формулируйте так, чтобы было понятно: выбрать можно только один вариант;</li>
+      <li><b>Обязательность и ошибка</b> — у обязательного заголовка группы ставится звёздочка <code class="tok">*</code>; текст ошибки группы — Body XS цвета <code class="tok">--error</code>;</li>
+      <li>не давайте пересекающиеся варианты и не обрезайте название многоточием — при нехватке места переформулируйте его короче.</li>
+    </ul>
+  
+<div class="subsec" data-screen-label="LabelRules">
+    <h3>Название радиокнопки</h3>
+    <p class="desc">Название пишется с заглавной буквы, без знаков пунктуации в конце, и всегда располагается справа от радиокнопки. Название каждой радиокнопки должно чётко и кратко описывать эффект от её выбора — короткие названия позволяют делать выбор быстро и уверенно.</p>
+    <p class="desc">Убедитесь, что варианты не пересекаются. Например, при выборе суммы «0–100», «100–1000» неясно, что выбрать, если сумма равна 100.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad1"></span>Не так</div>
+        <div class="guide-card__body" id="label-bad"></div>
+        <p class="guide-card__cap">Длинные названия и пересекающиеся диапазоны замедляют выбор.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good1"></span>Так</div>
+        <div class="guide-card__body" id="label-good"></div>
+        <p class="guide-card__cap">Короткие непересекающиеся названия читаются однозначно.</p>
+      </div>
+    </div>
+    <p class="desc" style="margin-top:26px;">Если пользователю может быть не очевидно, что произойдёт при выборе, объясните это дополнительным текстом-хелпером.</p>
+  </div>
+
+<div class="subsec" data-screen-label="GroupRules">
+    <h3>Заголовок группы</h3>
+    <p class="desc">Добавляйте заголовок к группе для ясности, если взаимосвязь пунктов неочевидна, или чтобы вынести в него повторяющиеся в пунктах слова. Заголовок начинается с заглавной, начертанием <b>Strong</b> того же кегля, что и название. Допустимо использование <b>H6 Strong</b>, если группа входит в состав другой группы. Формулируйте заголовок так, чтобы было понятно: можно выбрать только один вариант.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-bad2"></span>Не так</div>
+        <div class="guide-card__body" id="group-bad"></div>
+        <p class="guide-card__cap">«Статус сделки» повторяется в каждом пункте.</p>
+      </div>
+      <div class="guide-card good">
+        <div class="guide-card__bar"></div>
+        <div class="guide-card__tag"><span class="ic" id="ic-good2"></span>Так</div>
+        <div class="guide-card__body" id="group-good"></div>
+        <p class="guide-card__cap">Общее слово вынесено в заголовок группы.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Правила поведения: позиционирование, переполнение, анимация, адаптивность.</p>
+  
+<div class="subsec" data-screen-label="HowItWorks">
+    <h3>Описание работы</h3>
+    <p class="desc">Клик по названию или по самой радиокнопке приводит к её выбору. Повторное нажатие не снимает выбор. Когда пользователь выбирает новый элемент, предыдущий выбор автоматически отменяется.</p>
+    <p class="desc tight">Радиокнопки всегда образуют группы:</p>
+    <div class="panel">
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li>заголовок группы для дополнительной ясности, если необходимо;</li>
+        <li>несколько радиокнопок с текстом подписи (подпись всегда справа от радиокнопки);</li>
+        <li>выравнивание группы всегда по левому краю.</li>
+      </ul>
+      <p class="desc" style="margin-bottom:24px; max-width:80ch;">В группе радиокнопок только один пункт может быть выбран. Группа не может состоять из одного пункта. В группе активная область радиокнопки вытягивается на всю высоту строки. Поиграйте с примером:</p>
+      <div class="demo-card" id="how-demo" style="max-width:300px;"></div>
+    </div>
+    <p class="desc" style="margin-top:28px;">Если группа используется для настройки параметров и показывает текущее состояние системы, одна из радиокнопок всегда выбрана — так видно, в каком состоянии система находится по умолчанию. Выбранный по умолчанию пункт ставьте первым в списке.</p>
+    <p class="desc tight">Сортируйте пункты списка по определённой логике:</p>
+    <ul class="bullets">
+      <li>от наиболее подходящего в данном контексте до наименее подходящего;</li>
+      <li>по возрастанию или убыванию;</li>
+      <li>хронологически;</li>
+      <li>следуя другой понятной системе.</li>
+    </ul>
+  </div>
+
+  <div class="subsec" data-screen-label="Error">
+    <h3>Ошибка и валидация</h3>
+    <p class="desc">Состояние Error появляется, когда обязательная группа не имеет выбранного пункта при отправке формы. Поскольку у радиокнопки нет промежуточного состояния, ошибка всегда относится к группе целиком: шейпы и сообщение окрашиваются в <code class="tok">--error</code>, рядом с заголовком обязательной группы ставится звёздочка.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Обязательная группа без выбора — ошибка</p>
+        <div id="err-group"></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:18px;">Выбор любого пункта снимает ошибку</p>
+        <div id="err-fixed"></div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Два состояния выбора по вертикали и интерактивные состояния по горизонтали. Состояния <b>Hover</b>, <b>Focus</b>, <b>Pressed</b> и <b>Error</b> добавлены к исходной матрице Default / Disabled.</p>
+    <div class="panel">
+      <div class="matrix-wrap"><div class="matrix" id="matrix"></div></div>
+    </div>
+  </section>
+
+  <!-- HIT AREA / A11Y -->
+  <section class="section" data-screen-label="HitArea">
+    <h2>Доступность</h2>
+    <p class="desc">Видимый шейп — 16px, но кликабельная область шире: она включает название и хелпер. В группе активная область вытягивается на всю высоту строки. Клавиатура работает по правилам radio group: <b>Tab</b> переводит фокус на группу, <b>стрелками</b> ↑↓ ←→ выбор перемещается между пунктами (и сразу применяется), фокус показывается обводкой <code class="tok">--primary</code>.</p>
+    <div class="row">
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:16px;">Активная область строки в группе</p>
+        <div class="demo-card" style="background:var(--tertiary-light); border:none;" id="hit-demo"></div>
+      </div>
+      <div class="panel" style="flex:1; min-width:280px;">
+        <p class="desc tight" style="margin-bottom:16px;">Фокус и навигация стрелками — Tab, затем ↑ / ↓</p>
+        <div class="demo-card" id="focus-demo"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Название набирается гарнитурой <b>SB Sans Text</b> токеном <code class="tok">--type-body-m</code>, хелпер — <code class="tok">--type-body-xs</code>, заголовок группы — <code class="tok">--type-h6-strong</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.17fr 1.13fr 0.9fr 1.35fr 0.77fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.17fr 1.13fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Название</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.17fr 1.13fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Хелпер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.17fr 1.17fr 1.13fr 0.9fr 1.35fr 0.77fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок группы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-h6-strong</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Display</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Semibold</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-h6-strong)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <table id="typo-table" style="display:none"><tbody></tbody></table>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Компонент использует только семантические токены. Производные оттенки (hover) и state-слои вычисляются из <code class="tok">--primary</code> через <code class="tok">color-mix</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Шейп</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Граница · Unselected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Шейп</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Граница / точка · Selected</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Шейп</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Граница / точка · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#007A6D</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Шейп</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">State-слой · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">3% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Шейп</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">State-слой · Pressed</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Название</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Хелпер</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заголовок группы</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Текст · Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Граница / точка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--disabled</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--disabled)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#BEC5C8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Граница / точка</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E5625C</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Граница · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#D32F2F</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.81fr 1.62fr 1.26fr 0.77fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Error</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">State-слой · Hover</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--error-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--error-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FBECEB</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+    <div id="color-ref" style="display:none"></div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Хендофф-пакет: точные размеры, эталонная структура DOM, поведение и рекомендуемый API. Не привязан к стеку — команда, которая собирает компонент на React, берёт отсюда нужное для вёрстки, не читая код этой страницы построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения измерены на живом экземпляре компонента (<code class="tok">getComputedStyle</code>), источник — токены в <code class="tok">styles/radio.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:34px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Значение</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/label-helper.css</code>
+      <code class="tok">styles/radio.css</code>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 1. Состояние выбора — бинарное на каждом input:</span>
+<span class="tk-cm">//    unselected → checked=false; selected → checked=true</span>
+<span class="tk-cm">//    у радиокнопки нет indeterminate — всегда ровно один выбранный пункт в группе</span>
+
+<span class="tk-cm">// 2. Взаимоисключающий выбор: все input в группе делят один name —</span>
+<span class="tk-cm">//    браузер снимает выбор с остальных автоматически; повторный клик по выбранному не снимает выбор</span>
+
+<span class="tk-cm">// 3. Клик по названию ИЛИ шейпу переключает выбор (&lt;label&gt; оборачивает input)</span>
+
+<span class="tk-cm">// 4. Клавиатурная навигация (native radiogroup semantics):</span>
+<span class="tk-cm">//    Tab входит/выходит из группы одним шагом — фокусируется только checked-пункт (или первый, если ничего не выбрано);</span>
+<span class="tk-cm">//    ↑↓←→ перемещают фокус МЕЖДУ пунктами группы И сразу применяет выбор (без Enter/Space)</span>
+
+<span class="tk-cm">// 5. Интерактивные состояния — чистый CSS (:hover / :active / :focus-visible);</span>
+<span class="tk-cm">//    hover: рамка primary + halo 4px; pressed: halo 6px</span>
+<span class="tk-cm">//    классы .rb--hover / .rb--focus / .rb--pressed — только для документации</span>
+
+<span class="tk-cm">// 6. Error: обязательная группа без выбора при сабмите → класс .rb--error на всех пунктах группы;</span>
+<span class="tk-cm">//    сообщение .rb-group__error (Body XS, --error), связано через aria-describedby;</span>
+<span class="tk-cm">//    выбор любого пункта снимает ошибку со всей группы</span>
+
+<span class="tk-cm">// 7. Disabled: input.disabled + .rb--disabled (pointer-events: none) — может быть у отдельных</span>
+<span class="tk-cm">//    пунктов внутри доступной группы</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки — алгоритм, который реализуется поверх вашего стека (рабочий референс на vanilla JS — функции <code class="tok">makeRb</code> / <code class="tok">wireGroup</code> в коде этой страницы).</p>
+
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Radio-карточка</b> — крупный кликабельный вариант с описанием и иконкой (RadioCard, как в Ant/Carbon), не только строка с меткой.</li>
+        <li><b>Валидация группы целиком</b> — сообщение об ошибке на уровне <code class="tok">.rb-group</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · Radiobutton</span>
+    <span>Unselected · Selected — Default / Hover / Focus / Pressed / Disabled / Error</span>
+  </footer>
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите радиокнопку: переключайте состояние выбора, интерактивное состояние и состав — превью обновляется мгновенно.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script>
+/* ---------- icons ---------- */
+const UI_ICONS = {
+  bad:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  good: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+  warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
+};
+/* подставляем иконки из библиотеки ДС */
+(function(){ const L=window.DS_ICONS||{}; const m={bad:'close',good:'check',warn:'alert-triangle'};
+  for(const k in m){ if(L[m[k]]) UI_ICONS[k]=L[m[k]]; } })();
+
+/* ---------- radiobutton factory ----------
+   o: { state, label, helper, disabled, error, required, force, frozen, name } */
+function makeRb(o = {}) {
+  const { state='unselected', label=null, helper=null, disabled=false,
+          error=false, required=false, force=null, frozen=false, name=null } = o;
+  const root = document.createElement('label');
+  root.className = 'rb rb--' + state;
+  if (disabled) root.classList.add('rb--disabled');
+  if (error)    root.classList.add('rb--error');
+  if (force)    root.classList.add('rb--' + force);
+  if (label==null && helper==null) root.classList.add('rb--no-content');
+
+  const input = document.createElement('input');
+  input.type = 'radio'; input.className = 'rb__input';
+  if (name) input.name = name;
+  input.checked = state === 'selected';
+  if (disabled) input.disabled = true;
+
+  const box = document.createElement('span'); box.className = 'rb__box';
+  const mark = document.createElement('span'); mark.className = 'rb__mark';
+  mark.innerHTML = radioIconSvg(state);
+  box.appendChild(mark);
+
+  root.appendChild(input); root.appendChild(box);
+
+  if (label != null || helper != null) {
+    const content = document.createElement('span'); content.className = 'rb__content';
+    if (label != null) {
+      const l = document.createElement('span'); l.className = 'rb__label'; l.textContent = label;
+      if (required) { const r = document.createElement('span'); r.className = 'rb__req'; r.textContent = '*'; l.appendChild(r); }
+      content.appendChild(l);
+    }
+    if (helper != null) {
+      const h = document.createElement('span'); h.className = 'ds-helper ds-helper--left'; h.textContent = helper;
+      content.appendChild(h);
+    }
+    root.appendChild(content);
+  }
+
+  if (frozen) root.addEventListener('click', e => e.preventDefault());
+  return root;
+}
+function radioIconSvg(state){
+  const raw = (window.DS_ICONS||{})[state==='selected' ? 'radio-button-checked' : 'radio-button-unchecked'] || '';
+  return raw.replace(/fill="(?!none)[^"]*"/g, 'fill="currentColor"');
+}
+function setRbState(root, state){
+  root.classList.remove('rb--unselected','rb--selected');
+  root.classList.add('rb--' + state);
+  const input = root.querySelector('.rb__input');
+  input.checked = state==='selected';
+  const mark = root.querySelector('.rb__mark');
+  if (mark) mark.innerHTML = radioIconSvg(state);
+}
+/* exclusive selection within a list of rb elements */
+function wireGroup(items, onChange){
+  items.forEach(rb=>{
+    rb.addEventListener('click', e=>{
+      e.preventDefault();
+      if (rb.classList.contains('rb--disabled')) return;
+      items.forEach(o=> setRbState(o, o===rb ? 'selected' : 'unselected'));
+      if (onChange) onChange(rb);
+    });
+  });
+}
+
+/* ---------- PLAYGROUND ---------- */
+(function(){
+  const state = { sel:'selected', istate:'default', label:true, helper:false, group:false, required:false, error:false };
+  const controls = document.getElementById('pg-controls');
+  const preview  = document.getElementById('pg-preview');
+  const codeEl   = document.getElementById('pg-code');
+
+  function select(label, options, getCur, onPick){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    options.forEach(([val,txt])=>{ const op=document.createElement('option'); op.value=val; op.textContent=txt; if(val===getCur()) op.selected=true; sel.appendChild(op); });
+    sel.addEventListener('change',()=>{ onPick(sel.value); render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+  /* Бинарные опции — селекты: docs-split.js конвертирует их в свитчи ДС (урок Л4) */
+  function ctlToggle(label, key){
+    const wrap=document.createElement('div'); wrap.className='ctl';
+    const l=document.createElement('div'); l.className='lbl'; l.textContent=label; wrap.appendChild(l);
+    const box=document.createElement('div'); box.className='pg-select';
+    const sel=document.createElement('select');
+    [['no','Нет'],['yes','Да']].forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; if((v==='yes')===!!state[key]) o.selected=true; sel.appendChild(o); });
+    sel.addEventListener('change',()=>{ state[key]=sel.value==='yes'; render(); });
+    box.appendChild(sel); wrap.appendChild(box); return wrap;
+  }
+
+  controls.appendChild(select('Состояние выбора',
+    [['unselected','Unselected'],['selected','Selected']],
+    ()=>state.sel, v=>state.sel=v));
+  controls.appendChild(select('Интерактивное состояние',
+    [['default','Default'],['hover','Hover'],['focus','Focus'],['pressed','Pressed'],['disabled','Disabled']],
+    ()=>state.istate, v=>state.istate=v));
+
+  controls.appendChild(ctlToggle('Название','label'));
+  controls.appendChild(ctlToggle('Хелпер','helper'));
+  controls.appendChild(ctlToggle('Группа','group'));
+  controls.appendChild(ctlToggle('Обязательный выбор (*)','required'));
+  controls.appendChild(ctlToggle('Ошибка','error'));
+
+  function render(){
+    const o = { state: state.sel };
+    if (state.label)  o.label  = 'Ежеминутно';
+    if (state.helper) o.helper = 'Обновлять список чаще всего';
+    o.error    = state.error;
+    o.disabled = state.istate==='disabled';
+    if (['hover','focus','pressed'].includes(state.istate)) o.force = state.istate;
+    o.frozen = true;
+    // одиночная радиокнопка: звёздочка на названии, если обязательный и НЕ в группе
+    if (state.required && !state.group) o.required = true;
+    const rb = makeRb(o);
+    preview.innerHTML='';
+    if (state.group){
+      const group=document.createElement('div'); group.className='rb-group';
+      const title=document.createElement('p'); title.className='rb-group__title';
+      title.innerHTML='Обновлять список'+(state.required?'<span class="rb__req">*</span>':'');
+      const items=document.createElement('div'); items.className='rb-group__items';
+      items.appendChild(rb);
+      group.appendChild(title); group.appendChild(items);
+      preview.appendChild(group);
+    } else {
+      preview.appendChild(rb);
+    }
+
+    const cls=['rb','rb--'+state.sel];
+    if (o.disabled) cls.push('rb--disabled');
+    if (state.error) cls.push('rb--error');
+    if (o.force) cls.push('rb--'+o.force);
+    if (!state.label && !state.helper) cls.push('rb--no-content');
+    const labelCode='<code>&lt;label class="'+cls.join(' ')+'"&gt;</code>';
+    codeEl.innerHTML = state.group
+      ? '<code>&lt;div class="rb-group"&gt;&lt;p class="rb-group__title"&gt;…'+(state.required?'&lt;span class="rb__req"&gt;*&lt;/span&gt;':'')+'&lt;/p&gt;</code>'+labelCode
+      : labelCode;
+  }
+  render();
+})();
+
+/* ---------- HOW IT WORKS (interactive group) ---------- */
+(function(){
+  const root = document.getElementById('how-demo');
+  const group = document.createElement('div'); group.className='rb-group';
+  const title = document.createElement('p'); title.className='rb-group__title'; title.textContent='Обновлять список';
+  const items = document.createElement('div'); items.className='rb-group__items';
+  const defs = [['Ежеминутно (по умолчанию)','selected'],['Ежечасно','unselected'],['Ежедневно','unselected']];
+  const els = defs.map(([t,s])=> makeRb({ state:s, label:t, name:'how' }));
+  els.forEach(e=>items.appendChild(e));
+  group.appendChild(title); group.appendChild(items); root.appendChild(group);
+  wireGroup(els);
+})();
+
+/* ---------- ANATOMY DIAGRAM ---------- */
+(function(){
+  const d = document.getElementById('anat-diagram');
+  const group = document.createElement('div'); group.className='rb-group';
+  const title = document.createElement('p'); title.className='rb-group__title'; title.textContent='Заголовок группы';
+  const items = document.createElement('div'); items.className='rb-group__items';
+  items.appendChild(makeRb({ state:'selected', label:'Вариант 1', frozen:true }));
+  items.appendChild(makeRb({ state:'unselected', label:'Вариант 2', helper:'Хелпер', frozen:true }));
+  items.appendChild(makeRb({ state:'unselected', label:'Вариант 3', frozen:true }));
+  group.appendChild(title); group.appendChild(items); d.appendChild(group);
+})();
+
+/* ---------- LAYOUT (vertical / horizontal) ---------- */
+(function(){
+  function build(host, horizontal){
+    const group = document.createElement('div'); group.className='rb-group' + (horizontal?' rb-group--horizontal':'');
+    const title = document.createElement('p'); title.className='rb-group__title'; title.textContent='Обновлять список';
+    const items = document.createElement('div'); items.className='rb-group__items';
+    const defs = [['Ежеминутно','selected'],['Ежечасно','unselected'],['Ежедневно','unselected']];
+    const els = defs.map(([t,s])=> makeRb({ state:s, label:t, name: horizontal?'lh':'lv' }));
+    els.forEach(e=>items.appendChild(e));
+    group.appendChild(title); group.appendChild(items); host.appendChild(group);
+    wireGroup(els);
+  }
+  build(document.getElementById('layout-v'), false);
+  build(document.getElementById('layout-h'), true);
+})();
+
+/* ---------- STATES MATRIX ---------- */
+(function(){
+  const m = document.getElementById('matrix');
+  const cols = ['Default','Hover','Focus','Pressed','Disabled','Error'];
+  m.appendChild(Object.assign(document.createElement('div'),{className:'col-head'}));
+  cols.forEach(c=>{ const d=document.createElement('div'); d.className='col-head'; d.textContent=c; m.appendChild(d); });
+
+  const rows = [['Unselected','unselected'],['Selected','selected']];
+  rows.forEach(([name,sel])=>{
+    const rn=document.createElement('div'); rn.className='rowname'; rn.textContent=name; m.appendChild(rn);
+    [['default'],['hover'],['focus'],['pressed'],['disabled'],['error']].forEach(([k])=>{
+      const cell=document.createElement('div'); cell.className='cell';
+      const o={ state:sel, frozen:true };
+      if (k==='disabled') o.disabled=true;
+      else if (k==='error') o.error=true;
+      else if (k!=='default') o.force=k;
+      cell.appendChild(makeRb(o));
+      m.appendChild(cell);
+    });
+  });
+})();
+
+/* ---------- COMPOSITION ---------- */
+(function(){
+  const g = document.getElementById('compo');
+  const heads = ['', 'Label: No','Label: Yes','Label + Helper'];
+  heads.forEach((h,i)=>{ const d=document.createElement('div'); d.className= i===0?'rh':'ch'; if(i===3)d.classList.add('col3'); d.textContent=h; g.appendChild(d); });
+  [['Unselected','unselected'],['Selected','selected']].forEach(([name,sel])=>{
+    const rh=document.createElement('div'); rh.className='rh'; rh.textContent=name; g.appendChild(rh);
+    [null, {label:'Text'}, {label:'Text', helper:'Helper'}].forEach((cfg,i)=>{
+      const cell=document.createElement('div'); cell.className='cell'+(i===2?' col3':'');
+      cell.appendChild(makeRb(Object.assign({ state:sel, frozen:true }, cfg||{})));
+      g.appendChild(cell);
+    });
+  });
+})();
+
+/* ---------- ERROR / VALIDATION ---------- */
+(function(){
+  // left: group in error
+  const eg = document.getElementById('err-group');
+  const g1 = document.createElement('div'); g1.className='rb-group';
+  const t1 = document.createElement('p'); t1.className='rb-group__title';
+  t1.textContent='Способ доставки'; const r=document.createElement('span'); r.className='rb__req'; r.textContent='*'; t1.appendChild(r);
+  const i1 = document.createElement('div'); i1.className='rb-group__items';
+  ['Курьером','Самовывоз','Почтой'].forEach(t=> i1.appendChild(makeRb({ state:'unselected', error:true, label:t, frozen:true })));
+  const err = document.createElement('p'); err.className='rb-group__error'; err.innerHTML = UI_ICONS.warn + '<span>Выберите один из вариантов</span>';
+  g1.appendChild(t1); g1.appendChild(i1); g1.appendChild(err); eg.appendChild(g1);
+
+  // right: live — picking clears the error
+  const ef = document.getElementById('err-fixed');
+  const g2 = document.createElement('div'); g2.className='rb-group';
+  const t2 = document.createElement('p'); t2.className='rb-group__title';
+  t2.textContent='Способ доставки'; const r2=document.createElement('span'); r2.className='rb__req'; r2.textContent='*'; t2.appendChild(r2);
+  const i2 = document.createElement('div'); i2.className='rb-group__items';
+  const els = ['Курьером','Самовывоз','Почтой'].map(t=> makeRb({ state:'unselected', error:true, label:t, name:'ef' }));
+  els.forEach(e=>i2.appendChild(e));
+  const err2 = document.createElement('p'); err2.className='rb-group__error'; err2.innerHTML = UI_ICONS.warn + '<span>Выберите один из вариантов</span>';
+  g2.appendChild(t2); g2.appendChild(i2); g2.appendChild(err2); ef.appendChild(g2);
+  wireGroup(els, ()=>{
+    els.forEach(e=> e.classList.remove('rb--error'));
+    t2.querySelector('.rb__req').style.display='none';
+    err2.style.display='none';
+  });
+})();
+
+/* ---------- LABEL GUIDELINES ---------- */
+(function(){
+  const bad = document.getElementById('label-bad');
+  const g1 = document.createElement('div'); g1.className='rb-group';
+  const t1 = document.createElement('p'); t1.className='rb-group__title'; t1.textContent='Сумма сделки';
+  const i1 = document.createElement('div'); i1.className='rb-group__items';
+  [['Сделки на сумму от 0 до 100','selected'],['Сделки на сумму от 100 до 1000','unselected'],['Сделки на сумму свыше 1000','unselected']]
+    .forEach(([t,s])=> i1.appendChild(makeRb({ state:s, label:t, frozen:true })));
+  g1.appendChild(t1); g1.appendChild(i1); bad.appendChild(g1);
+
+  const good = document.getElementById('label-good');
+  const g2 = document.createElement('div'); g2.className='rb-group';
+  const t2 = document.createElement('p'); t2.className='rb-group__title'; t2.textContent='Сумма сделки, ₽';
+  const i2 = document.createElement('div'); i2.className='rb-group__items';
+  [['До 100','selected'],['100 — 1 000','unselected'],['Свыше 1 000','unselected']]
+    .forEach(([t,s])=> i2.appendChild(makeRb({ state:s, label:t, frozen:true })));
+  g2.appendChild(t2); g2.appendChild(i2); good.appendChild(g2);
+})();
+
+/* ---------- GROUP TITLE GUIDELINES ---------- */
+(function(){
+  const bad = document.getElementById('group-bad');
+  const g1 = document.createElement('div'); g1.className='rb-group';
+  const i1 = document.createElement('div'); i1.className='rb-group__items';
+  [['Статус сделки «В работе»','selected'],['Статус сделки «На рассмотрении»','unselected'],['Статус сделки «Закрыта»','unselected']]
+    .forEach(([t,s])=> i1.appendChild(makeRb({ state:s, label:t, frozen:true })));
+  g1.appendChild(i1); bad.appendChild(g1);
+
+  const good = document.getElementById('group-good');
+  const g2 = document.createElement('div'); g2.className='rb-group';
+  const t2 = document.createElement('p'); t2.className='rb-group__title'; t2.textContent='Статус сделки';
+  const i2 = document.createElement('div'); i2.className='rb-group__items';
+  [['В работе','selected'],['На рассмотрении','unselected'],['Закрыта','unselected']]
+    .forEach(([t,s])=> i2.appendChild(makeRb({ state:s, label:t, frozen:true })));
+  g2.appendChild(t2); g2.appendChild(i2); good.appendChild(g2);
+})();
+
+/* ---------- GUIDE ICONS ---------- */
+['ic-bad1','ic-bad2'].forEach(id=> document.getElementById(id).innerHTML = UI_ICONS.bad);
+['ic-good1','ic-good2'].forEach(id=> document.getElementById(id).innerHTML = UI_ICONS.good);
+
+/* ---------- HIT AREA + FOCUS DEMOS ---------- */
+(function(){
+  const hit = document.getElementById('hit-demo');
+  const group = document.createElement('div'); group.className='rb-group';
+  const title = document.createElement('p'); title.className='rb-group__title'; title.textContent='Заголовок группы';
+  const items = document.createElement('div'); items.className='rb-group__items';
+  const els = ['Вариант 1','Вариант 2','Вариант 3'].map((t,i)=> makeRb({ state: i===0?'selected':'unselected', label:t, name:'hit' }));
+  els.forEach(e=>items.appendChild(e));
+  group.appendChild(title); group.appendChild(items); hit.appendChild(group);
+  wireGroup(els);
+
+  // focus + arrow-key navigation demo (real radio group semantics)
+  const fd = document.getElementById('focus-demo');
+  const g2 = document.createElement('div'); g2.className='rb-group';
+  const t2 = document.createElement('p'); t2.className='rb-group__title'; t2.textContent='Тариф';
+  const i2 = document.createElement('div'); i2.className='rb-group__items';
+  const els2 = ['Базовый','Стандарт','Премиум'].map((t,i)=> makeRb({ state:i===0?'selected':'unselected', label:t, name:'focus' }));
+  els2.forEach(e=>i2.appendChild(e));
+  g2.appendChild(t2); g2.appendChild(i2); fd.appendChild(g2);
+  wireGroup(els2);
+  // arrow keys move selection (native radios share name -> browser handles it,
+  // but we keep visual state in sync on change)
+  els2.forEach(rb=>{
+    const input = rb.querySelector('.rb__input');
+    input.addEventListener('change', ()=>{
+      els2.forEach(o=> setRbState(o, o===rb ? 'selected':'unselected'));
+    });
+  });
+})();
+
+/* ---------- TYPOGRAPHY REFERENCE ---------- */
+(function(){
+  const rows = [
+    ['Название',        'Ежеминутно',       '--type-body-m',     'SB Sans Text',   '16 / 20', 'rb__label'],
+    ['Хелпер',          'Обновлять чаще',    '--type-body-xs',    'SB Sans Text',   '12 / 16', 'ds-helper ds-helper--left'],
+    ['Заголовок группы','Обновлять список',  '--type-h6-strong',  'SB Sans Display','16 / 20', 'rb-group__title'],
+  ];
+  const tb = document.querySelector('#typo-table tbody');
+  tb.innerHTML = rows.map(([part,sample,tok,font,sl,cls])=>`
+    <tr>
+      <td>${part}</td>
+      <td><span class="${cls}" style="display:inline;">${sample}</span></td>
+      <td class="rt-tok"><code>${tok}</code></td>
+      <td>${font}</td>
+      <td class="rt-num">${sl}</td>
+    </tr>`).join('');
+})();
+
+/* ---------- COLORS REFERENCE ---------- */
+(function(){
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(probe);
+  function resolveHex(cssValue){
+    probe.style.backgroundColor = 'transparent';
+    probe.style.backgroundColor = cssValue;
+    const v = getComputedStyle(probe).backgroundColor;
+    let r,g,b,a=1, m=v.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+    if (m){ r=+m[1]*255; g=+m[2]*255; b=+m[3]*255; if(m[4]!==undefined) a=+m[4]; }
+    else { const n=v.match(/[\d.]+/g); if(!n) return cssValue; r=+n[0]; g=+n[1]; b=+n[2]; if(n[3]!==undefined) a=+n[3]; }
+    const hx=n=>Math.round(n).toString(16).padStart(2,'0').toUpperCase();
+    let s='#'+hx(r)+hx(g)+hx(b); if(a<1) s+=' · '+Math.round(a*100)+'%'; return s;
+  }
+  const groups = [
+    { name:'Шейп', rows:[
+      ['Граница · Unselected', '--border-dark'],
+      ['Граница / точка · Selected', '--primary'],
+      ['Граница / точка · Hover', '--primary-dark'],
+      ['State-слой · Hover', '--primary-bg-light'],
+      ['State-слой · Pressed', '--primary-bg'],
+    ]},
+    { name:'Текст', rows:[
+      ['Название', '--text-primary'],
+      ['Хелпер', '--text-inactive'],
+      ['Заголовок группы', '--text-primary'],
+      ['Текст · Disabled', '--text-inactive'],
+    ]},
+    { name:'Disabled', rows:[
+      ['Граница / точка', '--disabled'],
+    ]},
+    { name:'Error', rows:[
+      ['Граница / точка', '--error'],
+      ['Граница · Hover', '--error-dark'],
+      ['State-слой · Hover', '--error-bg'],
+    ]},
+  ];
+  const root = document.getElementById('color-ref');
+  root.innerHTML = groups.map(g=>`
+    <section class="cref-group">
+      <h3>${g.name}</h3>
+      <div class="cref-rows">
+        ${g.rows.map(([role,tok])=>`
+          <div class="cref-row">
+            <div class="cref-sw"><div class="cf" style="background:var(${tok});"></div></div>
+            <div class="cref-meta"><p class="role">${role}</p><p class="tname">${tok}</p></div>
+            <div class="cref-hex">${resolveHex('var('+tok+')')}</div>
+          </div>`).join('')}
+      </div>
+    </section>`).join('');
+  probe.remove();
+})();
+
+/* ---------- DEV + SIZES: redline measured from live component ---------- */
+(function(){
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px;top:0;';
+  document.body.appendChild(host);
+  const base = makeRb({ state:'selected', label:'X', helper:'Y' });
+  const foc  = makeRb({ state:'selected', label:'X', force:'focus' });
+  const hov  = makeRb({ state:'selected', label:'X', force:'hover' });
+  const prs  = makeRb({ state:'selected', label:'X', force:'pressed' });
+  const grp  = document.createElement('div'); grp.className = 'rb-group rb-group--indent';
+  const gt   = document.createElement('p'); gt.className = 'rb-group__title'; gt.textContent = 'T';
+  const gi   = document.createElement('div'); gi.className = 'rb-group__items';
+  const gr   = makeRb({ state:'selected', label:'X' }); gi.appendChild(gr);
+  grp.appendChild(gt); grp.appendChild(gi);
+  const hgrp = document.createElement('div'); hgrp.className = 'rb-group rb-group--horizontal';
+  const hi   = document.createElement('div'); hi.className = 'rb-group__items';
+  hi.appendChild(makeRb({ state:'selected', label:'X' })); hi.appendChild(makeRb({ state:'unselected', label:'Y' }));
+  hgrp.appendChild(hi);
+  host.append(base, foc, hov, prs, grp, hgrp);
+
+  const csBase = getComputedStyle(base);
+  const csBox  = getComputedStyle(base.querySelector('.rb__box'));
+  const csMark = getComputedStyle(base.querySelector('.rb__mark'));
+  const csCont = getComputedStyle(base.querySelector('.rb__content'));
+  const csFoc  = getComputedStyle(foc.querySelector('.rb__mark'));
+  const csRow  = getComputedStyle(gr);
+  const csTitle= getComputedStyle(gt);
+  const csIndent = getComputedStyle(gi);
+  const csHGap = getComputedStyle(hi);
+  const spread = el => { const nums = getComputedStyle(el.querySelector('.rb__mark')).boxShadow.match(/-?[\d.]+px/g); return nums && nums[3] ? Math.round(parseFloat(nums[3]))+'px' : '—'; };
+
+  const r = n => Math.round(n*10)/10;
+  const px = v => { const n = parseFloat(v); return isNaN(n) ? v : r(n)+' px'; };
+  const D = {
+    zone:   px(csBox.width),
+    mark:   px(csMark.width),
+    gapBox: px(csBase.columnGap),
+    gapCont:px(csCont.rowGap),
+    rowPad: px(csRow.paddingTop),
+    titleMb:px(csTitle.marginBottom),
+    indent: px(csIndent.paddingLeft),
+    hGap:   px(csHGap.columnGap),
+    focusW: px(csFoc.outlineWidth),
+    focusOff:px(csFoc.outlineOffset),
+    hoverHalo: spread(hov),
+    pressHalo: spread(prs),
+  };
+  host.remove();
+
+  const sizeRows = [
+    ['Охранное поле (шейп-обёртка)', D.zone, '<code>.rb__box</code> · line-height Body M'],
+    ['Видимый круг (иконка пака System)', D.mark, '<code>.rb__mark</code> width/height'],
+    ['Зазор шейп ↔ содержимое', D.gapBox, '<code>.rb</code> gap'],
+    ['Зазор название ↔ хелпер', D.gapCont, '<code>.rb__content</code> gap'],
+    ['Зазор в горизонтальной группе', D.hGap, '<code>.rb-group--horizontal .rb-group__items</code>'],
+  ];
+  const sizeTb = document.querySelector('#size-table');
+  if (sizeTb) sizeTb.innerHTML = sizeRows.map(([p,v,src]) =>
+    `<div class="tbl__row" style="grid-template-columns:8px 1.6fr 0.7fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${p}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${v}</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">${src}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
+
+  const devRows = [
+    ['Охранное поле', D.zone],
+    ['Видимый круг (иконка пака System)', D.mark],
+    ['Зазор шейп ↔ содержимое', D.gapBox],
+    ['Зазор название ↔ хелпер', D.gapCont],
+    ['Отступ строки в группе (сверху/снизу)', D.rowPad],
+    ['Отступ заголовка группы (снизу)', D.titleMb],
+    ['Отступ дочерних (indent)', D.indent],
+    ['Зазор горизонтальной группы', D.hGap],
+    ['Обводка фокуса', D.focusW + ' / отступ ' + D.focusOff],
+    ['State-слои Hover / Pressed', 'halo ' + D.hoverHalo + ' / ' + D.pressHalo],
+  ];
+  const devTb = document.querySelector('#dev-spec-table');
+  if (devTb) devTb.innerHTML = devRows.map(([p,v]) =>
+    `<div class="tbl__row" style="grid-template-columns:8px 1.8fr 1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">${p}</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">${v}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
+})();
+
+/* ---------- SIZES: annotated sample ---------- */
+(function(){
+  const stage = document.getElementById('size-stage');
+  if(!stage) return;
+  const wrap = document.createElement('div'); wrap.style.cssText = 'display:flex; gap:28px; align-items:center;';
+  wrap.appendChild(makeRb({ state:'unselected', frozen:true }));
+  wrap.appendChild(makeRb({ state:'selected', frozen:true }));
+  wrap.appendChild(makeRb({ state:'selected', label:'Название', helper:'Хелпер', frozen:true }));
+  stage.appendChild(wrap);
+})();
+
+/* ---------- DEV: copy-to-clipboard on code panels ---------- */
+(function(){
+  document.querySelectorAll('.code-panel__copy').forEach(btn => {
+    const target = document.getElementById(btn.dataset.copyTarget);
+    if (!target) return;
+    const label = btn.querySelector('.copy-label');
+    btn.addEventListener('click', async () => {
+      const text = target.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      btn.classList.add('is-copied');
+      const prev = label.textContent;
+      label.textContent = 'Скопировано';
+      setTimeout(() => { btn.classList.remove('is-copied'); label.textContent = prev; }, 1600);
+    });
+  });
+})();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Состояние выбора': 'Выбран', 'Название': 'Показывать название', 'Хелпер': 'Показывать хелпер', 'Группа': 'Показывать группу', 'Обязательный выбор (*)': 'Обязательный выбор', 'Ошибка': 'Показывать ошибку' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- группа радиокнопок: заголовок + пункты с общим name -->
+<div class="rb-group" role="radiogroup" aria-labelledby="grp-t">
+  <p class="rb-group__title" id="grp-t">Обновлять список</p>
+  <div class="rb-group__items">
+    <label class="rb rb--selected">
+      <input type="radio" class="rb__input" name="refresh" checked>
+      <span class="rb__box"><i class="rb__mark" data-icon="radio-button-checked"></i></span>
+      <span class="rb__content"><span class="rb__label">Ежеминутно</span></span>
+    </label>
+    <label class="rb">
+      <input type="radio" class="rb__input" name="refresh">
+      <span class="rb__box"><i class="rb__mark" data-icon="radio-button-unchecked"></i></span>
+      <span class="rb__content"><span class="rb__label">Ежечасно</span></span>
+    </label>
+  </div>
+</div>
+
+<!-- обязательная группа без выбора — ошибка -->
+<div class="rb-group" role="radiogroup" aria-labelledby="grp-t2" aria-describedby="grp-e2">
+  <p class="rb-group__title" id="grp-t2">Способ доставки<span class="rb__req">*</span></p>
+  <div class="rb-group__items">…</div>
+  <p class="rb-group__error" id="grp-e2"><i data-icon="alert-triangle"></i><span>Выберите один из вариантов</span></p>
+</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+function makeRb(o) {
+  // o: { state:'unselected'|'selected', istate, label?, helper?, group?, required?, error? }
+  // label.rb(.rb--selected)(.rb--disabled)(.rb--error) → .rb__input + .rb__mark + .rb__content
+  // группа: .rb-group(+ .rb-group__error); required — «*» в подписи
+}</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Radiobutton
+   Shape: 20px alignment area (matches Body M line-height) · круглый шейп 16px —
+          готовые SVG-иконки пака System (radio-button-unchecked/checked),
+          currentColor задаёт цвет всей формы.
+   States: unselected · selected
+           ×  default · hover · focus · pressed · disabled · error
+   Label: Body M (SB Sans Text) · Helper: общий компонент подкачки (Body XS),
+   рендерится классом .ds-helper — см. label-helper.css.
+   Requires: typography.css, colors.css, label-helper.css
+   ========================================================================= */
+
+.rb {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.rb--disabled,
+.rb:has(.rb__input:disabled) { cursor: default; pointer-events: none; }
+
+/* visually-hidden native input (keeps it accessible / focusable) */
+.rb__input {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+  margin: 0;
+}
+
+/* 20px alignment box — matches Body M line-height (20px),
+   centers the 16px round mark, leaving the 2px empty area all round. */
+.rb__box {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 16px круглый шейп — готовая иконка пака System (radio-button-unchecked/checked),
+   currentColor управляет цветом всей формы (рамка + точка — единый SVG-путь) */
+.rb__mark {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-circle);
+  box-sizing: border-box;
+  display: flex;
+  overflow: hidden;
+  color: var(--border-dark);
+  transition: color .15s ease, box-shadow .15s ease, outline-color .15s ease;
+}
+.rb__mark :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; transform: scale(1.2); }
+
+/* ---------- selected (иконка radio-button-checked: рамка + точка) ---------
+   Класс — форс-состояние витрины; нативный .rb__input:checked даёт тот же
+   цвет без класса — см. RulesAudit W1. */
+.rb--selected .rb__mark,
+.rb__input:checked ~ .rb__box .rb__mark { color: var(--primary); }
+
+/* ---------- hover --------------------------------------------------------- */
+.rb:hover .rb__mark,
+.rb--hover .rb__mark {
+  color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-bg-light);
+}
+.rb:hover.rb--selected .rb__mark,
+.rb--hover.rb--selected .rb__mark,
+.rb:hover:has(.rb__input:checked) .rb__mark {
+  color: var(--primary-dark);
+}
+
+/* ---------- pressed ------------------------------------------------------- */
+/* a larger state layer halo (Material-style) on press */
+.rb:active .rb__mark,
+.rb--pressed .rb__mark {
+  box-shadow: 0 0 0 6px var(--primary-bg);
+}
+
+/* ---------- focus (keyboard) ---------------------------------------------- */
+.rb__input:focus-visible + .rb__box .rb__mark,
+.rb--focus .rb__mark {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- error / invalid ----------------------------------------------- */
+/* a required group left unselected, or a group that failed validation */
+.rb--error .rb__mark {
+  color: var(--error);
+  box-shadow: none;
+}
+.rb:hover.rb--error .rb__mark,
+.rb--hover.rb--error .rb__mark {
+  color: var(--error-dark);
+  box-shadow: 0 0 0 4px var(--error-bg);
+}
+.rb--error .ds-helper { color: var(--error); }
+
+/* ---------- content (label + helper) -------------------------------------- */
+.rb__content { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rb__label  { font: var(--type-body-m);  color: var(--text-primary); }
+/* Хелпер — общий компонент подкачки (не собственный класс), см. label-helper.css → .ds-helper */
+.rb--no-content .rb__content { display: none; }
+
+/* required marker — asterisk after the label */
+.rb__req { color: var(--error); margin-left: 2px; }
+
+/* ---------- disabled ------------------------------------------------------- */
+.rb--disabled .rb__mark,
+.rb__input:disabled ~ .rb__box .rb__mark { color: var(--disabled); box-shadow: none; }
+.rb--disabled .rb__label,
+.rb--disabled .ds-helper,
+.rb__input:disabled ~ .rb__content .rb__label,
+.rb__input:disabled ~ .rb__content .ds-helper { color: var(--text-inactive); }
+
+/* ---------- group ---------------------------------------------------------
+   Radiobuttons всегда образуют группы. Внутри группы активная (кликабельная)
+   область вытягивается на всю высоту строки; выравнивание всегда по левому краю. */
+.rb-group { display: flex; flex-direction: column; }
+.rb-group__title {
+  font: var(--type-h6-strong);
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.rb-group__items { display: flex; flex-direction: column; }
+.rb-group .rb { padding: 6px 0; }
+.rb-group--indent .rb-group__items { padding-left: 28px; }
+
+/* horizontal layout — используйте, когда пространство по вертикали ограничено */
+.rb-group--horizontal .rb-group__items {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0 24px;
+}
+
+/* group-level error message (Body XS, error color) */
+.rb-group__error {
+  font: var(--type-body-xs);
+  color: var(--error);
+  margin: 6px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.rb-group__error :is(svg,[data-icon]){ width: 14px; height: 14px; flex: none; }</script>
+</body>
+</html>

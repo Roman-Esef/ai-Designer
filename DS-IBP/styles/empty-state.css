@@ -1,0 +1,31 @@
+/* EmptyState — иллюстрация + заголовок + текст + опциональные действия: пустой
+   список/таблица после фильтра, нет результатов поиска, первый вход без данных,
+   полноэкранная ошибка (404/500/недоступность). Не для короткой паузы загрузки —
+   там Spinner/Skeleton. Токены — colors.css, radius.css, typography.css.
+   Иллюстрация — .illu из illustration.css (собственная палитра, не тонируется). */
+.es { display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; }
+.es__body { display: flex; flex-direction: column; }
+.es__title { margin: 0; color: var(--text-primary); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.es__text { margin: 0; color: var(--text-secondary); text-wrap: pretty; overflow-wrap: break-word; }
+.es__actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+/* ---------- размер M (по умолчанию для встроенного использования: пустая
+   таблица/тайл/страница) ---------- */
+.es--m { gap: 20px; padding: 48px 24px; }
+.es--m .es__illu { width: 96px; height: 96px; }
+.es--m .es__body { gap: 8px; max-width: 360px; }
+.es--m .es__title { font: var(--type-body-l-strong); }
+.es--m .es__text { font: var(--type-body-m); }
+.es--m .es__actions { margin-top: 4px; }
+
+/* ---------- размер L — полноэкранное состояние (404/500, отдельная страница) ---------- */
+.es--l { gap: 24px; padding: 80px 24px; }
+.es--l .es__illu { width: 160px; height: 160px; }
+.es--l .es__body { gap: 10px; max-width: 420px; }
+.es--l .es__title { font: var(--type-h4-strong); }
+.es--l .es__text { font: var(--type-body-l); }
+.es--l .es__actions { margin-top: 6px; }
+
+/* ---------- поверхность-карточка: своя рамка/фон, когда компонент стоит
+   отдельно, а не встроен в уже оформленный контейнер (Table/Tile/страница) ---------- */
+.es--card { background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-card); }

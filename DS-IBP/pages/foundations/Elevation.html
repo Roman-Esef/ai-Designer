@@ -1,0 +1,430 @@
+<!-- @dsCard group="Foundations" name="Elevation" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тени (Elevation) — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  /* masthead */
+
+  
+
+  
+
+  /* section */
+
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:76ch; text-wrap:pretty; }
+
+  /* ---------- playground ---------- */
+  @media (max-width:860px){ }
+  .pg__stage { flex:1; min-height:0; width:100%; padding:44px 40px; display:flex; align-items:center; justify-content:center;  transition: background-color .15s ease; }
+  .pg__stage.ctx-page { background: var(--bg-page); }
+  .pg__stage.ctx-tile { background: #fff; }
+  .pg__stage.ctx-dark { background: var(--c-cgrey-800); }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+  .readout { display:flex; flex-direction:column; gap:6px; padding-top:4px; border-top:1px solid var(--border-light); }
+  .readout .r { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+  .readout .r .k { font: var(--type-body-s); color: var(--text-inactive); }
+  .readout .r .v { font: var(--type-body-m-strong); color: var(--text-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; text-align:right; word-break:break-all; }
+  .readout .r .v.tokv { color: var(--primary); }
+
+  .stagebox {
+    width:180px; height:104px; border-radius: var(--radius-card);
+    background: var(--bg-tile);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--text-secondary); font: var(--type-body-s-strong);
+    transition: box-shadow .15s ease, background-color .15s ease;
+  }
+
+  /* ---------- scale ---------- */
+  .tbl-wrap { overflow-x: auto; }
+  .tbl--scale .tbl__row { grid-template-columns: 8px 76px 220px 240px 1.4fr 132px 8px; }
+  .tbl--map { min-width: 1360px; }
+  .tbl--map .tbl__row { grid-template-columns: 8px 76px 200px 168px 160px 200px 128px 1.8fr 8px; }
+  .tbl--scale { min-width: 940px; }
+  .tbl .tc--wrap code { white-space: normal; overflow-wrap: anywhere; }
+  .tbl .th__label { white-space: normal; }
+  .tbl--rings .tbl__row { grid-template-columns: 8px 76px 1.4fr 1.4fr 1.4fr 8px; }
+  .tbl .swatch { width:52px; height:52px; flex:none; border-radius: var(--radius-l); background: var(--bg-tile); }
+  .tbl .tc code { font-size:12.5px; color: var(--text-secondary); }
+  .tbl .tc--token code { color: var(--primary); }
+  .tbl .tc__subtext { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .pill { display:inline-flex; align-items:center; font: var(--type-body-xs); font-weight:600; padding:3px 9px; border-radius:999px; }
+  .pill.warn { color: var(--warning-dark); background: var(--warning-bg); }
+  .pill.ok { color: var(--success-dark); background: var(--success-bg); }
+  .pill.off { color: var(--text-inactive); background: var(--c-cgrey-100); }
+
+  /* ---------- guidelines ---------- */
+  .guides { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap:18px; }
+  .guide { background: var(--bg-tile); border:1px solid var(--border-light); border-radius: var(--radius-2xl); padding:24px 26px; }
+  .guide h3 { font: var(--type-h6-strong); color: var(--text-primary); margin:0 0 8px; display:flex; align-items:center; gap:9px; }
+  .guide p { font: var(--type-body-s); color: var(--text-secondary); margin:0; text-wrap:pretty; }
+  .guide .ic { width:22px; height:22px; flex:none; color: var(--primary); }
+  .guide.dont .ic { color: var(--error); }
+
+  /* not-elevation demo row */
+  .ring-demo { width:44px; height:44px; border-radius:50%; background: var(--primary); flex:none; }
+  .ring-demo.ring1 { box-shadow: 0 0 0 2px var(--bg-tile); }
+  .ring-demo.ring2 { box-shadow: 0 0 0 4px var(--primary-bg-light); }
+  .ring-demo.ring3 { box-shadow: inset 0 0 0 2px rgba(255,255,255,.5); background: var(--c-swamp-400); }
+</style>
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/segment-control.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+  <link rel="stylesheet" href="../../styles/tab.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Elevation">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage ctx-page" id="pgStage">
+        <div class="stagebox" id="pgBox">Surface</div>
+      </div>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+    <div class="meta"><span>Версия: <b>1.000</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Основы</p>
+    <h1>Тени (Elevation)</h1>
+    <p class="lead">Шкала теней ровно та, что уже используется в основном продукте: <strong>Elevation_1…5</strong> и отдельно именованная <strong>Shadow4.0_modalform</strong>. Значения не изобретены здесь и не меняются этой страницей — она каталогизирует то, что уже есть, и фиксирует, какой компонент какой уровень использует.</p>
+  </header>
+
+
+
+  
+
+  <!-- PLAYGROUND -->
+  
+
+  <!-- SCALE -->
+  <section class="section" data-screen-label="Scale">
+    <h2>Шкала</h2>
+    <p class="desc">6 именованных токенов. Elevation_1 и Elevation_2 уже закреплены за конкретными компонентами; Elevation_3–5 зарезервированы — в продукте пока не назначены ни одному компоненту, но числятся в шкале «на будущее» (как и верхние ступени <code class="tok">--radius-*</code>). Shadow4.0_modalform стоит отдельно от лестницы Elevation_* — это именованная тень конкретно под модальные поверхности.</p>
+    <div class="tbl-wrap">
+      <div class="tbl tbl--scale" id="scaleRows">
+        <div class="tbl__row">
+          <div class="th th--separator"></div>
+          <div class="th"></div>
+          <div class="th"><span class="th__label">Токен</span></div>
+          <div class="th"><span class="th__label">Значение</span></div>
+          <div class="th"><span class="th__label">Где используется</span></div>
+          <div class="th"><span class="th__label">Статус</span></div>
+          <div class="th th--separator"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPONENT MAPPING -->
+  <section class="section" data-screen-label="Mapping">
+    <h2>Где применяется</h2>
+    <p class="desc">Раскладка по конкретным компонентам, включая расхождения с текущим CSS этой ДС, которые стоит сверить перед внедрением токенов.</p>
+    <div class="tbl-wrap">
+      <div class="tbl tbl--map" id="mapRows">
+        <div class="tbl__row">
+          <div class="th th--separator"></div>
+          <div class="th"></div>
+          <div class="th"><span class="th__label">Компонент / поверхность</span></div>
+          <div class="th"><span class="th__label">Файл</span></div>
+          <div class="th"><span class="th__label">Токен</span></div>
+          <div class="th"><span class="th__label">Значение в коде сейчас</span></div>
+          <div class="th"><span class="th__label">Статус</span></div>
+          <div class="th"><span class="th__label">Комментарий</span></div>
+          <div class="th th--separator"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOT ELEVATION -->
+  <section class="section" data-screen-label="NotElevation">
+    <h2>Не тени: кольца и швы</h2>
+    <p class="desc">В коде компонентов есть похожие по синтаксису <code class="tok">box-shadow</code>-объявления, которые НЕ относятся к шкале Elevation — они не приподнимают поверхность, а рисуют разделительное кольцо, фокус-хало или тонкий шов. Не путайте их с токенами <code class="tok">--elevation-*</code> и не берите значения этой шкалы для них.</p>
+    <div class="tbl-wrap">
+      <div class="tbl tbl--rings">
+        <div class="tbl__row">
+          <div class="th th--separator"></div>
+          <div class="th"></div>
+          <div class="th"><span class="th__label">Назначение</span></div>
+          <div class="th"><span class="th__label">Значение</span></div>
+          <div class="th"><span class="th__label">Где используется</span></div>
+          <div class="th th--separator"></div>
+        </div>
+        <div class="tbl__row">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><div class="ring-demo ring1"></div></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Разделительное кольцо (isolation ring)</span></span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>0 0 0 2px var(--bg-tile)</code></span></span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Avatar group, Badge — bordered</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><div class="ring-demo ring2"></div></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Фокус/hover-хало интерактивного контрола</span></span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>0 0 0 4px / 6px var(--primary-bg-*)</code></span></span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Checkbox, Radiobutton, Switch (hover/pressed)</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+        <div class="tbl__row">
+          <div class="tc tc--separator"></div>
+          <div class="tc"><div class="ring-demo ring3"></div></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Тонкий шов между элементами (border через inset)</span></span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>inset 1px 0 0 0 var(--border-light)</code></span></span></div>
+          <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">ButtonGroup — граница между кнопками, Tab — общий рельс</span></span></div>
+          <div class="tc tc--separator"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUIDELINES -->
+  <section class="section" data-screen-label="Guidelines">
+    <h2>Правила</h2>
+    <p class="desc">Несколько принципов, чтобы тени работали как система, а не как случайные rgba-значения.</p>
+    <div class="guides">
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Только из шкалы</h3>
+        <p>Берите готовый токен <code class="tok">--elevation-*</code> или <code class="tok">--shadow-modal-form</code>. Свой <code class="tok">rgba(...)</code> с произвольным alpha ломает согласованность высоты поверхностей.</p>
+      </div>
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Один токен — несколько компонентов</h3>
+        <p>Elevation_2 сознательно общий для тултипа, контекстного меню и выпадающего списка: это один и тот же тип поверхности («плавающий оверлей»), поэтому у него одна тень.</p>
+      </div>
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Border по умолчанию, тень — по необходимости</h3>
+        <p>Карточки, панели и группы в состоянии покоя используют <code class="tok">--border-light</code>, а не тень. Тень включается только когда поверхность физически отрывается от потока (плавает, оверлей, драг).</p>
+      </div>
+      <div class="guide">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Резерв — не значит «не трогать»</h3>
+        <p>Elevation_3–5 существуют в шкале заранее, под будущие крупные оверлеи (полноэкранные шиты, сложные оверлеи над оверлеями). Назначайте их новому компоненту по смыслу, не изобретая соседнее произвольное значение.</p>
+      </div>
+      <div class="guide dont">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Кольца — не элевейшн</h3>
+        <p>Разделительные кольца и фокус-хало (<code class="tok">0 0 0 Npx</code>) не берите из этой шкалы и не смешивайте с ней в одном объявлении без явной причины.</p>
+      </div>
+      <div class="guide dont">
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Не смешивать источники света</h3>
+        <p>Все тени в шкале светят «сверху» (положительный Y, без X-смещения). Не добавляйте свои варианты с отрицательным Y или боковым смещением.</p>
+      </div>
+    </div>
+  </section>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Выберите токен и поверхность-контекст — превью и значение обновляются мгновенно.</p>
+              <div class="pg__controls">
+        <div class="ctl">
+          <span class="lbl">Токен тени</span>
+          <div class="pg-select"><select id="pgToken"></select></div>
+        </div>
+        <div class="ctl">
+          <span class="lbl">Поверхность-контекст</span>
+          <div class="pg-select"><select id="pgCtx">
+            <option value="ctx-page">Фон страницы</option>
+            <option value="ctx-tile">Белая плитка</option>
+            <option value="ctx-dark">Тёмная подложка</option>
+          </select></div>
+        </div>
+        <div class="readout">
+          <div class="r"><span class="k">Токен</span><span class="v tokv" id="roToken">--elevation-2</span></div>
+          <div class="r"><span class="k">Значение</span><span class="v" id="roVal">0 10px 30px rgba(40,50,55,.16)</span></div>
+          <div class="r"><span class="k">Где используется</span><span class="v" id="roUse">Тултипы, контекстное меню, выпадающий список</span></div>
+        </div>
+      </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+
+<script>
+  var SCALE = [
+    {token:'--elevation-1',        name:'Elevation_1',        value:'0 1px 2px rgba(40,50,55,.28)',   use:'Точка на свитчере',                                     status:'active'},
+    {token:'--elevation-2',        name:'Elevation_2',        value:'0 10px 30px rgba(40,50,55,.16)', use:'Тултипы, контекстное меню, выпадающий список',       status:'active'},
+    {token:'--elevation-3',        name:'Elevation_3',        value:'0 14px 38px rgba(40,50,55,.18)', use:'—',                                                     status:'reserved'},
+    {token:'--elevation-4',        name:'Elevation_4',        value:'0 18px 48px rgba(40,50,55,.20)', use:'—',                                                     status:'reserved'},
+    {token:'--elevation-5',        name:'Elevation_5',        value:'0 22px 58px rgba(40,50,55,.22)', use:'—',                                                     status:'reserved'},
+    {token:'--shadow-modal-form',  name:'Shadow4.0_modalform',value:'0 24px 64px rgba(40,50,55,.28)', use:'Тень под модалкой (Modal)',                             status:'active'}
+  ];
+
+  var MAP = [
+    ['Switch — thumb',                'styles/switch.css',   '--elevation-1', '0 1px 2px rgba(40,50,55,.28)',  'ok',   'ок',          'Значение в коде совпадает с токеном.'],
+    ['Tab — меню оверфлоу',           'styles/tab.css',      '--elevation-2', '0 10px 30px rgba(40,50,55,.16)', 'ok',   'ок',          'Значение в коде совпадает с токеном.'],
+    ['Button / ButtonGroup — дропдаун','Buttons.html / ButtonGroup.html', '--elevation-2', '0 10px 30px rgba(40,50,55,.16)', 'ok', 'ок',       'Значение в коде совпадает с токеном.'],
+    ['Tooltip',                       'styles/tooltip.css',  '--elevation-2', '0 4px 14px rgba(40,50,55,.18)', 'warn', 'расхождение', 'Текущий CSS отличается от Elevation_2 — синхронизировать.'],
+    ['Select · DropdownList — выпадашка', 'styles/dropdown-list.css', '--elevation-2', '0 10px 30px rgba(40,50,55,.16)', 'ok', 'ок', 'Тень списка задана токеном --elevation-2.'],
+    ['Модальное окно',                'styles/modal.css',    '--shadow-modal-form', '0 24px 64px rgba(40,50,55,.28)', 'ok', 'реализовано', 'Компонент Modal (styles/modal.css) — токен подключён как есть, без переопределений.']
+  ];
+
+  function statusPill(kind, label){
+    var cls = kind === 'ok' ? 'ok' : (kind === 'off' ? 'off' : 'warn');
+    return '<span class="pill ' + cls + '">' + label + '</span>';
+  }
+
+  (function(){
+    var host = document.getElementById('scaleRows');
+    host.insertAdjacentHTML('beforeend', SCALE.map(function(s){
+      var st = s.status === 'active'
+        ? statusPill('ok', 'применяется')
+        : statusPill('off', 'резерв');
+      return '<div class="tbl__row">' +
+        '<div class="tc tc--separator"></div>' +
+        '<div class="tc"><span class="swatch" style="box-shadow:' + s.value + '"></span></div>' +
+        '<div class="tc"><span class="tc__body"><span class="tc__row"><span class="tc__text">' + s.name + '</span></span><span class="tc__subtext">' + s.token + '</span></span></div>' +
+        '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>' + s.value + '</code></span></span></div>' +
+        '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">' + s.use + '</span></span></div>' +
+        '<div class="tc">' + st + '</div>' +
+        '<div class="tc tc--separator"></div>' +
+      '</div>';
+    }).join(''));
+  })();
+
+  (function(){
+    var host = document.getElementById('mapRows');
+    host.insertAdjacentHTML('beforeend', MAP.map(function(m){
+      return '<div class="tbl__row">' +
+        '<div class="tc tc--separator"></div>' +
+        '<div class="tc"><span class="swatch" style="box-shadow:' + (m[3].indexOf('rgba') > -1 ? m[3] : 'none') + '"></span></div>' +
+        '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">' + m[0] + '</span></span></div>' +
+        '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>' + m[1] + '</code></span></span></div>' +
+        '<div class="tc tc--wrap tc--token"><span class="tc__row"><span class="tc__text"><code>' + m[2] + '</code></span></span></div>' +
+        '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code>' + m[3] + '</code></span></span></div>' +
+        '<div class="tc">' + statusPill(m[4], m[5]) + '</div>' +
+        '<div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">' + m[6] + '</span></span></div>' +
+        '<div class="tc tc--separator"></div>' +
+      '</div>';
+    }).join(''));
+  })();
+
+  (function(){
+    var sel = document.getElementById('pgToken');
+    sel.innerHTML = SCALE.map(function(s){
+      return '<option value="' + s.token + '"' + (s.token === '--elevation-2' ? ' selected' : '') + '>' + s.name + '</option>';
+    }).join('');
+
+    var ctx     = document.getElementById('pgCtx');
+    var stage   = document.getElementById('pgStage');
+    var box     = document.getElementById('pgBox');
+    var roToken = document.getElementById('roToken');
+    var roVal   = document.getElementById('roVal');
+    var roUse   = document.getElementById('roUse');
+
+    function find(tok){ for (var i=0;i<SCALE.length;i++){ if (SCALE[i].token===tok) return SCALE[i]; } return SCALE[0]; }
+
+    function render(){
+      var s = find(sel.value);
+      box.style.boxShadow = s.value;
+      box.textContent = s.name;
+      stage.className = 'pg__stage ' + ctx.value;
+      roToken.textContent = s.token;
+      roVal.textContent = s.value;
+      roUse.textContent = s.use === '—' ? 'зарезервировано, компонент не назначен' : s.use;
+    }
+    sel.addEventListener('change', render);
+    ctx.addEventListener('change', render);
+    render();
+  })();
+</script>
+<script src="../../scripts/ds-nav.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = {};</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html"><!-- токен тени: тень из шкалы Elevation -->
+<div class="demo-panel" style="box-shadow: var(--elevation-2);">
+  Surface
+</div>
+<!-- контексты: ctx-page / ctx-tile / ctx-dark меняют подложку -->
+<div class="demo-stage ctx-tile">…</div></script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
+// Шкала теней: --elevation-0 … --elevation-6 (styles/shadow.css)
+// Конструктор: select#pgToken (токен) + select#pgCtx (поверхность) →
+//   превью .pg__stage получает класс ctx-* и box-shadow токена;
+//   сводка .readout (roToken/roVal/roUse) пересчитывается getComputedStyle.
+// Применение: stage.style.boxShadow = getComputedStyle(probe).boxShadow</script>
+<script type="text/plain" id="src-code-css">/* ============================================================
+   SHADOW / ELEVATION — токены теней
+   Часть основ дизайн-системы. Подключается как styles/shadow.css
+
+   Названия и число уровней — как в основном продукте: Elevation_1…5
+   + отдельный именованный Shadow4.0_modalform. Это НЕ придуманная здесь
+   шкала — сами значения этим файлом не меняются, только каталогизируются
+   для документации. Elevation_3–5 в проде пока не привязаны ни к одному
+   компоненту (зарезервированы «на будущее», как и часть шкалы --radius-*).
+   ============================================================ */
+
+:root {
+  --elevation-1: 0 1px 2px rgba(40, 50, 55, .28);     /* точка на свитчере (Switch — thumb) */
+  --elevation-2: 0 10px 30px rgba(40, 50, 55, .16);   /* тултипы, контекстное меню, выпадашка на селекте */
+  --elevation-3: 0 14px 38px rgba(40, 50, 55, .18);   /* резерв — пока не назначено компоненту */
+  --elevation-4: 0 18px 48px rgba(40, 50, 55, .20);   /* резерв — пока не назначено компоненту */
+  --elevation-5: 0 22px 58px rgba(40, 50, 55, .22);   /* резерв — пока не назначено компоненту */
+
+  /* именован отдельно от лестницы Elevation_* — под модальные окна/шиты */
+  --shadow-modal-form: 0 24px 64px rgba(40, 50, 55, .28); /* тень под модалкой (Shadow4.0_modalform) */
+}</script>
+</body>
+</html>

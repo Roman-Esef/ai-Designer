@@ -1,0 +1,100 @@
+/* =========================================================================
+   AllocationBar — итог + стек-бар распределения + список позиций.
+   Адаптив — контейнерные запросы: компонент знает ширину СВОЕГО контейнера.
+   Хост .albar-host обязан быть container-type: inline-size.
+   ========================================================================= */
+
+.albar-host{container-type:inline-size;container-name:albar}
+
+.albar{display:flex;flex-direction:column;gap:8px;max-width:var(--albar-max-w,600px);font:var(--type-body-s);color:var(--text-primary);font-variant-numeric:tabular-nums}
+
+/* ---------- шапка ---------- */
+.albar__head{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.albar__titles{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
+.albar__label{font:var(--type-body-xs);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.albar__sublabel{font:var(--type-body-xs);color:var(--text-inactive);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.albar__total{display:flex;align-items:baseline;gap:4px;flex:0 0 auto;white-space:nowrap;font:var(--type-body-m-strong);color:var(--text-primary)}
+.albar__unit{font:var(--type-body-xs);color:var(--text-inactive)}
+.albar__total--empty{font:var(--type-body-m);color:var(--text-inactive)}
+.albar__warn{display:inline-flex;align-items:center;align-self:center;flex:0 0 auto;color:var(--warning)}
+.albar__warn :is(svg,[data-icon]){width:16px;height:16px}
+
+/* ---------- бар ---------- */
+.albar__bar{display:flex;gap:2px;height:8px;min-height:8px;border-radius:var(--radius-pill);overflow:hidden;background:var(--st-grey-light)}
+.albar__seg{height:100%;flex:0 0 0;min-width:2px;transition:opacity .15s ease}
+.albar__seg--rest{background:var(--st-grey-midlight)}
+
+/* ---------- список позиций ---------- */
+.albar__list{display:flex;flex-direction:column}
+.albar__row{display:grid;grid-template-columns:8px 1fr auto auto;align-items:center;gap:8px;min-height:24px;padding:2px 0;border-radius:var(--radius-xs)}
+.albar__dot{width:8px;height:8px;border-radius:var(--radius-round);justify-self:center}
+.albar__name{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.albar__pct{min-width:64px;text-align:right;color:var(--text-secondary)}
+.albar__val{min-width:96px;text-align:right;color:var(--text-primary)}
+.albar__row:hover{background:var(--bgtable-row-hover)}
+.albar__more{align-self:flex-start;margin-top:4px}
+
+/* двунаправленная связь строка ↔ сегмент */
+.albar[data-hover] .albar__seg,.albar[data-hover] .albar__row{opacity:.4}
+.albar[data-hover] .albar__seg.is-active,.albar[data-hover] .albar__row.is-active{opacity:1}
+
+/* ---------- служебные состояния ---------- */
+.albar__empty{font:var(--type-body-s);color:var(--text-inactive)}
+.albar__calc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 16px;border-radius:var(--radius-control);background:var(--bg-page);text-align:center}
+.albar__calc-title{font:var(--type-body-s);color:var(--text-primary)}
+.albar__calc-sub{font:var(--type-body-xs);color:var(--text-secondary)}
+.albar__foot .alert{width:100%}
+
+/* скелетон загрузки */
+.albar__sk{background:linear-gradient(90deg,var(--c-cgrey-100) 0%,var(--c-cgrey-50) 50%,var(--c-cgrey-100) 100%);background-size:200% 100%;border-radius:var(--radius-xs);animation:albar-shimmer 1.4s linear infinite}
+@keyframes albar-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.albar__sk--total{width:96px;height:16px}
+.albar__sk--bar{height:8px;border-radius:var(--radius-pill)}
+.albar__sk--name{height:12px;width:56%}
+.albar__sk--num{height:12px;width:96px;justify-self:end}
+.albar__row--sk{grid-template-columns:8px 1fr auto;pointer-events:none}
+.albar__dot--sk{background:var(--c-cgrey-100)}
+@media (prefers-reduced-motion:reduce){.albar__sk{animation:none}.albar__seg{transition:none}}
+
+/* ---------- контейнерные запросы ---------- */
+/* Средний — 320–480px: компактнее шрифты и числовые колонки */
+@container albar (max-width:480px){
+  .albar{font:var(--type-body-xs)}
+  .albar__total{font:var(--type-body-s-strong)}
+  .albar__total--empty{font:var(--type-body-s)}
+  .albar__pct{min-width:56px}
+  .albar__val{min-width:80px}
+}
+/* Узкий — <320px: колонка процентов скрыта, строка в два ряда */
+@container albar (max-width:320px){
+  .albar__row{grid-template-columns:8px 1fr;grid-template-rows:auto auto;row-gap:2px;padding:6px 0}
+  .albar__name{grid-column:2;grid-row:1}
+  .albar__pct{display:none}
+  .albar__val{grid-column:2;grid-row:2;min-width:0;text-align:left;color:var(--text-secondary)}
+  .albar__row--sk{grid-template-columns:8px 1fr}
+  .albar__sk--num{width:72px;justify-self:start}
+}
+/* Очень узкий — <200px: только шапка + триггер разворота */
+@container albar (max-width:200px){
+  .albar__bar,.albar__list,.albar__foot{display:none}
+  .albar__head{flex-direction:column;align-items:stretch;gap:4px}
+  .albar__expand{display:inline-flex}
+}
+.albar__expand{display:none;align-self:flex-start}
+
+/* ---------- ограничение по высоте ---------- */
+.albar-host[data-height]{position:relative;overflow:hidden}
+.albar-host[data-height] .albar{height:100%}
+/* A — влезает не весь список: fade + ссылка «Ещё N» */
+.albar-host[data-height="A"] .albar__list{overflow:hidden;mask-image:linear-gradient(to bottom,#000 68%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,#000 68%,transparent 100%)}
+/* B — влезают только шапка и бар */
+.albar-host[data-height="B"] .albar__list,.albar-host[data-height="B"] .albar__foot{display:none}
+/* C — влезает только шапка */
+.albar-host[data-height="C"] .albar__list,.albar-host[data-height="C"] .albar__bar,.albar-host[data-height="C"] .albar__foot{display:none}
+
+/* ---------- растяжение ---------- */
+.albar--stretch{max-width:none}
+.albar--stretch .albar__row{padding-right:max(0px,calc(100% - 600px))}
+
+/* ---------- печать ---------- */
+@media print{.albar__bar{display:none!important}.albar__more{display:none!important}.albar__row{break-inside:avoid}}

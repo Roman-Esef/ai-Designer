@@ -1,0 +1,24 @@
+/* Локальный компонент <Имя>.
+   Только внутренняя раскладка и перестроение по СВОЕЙ ширине.
+   Цвета, шрифты, отступы, радиусы, тени — токены ДС; своих значений здесь нет.
+   Префикс lc-component заменить на lc-<имя>. */
+
+.lc-component{container-type:inline-size;display:flex;flex-direction:column;gap:16px}
+.lc-component__head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.lc-component__title{margin:0;font:var(--type-h5-strong);color:var(--text-primary)}
+.lc-component__actions{display:flex;align-items:center;gap:8px}
+.lc-component__body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px}
+
+/* режим прав: в просмотре действия не рисуются, а не выключаются */
+.lc-component[data-mode="view"] .lc-component__actions{display:none}
+
+/* состояния данных: пустота и ошибка живут внутри компонента */
+.lc-component[data-state="empty"] .lc-component__body,
+.lc-component[data-state="error"] .lc-component__body{display:none}
+.lc-component[data-state="empty"] .lc-component__empty,
+.lc-component[data-state="error"] .lc-component__error{display:block}
+
+/* перестроение от ширины компонента, а не окна */
+@container (max-width: 480px){
+  .lc-component__body{grid-template-columns:minmax(0,1fr)}
+}

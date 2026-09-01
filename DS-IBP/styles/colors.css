@@ -1,0 +1,280 @@
+/* =========================================================================
+   Design System — Color Foundation
+   Categories: Static · Active · Situative · Local
+   Opacity variants are expressed with color-mix() over transparent so they
+   composite correctly on any background.
+   ========================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------------
+     1. RAW PALETTE  (primitive ramps — do not use directly in product UI)
+     --------------------------------------------------------------------- */
+
+  /* Mono / Greys */
+  --c-mgrey-50:   #FFFFFF;
+  --c-mgrey-100:  #FEFEFE;
+  --c-cgrey-50:   #FBFBFB;
+  --c-cgrey-100:  #E8EDED;
+  --c-cgrey-200:  #BEC5C8;
+  --c-cgrey-300:  #AAB2B1;
+  --c-cgrey-500:  #6C8080;
+  --c-cgrey-600:  #324844;
+  --c-cgrey-700:  #333F48;
+  --c-cgrey-800:  #283237;
+  --c-cgrey-900:  #131618;
+
+  /* Swamp (cool grey-green) */
+  --c-swamp-50:   #EEF2F1;
+  --c-swamp-100:  #E5ECEB;
+  --c-swamp-200:  #E1EDE7;
+  --c-swamp-300:  #B8CCCC;
+  --c-swamp-400:  #7A9994;
+  --c-swamp-500:  #617C7C;
+  --c-swamp-600:  #6C8080;
+  --c-swamp-a100: #F5F7F7;
+  --c-swamp-a400: #F6FAFA;
+  --c-swamp-a700: #DEEDEC;
+
+  /* Emerald (brand teal) */
+  --c-emerald-100: #CDE2E0;
+  --c-emerald-200: #B8D6D3;
+  --c-emerald-300: #58DCCC;
+  --c-emerald-500: #00AA9B;
+  --c-emerald-600: #639994;
+  --c-emerald-700: #007A6D;
+  --c-emerald-900: #00635A;
+
+  /* Red */
+  --c-red-200:  #E57373;
+  --c-red-300:  #E5625C;
+  --c-red-400:  #EF5350;
+  --c-red-700:  #D32F2F;
+  --c-red-a100: #FCF1F1;
+  --c-red-a200: #FBECEB;
+  --c-red-a400: #F6D8D7;
+
+  /* Amber */
+  --c-amber-50:   #FFF8E1;
+  --c-amber-400:  #FFE54C;
+  --c-amber-600:  #FFB300;
+  --c-amber-700:  #FFA000;
+  --c-amber-800:  #C68400;
+  --c-amber-900:  #FF6F00;
+  --c-amber-a100: #FEF0C2;
+  --c-amber-a200: #FCE9AE;
+
+  /* Greens */
+  --c-lightgreen-50:  #E9F6DA;
+  --c-lightgreen-200: #C5E1A5;
+  --c-lightgreen-400: #9CCC65;
+  --c-lightgreen-600: #7CB342;
+  --c-lightgreen-800: #558B2F;
+  --c-green-50:  #E8F5E9;
+  --c-green-500: #4CAF50;
+  --c-green-800: #2E7D32;
+
+  /* Blues */
+  --c-lightblue-50:  #EAF8FE;
+  --c-lightblue-400: #29B6F6;
+  --c-lightblue-500: #03A9F4;
+  --c-lightblue-600: #1E88E5;
+  --c-lightblue-800: #01579B;
+  --c-lightblue-900: #01579B;
+  --c-blue-200: #90CAF9;
+
+  /* Purples */
+  --c-deeppurple-50:  #EDE7F6;
+  --c-deeppurple-200: #B39DDB;
+  --c-deeppurple-400: #7E57C2;
+  --c-deeppurple-900: #311B92;
+
+  /* Orange */
+  --c-orange-50:  #FFF3E0;
+  --c-orange-200: #FFCC80;
+
+
+  /* ---------------------------------------------------------------------
+     2. STATIC  — фоновые цвета и отображение информации
+     --------------------------------------------------------------------- */
+
+  /* BG */
+  --bg-popup:    var(--c-mgrey-50);
+  --bg-tile:     var(--c-mgrey-50);
+  --bg-mainmenu: var(--c-mgrey-100);
+  --bg-hint:     var(--c-cgrey-800);
+  --bg-page:     #F5F7F7;
+
+  /* Border */
+  --border-primary: var(--c-swamp-300);
+  --border-light:   var(--c-swamp-200);
+  --border-dark:    var(--c-swamp-600);
+
+  /* Text */
+  --text-primary:     var(--c-cgrey-600);
+  --text-secondary:   var(--c-cgrey-500);
+  --text-inactive:    var(--c-cgrey-300);
+  --text-on-dark:     var(--c-mgrey-50);
+
+  /* BGTable */
+  --bgtable:                 var(--c-mgrey-50);
+  --bgtable-row-hover:       var(--c-swamp-a400);
+  --bgtable-row-focus:       var(--c-swamp-a700);
+  --bgtable-row-focus-hover: var(--c-swamp-a700);
+  --bgtable-pinned:          var(--c-swamp-a100);
+  --bgtable-pinned-hover:    var(--c-swamp-50);
+  --bgtable-pinned-focus:    var(--c-swamp-a700);
+  --bgtable-accent:          var(--c-amber-50);
+  --bgtable-accent-hover:    var(--c-amber-a100);
+  --bgtable-accent-focus:    var(--c-amber-a200);
+
+
+  /* ---------------------------------------------------------------------
+     3. ACTIVE  — для интерактивных элементов
+     --------------------------------------------------------------------- */
+
+  /* Primary */
+  --primary:                  var(--c-emerald-500);
+  --primary-dark:             var(--c-emerald-700);
+  --primary-light:            var(--c-emerald-300);
+  --primary-bg:               color-mix(in srgb, var(--c-emerald-500) 6%, transparent);
+  --primary-bg-light:         color-mix(in srgb, var(--c-emerald-500) 3%, transparent);
+  --primary-bg-semitransparent: color-mix(in srgb, var(--c-mgrey-50) 50%, transparent);
+
+  /* Secondary */
+  --secondary:        var(--c-emerald-200);
+  --secondary-dark:   var(--c-emerald-600);
+  --secondary-light:  var(--c-emerald-100);
+  --secondary-bg:       color-mix(in srgb, var(--c-emerald-200) 30%, transparent);
+  --secondary-bg-light: color-mix(in srgb, var(--c-emerald-200) 15%, transparent);
+
+  /* Tertiary */
+  --tertiary:       var(--c-swamp-100);
+  --tertiary-dark:  var(--c-swamp-400);
+  --tertiary-light: var(--c-swamp-50);
+
+
+  /* ---------------------------------------------------------------------
+     4. SITUATIVE  — для ситуаций успеха/неуспеха
+     --------------------------------------------------------------------- */
+
+  /* Error */
+  --error:          var(--c-red-300);
+  --error-dark:     var(--c-red-700);
+  --error-light:    var(--c-red-200);
+  --error-bg-light: var(--c-red-a100);
+  --error-bg:       var(--c-red-a200);
+  --error-bg-dark:  var(--c-red-a400);
+
+  /* Warning */
+  --warning:       var(--c-amber-600);
+  --warning-dark:  var(--c-amber-800);
+  --warning-light: var(--c-amber-400);
+  --warning-bg:    var(--c-amber-50);
+
+  /* Success */
+  --success:       var(--c-lightgreen-600);
+  --success-dark:  var(--c-lightgreen-800);
+  --success-light: var(--c-lightgreen-400);
+  --success-bg:    var(--c-lightgreen-50);
+
+  /* Info */
+  --info:       var(--c-lightblue-600);
+  --info-dark:  var(--c-lightblue-800);
+  --info-light: var(--c-lightblue-400);
+  --info-bg:    var(--c-lightblue-50);
+
+  /* Link */
+  --link:       var(--c-emerald-500);
+  --link-dark:  var(--c-emerald-700);
+  --link-light: var(--c-emerald-200);
+
+  /* Disabled */
+  --disabled:                  var(--c-cgrey-200);
+  --disabled-bg:               var(--c-cgrey-50);
+  --disabled-bg-semitransparent: color-mix(in srgb, var(--c-mgrey-50) 50%, transparent);
+  --disabled-border:           var(--c-cgrey-100);
+
+
+  /* ---------------------------------------------------------------------
+     5. LOCAL  — для применения в отдельных компонентах
+     --------------------------------------------------------------------- */
+
+  /* Status — base + opacity ramp (Dark / base / Mid 56% / MidLight 32% / Light 16%) */
+  --st-green-dark:      var(--c-green-800);
+  --st-green:           var(--c-green-500);
+  --st-green-mid:       color-mix(in srgb, var(--c-green-500) 56%, transparent);
+  --st-green-midlight:  color-mix(in srgb, var(--c-green-500) 32%, transparent);
+  --st-green-light:     color-mix(in srgb, var(--c-green-500) 16%, transparent);
+
+  --st-lblue-dark:      var(--c-lightblue-900);
+  --st-lblue:           var(--c-lightblue-500);
+  --st-lblue-mid:       color-mix(in srgb, var(--c-lightblue-500) 56%, transparent);
+  --st-lblue-midlight:  color-mix(in srgb, var(--c-lightblue-500) 32%, transparent);
+  --st-lblue-light:     color-mix(in srgb, var(--c-lightblue-500) 16%, transparent);
+
+  --st-orange-dark:     var(--c-amber-900);
+  --st-orange:          var(--c-amber-700);
+  --st-orange-mid:      color-mix(in srgb, var(--c-amber-700) 56%, transparent);
+  --st-orange-midlight: color-mix(in srgb, var(--c-amber-700) 32%, transparent);
+  --st-orange-light:    color-mix(in srgb, var(--c-amber-700) 16%, transparent);
+
+  --st-red-dark:        var(--c-red-700);
+  --st-red:             var(--c-red-400);
+  --st-red-mid:         color-mix(in srgb, var(--c-red-400) 56%, transparent);
+  --st-red-midlight:    color-mix(in srgb, var(--c-red-400) 32%, transparent);
+  --st-red-light:       color-mix(in srgb, var(--c-red-400) 16%, transparent);
+
+  --st-dpurple-dark:     var(--c-deeppurple-900);
+  --st-dpurple:          var(--c-deeppurple-400);
+  --st-dpurple-mid:      color-mix(in srgb, var(--c-deeppurple-400) 56%, transparent);
+  --st-dpurple-midlight: color-mix(in srgb, var(--c-deeppurple-400) 32%, transparent);
+  --st-dpurple-light:    color-mix(in srgb, var(--c-deeppurple-400) 16%, transparent);
+
+  --st-grey-dark:       var(--c-cgrey-900);
+  --st-grey:            var(--c-cgrey-700);
+  --st-grey-mid:        color-mix(in srgb, var(--c-cgrey-700) 56%, transparent);
+  --st-grey-midlight:   color-mix(in srgb, var(--c-cgrey-700) 32%, transparent);
+  --st-grey-light:      color-mix(in srgb, var(--c-cgrey-700) 16%, transparent);
+
+  --st-system-dark:     var(--c-cgrey-600);
+  --st-system:          var(--c-swamp-400);
+  --st-system-mid:      color-mix(in srgb, var(--c-swamp-400) 56%, transparent);
+  --st-system-midlight: color-mix(in srgb, var(--c-swamp-400) 32%, transparent);
+  --st-system-light:    color-mix(in srgb, var(--c-swamp-400) 16%, transparent);
+
+  --st-disabled-dark:     color-mix(in srgb, var(--c-cgrey-600) 40%, transparent);
+  --st-disabled:          color-mix(in srgb, var(--c-cgrey-600) 24%, transparent);
+  --st-disabled-mid:      color-mix(in srgb, var(--c-cgrey-600) 16%, transparent);
+  --st-disabled-midlight: color-mix(in srgb, var(--c-cgrey-600) 8%, transparent);
+  --st-disabled-light:    color-mix(in srgb, var(--c-cgrey-600) 4%, transparent);
+
+  --st-primary-dark:     var(--c-emerald-900);
+  --st-primary:          var(--c-emerald-500);
+  --st-primary-mid:      color-mix(in srgb, var(--c-emerald-500) 56%, transparent);
+  --st-primary-midlight: color-mix(in srgb, var(--c-emerald-500) 32%, transparent);
+  --st-primary-light:    color-mix(in srgb, var(--c-emerald-500) 16%, transparent);
+
+  /* Rate */
+  --rate-green:        var(--c-lightgreen-200);
+  --rate-light-green:  var(--c-green-50);
+  --rate-blue:         var(--c-blue-200);
+  --rate-light-blue:   var(--c-lightblue-50);
+  --rate-purple:       var(--c-deeppurple-200);
+  --rate-light-purple: var(--c-deeppurple-50);
+  --rate-orange:       var(--c-orange-200);
+  --rate-light-orange: var(--c-orange-50);
+
+  /* Chart */
+  --chart-red:          #F99290;
+  --chart-orange:       #F9A580;
+  --chart-yellow:       #FFD081;
+  --chart-shiny-green:  #8CCB5E;
+  --chart-pastel-green: #76E385;
+  --chart-turquoise:    #31D4A8;
+  --chart-light-blue:   #7DCAFA;
+  --chart-blue:         #5B9CFA;
+  --chart-indigo:       #8D87F9;
+  --chart-purple:       #CB88F8;
+  --chart-pale-purple:  #F58BD8;
+  --chart-pink-purple:  #EC7390;
+}

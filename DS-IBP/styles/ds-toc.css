@@ -1,0 +1,82 @@
+/* ============================================================
+   DS TOC — якорная навигация по разделам страницы компонента
+   Подключается вместе с ds-toc.js на всех страницах компонентов.
+   Панель фиксируется в правой верхней части экрана; контент
+   страницы сдвигается влево через padding-right на body.
+   ============================================================ */
+
+:root { --ds-toc-w: 236px; }
+
+body.ds-has-toc { padding-right: var(--ds-toc-w); }
+
+/* ---------- reference tables (Цвета / Типографика) — единый вид ---------- */
+.ref-table--cols { width:100%; border-collapse:collapse; }
+.ref-table--cols th, .ref-table--cols td { text-align:left; padding:12px 16px; border-bottom:1px solid var(--border-light); font:var(--type-body-s); color:var(--text-primary); vertical-align:middle; }
+.ref-table--cols th { font:var(--type-body-xs); color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+.ref-table--cols tr:last-child td { border-bottom:none; }
+.ref-table--cols code.tok { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px; color:var(--primary); background:none; padding:0; }
+
+.ds-toc {
+  position: fixed;
+  top: 96px;
+  right: 28px;
+  z-index: 40;
+  width: calc(var(--ds-toc-w) - 48px);
+  max-height: calc(100vh - 150px);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-text), system-ui, sans-serif;
+}
+
+.ds-toc__label {
+  font: var(--type-button-xs);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-inactive);
+  margin: 0 0 10px;
+  padding-left: 15px;
+  flex: none;
+}
+
+.ds-toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+}
+.ds-toc__list::-webkit-scrollbar { width: 6px; }
+.ds-toc__list::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 6px; }
+
+.ds-toc__link {
+  display: block;
+  padding: 6px 10px 6px 13px;
+  border-left: 2px solid var(--border-light);
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color .12s ease, border-color .12s ease, background-color .12s ease;
+  text-wrap: balance;
+}
+.ds-toc__link:hover {
+  color: var(--text-primary);
+  background: var(--bgtable-row-hover);
+}
+.ds-toc__link.is-active {
+  border-left-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+.ds-toc__link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+/* на узких экранах панель скрывается, контент возвращается на всю ширину */
+@media (max-width: 1280px) {
+  body.ds-has-toc { padding-right: 0; }
+  .ds-toc { display: none; }
+}

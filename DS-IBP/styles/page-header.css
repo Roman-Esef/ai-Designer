@@ -1,0 +1,136 @@
+/* ============================================================
+   PageHeader — заголовок страницы
+   Части: Title (+IconLeft, +Edit) · Chips · Return · Subtitle · Actions (+MenuButton)
+   Зависимости: button, icon-button, chip, badge, context-menu, tooltip
+   ============================================================ */
+
+.phead{
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  width:100%;
+  min-width:0;
+}
+
+/* левая колонка: title-row + subtitle */
+.phead__main{
+  flex:1 1 auto;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+/* ---- Title row ---- */
+.phead__title-row{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  min-width:0;
+  min-height:32px;
+}
+.phead__title-ico{
+  flex:none;
+  width:24px;height:24px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--text-inactive);
+}
+.phead__title-ico :is(svg,[data-icon]){width:24px;height:24px;}
+/* IconLeft + Title + Edit — неразрывная группа: не переносятся отдельно от заголовка */
+.phead__title-group{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  flex:0 1 auto;
+}
+/* Title многострочный: заголовок страницы всегда виден целиком, усечения нет */
+.phead__title{
+  font:var(--type-h3-strong);
+  letter-spacing:0;
+  color:var(--text-primary);
+  margin:0;
+  min-width:120px;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  text-wrap:pretty;
+}
+/* Edit (IconButton S) — слот, стили из icon-button.css */
+.phead__edit{flex:none;}
+
+/* Chips — слот, чипы из chip.css */
+.phead__chips{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:none;
+  margin-left:4px;
+  min-width:0;
+}
+
+/* Return — кнопка возврата (Button Outline XS), слот */
+.phead__return{flex:none;margin-left:4px;}
+
+/* ---- Subtitle ---- */
+.phead__subtitle{
+  display:flex;
+  align-items:center;
+  gap:8px 12px;
+  flex-wrap:wrap;
+  min-width:0;
+  font:var(--type-body-s);
+  color:var(--text-secondary);
+}
+.phead__subtitle-ico{
+  flex:none;
+  width:16px;height:16px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--success);
+}
+.phead__subtitle-ico :is(svg,[data-icon]){width:16px;height:16px;}
+
+/* мета-элементы кастомного сабтайтла */
+.phead__meta{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font:var(--type-body-xs);
+  color:var(--text-inactive);
+  white-space:nowrap;
+}
+.phead__meta :is(svg,[data-icon]){width:16px;height:16px;}
+.phead__meta-ico{flex:none;display:inline-flex;color:var(--text-inactive);}
+.phead__meta-ico--ok{color:var(--success);}
+
+/* ---- Actions ---- */
+.phead__actions{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-left:auto;
+}
+
+/* ---- Extras: чипы и Return отдельной строкой (tablet/mobile) ---- */
+.phead__extras{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:2px;
+}
+.phead__extras .phead__chips,
+.phead__extras .phead__return{margin-left:0;}
+
+/* ---- Вариант: Dashboard (на белой подложке) ---- */
+.phead--dashboard{
+  background:var(--bg-tile);
+  border-radius:var(--radius-m);
+  padding:12px 16px;
+}
+
+/* ---- Адаптивная раскладка (мобильная): actions переносятся вниз ---- */
+.phead--stack{flex-direction:column;gap:12px;}
+.phead--stack .phead__actions{margin-left:0;width:100%;}
+.phead--stack .phead__actions .btn:not(.btn--icon-only){flex:1 1 auto;}
