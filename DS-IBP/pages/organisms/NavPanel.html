@@ -118,34 +118,6 @@
   .backlog > h2 { font: var(--type-h4-strong); margin:0 0 8px; color: var(--text-primary); }
   .backlog > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 24px; max-width:76ch; }
 
-  /* ---------- RND: вложенные разделы (эксперимент; удалить после утверждения) ---------- */
-  .rnd { display:grid; grid-template-columns:repeat(2, minmax(280px, 1fr)); gap:28px; align-items:flex-start; }
-  @media (max-width:820px){ .rnd { grid-template-columns:1fr; } }
-  .rnd-col { display:flex; flex-direction:column; gap:14px; min-width:0; }
-  .rnd-cap .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
-  .rnd-cap .d { font: var(--type-body-s); color: var(--text-secondary); display:block; margin-top:3px; text-wrap:pretty; }
-  .rnd-stage { position:relative; border:1px solid var(--border-light); border-radius:14px; background: var(--bg-tile); padding:20px; display:flex; justify-content:center; align-items:flex-start; }
-
-  /* родительский пункт — тот же <a class="nav__item …">, что и обычные пункты;
-     каретка раскрытия. У под-пунктов глифов-иконок нет. Состояние родителя
-     (nav__item--selected) красит сам компонент — страничный CSS его не трогает */
-  .nav__caret { flex:none; width:16px; height:16px; display:flex; align-items:center; justify-content:center; color:var(--text-inactive); transition:transform .15s ease; }
-  .nav__caret :is(svg,[data-icon]){ width:16px; height:16px; }
-  /* аккордеон: каретка крутится при раскрытии; у флайаута (chevron-right) — статична */
-  .nav__item--acc[aria-expanded="true"] .nav__caret { transform:rotate(180deg); color:var(--text-secondary); }
-
-  /* вариант A — аккордеон: под-список раскрывается в потоке (grid 0fr→1fr);
-     индент под-пунктов — под текст родителя (12 отступ + 24 иконка + 12 зазор) */
-  .nav__sub { display:grid; grid-template-rows:0fr; transition:grid-template-rows .2s ease; }
-  .nav__sub > .nav__sub-in { overflow:hidden; min-height:0; display:flex; flex-direction:column; gap:2px; }
-  .nav__item--acc[aria-expanded="true"] + .nav__sub { grid-template-rows:1fr; }
-  .nav__sub .nav__item { padding-left:48px; }
-
-  /* вариант B — флайаут: меню (ContextMenu) лежит снаружи .nav (прямой ребёнок
-     .rnd-stage), позиционирует bindFlyout(); в rail каретка и под-список скрыты */
-  .nav--rail .nav__caret { display:none; }
-  .nav--rail .nav__sub { display:none; }
-  
 </style>
   <link rel="stylesheet" href="../../styles/segment-control.css">
   <link rel="stylesheet" href="../../styles/tab.css">
@@ -178,7 +150,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.011</b></span><span>Обновлено: <b>01.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.013</b></span><span>Обновлено: <b>02.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>NavPanel · Панель навигации</h1>
     <p class="lead">Главная навигация приложения в левой части каждой страницы. Отображает все разделы продукта, сгруппированные по подразделениям и типам. Один компонент — три режима: свёрнутый <b>Rail</b>, развёрнутый-оверлей <b>Drawer</b> и закреплённый <b>Fixed</b>.</p>
@@ -239,6 +211,8 @@
           <li><span class="n"></span><span class="t"><span class="k">Burger</span><span class="d"> — IconButton (глиф left-menu), сворачивает/разворачивает панель</span></span></li>
           <li><span class="n"></span><span class="t"><span class="k">Pin / Unpin</span><span class="d"> — закрепляет панель в режиме Fixed (только Drawer/Fixed)</span></span></li>
           <li><span class="n"></span><span class="t"><span class="k">Navigation_Item</span><span class="d"> — пункт меню: иконка + подпись, опц. Badge</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Пункт-родитель</span><span class="d"> — пункт с кареткой, раскрывает вложенный под-список</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Под-список</span><span class="d"> — вложенные подстраницы, без иконок, раскрываются аккордеоном</span></span></li>
           <li><span class="n"></span><span class="t"><span class="k">Navigation-block</span><span class="d"> — блок разделов с заголовком-секцией</span></span></li>
           <li><span class="n"></span><span class="t"><span class="k">Заголовок блока</span><span class="d"> — метка подраздела (в Rail — короткая черта)</span></span></li>
           <li><span class="n"></span><span class="t"><span class="k">Footer</span><span class="d"> — Avatar + профиль + IconButton выхода</span></span></li>
@@ -314,6 +288,11 @@
       <h3>Fixed — закреплённая панель</h3>
       <p class="desc">По клику на кнопку в правом верхнем углу панель закрепляется на странице: контент подстраивается под новую ширину контентной области, иконка в кнопке меняется с <code class="tok">pin-menu</code> на <code class="tok">unpin-menu</code>. Повторный клик открепляет панель и возвращает её в режим Drawer.</p>
     </div>
+
+    <div class="subsec" data-screen-label="NestedBehavior">
+      <h3>Вложенные разделы (аккордеон)</h3>
+      <p class="desc">Пункт, у которого тайл содержит ссылки (<code class="tok">item.tile.links</code>), рендерится аккордеоном-родителем: под-список раскрывается прямо в потоке списка, раздвигая пункты ниже; каретка <code class="tok">chevron-down</code> поворачивается на 180°. По умолчанию свёрнут (<code class="tok">aria-expanded="false"</code>), клик по родителю раскрывает/сворачивает. В Rail под-список и каретка скрыты — клик по родителю разворачивает панель в Drawer. Пример — «Отчёты для Рисков» (Коды RWA · Расчет RWA · Расчет ОВП).</p>
+    </div>
   </section>
 
   <!-- STATES -->
@@ -326,7 +305,7 @@
   <!-- ACCESSIBILITY -->
   <section class="section" data-screen-label="A11y">
     <h2>Доступность</h2>
-    <p class="desc">Панель — элемент <code class="tok">&lt;nav&gt;</code> с <code class="tok">aria-label="Главное меню"</code>. Текущая страница помечена <code class="tok">aria-current="page"</code>. Кнопки бургера, пина и выхода имеют <code class="tok">aria-label</code>; пин отражает состояние через <code class="tok">aria-pressed</code>. Заблокированный пункт — <code class="tok">aria-disabled="true"</code> и вне таб-порядка.</p>
+    <p class="desc">Панель — элемент <code class="tok">&lt;nav&gt;</code> с <code class="tok">aria-label="Главное меню"</code>. Текущая страница помечена <code class="tok">aria-current="page"</code>. Кнопки бургера, пина и выхода имеют <code class="tok">aria-label</code>; пин отражает состояние через <code class="tok">aria-pressed</code>. Пункт-родитель вложенного раздела несёт <code class="tok">aria-expanded</code> и <code class="tok">aria-controls</code> на под-список. Заблокированный пункт — <code class="tok">aria-disabled="true"</code> и вне таб-порядка.</p>
     <div class="row">
       <div class="panel" style="flex:1; min-width:280px;">
         <p class="desc tight" style="margin-bottom:18px;">Клавиатура</p>
@@ -413,27 +392,15 @@
 <span class="tk-cm">// 5. Выбор пункта: клик → навигация, current = id;
 //    рендер: пункт с current → nav__item--selected + aria-current.</span>
 
-<span class="tk-cm">// 6. Выход: клик по logout → деавторизация пользователя.</span></code></pre>
+<span class="tk-cm">// 6. Выход: клик по logout → деавторизация пользователя.</span>
+
+<span class="tk-cm">// 7. Вложенный раздел (аккордеон):
+//    клик по .nav__item--acc →
+//      rail: развернуть панель в drawer;
+//      drawer/fixed: переключить aria-expanded
+//    (каретка .nav__caret крутится, под-список .nav__sub раскрывается в потоке).</span></code></pre>
     </div>
     <p class="dev-note">Это алгоритм поверх вашего стека, не готовый сниппет. Разметку панели и режимы см. в <code class="tok">nav-panel.page.js</code> (функция <code class="tok">buildNav</code>).</p>
-  </section>
-
-  <!-- RND: экспериментальные варианты «Вложенных разделов» (пункт бэклога).
-       Демо строит nav-panel.page.js (initRnd). После утверждения одного варианта
-       раздел удаляется, вариант вписывается в компонент и документацию. -->
-  <section class="section" data-screen-label="Rnd">
-    <h2>RND</h2>
-    <p class="desc">Экспериментальные варианты «Вложенных разделов» — раскрывающийся под-список у пункта меню для разделов с подстраницами. Два подхода на пункте «Обязательные сделки» (блок Origination): аккордеон (раскрытие в потоке списка) и контекстное меню (вылетает справа от панели). Под-пункты — без иконок. Текущая страница — «Подстраница 2»: в rail подсвечен только родитель, в развёрнутом виде — родитель и подстраница; «Главная» не выделена. Сверните панель бургером, чтобы увидеть поведение в rail. После утверждения один вариант войдёт в компонент, а этот раздел будет удалён.</p>
-    <div class="rnd">
-      <div class="rnd-col">
-        <div class="rnd-cap"><span class="k">Аккордеон</span><span class="d">Под-список раскрывается в потоке и раздвигает пункты ниже; раскрыт по умолчанию. Клик по пункту — свернуть/развернуть; в rail клик по иконке разворачивает панель.</span></div>
-        <div class="rnd-stage" id="rnd-accordion"></div>
-      </div>
-      <div class="rnd-col">
-        <div class="rnd-cap"><span class="k">Контекстное меню</span><span class="d">Под-список вылетает справа от панели компонентом ContextMenu; при большом числе пунктов меню скроллится само. Клик по пункту — открыть/закрыть; в rail меню открывается сразу, без разворота панели; скролл панели закрывает меню.</span></div>
-        <div class="rnd-stage" id="rnd-dropdown"></div>
-      </div>
-    </div>
   </section>
 
   <!-- BACKLOG -->
@@ -442,7 +409,6 @@
     <p class="desc">Кейсы, которых недостаёт документации, — на существующих токенах и компонентах.</p>
     <div class="panel">
       <ul class="rules">
-        <li><b>Вложенные разделы</b> — раскрывающийся под-список у пункта (аккордеон) для разделов с подстраницами.</li>
         <li><b>Поиск по меню</b> — поле поиска над списком при большом числе разделов.</li>
         <li><b>Избранное / закреплённые</b> — блок часто используемых пунктов наверху списка.</li>
         <li><b>Состояние загрузки</b> — скелетон пунктов, пока список разделов подгружается.</li>
@@ -502,13 +468,14 @@
 <script src="../../scripts/ds-splitter.js"></script>
 <script src="../../scripts/ds-tabs.js"></script>
 <script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/tbl-reorder.js"></script>
 <script src="../../scripts/docs-split.js"></script>
 
 <!-- статичные подписи свитчей конструктора (бинарные селекты → pg-toggle) -->
 <script>window.DS_SPLIT_SWITCH_LABELS = { 'Бейджи': 'Показывать бейджи', 'Заблокированный пункт': 'Показывать заблокированный пункт' };</script>
 
 <!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
-<script type="text/plain" id="src-code-html"><nav class="nav nav--drawer" aria-label="Главное меню">
+<script type="text/plain" id="src-code-html"><nav class="nav nav--rail" aria-label="Главное меню">
   <div class="nav__top">
     <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Свернуть меню"><i data-icon="left-menu"></i></button>
     <button class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
@@ -516,8 +483,14 @@
   <div class="nav__list">
     <a class="nav__item nav__item--selected" href="#" aria-current="page"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
     <div class="nav__block">
-      <div class="nav__block-label">Origination</div>
-      <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="Important-deals"></i></span><span class="nav__label">Обязательные сделки</span></a>
+      <div class="nav__block-label">Отчёты</div>
+      <!-- … пункт-родитель с вложенным под-списком (аккордеон, по умолчанию свёрнут): -->
+      <a class="nav__item nav__item--acc" href="#" aria-expanded="false" aria-controls="nested-sub"><span class="nav__ico"><i data-icon="rwa"></i></span><span class="nav__label">Отчёты для Рисков</span><span class="nav__caret"><i data-icon="chevron-down"></i></span></a>
+      <div class="nav__sub" id="nested-sub"><div class="nav__sub-in">
+        <a class="nav__item" href="#"><span class="nav__label">Коды RWA</span></a>
+        <a class="nav__item" href="#"><span class="nav__label">Расчет RWA</span></a>
+        <a class="nav__item" href="#"><span class="nav__label">Расчет ОВП</span></a>
+      </div></div>
       <!-- … пункт с бейджем: -->
       <a class="nav__item" href="#" aria-label="Задачи, 7"><span class="nav__ico"><i data-icon="tasks"></i></span><span class="nav__label">Задачи</span><span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">7</span></span></a>
     </div>
@@ -534,7 +507,7 @@
     <button class="ibtn ibtn--neutral ibtn--m nav__logout" data-modal="nav-role-modal" aria-label="Сменить роль / выйти"><i data-icon="logout"></i></button>
   </div>
 </nav>
-<!-- Rail: nav--rail (подписи → тултип, бейдж на угол иконки, футер = только аватар).
+<!-- Развёрнутый вид — nav--drawer (подписи видимы, тень, оверлей).
      Fixed: nav--fixed (шов справа, без тени). --></script>
 
 <script type="text/plain" id="src-code-js">/* NavPanel — режимы rail/drawer/fixed оживляет рантайм scripts/ds-nav-panel.js. */
@@ -544,11 +517,12 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
 // Pin (drawer/fixed): drawer→fixed (pin-menu→unpin-menu, aria-pressed=true), fixed→drawer.
 // Drawer-оверлей: тень Shadow4.0_modalform; клик вне области или Esc → rail.
 // Rail-тултип: hover/focus пункта → всплывающая подпись справа.
+// Вложенный раздел: клик по .nav__item--acc → toggle aria-expanded; в rail — развернуть панель.
 // Выбор: клик → навигация, current=id → nav__item--selected + aria-current.
 // Событие: 'ds-nav-mode' на .nav — detail {mode, prev}.
 
 /* React API (предложение): NavPanelProps — mode · items[] {icon, label, badge,
-   disabled} · groups[] · user{name, role, org} · onNavigate(id) · onLogout */</script>
+   disabled, children?[]} · groups[] · user{name, role, org} · onNavigate(id) · onLogout */</script>
 
 <script type="text/plain" id="src-code-css">/* =========================================================================
    NavPanel — «Панель навигации» (организм).
@@ -735,6 +709,26 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
 .nav__item[aria-disabled="true"] { pointer-events: none; cursor: default; }
 .nav__item--disabled .nav__badge .badge,
 .nav__item[aria-disabled="true"] .nav__badge .badge { background: var(--disabled-bg); color: var(--text-inactive); }
+
+/* ========================================================================== *
+   NESTED — пункт-родитель с вложенным под-списком (аккордеон)
+   Пункт с подстраницами: родитель — тот же .nav__item (плюс .nav__item--acc),
+   каретка .nav__caret показывает раскрытие; под-список .nav__sub раскрывается
+   в потоке списка (grid 0fr→1fr), раздвигая пункты ниже. Под-пункты — без
+   иконок, индент под текст родителя (12 отступ + 24 иконка + 12 зазор = 48).
+   В Rail каретка и под-список скрыты — клик по родителю разворачивает панель.
+   ========================================================================== */
+.nav__caret { flex: none; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-inactive); transition: transform .15s ease; }
+.nav__caret :is(svg,[data-icon]) { width: 16px; height: 16px; }
+.nav__item--acc[aria-expanded="true"] .nav__caret { transform: rotate(180deg); color: var(--text-secondary); }
+
+.nav__sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .2s ease; }
+.nav__sub > .nav__sub-in { overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 2px; }
+.nav__item--acc[aria-expanded="true"] + .nav__sub { grid-template-rows: 1fr; }
+.nav__sub .nav__item { padding-left: 48px; }
+
+.nav--rail .nav__caret { display: none; }
+.nav--rail .nav__sub { display: none; }
 
 /* ========================================================================== *
    RAIL — тултип по hover + бейдж-надстрочник

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FIDELITY-GATE: N/A · нет исходного макета · 01.09.2026 -->
+<!-- FIDELITY-GATE: N/A · нет исходного макета · 02.09.2026 -->
 <html lang="ru">
 <head>
 <script>window.__DS_ROOT = '../../../../DS-IBP/';</script>
@@ -53,7 +53,7 @@
 <body>
 <div class="nav-layout">
   <!-- меню строится экранным скриптом из ibp-home.js по выбранной роли -->
-  <nav class="nav nav--drawer" id="nav" aria-label="Главное меню"></nav>
+  <nav class="nav nav--rail" id="nav" aria-label="Главное меню"></nav>
 
   <div class="screen">
     <nav class="crumbs" aria-label="Хлебные крошки">
@@ -98,6 +98,16 @@
   function ic(name) { return '<i data-icon="' + name + '"></i>'; }
 
   function itemHTML(it) {
+    /* пункт с тайлом-со-ссылками — аккордеон-родитель (под-пункты = ссылки тайла) */
+    if (it.tile && it.tile.links && it.tile.links.length) {
+      var sub = '<div class="nav__sub" id="nav-sub-' + it.id + '"><div class="nav__sub-in">'
+        + it.tile.links.map(function (l) { return '<a class="nav__item" href="#"><span class="nav__label">' + l + '</span></a>'; }).join('')
+        + '</div></div>';
+      return '<a class="nav__item nav__item--acc" href="#" aria-expanded="false" aria-controls="nav-sub-' + it.id + '">'
+        + '<span class="nav__ico">' + ic(it.icon) + '</span>'
+        + '<span class="nav__label">' + it.label + '</span>'
+        + '<span class="nav__caret">' + ic('chevron-down') + '</span></a>' + sub;
+    }
     var badge = it.badge
       ? '<span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">' + it.badge + '</span></span>'
       : '';

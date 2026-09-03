@@ -12,7 +12,9 @@
    Автоподключение: любой <nav class="nav nav--rail|--drawer|--fixed"> на
    странице получает поведение — бургер сворачивает/разворачивает панель,
    пин переключает drawer ↔ fixed, подписи пунктов в rail позиционируются
-   как тултипы (position:fixed, вне скролл-контейнера).
+   как тултипы (position:fixed, вне скролл-контейнера), пункт-родитель
+   .nav__item--acc раскрывает/сворачивает вложенный под-список (в rail —
+   разворачивает панель).
 
    Настройки на панели: data-nav-collapsed-mode (в какой режим уводит бургер
    из rail: drawer|fixed, по умолчанию — последний развёрнутый, иначе drawer),
@@ -40,7 +42,7 @@
 
   function modeOf(nav) {
     for (var i = 0; i < MODES.length; i++) if (nav.classList.contains('nav--' + MODES[i])) return MODES[i];
-    return 'drawer';
+    return 'rail'; /* без класса режима — по умолчанию свёрнуто */
   }
 
   /* rail-подписи спозиционированы фиксированно — иначе их режет скролл списка */
@@ -100,6 +102,15 @@
     }
 
     nav.addEventListener('click', function (e) {
+      /* пункт-родитель с под-списком (аккордеон): в rail клик разворачивает
+         панель, в развёрнутых режимах — переключает aria-expanded */
+      var parent = e.target.closest('.nav__item--acc');
+      if (parent) {
+        e.preventDefault();
+        if (modeOf(nav) === 'rail') { setMode(nav, expanded); return; }
+        parent.setAttribute('aria-expanded', String(parent.getAttribute('aria-expanded') !== 'true'));
+        return;
+      }
       if (!modes) return;
       if (e.target.closest('.nav__burger')) { e.preventDefault(); toggleRail(); return; }
       if (e.target.closest('.nav__pin')) { e.preventDefault(); togglePin(); }

@@ -37,8 +37,8 @@ purpose: Манифест спек компонентов. Читай нужну
 | LabelHelper | specs/LabelHelper.md | styles/label-helper.css | checkbox, radio, switch | 1.004 |
 | Link | specs/Link.md | styles/link.css | breadcrumbs | 1.007 |
 | Modal | specs/Modal.md | styles/modal.css | button, icon-button, label-helper, checkbox | 1.005 |
-| NavPanel | specs/NavPanel.md | styles/nav-panel.css | icon-button, badge, avatar | 1.011 |
-| NavTile | specs/NavTile.md | styles/nav-tile.css | illustration, link | 1.007 |
+| NavPanel | specs/NavPanel.md | styles/nav-panel.css | icon-button, badge, avatar | 1.013 |
+| NavTile | specs/NavTile.md | styles/nav-tile.css | illustration, link | 1.010 |
 | PageHeader | specs/PageHeader.md | styles/page-header.css | button, icon-button, chip, badge, context-menu, tooltip, breadcrumbs | 1.007 |
 | Pagination | specs/Pagination.md | styles/pagination.css | dropdown-list, checkbox, label-helper, button, splitter | 1.008 |
 | Popover | specs/Popover.md | styles/popover.css | button, icon-button, link, chip, label-helper | 1.005 |
@@ -54,8 +54,8 @@ purpose: Манифест спек компонентов. Читай нужну
 | Spinner | specs/Spinner.md | styles/spinner.css | — | 1.000 |
 | Splitter | specs/Splitter.md | styles/splitter.css | button | 1.003 |
 | Switch | specs/Switch.md | styles/switch.css | label-helper, spinner | 1.007 |
-| Table | specs/Table.md | styles/table.css | table-cell, pagination, table-filter, button, button-group, icon-button, chip, checkbox, illustration, modal, context-menu | 1.005 |
-| TableCell | specs/TableCell.md | styles/table-cell.css | checkbox, chip, icon-button, button, tooltip, chart | 2.005 |
+| Table | specs/Table.md | styles/table.css | table-cell, pagination, table-filter, button, button-group, icon-button, chip, checkbox, illustration, modal, context-menu | 1.006 |
+| TableCell | specs/TableCell.md | styles/table-cell.css | checkbox, chip, icon-button, button, tooltip, chart | 2.006 |
 | TableFilter | specs/TableFilter.md | styles/table-filter.css | button, icon-button, chip, badge, modal, tab, input, checkbox | 1.007 |
 | Tab | specs/Tab.md | styles/tab.css | — | 1.009 |
 | Tile | specs/Tile.md | styles/tile.css | icon-button, button, link, chip, badge, alert, divider | 1.010 |

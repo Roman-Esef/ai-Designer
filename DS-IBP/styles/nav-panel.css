@@ -185,6 +185,26 @@
 .nav__item[aria-disabled="true"] .nav__badge .badge { background: var(--disabled-bg); color: var(--text-inactive); }
 
 /* ========================================================================== *
+   NESTED — пункт-родитель с вложенным под-списком (аккордеон)
+   Пункт с подстраницами: родитель — тот же .nav__item (плюс .nav__item--acc),
+   каретка .nav__caret показывает раскрытие; под-список .nav__sub раскрывается
+   в потоке списка (grid 0fr→1fr), раздвигая пункты ниже. Под-пункты — без
+   иконок, индент под текст родителя (12 отступ + 24 иконка + 12 зазор = 48).
+   В Rail каретка и под-список скрыты — клик по родителю разворачивает панель.
+   ========================================================================== */
+.nav__caret { flex: none; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-inactive); transition: transform .15s ease; }
+.nav__caret :is(svg,[data-icon]) { width: 16px; height: 16px; }
+.nav__item--acc[aria-expanded="true"] .nav__caret { transform: rotate(180deg); color: var(--text-secondary); }
+
+.nav__sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .2s ease; }
+.nav__sub > .nav__sub-in { overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 2px; }
+.nav__item--acc[aria-expanded="true"] + .nav__sub { grid-template-rows: 1fr; }
+.nav__sub .nav__item { padding-left: 48px; }
+
+.nav--rail .nav__caret { display: none; }
+.nav--rail .nav__sub { display: none; }
+
+/* ========================================================================== *
    RAIL — тултип по hover + бейдж-надстрочник
    ========================================================================== */
 .nav--rail .nav__label {
