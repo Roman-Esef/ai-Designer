@@ -47,6 +47,7 @@
     'ds-modal.js',
     'ds-table.js',
     'tbl-resize.js',
+    'tbl-reorder.js',
     'ds-pagination.js',
     'ds-notify.js',
     'ds-datepicker.js',

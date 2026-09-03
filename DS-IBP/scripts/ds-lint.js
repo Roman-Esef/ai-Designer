@@ -34,7 +34,7 @@ const HEX_ALLOW = [/^#(fff|ffffff|000|000000)$/i, /^rgba?\(\s*255\s*,\s*255\s*,\
 // пары «скрипт ↔ его CSS» (сами скрипты умеют подтягивать стиль, потому WARN)
 const JS_CSS_PAIRS = [['ds-nav.js', 'ds-nav.css'], ['ds-toc.js', 'ds-toc.css'], ['pg-kit.js', 'pg-kit.css']];
 // рантаймы, которые ds.js (RulesAudit W0/K0) догружает сам — экран не должен подключать их напрямую
-const DS_JS_BUNDLES = ['icons-data.js', 'ds-icons.js', 'screens-chrome.js', 'ds-tabs.js', 'ds-tile.js', 'ds-menu.js', 'ds-popover.js', 'ds-tooltip.js', 'ds-modal.js', 'ds-table.js', 'tbl-resize.js', 'ds-pagination.js', 'ds-riskmetric.js', 'ds-alert.js', 'ds-chip.js', 'ds-allocationbar.js', 'ds-notify.js', 'ds-datepicker.js', 'input-kit.js', 'ds-nav-panel.js', 'ds-splitter.js', 'ds-illustrations.js'];
+const DS_JS_BUNDLES = ['icons-data.js', 'ds-icons.js', 'screens-chrome.js', 'ds-tabs.js', 'ds-tile.js', 'ds-menu.js', 'ds-popover.js', 'ds-tooltip.js', 'ds-modal.js', 'ds-table.js', 'tbl-resize.js', 'tbl-reorder.js', 'ds-pagination.js', 'ds-riskmetric.js', 'ds-alert.js', 'ds-chip.js', 'ds-allocationbar.js', 'ds-notify.js', 'ds-datepicker.js', 'input-kit.js', 'ds-nav-panel.js', 'ds-splitter.js', 'ds-illustrations.js'];
 // утилитарные классы разметки документации — владельца в styles/* не имеют
 const CLASS_IGNORE = new Set(['page', 'section', 'masthead', 'meta', 'lead', 'eyebrow', 'crumb', 'desc', 'panel', 'row', 'col', 'grid', 'card', 'note', 'name', 'c', 'n', 'is-off']);
 // F5 — реестр «анатомия компонента взята целиком, не урезана под текущий вид». Каждый

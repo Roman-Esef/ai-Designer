@@ -15,16 +15,18 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 16px;
+  align-items: start; /* плитки по высоте контента, не тянутся к высоте ряда */
 }
 
 /* ---------- плитка ----------
    Горизонтальная раскладка: текст слева, иллюстрация справа —
-   фиксированного размера 195×140, прижата к правому краю и закреплена
-   от верха (не центр по вертикали) — при росте тайла остаётся на месте. */
+   фиксированного размера 195×140, прижата к правому краю и
+   центрирована по вертикали (при росте тайла остаётся по центру). */
 .ntile {
   --ntile-pad: 32px;
   --ntile-illu-w: 195px;
   --ntile-illu-h: 140px;
+  box-sizing: border-box;
   min-width: 400px;
   position: relative;
   display: flex;
@@ -32,9 +34,9 @@
   align-items: flex-start;
   gap: 8px;
   width: 442px;
-  min-height: 188px;
+  min-height: 190px;
   padding: var(--ntile-pad);
-  padding-right: 160px; /* чуть меньше ширины иллюстрации — текст может чуть перекрывать картинку, это нормально */
+  padding-right: 160px; /* чуть меньше ширины иллюстрации — текст ложится поверх (картинка — фон) */
   background: var(--bg-tile);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-control);
@@ -42,10 +44,13 @@
   color: var(--text-primary);
   transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
 }
-/* внутри адаптивной сетки плитка тянется на ширину колонки — 483×253 это размер по умолчанию вне сетки */
+/* внутри адаптивной сетки плитка тянется на ширину колонки (вне сетки по умолчанию — 442×190) */
 .ntile-grid > .ntile { width: auto; }
+.ntile *, .ntile *::before, .ntile *::after { box-sizing: border-box; }
 
 /* ---------- части ---------- */
+/* иллюстрация — фон (z-index 0), текст рисуется поверх (z-index 1):
+   при сужении тайла текст не уходит под картинку */
 .ntile__illu {
   position: absolute;
   right: 0;
@@ -53,7 +58,12 @@
   transform: translateY(-50%);
   width: var(--ntile-illu-w);
   height: var(--ntile-illu-h);
+  z-index: 0;
 }
+.ntile__title,
+.ntile__desc,
+.ntile__links,
+.ntile__title-link { position: relative; z-index: 1; }
 .ntile__title {
   font: var(--type-h4-strong);
   color: var(--text-primary);

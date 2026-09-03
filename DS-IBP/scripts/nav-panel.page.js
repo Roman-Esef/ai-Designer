@@ -76,6 +76,16 @@
   /* ---------------- сборка пункта ---------------- */
   function itemHTML(it, opts) {
     var disabled = opts.disabled && it.canDisable;
+    /* пункт с тайлом-со-ссылками — аккордеон-родитель (под-пункты = ссылки тайла) */
+    if (it.tile && it.tile.links && it.tile.links.length) {
+      var sub = '<div class="nav__sub" id="nav-sub-' + it.id + '"><div class="nav__sub-in">'
+        + it.tile.links.map(function (l) { return '<a class="nav__item" href="#"><span class="nav__label">' + l + '</span></a>'; }).join('')
+        + '</div></div>';
+      return '<a class="nav__item nav__item--acc" href="#" aria-expanded="false" aria-controls="nav-sub-' + it.id + '">'
+        + '<span class="nav__ico">' + ic(it.icon) + '</span>'
+        + '<span class="nav__label">' + it.label + '</span>'
+        + '<span class="nav__caret">' + ic('chevron-down') + '</span></a>' + sub;
+    }
     var cls = 'nav__item'
       + (it.selected ? ' nav__item--selected' : '')
       + (disabled ? ' nav__item--disabled' : '');
@@ -95,7 +105,7 @@
       + '</a>';
   }
 
-  /* ---------------- шапка и футер (общие для buildNav и buildNestedNav) ---------------- */
+  /* ---------------- шапка и футер (для buildNav) ---------------- */
   function topHTML(mode) {
     var s = '<div class="nav__top">';
     s += '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="'
@@ -171,8 +181,8 @@
     controls.innerHTML =
       '<div class="ctl"><span class="lbl">Режим</span>'
       + '<div class="pg-select"><select id="pg-mode">'
-      + '<option value="rail">Rail</option>'
-      + '<option value="drawer" selected>Drawer</option>'
+      + '<option value="rail" selected>Rail</option>'
+      + '<option value="drawer">Drawer</option>'
       + '<option value="fixed">Fixed</option>'
       + '</select></div></div>'
       /* бинарные опции — бинарные селекты: docs-split.js конвертирует их
@@ -260,6 +270,14 @@
       ['Menu Item + Badge', 'Опциональный Badge (accent) — счётчик сущностей.',
         itemHTML({ icon: 'tasks', label: 'Задачи', badge: 7 }, { badges: true }),
         itemHTML({ icon: 'tasks', label: 'Задачи', badge: 7 }, { badges: true })],
+      ['Пункт-родитель', 'Пункт с тайлом-со-ссылками: каретка раскрывает под-пункты (ссылки тайла); в Rail каретка и под-список скрыты.',
+        '<a class="nav__item nav__item--acc" href="#" aria-expanded="false"><span class="nav__ico">' + ic('rwa') + '</span><span class="nav__label">Отчёты для Рисков</span><span class="nav__caret">' + ic('chevron-down') + '</span></a>',
+        '<a class="nav__item nav__item--acc" href="#" aria-expanded="true" aria-controls="el-nested-sub"><span class="nav__ico">' + ic('rwa') + '</span><span class="nav__label">Отчёты для Рисков</span><span class="nav__caret">' + ic('chevron-down') + '</span></a>'
+        + '<div class="nav__sub" id="el-nested-sub"><div class="nav__sub-in">'
+        + '<a class="nav__item" href="#"><span class="nav__label">Коды RWA</span></a>'
+        + '<a class="nav__item" href="#"><span class="nav__label">Расчет RWA</span></a>'
+        + '<a class="nav__item" href="#"><span class="nav__label">Расчет ОВП</span></a>'
+        + '</div></div>'],
       ['Footer', 'Строка пользователя — ссылка на личный кабинет + логаут; в Rail — только аватар.',
         '<div class="nav__footer" style="border-top:none;padding:8px 0"><a class="nav__user" href="#" aria-label="Открыть личный кабинет"><span class="av av--circular av--m"><span class="av__text">АП</span></span></a></div>',
         '<div class="nav__footer" style="border-top:none;padding:8px"><a class="nav__user" href="#" aria-label="Открыть личный кабинет"><span class="av av--circular av--m"><span class="av__text">АП</span></span><span class="nav__user-text"><span class="nav__user-name">Александров Петр</span><span class="nav__user-role">Аналитик ДИД</span></span></a><button class="ibtn ibtn--neutral ibtn--m" aria-label="Выйти">' + ic('logout') + '</button></div>']
@@ -302,191 +320,6 @@
       wrap.appendChild(cell);
     });
     paint(wrap);
-  }
-
-  /* =====================================================================
-     RND — вложенные разделы (эксперимент; удалить после утверждения)
-     Два варианта на ПОЛНОЦЕННОЙ панели NavPanel (шапка + список блоков +
-     футер — тот же каркас, что в buildNav). Под-список появляется у пункта
-     «Обязательные сделки» (первый пункт блока Origination):
-       аккордеон — .nav__item--acc, каретка chevron-down (крутится при
-         раскрытии), под-список .nav__sub раскрывается в потоке (grid
-         0fr→1fr); по умолчанию раскрыт. В rail под-список скрыт, клик по
-         иконке разворачивает панель в drawer;
-       флайаут — .nav__item--fly, каретка chevron-right (СТАТИЧНА), меню
-         ContextMenu (.menu.menu--floating) вылетает СПРАВА от панели.
-         Рантайм ds-menu умеет только bottom/top, поэтому позиционирование —
-         страничное (bindFlyout); меню — прямой ребёнок .rnd-stage
-         (position:relative), вне .nav (overflow:hidden), не обрезается.
-         В rail меню открывается сразу, без разворота панели.
-     Оба демо — с рабочим бургером (drawer ↔ rail, DSNavPanel.bind).
-     Под-пункты — текстовые, без глифов-иконок; один отмечен как текущая
-     страница. Стили — в <style> страницы (классы .rnd*, .nav__caret,
-     .nav__sub), не в styles/nav-panel.css.
-     ===================================================================== */
-  var RND_PARENT = { icon: 'Important-deals', label: 'Обязательные сделки', selected: true };
-  function rndSubItem(label, sel) {
-    return '<a class="nav__item' + (sel ? ' nav__item--selected' : '') + '" href="#"'
-      + (sel ? ' aria-current="page"' : '')
-      + '><span class="nav__label">' + label + '</span></a>';
-  }
-  function rndMenuItem(label, sel) {
-    return '<button type="button" class="menu__item' + (sel ? ' menu__item--selected' : '') + '" role="menuitem"'
-      + (sel ? ' aria-current="page"' : '')
-      + '><span class="menu__item-label">' + label + '</span></button>';
-  }
-  /* родительский пункт: тот же <a class="nav__item …">, что и обычные пункты
-     (itemHTML), состояние — данными RND_PARENT.selected; cls — модификатор
-     (.nav__item--acc | --fly), caret — глиф каретки, extra — aria-атрибуты */
-  function rndParentHTML(cls, caret, extra) {
-    return '<a href="#" class="nav__item' + (RND_PARENT.selected ? ' nav__item--selected' : '') + ' nav__item--parent ' + cls + '"' + (extra ? ' ' + extra : '')
-      + '><span class="nav__ico">' + ic(RND_PARENT.icon) + '</span>'
-      + '<span class="nav__label">' + RND_PARENT.label + '</span>'
-      + '<span class="nav__caret">' + ic(caret) + '</span></a>';
-  }
-  function buildNestedNav(variant, opts) {
-    opts = opts || {};
-    var s = '<nav class="nav nav--drawer" aria-label="Главное меню">';
-    s += topHTML('drawer');
-    s += '<div class="nav__list">';
-    s += itemHTML({ icon: HOME.icon, label: HOME.label }, opts);
-    /* RND-демо вложенности — на ПОЛНОМ каталоге (Origination вне роли Финансист) */
-    (window.IBPHome ? IBPHome.groups : BLOCKS).forEach(function (b, i) {
-      s += '<div class="nav__block' + (i === 0 ? ' nav__block--first' : '') + '">';
-      s += '<div class="nav__block-label">' + b.label + '</div>';
-      b.items.forEach(function (it) {
-        /* «Обязательные сделки» (первый пункт Origination) — родитель */
-        if ((b.id === 'origination' || b === BLOCKS[0]) && it === b.items[0]) {
-          if (variant === 'dropdown') {
-            /* флайаут: пункт без обёртки; меню кладётся наружу .nav (см. initRnd) */
-            s += rndParentHTML('nav__item--fly', 'chevron-right', 'aria-haspopup="menu" aria-controls="rnd-flyout-1" aria-expanded="false"');
-          } else {
-            s += rndParentHTML('nav__item--acc', 'chevron-down', 'aria-expanded="true" aria-controls="rnd-nested-sub"');
-            s += '<div class="nav__sub" id="rnd-nested-sub"><div class="nav__sub-in">'
-              + rndSubItem('Подстраница 1') + rndSubItem('Подстраница 2', true)
-              + rndSubItem('Подстраница 3') + rndSubItem('Подстраница 4')
-              + '</div></div>';
-          }
-        } else {
-          s += itemHTML(it, opts);
-        }
-      });
-      s += '</div>';
-    });
-    s += '</div>';
-    s += footerHTML();
-    s += '</nav>';
-    return h(s);
-  }
-  function rndFrame(variant, h0) {
-    var f = h('<div class="nav-frame" style="height:' + (h0 || 560) + 'px"></div>');
-    f.appendChild(buildNestedNav(variant));
-    return f;
-  }
-  function buildFlyoutMenu() {
-    /* menu--scroll — правило компонента ContextMenu: max-height 280px, свой скролл */
-    return h('<div id="rnd-flyout-1" class="menu menu--floating menu--scroll" role="menu" hidden>'
-      + rndMenuItem('Подстраница 1') + rndMenuItem('Подстраница 2', true)
-      + rndMenuItem('Подстраница 3') + rndMenuItem('Подстраница 4')
-      + rndMenuItem('Подстраница 5') + rndMenuItem('Подстраница 6')
-      + rndMenuItem('Подстраница 7') + rndMenuItem('Подстраница 8')
-      + '</div>');
-  }
-  /* флайаут справа от панели: меню — прямой ребёнок .rnd-stage, позиция
-     считается от триггера в координатах стадии; закрытие по клику вне / Esc /
-     выбору пункта / скроллу списка панели (порог 60px, чтобы случайный мелкий
-     скролл не закрывал); пересчёт на resize. Скролл списка НЕ двигает меню
-     за триггером — иначе оно уезжает за границу экрана. */
-  function bindFlyout(trigger, menu) {
-    var stage = menu.parentElement;
-    var list = trigger.closest('.nav__list');
-    var SCROLL_CLOSE = 60;
-    var open = false;
-    var openScrollTop = 0;
-    function place() {
-      if (!open) return;
-      var sr = stage.getBoundingClientRect();
-      var tr = trigger.getBoundingClientRect();
-      var x = tr.right - sr.left + 8;
-      x = Math.min(x, window.innerWidth - menu.offsetWidth - 8);
-      menu.style.left = x + 'px';
-      menu.style.top = (tr.top - sr.top) + 'px';
-      menu.style.setProperty('--menu-origin', 'left top');
-    }
-    function openMenu() {
-      if (open) return;
-      open = true;
-      if (list) openScrollTop = list.scrollTop;
-      menu.removeAttribute('hidden');
-      menu.classList.add('is-open');
-      trigger.setAttribute('aria-expanded', 'true');
-      place();
-    }
-    function closeMenu(returnFocus) {
-      if (!open) return;
-      open = false;
-      menu.classList.remove('is-open');
-      menu.setAttribute('hidden', '');
-      trigger.setAttribute('aria-expanded', 'false');
-      if (returnFocus) trigger.focus();
-    }
-    trigger.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (open) closeMenu(true); else openMenu();
-    });
-    menu.addEventListener('click', function (e) {
-      if (e.target.closest('.menu__item')) closeMenu(false);
-    });
-    document.addEventListener('click', function (e) {
-      if (open && !menu.contains(e.target) && !trigger.contains(e.target)) closeMenu(false);
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && open) closeMenu(true);
-    });
-    if (list) {
-      list.addEventListener('scroll', function () {
-        if (open && Math.abs(list.scrollTop - openScrollTop) > SCROLL_CLOSE) closeMenu(false);
-      });
-    }
-    window.addEventListener('resize', place);
-    return { close: closeMenu };
-  }
-  /* бургер сворачивает/разворачивает панель (drawer ↔ rail) — штатный рантайм */
-  function bindRndNav(nav) {
-    if (window.DSNavPanel) window.DSNavPanel.bind(nav);
-  }
-  function initRnd() {
-    var acc = document.getElementById('rnd-accordion');
-    if (acc) {
-      acc.appendChild(rndFrame('accordion', 560));
-      var accBtn = acc.querySelector('.nav__item--acc');
-      var accNav = acc.querySelector('.nav');
-      accBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        /* в rail под-список скрыт — клик по иконке разворачивает панель */
-        if (accNav.classList.contains('nav--rail')) {
-          if (window.DSNavPanel) window.DSNavPanel.setMode(accNav, 'drawer');
-          return;
-        }
-        var open = accBtn.getAttribute('aria-expanded') === 'true';
-        accBtn.setAttribute('aria-expanded', String(!open));
-      });
-      paint(acc);
-      bindRndNav(accNav);
-    }
-
-    var dd = document.getElementById('rnd-dropdown');
-    if (dd) {
-      dd.appendChild(rndFrame('dropdown', 560));
-      var flyBtn = dd.querySelector('.nav__item--fly');
-      var flyMenu = buildFlyoutMenu();
-      dd.appendChild(flyMenu);
-      var flyApi = bindFlyout(flyBtn, flyMenu);
-      /* при смене режима панели закрываем меню, чтобы оно не зависло в старом месте */
-      dd.querySelector('.nav').addEventListener('ds-nav-mode', function () { flyApi.close(false); });
-      paint(dd);
-      bindRndNav(dd.querySelector('.nav'));
-    }
   }
 
   /* =====================================================================
@@ -642,7 +475,6 @@
     initModes();
     initElements();
     initStates();
-    initRnd();
     initColors();
     initCopy();
     try { fillTables(measure()); } catch (e) { /* redline optional */ }

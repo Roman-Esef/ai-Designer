@@ -382,10 +382,12 @@
 .th__resize:focus-visible { outline: none; }
 
 /* --- порядок колонок: перетаскивание шапки ------------------------------ */
-/* Колонку берут за подпись шапки. Пока идёт перенос, вся колонка приглушена,
-   а место вставки показывает вертикальная линия через всю таблицу. */
-.th--movable .th__label { cursor: grab; }
-.tbl--reordering .th--movable .th__label { cursor: grabbing; }
+/* Колонку берут за подпись шапки. Переносятся все колонки, кроме разделителей
+   и закреплённых — автоматически, без маркера (общий рантайм tbl-reorder.js).
+   Пока идёт перенос, вся колонка приглушена, а место вставки показывает
+   вертикальная линия через всю таблицу. */
+.th:not(.th--separator):not(.th--pinned) .th__label { cursor: grab; }
+.tbl--reordering .th:not(.th--separator):not(.th--pinned) .th__label { cursor: grabbing; }
 .th--dragging,
 .tc--dragging { opacity: .4; }
 .tbl--resizing,
