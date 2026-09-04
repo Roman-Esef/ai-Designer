@@ -24,6 +24,8 @@
    data-tooltip-flip="no", data-tooltip-boundary (CSS-селектор границы),
    data-tooltip-delay (мс, 400), data-tooltip-truncated="only" — показывать
    только при усечении текста цели (scrollWidth > clientWidth).
+     data-tooltip-multiline="yes" — переносить длинный текст по --tip-max
+     вместо усечения самого тултипа.
 
    Поведение по спеке: 12 позиций, авто-flip стороны и выравнивания, стрелка
    доводится до центра цели, задержка 400 мс по hover и мгновенно по focus,
@@ -224,7 +226,7 @@
       boundary: opts.boundary || (d.tooltipBoundary ? document.querySelector(d.tooltipBoundary) : null),
       delay: opts.delay != null ? opts.delay : (d.tooltipDelay != null ? parseFloat(d.tooltipDelay) : SHOW_DELAY),
       truncatedOnly: opts.truncatedOnly != null ? opts.truncatedOnly : d.tooltipTruncated === 'only',
-      multiline: opts.multiline || false,
+      multiline: opts.multiline != null ? opts.multiline : d.tooltipMultiline === 'yes',
       rich: opts.rich || false,
       title: opts.title || '',
       action: opts.action || '',

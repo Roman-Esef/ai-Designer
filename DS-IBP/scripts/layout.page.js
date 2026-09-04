@@ -121,7 +121,7 @@
       frame.classList.toggle('is-zones', cbZones.checked);
       ro.nav.textContent = fixed ? '272 px' : '56 px';
       ro.crumbs.textContent = cbCrumbs.checked ? parseFloat(m.crumbsH) + ' px · 16/24/12' : 'нет (Дашборд)';
-      ro.pad.textContent = '0 / 24 / 24';
+      ro.pad.textContent = '8 / 24 / 24';
       ro.gap.textContent = parseFloat(m.contentGap) + ' px';
       applyWidth();
     }
@@ -151,7 +151,7 @@
         ['Панель навигации', tok('.nav'), 'фиксирована на высоту вьюпорта, не участвует в потоке; отступа до рабочей области нет'],
         ['Рабочая область', tok('.screen'), 'колонка: зона крошек + контентная область; фон страницы; резиновая, перестраивается по брейкпоинтам'],
         ['Зона крошек', tok('.crumbs'), 'высота 44 px и поля 24 px — внутри компонента Breadcrumbs; в каркасе — залипание сверху'],
-        ['Контентная область', tok('.screen__content'), 'поля 0 / 24 / 24, зазор блоков 24 px; семантически ' + tok('&lt;main&gt;')],
+        ['Контентная область', tok('.screen__content'), 'поля 8 / 24 / 24, зазор блоков 24 px; семантически ' + tok('&lt;main&gt;')],
         ['Сетка внутри контента', tok('.grid12') + ' ' + tok('.col-N'), '12 колонок, зазор 16 px — компонент Spacing, каркас его не переопределяет']
       ]);
 
@@ -170,7 +170,7 @@
         ['Отступ рабочей области слева (fixed)', '272 px', 'NavPanel, ' + tok('.nav-layout')],
         ['Высота зоны крошек', m.crumbsH, tok('--layout-crumbs-h') + ' / Breadcrumbs'],
         ['Поля зоны крошек (top / side / bottom)', '16 / 24 / 12 px', 'Breadcrumbs, ' + tok('.crumbs')],
-        ['Поля контентной области (top / side / bottom)', '0 / 24 / 24 px', tok('--layout-pad-x') + ', ' + tok('--layout-pad-bottom')],
+        ['Поля контентной области (top / side / bottom)', '8 / 24 / 24 px', tok('--layout-pad-top') + ', ' + tok('--layout-pad-x') + ', ' + tok('--layout-pad-bottom')],
         ['Зазор блоков контента', m.contentGap, tok('--layout-block-gap')],
         ['Колонок / зазор сетки', '12 / 16 px', tok('--grid-columns') + ', ' + tok('--grid-gutter')]
       ]);

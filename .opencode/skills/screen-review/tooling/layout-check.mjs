@@ -7,6 +7,9 @@
    Два класса проверок:
      механика   — блокеры screen-review (Б1–Б16): точные,
                    строковые/структурные;
+     Б24/Б25   — усечение в таблице без браузера: помещается ли значение
+                   в свою колонку и не шире ли строка контентной области
+                   (уроки Л28–Л30, эвристика ~7px/символ body-s).
      геометрия  — блокеры composition-review (K1–K6): вычисленные
                    из токенов styles/*.css + эвристика ширины
                    символа (~8px body-m кириллица, ~7px body-xs).
@@ -233,9 +236,15 @@ function checkMechanics(html, icons) {
   const ok = (cond, label, line) => res.push({ ok: !!cond, label, line, level: cond ? 'ok' : 'fail' });
   const warn = (label, line) => res.push({ ok: false, label, line, level: 'warn' });
 
-  /* Б1 подключения */
-  ok((html.match(/\.\.\/\.\.\/\.\.\/ds\.css/g) || []).length === 1,
-    `Б1 ровно один ds.css (${(html.match(/\.\.\/\.\.\/\.\.\/ds\.css/g) || []).length})`);
+  /* Б1 подключения. Путь к ds.css НЕ фиксирован по числу уровней: экраны лежат
+     на разной глубине (`Projects/test/` → `../../DS-IBP/ds.css`,
+     `Projects/post/<направление>/<экран>/` → `../../../../DS-IBP/ds.css`).
+     Раньше здесь была зашита строка `../../../ds.css` — путь структуры до
+     переезда ДС в `DS-IBP/` (01.09.2026), из-за чего Б1 падал на ЛЮБОМ экране
+     репозитория, включая заведомо правильные из `Projects/test/`. */
+  const dsCssLinks = (html.match(/href="[^"]*\bds\.css"/g) || []);
+  ok(dsCssLinks.length === 1,
+    `Б1 ровно один ds.css (${dsCssLinks.length})`);
   ok((html.match(/scripts\/ds\.js/g) || []).length === 1,
     `Б1 ровно один scripts/ds.js (${(html.match(/scripts\/ds\.js/g) || []).length})`);
   ok(!/href="[^"]*styles\//.test(html), 'Б1 нет поштучных styles/* (только ds.css)');
@@ -339,6 +348,81 @@ function checkMechanics(html, icons) {
   }
   ok(usedDoc.length === 0,
     usedDoc.length ? `Б23 док-классы на экране (нет в ds.css): ${usedDoc.join(', ')}` : 'Б23 нет классов документационного слоя');
+
+  /* Б24/Б25 — усечение в таблице, проверяемое БЕЗ браузера.
+
+     Почему статикой: рендер в контуре компании недоступен (ds-rules §9), а
+     класс дефектов дорогой — 04.09.2026 усечение в таблицах ломалось тремя
+     разными способами, и все три выглядели как правильная разметка
+     (уроки Л28–Л30). Меряем не «стоит ли класс», а помещается ли текст.
+
+     Эвристика та же, что у K1/K2.1: ~7px на символ для body-s (шрифт ячейки
+     .tc — --type-body-s 14/16). Запас 15% — при значении около порога
+     выводим замечание, а не блокер (правило §9 «близко к порогу — проверить
+     вручную»).
+
+     Что НЕ ловится статикой и закрыто линтером ds-lint по CSS: обёртка
+     рантайма, отключающая усечение (B9, урок Л28), и компонент с усекаемой
+     подписью, который не умеет сжиматься (B8, урок Л29). */
+  const CHAR_W_CELL = 7;                   // body-s 14px, кириллица
+  const CELL_PAD = 32;                     // .tc padding 16 + 16
+  const TRUNC_HARD = 1.5;                  // усечено больше трети — колонка систематически узка
+
+  const bleed = [];
+  const tight = new Map();                 // колонка → сколько значений усекается жёстко
+  let rowsChecked = 0;
+
+  for (const row of html.matchAll(/<div class="tbl__row[^"]*"[^>]*style="[^"]*grid-template-columns:([^;"]+)[^>]*>([\s\S]*?)(?=<div class="tbl__row|<\/div>\s*<\/div>)/g)) {
+    const tracks = row[1].trim().split(/\s+(?![^(]*\))/);
+    const cells = [...row[2].matchAll(/<div class="(tc[^"]*)"[^>]*>([\s\S]*?)<\/div>/g)];
+    if (!cells.length) continue;
+    rowsChecked++;
+    const rowLine = lineOf(html, row.index);
+
+    cells.forEach((cell, i) => {
+      const track = tracks[i];
+      if (!track || !/^\d+(\.\d+)?px$/.test(track)) return;   // fr/minmax/auto — ширина неизвестна
+      const cls = cell[1];
+      if (/tc--wrap/.test(cls)) return;                        // перенос разрешён явно — растёт по высоте
+      const inner = cell[2];
+      const textEl = inner.match(/<span class="(tc__text[^"]*)"[^>]*>([^<]*)</);
+      if (!textEl) return;
+      const value = textEl[2].trim();
+      if (!value || value === '—') return;
+      const avail = parseFloat(track) - CELL_PAD;
+      const est = value.length * CHAR_W_CELL;
+      if (est <= avail) return;
+      const truncates = /tc__text--truncate/.test(textEl[1]);
+      const item = `строка ${rowLine}, колонка ${i + 1} (${track}): «${value.slice(0, 28)}» ~${est}px / ${Math.round(avail)}px`;
+      if (!truncates) bleed.push(item);
+      else if (est > avail * TRUNC_HARD) {
+        const key = `колонка ${i + 1} (${track})`;
+        tight.set(key, (tight.get(key) || 0) + 1);
+      }
+    });
+  }
+
+  if (rowsChecked) {
+    ok(bleed.length === 0, bleed.length
+      ? `Б24 значение шире своей колонки и без .tc__text--truncate — текст выйдет за ячейку, а непрозрачный фон соседней обрежет его без многоточия: ${bleed.slice(0, 3).join(' · ')}`
+      : `Б24 значения помещаются в колонки или усечены (${rowsChecked} строк)`);
+    for (const [col, n] of tight) {
+      warn(`Б24 ${col}: ${n} из ${rowsChecked} значений теряют больше трети текста — колонка систематически узка; расширить или подтвердить, что смысл читается по началу строки и тултипа достаточно`);
+    }
+  }
+
+  /* Б25 — строка шире контентной области, а таблица не прокручивается:
+     хвост колонок физически недостижим (статический аналог урока Л30). */
+  for (const row of html.matchAll(/<div class="tbl__row[^"]*"[^>]*style="[^"]*grid-template-columns:([^;"]+)/g)) {
+    const tracks = row[1].trim().split(/\s+(?![^(]*\))/);
+    if (!tracks.every((t) => /^\d+(\.\d+)?px$/.test(t))) continue;   // есть fr/minmax — строка тянется
+    const sum = tracks.reduce((a, t) => a + parseFloat(t), 0);
+    const scrollable = /class="[^"]*\btbl--scroll\b/.test(html) || /class="[^"]*\bdtable__body\b/.test(html);
+    if (sum > 1816 && !scrollable) {
+      ok(false, `Б25 строка ${lineOf(html, row.index)}: сумма колонок ${Math.round(sum)}px шире контентной области, а горизонтального скролла нет (.tbl--scroll / .dtable__body) — хвост колонок недостижим`);
+    }
+    break;   // достаточно одной строки: треки у всех одинаковые (Б8)
+  }
 
   return res;
 }

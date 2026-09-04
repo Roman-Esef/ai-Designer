@@ -43,6 +43,10 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
 .dt-stage{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg-page);border:1px solid var(--border-light);border-radius:12px;padding:28px;min-height:280px;width:100%;}
 .dt-stage .dtable{width:100%;}
 .dt-stage .dtable__body{max-height:260px;}
+/* detached-вариант «тулбар над таблицей»: зона и таблица в общем контейнере-колонке (ритм 12px) */
+.dt-detached{display:flex;flex-direction:column;align-items:stretch;gap:12px;width:100%;min-width:0;}
+/* неактуальные свитчи конструктора скрываются целиком (label.pg-toggle) */
+.toggles .pg-toggle.is-off{display:none;}
 .ws-cap{font:var(--type-body-xs);color:var(--text-inactive);margin:12px 0 0;text-wrap:pretty;}
 /* columns modal (demo-only chrome, not part of the shipped component) */
 .col-actions{display:flex;gap:8px;margin-bottom:12px;}
@@ -112,8 +116,8 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     Обзор компонентов
   </a>
   <div class="meta">
-    <span>Версия <b>1.006</b></span>
-    <span>Обновлено <b>02.09.2026</b></span>
+    <span>Версия <b>1.009</b></span>
+    <span>Обновлено <b>04.09.2026</b></span>
     <span>CSS <b>styles/table.css</b></span>
     <span>Зависимости <b>table-cell, pagination, table-filter, button, button-group, icon-button, chip, checkbox, illustration, modal, context-menu</b></span>
   </div>
@@ -199,12 +203,20 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     <h3>Горизонтальный скролл и закрепление колонок</h3>
     <p class="desc">Когда колонки не помещаются по ширине, тело скроллится горизонтально; закреплённые колонки (свойство TableCell) остаются на месте. Теней-градиентов по краям тела нет — скрытый контент по бокам обозначает сам скроллбар (решение 27.08.2026: прежние <code class="tok">.dtable__edge</code> позиционировались внутри скролл-контейнера и уезжали вместе с колонками).</p>
   </div>
+  <div class="subsec" data-screen-label="FillHeight">
+    <h3>На всю высоту</h3>
+    <p class="desc">Таблица как основной контент экрана: вариант <code class="tok">.dtable--fill</code> растягивает контейнер на всю свободную высоту (минус крошки, шапка страницы, тулбар), тело скроллится внутри, тулбар и пагинация остаются на месте. Требует фиксированной высоты родителя — на рабочую область ставится <code class="tok">.screen--app</code> (см. <a class="inl" href="../foundations/Layout.html">Layout</a>, вариант app-shell). Используйте, когда на странице одна таблица (реестр); если над/под таблицей есть тайлы — кейс индивидуальный, но по умолчанию таблица всё равно занимает оставшуюся высоту.</p>
+  </div>
+  <div class="subsec" data-screen-label="ToolbarFloat">
+    <h3>Тулбар над таблицей</h3>
+    <p class="desc">Зона фильтра и настроек вынесена из таблицы: контейнер <code class="tok">.dtable-toolbar</code> БЕЗ подложки стоит над <code class="tok">.dtable</code> — слева TableFilter (<code class="tok">.tfilter</code>), справа кнопка настройки колонок. Таблица при этом <b>headless</b>: без <code class="tok">.dtable__toolbar</code>, сразу шапка — ни заголовка, ни счётчика строк. Вертикальный ритм варианта — 12px: заголовок страницы → зона → таблица (задаёт экран, <code class="tok">gap: var(--space-12)</code>). Сочетается с вариантом «на всю высоту» (<code class="tok">.screen--app</code> + <code class="tok">.dtable--fill</code>): зона остаётся над таблицей, тело скроллится внутри.</p>
+  </div>
 </section>
 
 <!-- 5. РАЗМЕРЫ -->
 <section class="section" id="sizes" data-screen-label="Размеры">
   <h2>Размеры</h2>
-  <p class="desc">Не применимо: собственной размерной шкалы у Table нет. Высота строки (48px) и паддинги ячеек задаёт TableCell; высота ряда пагинации — Pagination. Table лишь добавляет фиксированные отступы Toolbar (16/20px) и Footer (0/20px по бокам).</p>
+  <p class="desc">Не применимо: собственной размерной шкалы у Table нет. Высота строки (48px) и паддинги ячеек задаёт TableCell; высота ряда пагинации — Pagination. Table лишь добавляет фиксированные отступы Toolbar (16/20px) и Footer (0/20px по бокам). Высота контейнера по умолчанию — по контенту; вариант <code class="tok">.dtable--fill</code> растягивает таблицу на свободную высоту родителя (flex-цепочка <code class="tok">flex:1; min-height:0</code> у контейнера и тела, тело — скролл-контейнер).</p>
 
 <div class="subsec" data-screen-label="Radius">
     <h3>Радиус скругления</h3>
@@ -437,6 +449,7 @@ onSelectionChange(count): bulkRow.hidden = (count === 0)
                 </div>
                 <div class="toggles">
                   <label class="pg-toggle"><input id="ctl-toolbar" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать тулбар</span></label>
+                  <label class="pg-toggle"><input id="ctl-toolbar-float" type="checkbox"><span class="pg-toggle__sw"></span><span>Тулбар над таблицей</span></label>
                   <label class="pg-toggle"><input id="ctl-filter" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать фильтр в тулбаре</span></label>
                   <label class="pg-toggle"><input id="ctl-presets" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать сохранённые пресеты</span></label>
                   <label class="pg-toggle"><input id="ctl-footer" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать пагинацию</span></label>
@@ -477,6 +490,7 @@ onSelectionChange(count): bulkRow.hidden = (count === 0)
 <script src="../../scripts/ds-table.js"></script>
 <script src="../../scripts/tbl-resize.js"></script>
 <script src="../../scripts/tbl-reorder.js"></script>
+<script src="../../scripts/tbl-pin.js"></script>
 <script src="../../scripts/table.page.js"></script>
 <script src="../../scripts/docs-split.js"></script>
 
@@ -501,7 +515,23 @@ onSelectionChange(count): bulkRow.hidden = (count === 0)
   </div>
 </div>
 <!-- Empty: .dtable__body содержит только .dtable__empty (иллюстрация + текст + действие) -->
-<!-- Loading: .dtable__body содержит .tbl с N строками .tc--skeleton (плейсхолдер .sk-line--caption) --></script>
+<!-- Loading: .dtable__body содержит .tbl с N строками .tc--skeleton (плейсхолдер .sk-line--caption) -->
+
+<!-- Вариант «тулбар над таблицей»: зона .dtable-toolbar (без подложки) над headless-таблицей;
+     ритм 12px (заголовок → зона → таблица) задаёт экран -->
+<div class="dtable-toolbar">
+  <div class="tfilter" role="group" aria-label="Фильтр таблицы">
+    <button class="btn btn--outline btn--s tfilter__open" aria-haspopup="dialog" aria-expanded="false"><i data-icon="filter"></i><span class="btn__label">Фильтр</span></button>
+    <span class="chip chip--edit chip--m tfilter__applied" tabindex="0"><span class="chip__label">Применено: 3</span><span class="chip__remove" role="button" aria-label="Сбросить все фильтры"><i data-icon="close"></i></span></span>
+  </div>
+  <button class="ibtn ibtn--neutral ibtn--m" aria-label="Настроить колонки"><i data-icon="settings"></i></button>
+</div>
+<div class="dtable">
+  <div class="dtable__body">
+    <div class="tbl"><!-- .tbl__row/.th/.tc — см. TableCell; без .dtable__toolbar — таблица headless --></div>
+  </div>
+  <div class="dtable__footer"><div class="pgn-row"><!-- см. Pagination --></div></div>
+</div></script>
 
 <script type="text/plain" id="src-code-css">/* =========================================================================
    Table — организм-контейнер таблицы/реестра.
@@ -521,6 +551,12 @@ onSelectionChange(count): bulkRow.hidden = (count === 0)
   overflow: hidden;
 }
 
+/* вариант «на всю высоту»: таблица — основной контент экрана и занимает всю
+   свободную высоту (минус крошки/шапка/тулбар); тело скроллится внутри.
+   Требует фиксированной высоты родителя: .screen--app (styles/layout.css). */
+.dtable--fill { flex: 1 1 auto; min-height: 0; }
+.dtable--fill .dtable__body { flex: 1 1 auto; min-height: 0; }
+
 /* ------------------------------------------------------------------ */
 /*  TOOLBAR — заголовок + счётчик + фильтр/действия                    */
 /* ------------------------------------------------------------------ */
@@ -532,6 +568,17 @@ onSelectionChange(count): bulkRow.hidden = (count === 0)
   padding: 16px 20px;
   border-bottom: 1px solid var(--border-light);
   flex-wrap: wrap;
+}
+
+/* Тулбар-зона НАД таблицей (detached): контейнер без подложки. Стоит вне .dtable,
+   слева — TableFilter (.tfilter), справа — кнопка настройки колонок. Таблица под
+   зоной — без собственного тулбара (headless: сразу шапка, без заголовка/счётчика).
+   Вертикальный ритм варианта — 12px (заголовок → зона → таблица), задаёт экран. */
+.dtable-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 .dtable__toolbar-left { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; }
 .dtable__title-row { display: flex; align-items: baseline; gap: 10px; }

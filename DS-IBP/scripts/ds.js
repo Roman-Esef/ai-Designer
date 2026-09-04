@@ -48,6 +48,7 @@
     'ds-table.js',
     'tbl-resize.js',
     'tbl-reorder.js',
+    'tbl-pin.js',
     'ds-pagination.js',
     'ds-notify.js',
     'ds-datepicker.js',

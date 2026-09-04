@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<!-- FIDELITY-GATE: N/A · нет исходного макета · 03.09.2026 -->
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Текущий портфель ДИД — IBP</title>
+<link rel="stylesheet" href="../../../../DS-IBP/ds.css">
+<style>
+  /* ---------- только раскладка экрана, на токенах ДС ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* Отступ контейнера таблицы от нижней границы экрана — 32px.
+     У .screen__content уже 24px снизу (--layout-pad-bottom), добавляем 8px. */
+  .dtable { margin-bottom: 8px; }
+
+  /* Вариант Table «тулбар над таблицей»: вертикальный ритм 12px —
+     заголовок страницы → зона тулбара → таблица (вместо дефолтных 24px). */
+  .screen__content { gap: var(--space-12); }
+
+  /* Форма фильтра: секции с заголовком и двухколоночной сеткой полей */
+  .fil-group { display: flex; flex-direction: column; gap: 16px; }
+  .fil-title { font: var(--type-h5-strong); color: var(--text-primary); margin: 0; }
+  .fil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* Список чекбоксов настройки таблицы — компактнее, чем зазор тела модалки */
+  .cols-list { display: flex; flex-direction: column; gap: 8px; }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <!-- Боковое меню строится экранным скриптом из ibp-home.js по роли -->
+  <nav class="nav nav--rail" id="nav" aria-label="Главное меню"></nav>
+
+  <div class="screen screen--app">
+    <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
+      <li class="crumbs__item"><a class="link link--muted" href="../mainPage/index.html">Главная</a></li>
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Текущий портфель ДИД</span>
+      </li>
+    </nav>
+
+    <main class="screen__content">
+
+      <!-- Шапка страницы -->
+      <div class="phead">
+        <div class="phead__main">
+          <div class="phead__title-row">
+            <div class="phead__title-group">
+              <h1 class="phead__title">Текущий портфель ДИД</h1>
+            </div>
+          </div>
+        </div>
+        <div class="phead__actions">
+          <button class="btn btn--accent btn--m" data-modal="new-deal-scrim"><i data-icon="add"></i><span class="btn__label">Новая сделка</span></button>
+        </div>
+      </div>
+
+      <!-- Зона тулбара над таблицей (вариант Table «тулбар над таблицей», без подложки):
+           слева фильтр, справа настройка колонок; таблица headless (без заголовка/счётчика) -->
+      <div class="dtable-toolbar">
+        <div class="tfilter" role="group" aria-label="Фильтр таблицы">
+          <button class="btn btn--outline btn--s tfilter__open" aria-haspopup="dialog" aria-expanded="false" data-modal="filter-scrim">
+            <i data-icon="filter"></i><span class="btn__label">Фильтр</span>
+          </button>
+          <span class="chip chip--edit chip--m tfilter__applied" tabindex="0">
+            <span class="chip__label">Применено: 5</span>
+            <span class="chip__remove" role="button" aria-label="Сбросить все фильтры"><i data-icon="close"></i></span>
+          </span>
+        </div>
+        <button class="ibtn ibtn--neutral ibtn--m" aria-label="Настроить колонки" data-modal="cols-scrim"><i data-icon="settings"></i></button>
+      </div>
+
+      <!-- Таблица сделок (headless — сразу шапка) -->
+      <div class="dtable dtable--fill">
+        <div class="dtable__body">
+          <div class="tbl tbl--scroll" data-table>
+
+            <!-- Шапка. grid-template-columns одинаковый у шапки и всех строк -->
+            <div class="tbl__row" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 130px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
+              <div class="th th--separator"></div>
+              <div class="th th--pinned">
+                <span class="th__label">Номер сделки</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="true" aria-label="Открепить колонку"><i data-icon="pin-filled"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th th--pinned">
+                <span class="th__label">Наименование сделки</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="true" aria-label="Открепить колонку"><i data-icon="pin-filled"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Статус</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Статус ЦУП</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Статус Operations</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Статус Мониторинг</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Ограниченный доступ</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Деск</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Балансы сделки</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Private Equity</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Основной продукт ДИД</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Продукты ДИД</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Продукты</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">КНР</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">ГСЗ</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Валюты</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th th--sorted" aria-sort="descending">
+                <span class="th__label">Дата подписания</span>
+                <span class="th__tools">
+                  <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
+                  <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort aria-label="Сортировать"><i data-icon="arrow-narrow-down"></i></button>
+                </span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th" aria-sort="none">
+                <span class="th__label">Дата первой выдачи</span>
+                <span class="th__tools">
+                  <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
+                  <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button>
+                </span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th" aria-sort="none">
+                <span class="th__label">Дата окончания</span>
+                <span class="th__tools">
+                  <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
+                  <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button>
+                </span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Директор</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Менеджер</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Сотрудник ЦУП</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th">
+                <span class="th__label">Фин. расчеты в шаблоне</span>
+                <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
+                <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+              </div>
+              <div class="th th--separator"></div>
+            </div>
+
+            <!-- Строка 1 -->
+            <div class="tbl__row" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 130px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
+              <div class="tc tc--separator"></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1024</span></span></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Финансирование строительства логистического хаба</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Активная</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Утверждена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">На сопровождении</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">На мониторинге ГК СБИ</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Недвижимость</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «СБИ», SBERFIN</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Кредитный мезонин</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Акционерный мезонин, Кредитный мезонин</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Кредитная линия, Опцион</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ЮгСтрой»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «СтройИнвест»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span><span class="chip chip--s"><span class="chip__label">$</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">15.03.2024</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">20.04.2024</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">31.12.2027</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Иванов И.И.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Петров П.П.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Сидоров С.С.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Да</span></span></div>
+              <div class="tc tc--separator"></div>
+            </div>
+
+            <!-- Строка 2 -->
+            <div class="tbl__row" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 130px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
+              <div class="tc tc--separator"></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1025</span></span></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Приобретение сети АЗС</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__label">Черновик</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Черновик</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Черновик</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">На утверждении</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Розничная торговля</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">СОКОЛ ФИНАНС</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Корпоративный контроль</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Корпоративный контроль, Долевое участие в капитале</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Акции</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">АО «НефтьСервис»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Кузнецов К.К.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Смирнов С.С.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc tc--separator"></div>
+            </div>
+
+            <!-- Строка 3 -->
+            <div class="tbl__row" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 130px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
+              <div class="tc tc--separator"></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1026</span></span></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Рефинансирование кредитного портфеля</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Ожидает подтверждения</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Ожидает подтверждения</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Ожидает подтверждения</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Утверждена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Телекоммуникации</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">VPE CAPITAL, SBERFIN</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Акционерный мезонин</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Акционерный мезонин, Венчурное финансирование</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Привилегированные акции, Обыкновенные акции</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ПАО «ТелекомИнвест»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «СвязьКапитал»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span><span class="chip chip--s"><span class="chip__label">€</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">02.06.2023</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">18.07.2023</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">30.06.2026</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Воробьёв В.В.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Лебедев Л.Л.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Николаев Н.Н.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Да</span></span></div>
+              <div class="tc tc--separator"></div>
+            </div>
+
+            <!-- Строка 4 -->
+            <div class="tbl__row" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 130px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
+              <div class="tc tc--separator"></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1027</span></span></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Развитие горнорудного месторождения</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__label">Ввод изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Ввод изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Ввод изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Изменения ожидают передачи на мониторинг</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Да</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Природные ресурсы</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «СБИ»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">PE</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Долевое участие в капитале</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Долевое участие в капитале, Кредитный мезонин</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Доли в уставном капитале, Заём</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ГорноКапитал»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «УралРесурс»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">$</span></span><span class="chip chip--s"><span class="chip__label">¥</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">10.09.2022</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">01.12.2022</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">31.12.2025</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Соколов С.С.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Орлов О.О.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Павлов П.П.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Да</span></span></div>
+              <div class="tc tc--separator"></div>
+            </div>
+
+            <!-- Строка 5 -->
+            <div class="tbl__row" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 130px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
+              <div class="tc tc--separator"></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1028</span></span></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Кредитование застройщика жилого квартала</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__label">Погашена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Погашена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Погашена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Погашена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Недвижимость</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «СБИ», СОКОЛ ФИНАНС</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Кредитный мезонин</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Кредитный мезонин</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Кредитная линия</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ЖилСтрой»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «ГорСтрой»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">14.02.2021</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">05.03.2021</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">28.02.2024</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Крылов К.К.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Волков В.В.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Зайцев З.З.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Да</span></span></div>
+              <div class="tc tc--separator"></div>
+            </div>
+
+            <!-- Строка 6 -->
+            <div class="tbl__row" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 130px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
+              <div class="tc tc--separator"></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1029</span></span></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Расширение сети продовольственного ритейла</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Активная</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Утверждена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">На сопровождении</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">На мониторинге ПАО Сбербанк</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Розничная торговля</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">VPE CAPITAL</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Корпоративный контроль</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Корпоративный контроль, Акционерный мезонин</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Акции, Конвертируемый заём</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ПродуктТрейд»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «РитейлГрупп»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span><span class="chip chip--s"><span class="chip__label">€</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">22.05.2024</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">30.06.2024</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">31.12.2028</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Медведев М.М.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Егоров Е.Е.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Фролов Ф.Ф.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc tc--separator"></div>
+            </div>
+
+            <!-- Строка 7 -->
+            <div class="tbl__row" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 130px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
+              <div class="tc tc--separator"></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1030</span></span></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Строительство дата-центра</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__label">Корректировка</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Корректировка</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Корректировка</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Ожидает передачи на мониторинг</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Телекоммуникации</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «СБИ», SBERFIN</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Венчурное финансирование</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Венчурное финансирование, Долевое участие в капитале</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Конвертируемый заём, Доли</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">АО «ДатаХаб»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">$</span></span><span class="chip chip--s"><span class="chip__label">¥</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">08.11.2023</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">15.01.2024</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">30.09.2026</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Гусев Г.Г.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Титов Т.Т.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Кузьмин К.К.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Да</span></span></div>
+              <div class="tc tc--separator"></div>
+            </div>
+
+            <!-- Строка 8 -->
+            <div class="tbl__row" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 130px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
+              <div class="tc tc--separator"></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1031</span></span></div>
+              <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Инвестиции в фармацевтическое производство</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Подтверждение изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Подтверждение изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Подтверждение изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Направлена на передачу</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Природные ресурсы</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">VPE CAPITAL, СОКОЛ ФИНАНС</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">PE</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Долевое участие в капитале</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Долевое участие в капитале, Венчурное финансирование</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Доли в уставном капитале</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ФармаПлюс»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «МедИнвест»</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">27.07.2024</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">12.09.2024</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">31.12.2029</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Баранов Б.Б.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Комаров К.К.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Щукин Щ.Щ.</span></span></div>
+              <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
+              <div class="tc tc--separator"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="dtable__footer">
+          <div class="pgn-row">
+            <div class="pgn-row__right">
+              <div class="pgn">
+                <span class="pgn__pagesize"><span class="pgn__pagesize-label">Показывать строк: <b>50</b></span><button class="pgn__pagesize-btn" aria-haspopup="listbox"><i data-icon="chevron-down"></i></button></span>
+                <span class="pgn__range">1–8 из 128</span>
+                <nav class="pgn__nav" aria-label="Страницы">
+                  <button class="pgn__arrow" aria-label="Предыдущая страница">‹</button>
+                  <button class="pgn__num" aria-current="page">1</button>
+                  <button class="pgn__num">2</button>
+                  <button class="pgn__num">3</button>
+                  <button class="pgn__arrow" aria-label="Следующая страница">›</button>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Модальное окно «Новая сделка» -->
+<div class="modal-scrim" id="new-deal-scrim" hidden>
+  <div class="modal modal--w4" role="dialog" aria-modal="true" aria-labelledby="new-deal-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="new-deal-title">Создание новой сделки</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div class="inp">
+        <label class="ds-label" for="nd-number"><span class="ds-label__text">Номер сделки</span></label>
+        <div class="inp__field">
+          <input class="inp__control" id="nd-number" inputmode="numeric" placeholder="Например, 1032">
+        </div>
+        <span class="ds-helper ds-helper--left" id="nd-number-h">Только числовые символы</span>
+      </div>
+      <div class="inp">
+        <label class="ds-label" for="nd-name"><span class="ds-label__text">Наименование сделки</span></label>
+        <div class="inp__field">
+          <input class="inp__control" id="nd-name" placeholder="Наименование сделки">
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--accent btn--m"><span class="btn__label">Сохранить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Модальное окно «Фильтр» -->
+<div class="modal-scrim" id="filter-scrim" hidden>
+  <div class="modal modal--w6" role="dialog" aria-modal="true" aria-labelledby="filter-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="filter-title">Фильтр</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+
+      <section class="fil-group">
+        <h3 class="fil-title">Основная информация</h3>
+        <div class="fil-grid">
+          <div class="inp">
+            <label class="ds-label" for="f-number"><span class="ds-label__text">Номер сделки</span></label>
+            <div class="inp__field"><input class="inp__control" id="f-number" inputmode="numeric" placeholder="Номер"></div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-name"><span class="ds-label__text">Наименование сделки</span></label>
+            <div class="inp__field"><input class="inp__control" id="f-name" placeholder="Наименование"></div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-knr"><span class="ds-label__text">КНР</span></label>
+            <div class="inp__field"><input class="inp__control" id="f-knr" placeholder="Контрагент"></div>
+          </div>
+          <div class="inp is-open">
+            <label class="ds-label" for="f-status"><span class="ds-label__text">Статус</span></label>
+            <div class="inp__field" role="combobox" aria-expanded="true" aria-controls="f-status-list">
+              <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">Активная</span><span class="chip__remove" role="button" aria-label="Удалить Активная"><i data-icon="close"></i></span></span></span>
+              <input class="inp__control" id="f-status" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+            <div id="f-status-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+              <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed">
+                <span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span>
+                <span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span>
+              </button>
+              <hr class="ddl__divider">
+              <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="true">
+                <span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span>
+                <span class="ddl__item-body"><span class="ddl__item-label">Активная</span></span>
+              </button>
+              <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false">
+                <span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span>
+                <span class="ddl__item-body"><span class="ddl__item-label">Черновик</span></span>
+              </button>
+              <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false">
+                <span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span>
+                <span class="ddl__item-body"><span class="ddl__item-label">Погашена</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-status-ops"><span class="ds-label__text">Статус operations</span></label>
+            <div class="inp__field">
+              <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">На сопровождении</span><span class="chip__remove" role="button" aria-label="Удалить На сопровождении"><i data-icon="close"></i></span></span></span>
+              <input class="inp__control" id="f-status-ops" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-status-tsup"><span class="ds-label__text">Статус ЦУП</span></label>
+            <div class="inp__field">
+              <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">Утверждена</span><span class="chip__remove" role="button" aria-label="Удалить Утверждена"><i data-icon="close"></i></span></span></span>
+              <input class="inp__control" id="f-status-tsup" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-status-mon"><span class="ds-label__text">Статус Мониторинг</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-status-mon" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-desk"><span class="ds-label__text">Деск</span></label>
+            <div class="inp__field">
+              <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">Недвижимость</span><span class="chip__remove" role="button" aria-label="Удалить Недвижимость"><i data-icon="close"></i></span></span></span>
+              <input class="inp__control" id="f-desk" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-ccy"><span class="ds-label__text">Валюта сделки</span></label>
+            <div class="inp__field">
+              <span class="inp__chips">
+                <span class="chip chip--edit chip--s"><span class="chip__label">₽</span><span class="chip__remove" role="button" aria-label="Удалить ₽"><i data-icon="close"></i></span></span>
+                <span class="chip chip--edit chip--s"><span class="chip__label">$</span><span class="chip__remove" role="button" aria-label="Удалить $"><i data-icon="close"></i></span></span>
+              </span>
+              <input class="inp__control" id="f-ccy" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-balance"><span class="ds-label__text">Балансы сделки</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-balance" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="fil-group">
+        <h3 class="fil-title">Продукты</h3>
+        <div class="fil-grid">
+          <div class="inp">
+            <label class="ds-label" for="f-prod"><span class="ds-label__text">Продукты сделки</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-prod" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-prod-did"><span class="ds-label__text">Продукты ДИД</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-prod-did" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-prod-main"><span class="ds-label__text">Основной продукт ДИД</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-prod-main" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="fil-group">
+        <h3 class="fil-title">Сроки</h3>
+        <div class="fil-grid">
+          <div class="inp-range inp-range--date">
+            <label class="ds-label"><span class="ds-label__text">Дата подписания</span></label>
+            <div class="inp-range__row">
+              <div class="inp inp-range__field">
+                <div class="inp__field">
+                  <span class="inp__prefix">От</span>
+                  <input class="inp__control" inputmode="numeric" placeholder="ММ.ДД.ГГГГ">
+                  <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                </div>
+              </div>
+              <span class="inp-range__line" aria-hidden="true"></span>
+              <div class="inp inp-range__field">
+                <div class="inp__field">
+                  <span class="inp__prefix">До</span>
+                  <input class="inp__control" inputmode="numeric" placeholder="ММ.ДД.ГГГГ">
+                  <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="inp-range inp-range--date">
+            <label class="ds-label"><span class="ds-label__text">Дата первой выдачи</span></label>
+            <div class="inp-range__row">
+              <div class="inp inp-range__field">
+                <div class="inp__field">
+                  <span class="inp__prefix">От</span>
+                  <input class="inp__control" inputmode="numeric" placeholder="ММ.ДД.ГГГГ">
+                  <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                </div>
+              </div>
+              <span class="inp-range__line" aria-hidden="true"></span>
+              <div class="inp inp-range__field">
+                <div class="inp__field">
+                  <span class="inp__prefix">До</span>
+                  <input class="inp__control" inputmode="numeric" placeholder="ММ.ДД.ГГГГ">
+                  <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="inp-range inp-range--date">
+            <label class="ds-label"><span class="ds-label__text">Дата окончания</span></label>
+            <div class="inp-range__row">
+              <div class="inp inp-range__field">
+                <div class="inp__field">
+                  <span class="inp__prefix">От</span>
+                  <input class="inp__control" inputmode="numeric" placeholder="ММ.ДД.ГГГГ">
+                  <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                </div>
+              </div>
+              <span class="inp-range__line" aria-hidden="true"></span>
+              <div class="inp inp-range__field">
+                <div class="inp__field">
+                  <span class="inp__prefix">До</span>
+                  <input class="inp__control" inputmode="numeric" placeholder="ММ.ДД.ГГГГ">
+                  <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="fil-group">
+        <h3 class="fil-title">Команда сделки</h3>
+        <div class="fil-grid">
+          <div class="inp">
+            <label class="ds-label" for="f-director"><span class="ds-label__text">Директор</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-director" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-manager"><span class="ds-label__text">Менеджер</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-manager" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-tsup-emp"><span class="ds-label__text">Сотрудник ЦУП</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-tsup-emp" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="fil-group">
+        <h3 class="fil-title">Прочее</h3>
+        <div class="fil-grid">
+          <div class="inp">
+            <label class="ds-label" for="f-joint"><span class="ds-label__text">Совместность</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-joint" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-collateral"><span class="ds-label__text">Обеспечение</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-collateral" placeholder="Да / Нет">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-gov"><span class="ds-label__text">Корпоративное управление</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-gov" placeholder="Выберите…">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-board"><span class="ds-label__text">Представительство в СД</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-board" placeholder="Да / Нет">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-fin-tpl"><span class="ds-label__text">Фин. расчеты в шаблоне</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-fin-tpl" placeholder="Да / Нет">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <div class="inp">
+            <label class="ds-label" for="f-pe"><span class="ds-label__text">Сделки Private Equity</span></label>
+            <div class="inp__field">
+              <input class="inp__control" id="f-pe" placeholder="Да / Нет">
+              <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+            </div>
+          </div>
+          <label class="cb">
+            <input type="checkbox" class="cb__input">
+            <span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span>
+            <span class="cb__content"><span class="cb__label">Только сделки ограниченного доступа</span></span>
+          </label>
+        </div>
+      </section>
+
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-left">
+        <button class="btn btn--transparent btn--m"><span class="btn__label">Очистить фильтр</span></button>
+      </div>
+      <div class="modal__foot-right">
+        <button class="btn btn--accent btn--m"><span class="btn__label">Сохранить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Модальное окно «Настройка таблицы» -->
+<div class="modal-scrim" id="cols-scrim" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="cols-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="cols-title">Настройка таблицы</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <p style="font:var(--type-body-m);color:var(--text-secondary);margin:0;">Выберите столбцы для отображения</p>
+      <label class="cb cb--indeterminate">
+        <input type="checkbox" class="cb__input">
+        <span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span>
+        <span class="cb__content"><span class="cb__label">Выбрать все</span></span>
+      </label>
+      <hr class="dvd dvd--h" aria-hidden="true">
+      <div class="cols-list">
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Номер сделки</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Наименование сделки</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Статус</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Статус ЦУП</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Статус Operations</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Статус Мониторинг</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Ограниченный доступ</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Деск</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Балансы сделки</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Private Equity</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Основной продукт ДИД</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Продукты ДИД</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Продукты</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">КНР</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">ГСЗ</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Валюты</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Дата подписания</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Дата первой выдачи</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Дата окончания</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Директор</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Менеджер</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Сотрудник ЦУП</span></span></label>
+        <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Фин. расчеты в шаблоне</span></span></label>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-left">
+        <button class="btn btn--transparent btn--m"><span class="btn__label">Сбросить</span></button>
+      </div>
+      <div class="modal__foot-right">
+        <button class="btn btn--accent btn--m"><span class="btn__label">Применить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="../../../../DS-IBP/scripts/ds.js"></script>
+<script src="../../../../DS-IBP/scripts/ibp-home.js"></script>
+<script>
+/* Экранный скрипт: меню панели навигации строится из каталога ibp-home.js
+   (window.IBPHome) по роли «Финансист ДИД»; пункт «Текущий портфель» selected. */
+(function () {
+  'use strict';
+  var role = window.IBPHome.defaultRole;
+  var SELECTED_ID = 'current-portfolio';
+
+  function ic(name) { return '<i data-icon=\'' + name + '\'></i>'; }
+
+  function itemHTML(it) {
+    /* пункт с тайлом-со-ссылками — аккордеон-родитель (под-пункты = ссылки тайла) */
+    if (it.tile && it.tile.links && it.tile.links.length) {
+      var sub = '<div class="nav__sub" id="nav-sub-' + it.id + '"><div class="nav__sub-in">'
+        + it.tile.links.map(function (l) { return '<a class="nav__item" href="#"><span class="nav__label">' + l + '</span></a>'; }).join('')
+        + '</div></div>';
+      return '<a class="nav__item nav__item--acc" href="#" aria-expanded="false" aria-controls="nav-sub-' + it.id + '">'
+        + '<span class="nav__ico">' + ic(it.icon) + '</span>'
+        + '<span class="nav__label">' + it.label + '</span>'
+        + '<span class="nav__caret">' + ic('chevron-down') + '</span></a>' + sub;
+    }
+    var badge = it.badge
+      ? '<span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">' + it.badge + '</span></span>'
+      : '';
+    var sel = (it.id === SELECTED_ID) ? ' nav__item--selected" aria-current="page' : '';
+    return '<a class="nav__item' + sel + '" href="#"><span class="nav__ico">' + ic(it.icon) + '</span>'
+      + '<span class="nav__label">' + it.label + '</span>' + badge + '</a>';
+  }
+
+  function buildNav() {
+    var nav = document.getElementById('nav');
+    var s = '<div class="nav__top">'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Свернуть меню">' + ic('left-menu') + '</button>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель">' + ic('pin-menu') + '</button>'
+      + '</div>';
+    s += '<div class="nav__list">';
+    s += '<a class="nav__item" href="../mainPage/index.html"><span class="nav__ico">' + ic('main-page') + '</span><span class="nav__label">Главная</span></a>';
+    IBPHome.itemsFor(role).forEach(function (g, i) {
+      s += '<div class="nav__block' + (i === 0 ? ' nav__block--first' : '') + '">';
+      s += '<div class="nav__block-label">' + g.label + '</div>';
+      g.items.forEach(function (it) { s += itemHTML(it); });
+      s += '</div>';
+    });
+    s += '</div>';
+    s += '<div class="nav__footer">'
+      + '<a class="nav__user" href="#" aria-label="Открыть личный кабинет">'
+      + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
+      + '<span class="nav__user-text">'
+      + '<span class="nav__user-name">Александров Петр Константинович</span>'
+      + '<span class="nav__user-role">' + role + '</span>'
+      + '<span class="nav__user-org">SMB Недвижимость +2</span>'
+      + '</span></a>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти">' + ic('logout') + '</button>'
+      + '</div>';
+    nav.innerHTML = s;
+    if (window.DSNavPanel) window.DSNavPanel.bind(nav);
+  }
+
+  function paintAll() {
+    if (window.dsIcons) window.dsIcons.apply(document);
+  }
+
+  buildNav(); paintAll();
+})();
+</script>
+</body>
+</html>

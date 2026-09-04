@@ -14,7 +14,9 @@
    пин переключает drawer ↔ fixed, подписи пунктов в rail позиционируются
    как тултипы (position:fixed, вне скролл-контейнера), пункт-родитель
    .nav__item--acc раскрывает/сворачивает вложенный под-список (в rail —
-   разворачивает панель).
+   разворачивает панель), развёрнутая (drawer) панель сворачивается в rail
+   кликом вне панели или по Esc (клики внутри открытых модалок — например,
+   смена роли из футера — drawer не сворачивают).
 
    Настройки на панели: data-nav-collapsed-mode (в какой режим уводит бургер
    из rail: drawer|fixed, по умолчанию — последний развёрнутый, иначе drawer),
@@ -88,6 +90,7 @@
     var d = nav.dataset || {};
     var expanded = opts.expandedMode || d.navCollapsedMode || (modeOf(nav) === 'rail' ? 'drawer' : modeOf(nav));
     var modes = opts.modes !== false && d.navModes !== 'no';
+    nav.__dsNavModes = modes;
 
     function toggleRail() {
       var cur = modeOf(nav);
@@ -138,6 +141,36 @@
     nav.__dsNavPanel = api;
     return api;
   }
+
+  /* Развёрнутая (drawer), но не закреплённая (fixed) панель сворачивается в rail
+     кликом вне панели и по Esc. Клики внутри открытых модалок (например, смена
+     роли — футер панели) drawer не трогают: модалка — отдельный слой поверх.
+     Сворачивается только «живая» панель каркаса: внутри .nav-layout (демо-панели
+     документации вне каркаса не трогаем), привязанная с включёнными режимами. */
+  function outsideDrawer(t) {
+    return t && t.closest && t.closest('.modal-scrim');
+  }
+  function liveDrawer(nav) {
+    if (!nav.closest || !nav.closest('.nav-layout')) return false; /* демо вне каркаса */
+    if (nav.__dsNavModes === false) return false;                  /* режимы выключены */
+    return modeOf(nav) === 'drawer';
+  }
+  document.addEventListener('click', function (e) {
+    if (outsideDrawer(e.target)) return;
+    document.querySelectorAll('.nav--drawer').forEach(function (nav) {
+      if (!liveDrawer(nav)) return;
+      if (nav.contains(e.target)) return; /* клик внутри панели — её обработчики решают */
+      setMode(nav, 'rail');
+    });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    /* Esc закрывает сначала открытую модалку — drawer не трогаем */
+    if (document.querySelector('.modal-scrim:not([hidden])')) return;
+    document.querySelectorAll('.nav--drawer').forEach(function (nav) {
+      if (liveDrawer(nav)) setMode(nav, 'rail');
+    });
+  });
 
   function bindAll(root) {
     (root || document).querySelectorAll('.nav').forEach(function (nav) {

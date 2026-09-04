@@ -94,8 +94,13 @@
 (function () {
   'use strict';
   var role = window.IBPHome.defaultRole;
+  /* ссылки на собранные экраны направления (по id пунктов каталога ibp-home.js).
+     Каталог не трогаем: он общий для ДС, а пути к экранам знает только этот экран.
+     Пункты без реальной страницы остаются href="#". */
+  var PAGE_HREFS = { 'current-portfolio': '../Portfolio-did/Portfolio.html' };
 
   function ic(name) { return '<i data-icon="' + name + '"></i>'; }
+  function pageHref(id) { return PAGE_HREFS[id] || '#'; }
 
   function itemHTML(it) {
     /* пункт с тайлом-со-ссылками — аккордеон-родитель (под-пункты = ссылки тайла) */
@@ -111,7 +116,7 @@
     var badge = it.badge
       ? '<span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">' + it.badge + '</span></span>'
       : '';
-    return '<a class="nav__item" href="#"><span class="nav__ico">' + ic(it.icon) + '</span>'
+    return '<a class="nav__item" href="' + pageHref(it.id) + '"><span class="nav__ico">' + ic(it.icon) + '</span>'
       + '<span class="nav__label">' + it.label + '</span>' + badge + '</a>';
   }
 
@@ -153,7 +158,13 @@
       if (!tiles.length) return;
       html += '<section class="home-group">';
       html += '<h2 class="home-group__head">' + g.label + '</h2>';
-      html += tiles.map(function (it) { return IBPHome.tileHTML(it); }).join('');
+      /* тайл целиком — ссылка на раздел; для собранных экранов подменяем первый
+         href="#" (ссылка-обёртка тайла) на реальный путь (разметка — IBPHome.tileHTML) */
+      html += tiles.map(function (it) {
+        var h = IBPHome.tileHTML(it);
+        if (PAGE_HREFS[it.id]) h = h.replace('href="#"', 'href="' + PAGE_HREFS[it.id] + '"');
+        return h;
+      }).join('');
       html += '</section>';
     });
     host.innerHTML = html;
