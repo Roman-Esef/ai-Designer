@@ -5,9 +5,11 @@
    на собранных экранах перетаскивание колонок работает из коробки —
    отдельно подключать не нужно.
    Колонку берут за подпись шапки (.th__label). Переносятся все
-   колонки, кроме разделителей (.th--separator) и закреплённых
-   (.th--pinned); колонки без подписи (например, колонка выбора)
-   не перетаскиваются. Подписи с собственной логикой
+   колонки, кроме разделителей (.th--separator); закреплённые
+   (.th--pinned) переносятся тоже — класс pin едет с колонкой,
+   tbl-pin.js пересчитывает удержание после 'columnreorder'.
+   Колонки без подписи (например, колонка выбора) не перетаскиваются.
+   Подписи с собственной логикой
    ([data-grab]/[data-drag-idx] — демо страниц) скрипт не трогает.
    ============================================================ */
 (function () {
@@ -18,7 +20,7 @@
   function movableIndices(headerRow) {
     var idx = [];
     Array.prototype.forEach.call(headerRow.children, function (th, i) {
-      if (!th.classList.contains('th--separator') && !th.classList.contains('th--pinned')) idx.push(i);
+      if (!th.classList.contains('th--separator')) idx.push(i);
     });
     return idx;
   }
@@ -40,7 +42,7 @@
     var label = e.target.closest && e.target.closest('.th__label');
     if (!label || label.hasAttribute('data-grab') || label.hasAttribute('data-drag-idx')) return;
     var th = label.closest('.th');
-    if (!th || th.classList.contains('th--separator') || th.classList.contains('th--pinned')) return;
+    if (!th || th.classList.contains('th--separator')) return;
     var headerRow = th.closest('.tbl__row');
     var tbl = th.closest('.tbl');
     if (!headerRow || !tbl || e.button !== 0) return;

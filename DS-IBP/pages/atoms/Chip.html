@@ -166,7 +166,7 @@
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.009</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.010</b></span><span>Обновлено: <b>04.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>Chip</h1>
     <p class="lead">Чип — компактный интерактивный элемент для фильтрации и группировки данных. Применяется как <b>тег</b>, <b>маркер</b> и <b>статус</b>, входит в состав чиплиста и InputAutocomplete. Два типа — <b>Edit</b> и <b>ReadOnly</b>, два стиля — <b>Fill</b> и <b>Outline</b>.</p>
@@ -659,6 +659,12 @@ function makeChip(o) {
   align-items: center;
   gap: var(--chip-gap);
   max-width: 320px;
+  /* чип несёт данные переменной длины и рассчитан на усечение подписи
+     (.chip__label с ellipsis), поэтому он обязан СЖИМАТЬСЯ в чужой flex-строке.
+     Без min-width:0 автоминимум inline-flex равен min-content: чип не сжимается,
+     вылезает за границу контейнера (ячейка таблицы, тулбар) и обрывается его
+     непрозрачным фоном — без многоточия. */
+  min-width: 0;
   height: var(--chip-height);
   padding: 0 var(--chip-pad-x);
   border: 1px solid var(--chip-border);

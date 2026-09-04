@@ -25,7 +25,7 @@ scripts/                 ← ds-nav, ds-toc, ds-icons, pg-kit, icons-data, per-p
 pages/foundations|atoms|molecules|organisms|patterns/  ← документация
 specs/                   ← md-спеки компонентов (экономят контекст) + _index.md, _cheatsheet.md
 templates/screen/        ← Screen.html — стартовый шаблон экрана
-CLAUDE.md                ← правила ведения ДС (инжектится в каждый разговор)
+MAINTAINING.md           ← правила ведения ДС (инжектится в каждый разговор)
 ```
 
 ## Компоненты
@@ -43,6 +43,6 @@ SB Sans Display / Text / Screen (`.otf` в `fonts/`, `@font-face` в `styles/typ
 - Логотип — `assets/logo.svg`.
 
 ## Как пользоваться
-- Правила ведения, чек-листы (новый компонент / правка / экран) и запреты — в `CLAUDE.md`.
+- Правила ведения, чек-листы (новый компонент / правка / экран) и запреты — в `MAINTAINING.md`.
 - Быстрый обзор всех компонентов для сборки экрана — `specs/_cheatsheet.md`.
 - Новый экран — копия `templates/screen/Screen.html` + компоненты из спек.

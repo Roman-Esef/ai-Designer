@@ -200,14 +200,23 @@
   }
 
   /* усечённый текст объясняет себя тултипом — показывается только когда
-     текст действительно не помещается (ds-tooltip проверяет scrollWidth) */
+     текст действительно не помещается (ds-tooltip проверяет scrollWidth).
+     Поведение общее для всей таблицы: значение ячейки (.tc__text--truncate),
+     подпись шапки (.th__label) и подпись чипа в ячейке (.chip__label) —
+     всё, что усекается многоточием, по наведению показывает полный текст. */
+  var TRUNC_SEL = '.tc__text--truncate, .th__label, .tc .chip__label';
+
   function truncationTooltips(tbl) {
     if (!window.DSTooltip) return;
-    tbl.querySelectorAll('.tc__text--truncate:not([data-tooltip])').forEach(function (el) {
+    tbl.querySelectorAll(TRUNC_SEL).forEach(function (el) {
+      if (el.hasAttribute('data-tooltip')) return;
       var text = el.textContent.trim();
       if (!text) return;
       el.setAttribute('data-tooltip', text);
       el.setAttribute('data-tooltip-truncated', 'only');
+      /* смысл тултипа здесь — показать значение ЦЕЛИКОМ, поэтому длинный текст
+         переносится по --tip-max, а не усекается повторно внутри тултипа */
+      el.setAttribute('data-tooltip-multiline', 'yes');
       DSTooltip.bind(el);
     });
   }

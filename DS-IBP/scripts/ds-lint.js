@@ -34,7 +34,7 @@ const HEX_ALLOW = [/^#(fff|ffffff|000|000000)$/i, /^rgba?\(\s*255\s*,\s*255\s*,\
 // пары «скрипт ↔ его CSS» (сами скрипты умеют подтягивать стиль, потому WARN)
 const JS_CSS_PAIRS = [['ds-nav.js', 'ds-nav.css'], ['ds-toc.js', 'ds-toc.css'], ['pg-kit.js', 'pg-kit.css']];
 // рантаймы, которые ds.js (RulesAudit W0/K0) догружает сам — экран не должен подключать их напрямую
-const DS_JS_BUNDLES = ['icons-data.js', 'ds-icons.js', 'screens-chrome.js', 'ds-tabs.js', 'ds-tile.js', 'ds-menu.js', 'ds-popover.js', 'ds-tooltip.js', 'ds-modal.js', 'ds-table.js', 'tbl-resize.js', 'tbl-reorder.js', 'ds-pagination.js', 'ds-riskmetric.js', 'ds-alert.js', 'ds-chip.js', 'ds-allocationbar.js', 'ds-notify.js', 'ds-datepicker.js', 'input-kit.js', 'ds-nav-panel.js', 'ds-splitter.js', 'ds-illustrations.js'];
+const DS_JS_BUNDLES = ['icons-data.js', 'ds-icons.js', 'screens-chrome.js', 'ds-tabs.js', 'ds-tile.js', 'ds-menu.js', 'ds-popover.js', 'ds-tooltip.js', 'ds-modal.js', 'ds-table.js', 'tbl-resize.js', 'tbl-reorder.js', 'tbl-pin.js', 'ds-pagination.js', 'ds-riskmetric.js', 'ds-alert.js', 'ds-chip.js', 'ds-allocationbar.js', 'ds-notify.js', 'ds-datepicker.js', 'input-kit.js', 'ds-nav-panel.js', 'ds-splitter.js', 'ds-illustrations.js'];
 // утилитарные классы разметки документации — владельца в styles/* не имеют
 const CLASS_IGNORE = new Set(['page', 'section', 'masthead', 'meta', 'lead', 'eyebrow', 'crumb', 'desc', 'panel', 'row', 'col', 'grid', 'card', 'note', 'name', 'c', 'n', 'is-off']);
 // F5 — реестр «анатомия компонента взята целиком, не урезана под текущий вид». Каждый
@@ -50,6 +50,17 @@ const ANATOMY_CONTRACTS = [
       [/\bnav-layout\b/, '.nav-layout (обёртка хост-контракта)']
     ] }
 ];
+// B8 — компоненты, чья подпись усекается, но сам компонент НАМЕРЕННО не сжимается.
+// Каждое подавление — с причиной: переполнение решается не сжатием элемента.
+const SHRINK_OK = {
+  tab: 'ряд табов не сжимает таб, а скроллится (.tabs-scroll) или прячет хвост в меню «Ещё» (.tabs-overflow); внутри меню .tab__label сжимается своим правилом',
+  segctrl: 'ширина трека — по контенту; в --fullwidth растягивается трек, а сегменты делят его через flex:1 1 0 — сжимается item, не контрол'
+};
+// B9 — обёртки, которые рантайм вставляет ВОКРУГ уже свёрстанного элемента.
+// Такая обёртка обязана быть раскладочно прозрачной, иначе она меняет поведение
+// чужой разметки, которая сама по себе написана правильно.
+const RUNTIME_WRAPPERS = /(\w+)\.parentNode\.insertBefore\(\s*(\w+)\s*,\s*(\w+)\s*\)/g;
+
 // нативные таблицы и устаревшие сетки-справочники
 // плюс: служебный тост «Скопировано» на страницах-каталогах и галочки внутри контролов ДС
 // (.cb__mark/.sw__/.rb__ — инлайн-SVG прописан в самих DOM-снипах компонентов)
@@ -133,13 +144,13 @@ async function loadProject() {
   for (const [c, set] of classOwners) if (set.size === 1) owner.set(c, [...set][0]);
   const cssClasses = new Set(classOwners.keys());
 
-  const [index, nav, specIndex, cheat, dsCss, rootCss, claude] = await Promise.all(
-    ['index.html', 'scripts/ds-nav.js', 'specs/_index.md', 'specs/_cheatsheet.md', 'ds.css', 'styles.css', 'CLAUDE.md'].map((f) => readFile(f))
+  const [index, nav, specIndex, cheat, dsCss, rootCss, dsRules] = await Promise.all(
+    ['index.html', 'scripts/ds-nav.js', 'specs/_index.md', 'specs/_cheatsheet.md', 'ds.css', 'styles.css', 'MAINTAINING.md'].map((f) => readFile(f))
   );
 
-  // канонический порядок h2 — из CLAUDE.md, не дублируем
+  // канонический порядок h2 — из MAINTAINING.md, не дублируем
   let canon = [];
-  const blk = claude.split('Контракт страницы компонента')[1];
+  const blk = dsRules.split('Контракт страницы компонента')[1];
   if (blk) {
     canon = all(/^\d+\.\s*(.+)$/gm, blk.split('###')[0])
       .map((s) => s.split(/\s+[—(]|:/)[0].trim())
@@ -178,6 +189,75 @@ async function globalChecks(P, out) {
             || /^:is\([^)]*\[aria-(selected|current|checked|pressed|expanded)="true"\]/.test(t)) {
           out.push(['BLOCKER', 'B7', f + ': "' + t.slice(0, 80) + '" — топ-ветка без класса-скоупа перед :is()/атрибутом, протечёт на любой другой компонент с тем же ARIA-атрибутом']);
         }
+      }
+    }
+  }
+
+  /* B8 — усечение, которое не сработает: подпись компонента усекается многоточием
+     (`.x__label { text-overflow: ellipsis }`), а сам компонент — inline-flex-строка без
+     `min-width: 0`. Автоминимум flex-элемента равен min-content содержимого, поэтому в
+     чужой flex-строке такой компонент НЕ сжимается: он вылезает за границу контейнера, а
+     непрозрачный фон соседа обрезает подпись без многоточия — усечение выглядит как
+     поломка вёрстки (инцидент Chip в ячейке реестра ДИД, 04.09.2026). Компонент обязан
+     высказаться явно: либо сжимается (`min-width: 0`), либо не сжимается намеренно
+     (`flex: none` / `flex-shrink: 0` — как Avatar), либо стоит в SHRINK_OK с причиной. */
+  for (const f of P.styleFiles) {
+    const css = (P.src && P.src.get(f)) || (await readFile(f).catch(() => ''));
+    const rules = [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+      .map((m) => ({ sel: m[1].trim(), decl: m[2] }));
+    const truncated = new Set();
+    for (const r of rules) {
+      if (!/text-overflow\s*:\s*ellipsis/.test(r.decl)) continue;
+      for (const c of r.sel.match(/\.[-\w]+/g) || []) truncated.add(c.slice(1));
+    }
+    const blockDecl = new Map();
+    for (const r of rules) {
+      const m = r.sel.match(/^\.([-\w]+)$/);
+      if (m) blockDecl.set(m[1], (blockDecl.get(m[1]) || '') + r.decl);
+    }
+    for (const t of truncated) {
+      if (!t.includes('__')) continue;                       // усечение самого блока — не про сжатие
+      const block = t.split('__')[0];
+      if (SHRINK_OK[block]) continue;
+      const d = blockDecl.get(block);
+      if (!d || !/display\s*:\s*inline-flex/.test(d)) continue;
+      if (/flex-direction\s*:\s*column/.test(d)) continue;    // колонка усекает по своей ширине
+      if (/min-width\s*:\s*0(px)?\s*[;}]/.test(d)) continue;  // сжимается — высказался
+      if (/flex\s*:\s*none|flex-shrink\s*:\s*0/.test(d)) continue; // не сжимается намеренно
+      out.push(['WARN', 'B8', f + ': .' + block + ' — inline-flex без min-width:0, а внутри усечение .' + t
+        + '; в чужой flex-строке компонент не сожмётся и подпись обрежется без многоточия — добавить min-width:0, либо flex:none, либо строку в SHRINK_OK с причиной']);
+    }
+  }
+
+  /* B9 — обёртка рантайма меняет раскладку чужой разметки. Рантаймы ДС вставляют свои
+     обёртки ВОКРУГ уже свёрстанного элемента (`X.parentNode.insertBefore(W, X)`), поэтому
+     обёртка обязана быть раскладочно прозрачной: `max-width: 100%`, а для flex/inline-flex
+     ещё и `min-width: 0`. Иначе разметка, написанная правильно, ломается от одного факта
+     подключения рантайма — и чинить её на экране бесполезно (инцидент .tip-anchor: якорь
+     тултипа отключал усечение у ячейки таблицы, 04.09.2026). */
+  {
+    const runtimes = P.list.filter((f) => /^scripts\/(ds-|tbl-|input-kit)/.test(f) && f.endsWith('.js'));
+    const srcs = await Promise.all(runtimes.map((f) => readFile(f).catch(() => '')));
+    const cssAll = (await Promise.all(P.styleFiles.map((f) => readFile(f).catch(() => '')))).join('\n');
+    const cssRules = [...cssAll.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+      .map((m) => ({ sel: m[1].trim(), decl: m[2] }));
+    for (let i = 0; i < runtimes.length; i++) {
+      const js = srcs[i];
+      for (const m of [...js.matchAll(RUNTIME_WRAPPERS)]) {
+        const [, target, wrapper, before] = m;
+        if (target !== before) continue;                     // не обёртка, а вставка соседа
+        const clsRe = new RegExp(wrapper + "\\.className\\s*=\\s*'([\\w-]+)");
+        const cls = (js.match(clsRe) || [])[1];
+        if (!cls) continue;
+        const decl = cssRules.filter((r) => r.sel === '.' + cls).map((r) => r.decl).join('');
+        if (!decl) continue;
+        const flex = /display\s*:\s*(inline-)?flex/.test(decl);
+        const miss = [];
+        if (!/max-width\s*:\s*100%/.test(decl)) miss.push('max-width: 100%');
+        if (flex && !/min-width\s*:\s*0(px)?\s*[;}]/.test(decl)) miss.push('min-width: 0');
+        if (miss.length) out.push(['WARN', 'B9', runtimes[i] + ' оборачивает чужой элемент в .' + cls
+          + ', а обёртка не раскладочно прозрачна — нет ' + miss.join(' и ')
+          + '; подключение рантайма изменит раскладку правильной разметки']);
       }
     }
   }

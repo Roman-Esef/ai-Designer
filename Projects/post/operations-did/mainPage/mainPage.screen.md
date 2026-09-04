@@ -3,9 +3,9 @@ screen: mainPage
 title: Главная страница
 file: Projects/post/operations-did/mainPage/index.html
 source: DS-IBP/uploads/1920_Dashboard_Финансист ДИД.png (референс), решение пользователя 01.09.2026 (роли, состав)
-version: "1.002"
+version: "1.003"
 created: "01.09.2026"
-updated: "02.09.2026"
+updated: "03.09.2026"
 design_system: IBP DS
 components: [Layout, NavPanel, Breadcrumbs, NavTile, Illustrations, Modal, Badge, Avatar, IconButton]
 ---
@@ -31,6 +31,15 @@ components: [Layout, NavPanel, Breadcrumbs, NavTile, Illustrations, Modal, Badge
 Крошки на самой главной — единственная ссылка «Главная» (намеренно; решение
 пользователя). Пункт меню «Главная» (`main-page`) — текущий
 (`nav__item--selected` + `aria-current="page"`).
+
+Переход на собранные экраны: экранный скрипт держит карту `PAGE_HREFS`
+(по `item.id` каталога). Сейчас один реальный переход — «Текущий портфель»
+(`current-portfolio`): пункт меню и тайл ведут на
+`../Portfolio-did/Portfolio.html` (страница портфеля; путь от `mainPage/`
+поднимается в `operations-did/`, где лежат обе папки). Пункты без собранной
+страницы остаются `href="#"`. Каталог `ibp-home.js` при этом не меняется:
+пути к экранам знает только экран (общий каталог ДС не должен знать про
+файлы Projects).
 
 ## 3. Источник данных — единый каталог
 
@@ -67,6 +76,9 @@ components: [Layout, NavPanel, Breadcrumbs, NavTile, Illustrations, Modal, Badge
 ## 5. Поведение
 
 - Клик по обычному тайлу — переход на страницу раздела (вся плитка — ссылка).
+  Реальный переход сейчас есть у тайла «Текущий портфель»
+  (`PAGE_HREFS['current-portfolio']` → `../Portfolio-did/Portfolio.html`);
+  остальные тайлы-заглушки ведут на `#` до сборки их страниц.
 - Тайлы со ссылками («Отчёты 1C/Navision», «Корпоративные запросы», «Отчёты для
   Рисков») — переход по названию или по ссылке; фон плитки не кликабелен
   (правило NavTile).
@@ -122,7 +134,16 @@ components: [Layout, NavPanel, Breadcrumbs, NavTile, Illustrations, Modal, Badge
    nav--rail">` (было `nav--drawer`) — при загрузке панель свёрнута (56px,
    иконки), разворачивается бургером в Drawer.
 
-## 9. Открытые вопросы
+## 9. Правки 03.09.2026
+
+1. Двусторонняя связь с экраном «Текущий портфель ДИД» (`Portfolio-did/Portfolio.html`):
+   экранный скрипт держит карту `PAGE_HREFS` (по `item.id`); пункт меню и тайл
+   «Текущий портфель» (`current-portfolio`) получают реальный href
+   (`../Portfolio-did/Portfolio.html`) вместо `#`. Каталог `ibp-home.js` не менялся
+   (пути к экранам — ответственность экрана). Обратный переход — крошка «Главная»
+   и пункт меню «Главная» на странице портфеля (см. Portfolio.screen.md).
+
+## 10. Открытые вопросы
 
 1. Фоновая иллюстрация размещена за всем контентом с `opacity .6` — точное
    положение/прозрачность по макету уточнить (модель не читает изображения,

@@ -130,8 +130,8 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     Обзор компонентов
   </a>
   <div class="meta">
-    <span>Версия <b>2.006</b></span>
-    <span>Обновлено <b>02.09.2026</b></span>
+    <span>Версия <b>2.011</b></span>
+    <span>Обновлено <b>04.09.2026</b></span>
     <span>CSS <b>styles/table-cell.css</b></span>
     <span>Зависимости <b>checkbox, chip, icon-button, button, input, dropdown-list, tooltip, chart</b></span>
   </div>
@@ -458,7 +458,16 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
 
 <div class="subsec" data-screen-label="Pinned">
     <h3>Закрепление колонки</h3>
-    <p class="desc">Закрепление — свойство <b>колонки</b>, а не отдельной ячейки: оно красит фоном Pinned и шапку, и все ячейки под ней, и оставляет колонку на месте при горизонтальном скролле таблицы (<code class="tok">position:sticky</code> в контейнере <code class="tok">.tbl--scroll</code>). Иконка <b>pin</b> появляется по наведению на шапку; закреплённая колонка показывает <b>pin-filled</b> в тоне <code class="tok">--secondary-dark</code> постоянно. Если у колонки нет сортировки, закрепление занимает её место.</p>
+    <p class="desc">Закрепление — свойство <b>колонки</b>, а не отдельной ячейки: оно красит фоном Pinned и шапку, и все ячейки под ней, и оставляет колонку на месте при горизонтальном скролле. Взаимодействие — <b>из коробки</b>: клик по иконке <b>pin</b> в шапке закрепляет/открепляет колонку (рантайм <code class="tok">tbl-pin.js</code>); закреплённая колонка показывает <b>pin-filled</b> в тоне <code class="tok">--secondary-dark</code> постоянно. Удержание при скролле делает JS (<code class="tok">transform: translateX</code>) — CSS <code class="tok">position:sticky</code> для колонок grid-раскладки не работает. Закрепление не переносит колонку в начало.</p>
+    <ul class="rules">
+      <li><b>Left-pinned</b> — колонка не в хвостовом блоке: при скролле «упирается» в левый край контейнера или в закреплённую колонку левее.</li>
+      <li><b>Right-pinned</b> — закреплённая колонка, у которой все колонки правее тоже закреплены (хвостовой блок): удерживается у правого края; тень-разделитель слева. Если правее появилась незакреплённая колонка — снова left-pinned.</li>
+      <li><b>Сепаратор</b> прилипает вместе с примыкающей закреплённой колонкой: левый крайний — при закреплённой первой, правый — при закреплённой последней. Сепаратор имеет явную заливку <code class="tok">--bgtable</code> и при прилипании красится <code class="tok">--bgtable-pinned</code> (рантайм ставит на него <code class="tok">data-pin-side</code>) — сливается с колонкой в сплошную полосу, без собственной тени. Прилипший сепаратор несёт z-index закреплённой колонки (рисуется поверх проезжающих ячеек) и наследует её hover/focus/selected.</li>
+      <li><b>Перетаскивание</b>: закреплённые колонки переносятся как обычные — класс pin едет с колонкой.</li>
+    </ul>
+    <p class="desc">Фон закреплённой колонки стабилен — hover-затемнения у шапки нет. Если у колонки нет сортировки, закрепление занимает её место.</p>
+    <p class="desc">Тень-разделитель блока — только на граничной колонке: у лево-закреплённого блока справа (<code class="tok">data-pin-side="left"</code>), у право-закреплённого слева (<code class="tok">data-pin-side="right"</code>). Внутренние колонки блока и сепаратор тени не несут — сливаются в сплошную полосу.</p>
+    <p class="desc">Удержание через <code class="tok">transform: translateX</code> не сужает ширину прокрутки: <code class="tok">.tbl__row { min-width: max-content }</code> резервирует полную ширину строки. Иначе браузер считает <code class="tok">scrollWidth</code> по визуальным (трансформированным) боксам, полоса прокрутки «не доезжает» до естественной позиции закреплённой колонки, и она перекрывает соседние слева ровно на свою ширину.</p>
     <div class="panel pin-demo" style="margin-top:14px;">
       <div class="tbl tbl--scroll">
         <div class="tbl__row" style="grid-template-columns:8px 200px 160px 160px 160px 8px;">
@@ -502,7 +511,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
 
 <div class="subsec" data-screen-label="ColumnOrder">
     <h3>Порядок колонок</h3>
-    <p class="desc">Порядок меняется одним способом — перетаскиванием. Колонку берут за подпись шапки и переносят с зажатой кнопкой мыши: пока идёт перенос, вся колонка приглушается до 40%, а место вставки показывает вертикальная линия в тоне <code class="tok">--primary</code>. Перенос начинается после смещения на 4px, поэтому обычный клик по шапке остаётся кликом. Берут именно за подпись, а не за всю ячейку, — чтобы сортировка и закрепление оставались нажимаемыми. Разделители и закреплённые колонки из переноса исключаются; маркер не нужен — все остальные колонки переносятся автоматически.</p>
+    <p class="desc">Порядок меняется одним способом — перетаскиванием. Колонку берут за подпись шапки и переносят с зажатой кнопкой мыши: пока идёт перенос, вся колонка приглушается до 40%, а место вставки показывает вертикальная линия в тоне <code class="tok">--primary</code>. Перенос начинается после смещения на 4px, поэтому обычный клик по шапке остаётся кликом. Берут именно за подпись, а не за всю ячейку, — чтобы сортировка и закрепление оставались нажимаемыми. Из переноса исключаются только разделители; закреплённые колонки переносятся тоже — класс pin едет с колонкой. Маркер не нужен — перенос автоматический.</p>
     <p class="desc">Порядок колонок — базовое поведение, как и изменение ширины: работает из коробки, поведение приходит из общего скрипта <code class="tok">scripts/tbl-reorder.js</code> (входит в <code class="tok">scripts/ds.js</code>), инициализация на странице не нужна.</p>
     <p class="desc">Кнопок и пунктов меню, дублирующих перенос, у колонки нет: порядок — прямая манипуляция, дополнительный орган управления на него не заводим.</p>
   </div>
@@ -586,7 +595,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
       <div class="tbl"><div class="tbl__row" style="grid-template-columns:1fr;"><div class="tc tc--accent"><span class="tc__row"><span class="tc__text">Значение ячейки</span></span></div></div></div>
     </div>
     <div class="st-card">
-      <div class="st-card__label"><b>Pinned</b> · закреплённая колонка (фон + sticky)</div>
+      <div class="st-card__label"><b>Pinned</b> · закреплённая колонка (фон; удержание у края — рантайм tbl-pin)</div>
       <div class="tbl"><div class="tbl__row" style="grid-template-columns:1fr;"><div class="tc tc--pinned"><span class="tc__row"><span class="tc__text">Значение ячейки</span></span></div></div></div>
     </div>
     <div class="st-card">
@@ -954,6 +963,7 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
 <script src="../../scripts/ds-tabs.js"></script>
 <script src="../../scripts/tbl-resize.js"></script>
 <script src="../../scripts/tbl-reorder.js"></script>
+<script src="../../scripts/tbl-pin.js"></script>
 <script src="../../scripts/ds-tooltip.js"></script>
 <script src="../../scripts/ds-table.js"></script>
 <script src="../../scripts/ds-chart.js"></script>
@@ -1002,6 +1012,9 @@ DSTable.wireAll(document);
 
 // Сортировка: клик по [data-sort] в шапке — none → asc → desc → none,
 // глиф и aria-sort синхронны; событие 'sort' с { column, dir }.
+// Закрепление (tbl-pin.js): клик по .th__pin — фон Pinned у всей колонки, pin → pin-filled,
+// aria-pressed, событие 'columnpin'; удержание при скролле — JS (transform): left-pinned у левого
+// края, right-pinned (хвостовой блок) у правого; примыкающий сепаратор прилипает с колонкой.
 // Дерево: .tc__twisty переключает aria-expanded и показ дочерних строк ([data-parent] = id узла).
 // Выбор строк: чекбокс строки красит .tbl__row--selected, чекбокс шапки держит промежуточное состояние.
 // Фокус строки: клик по строке ставит .tbl__row--focus.
@@ -1250,7 +1263,32 @@ DSTable.wireAll(document);
 .th--separator {
   padding: 0;
   gap: 0;
+  /* явная заливка как у обычной ячейки: базовый .tc/.th уже даёт
+     var(--bgtable), но цвет совпадает с фоном .tbl (--bg-tile = mgrey-50),
+     поэтому сепаратор выглядел «пустым»; фиксируем фон явно */
+  background: var(--bgtable);
 }
+/* прилипший к закреплённой колонке сепаратор красится как закреплённая ячейка
+   (var(--bgtable-pinned)) — сливается с колонкой в сплошную полосу. Только фон,
+   БЕЗ box-shadow: тень-разделитель принадлежит примыкающей закреплённой колонке */
+.tc--separator[data-pin-side],
+.th--separator[data-pin-side] {
+  background: var(--bgtable-pinned);
+}
+/* прилипший сепаратор наследует интерактивные состояния закреплённой колонки.
+   Без этих правил общий `.tbl__row:hover > .tc` (0,3,0) перебивал базовую заливку
+   (0,2,0) и красил сепаратор в --bgtable-row-hover (≈ белый) вместо
+   --bgtable-pinned-hover — ховер «не срабатывал», а при наведении сепаратор
+   выглядел прозрачным рядом с затемнившейся колонкой */
+.tbl__row:hover > .tc--separator[data-pin-side],
+.tbl__row--hover > .tc--separator[data-pin-side],
+.tc--separator.tc--hover[data-pin-side] { background: var(--bgtable-pinned-hover); }
+.tbl__row:focus-within > .tc--separator[data-pin-side],
+.tbl__row--focus > .tc--separator[data-pin-side],
+.tc--separator.tc--focus[data-pin-side] { background: var(--bgtable-pinned-focus); }
+.tbl__row--selected > .tc--separator[data-pin-side],
+.tbl__row[aria-selected="true"] > .tc--separator[data-pin-side],
+.tc--separator.tc--selected[data-pin-side] { background: var(--primary-bg); }
 /* разделителю доступны ТОЛЬКО состояния строки (hover/focus/selected/фон
    колонки) — контентных признаков у него быть не может */
 .tc--separator::before { content: none; }
@@ -1328,14 +1366,18 @@ DSTable.wireAll(document);
   user-select: none;
 }
 .th--right  { justify-content: flex-end;  text-align: right;  }
-/* закреплённая колонка — фон Pinned и у шапки */
+/* закреплённая колонка — фон Pinned и у шапки (без hover-затемнения:
+   фон закреплённой колонки стабилен, чтобы отличать её от скроллящегося контента) */
 .th--pinned { background: var(--bgtable-pinned); }
-.th--pinned:hover { background: var(--bgtable-pinned-hover); }
 .th--center { justify-content: center; }
 .th__label {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
 }
 .th__icon { flex: none; display: inline-flex; color: var(--text-secondary); }
 .th__icon :is(svg,[data-icon]){ display: block; width: 18px; height: 18px; }
@@ -1399,12 +1441,12 @@ DSTable.wireAll(document);
 .th__resize:focus-visible { outline: none; }
 
 /* --- порядок колонок: перетаскивание шапки ------------------------------ */
-/* Колонку берут за подпись шапки. Переносятся все колонки, кроме разделителей
-   и закреплённых — автоматически, без маркера (общий рантайм tbl-reorder.js).
-   Пока идёт перенос, вся колонка приглушена, а место вставки показывает
-   вертикальная линия через всю таблицу. */
-.th:not(.th--separator):not(.th--pinned) .th__label { cursor: grab; }
-.tbl--reordering .th:not(.th--separator):not(.th--pinned) .th__label { cursor: grabbing; }
+/* Колонку берут за подпись шапки. Переносятся все колонки, кроме разделителей;
+   закреплённые переносятся тоже (класс pin едет с колонкой) — автоматически,
+   без маркера (общий рантайм tbl-reorder.js). Пока идёт перенос, вся колонка
+   приглушена, а место вставки показывает вертикальная линия через всю таблицу. */
+.th:not(.th--separator) .th__label { cursor: grab; }
+.tbl--reordering .th:not(.th--separator) .th__label { cursor: grabbing; }
 .th--dragging,
 .tc--dragging { opacity: .4; }
 .tbl--resizing,
@@ -1447,18 +1489,57 @@ DSTable.wireAll(document);
   background: var(--bg-tile);
 }
 .tbl__row { display: grid; }
+/* min-width: max-content — ТОЛЬКО у прокручиваемой по горизонтали таблицы.
+   Там строка обязана резервировать полную ширину контента (сумму треков):
+   иначе transform: translateX на закреплённых ячейках двигает их визуально,
+   браузер считает scrollWidth по визуальным (трансформированным) боксам,
+   полоса прокрутки «не доезжает» до естественной позиции закреплённой колонки,
+   и она перекрывает соседние слева ровно на свою ширину.
+   Таблице БЕЗ горизонтального скролла это правило вредит: под max-content
+   доля-трек (fr) разворачивается по содержимому, колонка растягивается под
+   самый длинный текст, усечение (.tc__text--truncate) не срабатывает вовсе,
+   а строка вылезает за контейнер (инцидент 04.09.2026 — правило стояло на всех
+   .tbl__row без разбора, усечение в fr-колонках не работало нигде). */
+.tbl--scroll .tbl__row,
+.dtable__body .tbl__row { min-width: max-content; }
 .tbl__row:last-child .tc { border-bottom: none; }
 
-/* закреплённая колонка не уезжает при горизонтальном скролле таблицы:
-   .tbl--scroll — прокручиваемый контейнер, .tc--pinned/.th--pinned — sticky */
+/* закреплённая колонка не уезжает при горизонтальном скролле таблицы.
+   CSS position:sticky для колонок grid-раскладки не работает (sticky-элемент
+   ограничен своей grid-областью = собственной колонкой) — позиционирование
+   ведёт рантайм tbl-pin.js (transform: translateX). Здесь — фон, z-index
+   (закреплённая колонка поверх скроллящегося контента) и тень-разделитель
+   по правому краю закреплённой колонки. */
 .tbl--scroll { overflow-x: auto; }
-.tbl--scroll .tc--pinned,
-.tbl--scroll .th--pinned {
-  position: sticky;
-  left: 0;
-  z-index: 2;
-  box-shadow: 1px 0 0 var(--border-light);
-}
+/* Тень-разделитель — только НА ГРАНИЧНЫХ колонках блока, не на внутренних:
+   лево-закреплённый блок держит правую тень у СВОЕЙ правой границы
+   (data-pin-side="left"), право-закреплённый — левую тень у левой границы
+   (data-pin-side="right"). Внутренние колонки блока (без data-pin-side) тени
+   не несут — сливаются в сплошную полосу. Раньше базовое правило красило тень
+   у всех .tc--pinned/.th--pinned, из-за чего у внутренней колонки правого
+   блока оставалась правая тень — «полоска» между ней и замыкающим сепаратором. */
+.tc--pinned[data-pin-side="left"],
+.th--pinned[data-pin-side="left"] { box-shadow: 1px 0 0 var(--border-light); }
+/* right-pinned (JS ставит data-pin-side="right" на ЛЕВУЮ ГРАНИЦУ хвостового
+   блока): тень-разделитель с левого края — колонки блока удерживаются у правого
+   края таблицы, тень отделяет блок от скроллящегося контента */
+.tc--pinned[data-pin-side="right"],
+.th--pinned[data-pin-side="right"] { box-shadow: -1px 0 0 var(--border-light); }
+.tc--pinned { z-index: 1; }
+.th--pinned { z-index: 3; }
+/* в реестровой раскладке липкая шапка всех колонок несёт z-index 3
+   (.dtable__body .th) — закреплённая шапка должна быть ВЫШЕ, иначе проезжающие
+   шапки незакреплённых колонок рисуются поверх неё (равный z-index + поздний DOM) */
+.dtable__body .th--pinned { z-index: 4; }
+/* Прилипший сепаратор — тот же слой, что и закреплённая колонка: он должен
+   РИСОВАТЬСЯ ПОВЕРХ проезжающих незакреплённых ячеек (иначе ячейки видны сквозь
+   него). Ведущий сепаратор — первый ребёнок строки (z-index auto), и незакреплённые
+   ячейки позже в DOM рисуются поверх; без этого z-index сепаратор «терял заливку».
+   Одинаковый с закреплённой колонкой слой не ломает слияние в полосу (они смежные). */
+.tc--separator[data-pin-side] { z-index: 1; }
+.th--separator[data-pin-side] { z-index: 3; }
+.dtable__body .th--separator[data-pin-side] { z-index: 4; }
+.tbl--scroll .th--pinned { position: sticky; top: 0; } /* вертикальная липкость шапки сохраняется; горизонталь — JS */
 
 /* ================================================================== */
 /* динамика: спарклайн в ячейке — компонент Chart (type:'spark'),      */

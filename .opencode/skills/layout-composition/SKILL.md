@@ -223,8 +223,8 @@ metadata:
 | Источник | Что взято |
 |---|---|
 | [szilu/ux-designer-skill](https://github.com/szilu/ux-designer-skill) | длина строки **50–75 символов** (дала формулу числа колонок), правило 7±2 для группировки, шкала интервалов от одной базы 4/8px |
-| [jezweb/claude-skills · design-review](https://github.com/jezweb/claude-skills/blob/main/plugins/frontend/skills/design-review/SKILL.md) | единообразие зазоров как проверяемый признак (смешение 16 и 24 в одной сетке — дефект), требование единой шкалы радиусов и теней |
-| [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills), [anthropics/skills](https://github.com/anthropics/skills) | каталоги для дальнейшего разбора |
+| [design-review · подборка скиллов для фронтенда](https://github.com/jezweb/claude-skills/blob/main/plugins/frontend/skills/design-review/SKILL.md) | единообразие зазоров как проверяемый признак (смешение 16 и 24 в одной сетке — дефект), требование единой шкалы радиусов и теней |
+| [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills), [референсные скиллы вендора](https://github.com/anthropics/skills) | каталоги для дальнейшего разбора |
 
 **Чего в них нет и что пришлось выводить самим:** правил для read-only карточки
 сущности, расчёта числа колонок от ширины ячейки, сопоставимости соседних тайлов

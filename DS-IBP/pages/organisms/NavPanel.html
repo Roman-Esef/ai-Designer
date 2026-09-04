@@ -150,7 +150,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.013</b></span><span>Обновлено: <b>02.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.014</b></span><span>Обновлено: <b>03.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>NavPanel · Панель навигации</h1>
     <p class="lead">Главная навигация приложения в левой части каждой страницы. Отображает все разделы продукта, сгруппированные по подразделениям и типам. Один компонент — три режима: свёрнутый <b>Rail</b>, развёрнутый-оверлей <b>Drawer</b> и закреплённый <b>Fixed</b>.</p>
@@ -281,7 +281,7 @@
 
     <div class="subsec" data-screen-label="DrawerBehavior">
       <h3>Drawer — развёрнутый оверлей</h3>
-      <p class="desc">Развёрнутое меню лежит поверх контента и отбрасывает тень <code class="tok">Shadow4.0_modalform</code>. Сворачивается по клику на бургер или по клику вне области меню. Клик по IconButton выхода деавторизует пользователя.</p>
+      <p class="desc">Развёрнутое меню лежит поверх контента и отбрасывает тень <code class="tok">Shadow4.0_modalform</code>. Сворачивается по клику на бургер, по клику вне области меню или по <b>Esc</b> (в rail). Клики внутри открытых модалок — например, смены роли из футера — панель не сворачивают: модалка отдельный слой поверх. Клик по IconButton выхода деавторизует пользователя.</p>
     </div>
 
     <div class="subsec" data-screen-label="FixedBehavior">
@@ -382,7 +382,7 @@
 
 <span class="tk-cm">// 3. Drawer как оверлей:
 //    показывать тень Shadow4.0_modalform;
-//    клик вне области панели ИЛИ Esc → свернуть в rail;
+//    клик вне области панели (кроме открытых модалок) ИЛИ Esc → свернуть в rail;
 //    fixed тени не имеет и клик-снаружи не сворачивает.</span>
 
 <span class="tk-cm">// 4. Rail-тултип:
@@ -515,7 +515,7 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
 
 // Burger: rail→drawer, drawer→rail; в fixed скрыт.
 // Pin (drawer/fixed): drawer→fixed (pin-menu→unpin-menu, aria-pressed=true), fixed→drawer.
-// Drawer-оверлей: тень Shadow4.0_modalform; клик вне области или Esc → rail.
+// Drawer-оверлей: тень Shadow4.0_modalform; клик вне области (кроме открытых модалок) или Esc → rail.
 // Rail-тултип: hover/focus пункта → всплывающая подпись справа.
 // Вложенный раздел: клик по .nav__item--acc → toggle aria-expanded; в rail — развернуть панель.
 // Выбор: клик → навигация, current=id → nav__item--selected + aria-current.

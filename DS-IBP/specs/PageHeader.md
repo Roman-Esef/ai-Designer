@@ -1,8 +1,8 @@
 ---
 component: PageHeader
 title: "PageHeader"
-version: "1.008"
-updated: "21.08.2026"
+version: "1.009"
+updated: "03.09.2026"
 page: pages/organisms/PageHeader.html
 runtime: scripts/ds-menu.js, scripts/ds-actions-overflow.js
 css: styles/page-header.css
@@ -75,8 +75,8 @@ PageHeader — заголовок страницы рабочей области
 |---|---|
 | `.phead` | корень: flex-строка main + actions, gap 16 |
 | `.phead__main` | колонка title-row → subtitle, gap 6, min-width:0 |
-| `.phead__title-row` | строка частей заголовка, gap 8, min-height 32, wrap при переполнении |
-| `.phead__title-group` | неразрывная группа IconLeft + Title + Edit, gap 8, min-width:0 |
+| `.phead__title-row` | строка частей заголовка, gap 8, min-height 40 (под кнопки Actions), wrap при переполнении, растёт под многострочный Title |
+| `.phead__title-group` | неразрывная группа IconLeft + Title + Edit, gap 8, padding-top 4, min-width:0 |
 | `.phead__title-ico` | иконка слева 24, `--text-inactive` |
 | `.phead__title` | h1, `--type-h3-strong`, многострочный (без усечения), min-width 120px |
 | `.phead__edit` | слот IconButton neutral S (edit) |

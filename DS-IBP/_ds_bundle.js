@@ -10096,11 +10096,11 @@ async function loadProject() {
   const owner = new Map();
   for (const [c, set] of classOwners) if (set.size === 1) owner.set(c, [...set][0]);
   const cssClasses = new Set(classOwners.keys());
-  const [index, nav, specIndex, cheat, dsCss, rootCss, claude] = await Promise.all(['index.html', 'scripts/ds-nav.js', 'specs/_index.md', 'specs/_cheatsheet.md', 'ds.css', 'styles.css', 'CLAUDE.md'].map(f => readFile(f)));
+  const [index, nav, specIndex, cheat, dsCss, rootCss, dsRules] = await Promise.all(['index.html', 'scripts/ds-nav.js', 'specs/_index.md', 'specs/_cheatsheet.md', 'ds.css', 'styles.css', 'MAINTAINING.md'].map(f => readFile(f)));
 
-  // канонический порядок h2 — из CLAUDE.md, не дублируем
+  // канонический порядок h2 — из MAINTAINING.md, не дублируем
   let canon = [];
-  const blk = claude.split('Контракт страницы компонента')[1];
+  const blk = dsRules.split('Контракт страницы компонента')[1];
   if (blk) {
     canon = all(/^\d+\.\s*(.+)$/gm, blk.split('###')[0]).map(s => s.split(/\s+[—(]|:/)[0].trim()).filter(s => s && !/^Шапка/.test(s));
   }
@@ -16086,7 +16086,7 @@ try { (() => {
       // Content. The sidecar is also writable by the agent's write_file
       // tool, so its value isn't guaranteed canvas-originated — only accept
       // data:image/ URLs from it. The `src` attribute is author-controlled
-      // (Claude wrote it into the HTML) so it passes through unchanged.
+      // (the agent wrote it into the HTML) so it passes through unchanged.
       let stored = this.id ? getSlot(this.id) : this._local;
       if (stored && stored.u && !/^data:image\//i.test(stored.u)) stored = null;
       const srcAttr = this.getAttribute('src') || '';

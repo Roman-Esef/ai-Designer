@@ -7,14 +7,16 @@
    Style:   fill  (Border + Fill) · outline (Border only)
    Sizes:   l (40) · m (32) · s (24) · xs (20)
             l — readonly only · xs — content/compact
-   Tone:    system (default) · accent · success · info · warning · error · dark ← proposed
+   Tone:    system (default) · СЕМАНТИЧЕСКИЕ (цвет = смысл): success · info ·
+            warning · error · ТОНАЛЬНЫЕ (цвет = просто цвет, имя рампы): green ·
+            lblue · orange · red · dpurple · grey · primary · алиасы: accent (=primary),
+            dark (=grey)
             Solid: success-solid · warning-solid · error-solid · dark-solid ← proposed
             (base status fill + white text — критичные акценты, RiskMetric красная/чёрная зона)
-            Тон — не фиксированный список «ситуативных» имён: чип может брать любой
-            локальный статус-тон (Local, colors.css). success/info/warning/error —
-            просто самые частые алиасы (StGreen/StLBlue/StOrange/StRed); dark — ещё
-            один локальный тон (StGrey), для нейтрально-тёмной/«чёрной» семантики
-            (см. RiskMetric — Чёрная зона).
+            Окраска статусов ОДИНАКОВА для всех: фон = -light, обводка = -light
+            (тот же), текст = -dark, иконка = base-тон (Local-рампы, colors.css).
+            Статусные чипы ВСЕГДА скруглённые (.chip--rounded). Аватар в статусном
+            чипе: фон = -mid, текст/иконка — белые (--text-on-dark).
    States:  default · hover · selected ← proposed · focus ← proposed
             disabled · loading ← proposed · error/invalid ← proposed
    Slots:   leading icon / marker / avatar (компонент Avatar) · trailing remove (×) /
@@ -45,6 +47,12 @@
   align-items: center;
   gap: var(--chip-gap);
   max-width: 320px;
+  /* чип несёт данные переменной длины и рассчитан на усечение подписи
+     (.chip__label с ellipsis), поэтому он обязан СЖИМАТЬСЯ в чужой flex-строке.
+     Без min-width:0 автоминимум inline-flex равен min-content: чип не сжимается,
+     вылезает за границу контейнера (ячейка таблицы, тулбар) и обрывается его
+     непрозрачным фоном — без многоточия. */
+  min-width: 0;
   height: var(--chip-height);
   padding: 0 var(--chip-pad-x);
   border: 1px solid var(--chip-border);
@@ -182,7 +190,9 @@
 .chip--edit.chip--outline:not(:is(.chip--disabled,[aria-disabled="true"])):hover,
 .chip--edit.chip--outline:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { border-color: var(--st-system-mid); }
 
-/* ---------- rounded (full pill) ------------------------------------------- */
+/* ---------- rounded (full pill) ------------------------------------------- *
+   Статусные чипы ВСЕГДА скруглённые: .chip--rounded (пилюля) — обязательное
+   правило для любых чипов-статусов (см. specs/Chip.md «Тон и статусы»). */
 .chip--rounded { border-radius: var(--radius-pill); }
 
 /* ---------- hover (Edit only) --------------------------------------------- */
@@ -205,37 +215,70 @@
 .chip--edit.chip--selected:not(:is(.chip--disabled,[aria-disabled="true"])):hover,
 .chip--edit.chip--selected:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-primary-midlight); border-color: var(--primary); }
 
-/* ---------- tones / statuses — PROPOSED ----------------------------------- *
-   Used when chips carry status meaning (active/blocked/overdue…) rather than
-   neutral tags. Fill = status Light, text = status Dark, icon = status base. */
-.chip--accent  { background: var(--st-primary-light); border-color: var(--st-primary-light); color: var(--st-primary-dark); }
-.chip--success { background: var(--st-green-light);   border-color: var(--st-green-light);   color: var(--st-green-dark); }
-.chip--info    { background: var(--st-lblue-light);   border-color: var(--st-lblue-light);   color: var(--st-lblue-dark); }
-.chip--warning { background: var(--st-orange-light);  border-color: var(--st-orange-light);  color: var(--st-orange-dark); }
-.chip--error   { background: var(--st-red-light);     border-color: var(--st-red-light);     color: var(--st-red-dark); }
-.chip--dark    { background: var(--st-grey-light);    border-color: var(--st-grey-light);    color: var(--st-grey-dark); }
+/* ---------- tones / statuses --------------------------------------------- *
+   Две категории статусных тонов; ОКРАСКА ОДИНАКОВАЯ для всех:
+     фон = -light, обводка = -light (тот же), текст = -dark, иконка = base.
+   · Семантические (цвет = смысл состояния): success / info / warning / error.
+   · Тональные (цвет = просто цвет, без смысла): green / lblue / orange / red /
+     dpurple / grey / primary — имя = имя рампы палитры статусов.
+   · Алиасы (одна и та же рампа): accent = primary · dark = grey.
+   Статусные чипы ВСЕГДА скруглённые (.chip--rounded). */
+.chip--accent, .chip--primary  { background: var(--st-primary-light); border-color: var(--st-primary-light); color: var(--st-primary-dark); }
+.chip--success, .chip--green   { background: var(--st-green-light);   border-color: var(--st-green-light);   color: var(--st-green-dark); }
+.chip--info, .chip--lblue      { background: var(--st-lblue-light);   border-color: var(--st-lblue-light);   color: var(--st-lblue-dark); }
+.chip--warning, .chip--orange  { background: var(--st-orange-light);  border-color: var(--st-orange-light);  color: var(--st-orange-dark); }
+.chip--error, .chip--red       { background: var(--st-red-light);     border-color: var(--st-red-light);     color: var(--st-red-dark); }
+.chip--dark, .chip--grey       { background: var(--st-grey-light);    border-color: var(--st-grey-light);    color: var(--st-grey-dark); }
+.chip--dpurple                 { background: var(--st-dpurple-light); border-color: var(--st-dpurple-light); color: var(--st-dpurple-dark); }
 
-.chip--accent  .chip__icon, .chip--accent  .chip__marker, .chip--accent  .chip__remove, .chip--accent  .chip__dropdown, .chip--accent  .chip__info, .chip--accent  .chip__count { color: var(--primary); }
-.chip--success .chip__icon, .chip--success .chip__marker, .chip--success .chip__remove, .chip--success .chip__dropdown, .chip--success .chip__info, .chip--success .chip__count { color: var(--st-green); }
-.chip--info    .chip__icon, .chip--info    .chip__marker, .chip--info    .chip__remove, .chip--info    .chip__dropdown, .chip--info    .chip__info, .chip--info    .chip__count { color: var(--st-lblue); }
-.chip--warning .chip__icon, .chip--warning .chip__marker, .chip--warning .chip__remove, .chip--warning .chip__dropdown, .chip--warning .chip__info, .chip--warning .chip__count { color: var(--st-orange); }
-.chip--error   .chip__icon, .chip--error   .chip__marker, .chip--error   .chip__remove, .chip--error   .chip__dropdown, .chip--error   .chip__info, .chip--error   .chip__count { color: var(--st-red); }
-.chip--dark    .chip__icon, .chip--dark    .chip__marker, .chip--dark    .chip__remove, .chip--dark    .chip__dropdown, .chip--dark    .chip__info, .chip--dark    .chip__count { color: var(--st-grey); }
+.chip--accent .chip__icon, .chip--accent .chip__marker, .chip--accent .chip__remove, .chip--accent .chip__dropdown, .chip--accent .chip__info, .chip--accent .chip__count,
+.chip--primary .chip__icon, .chip--primary .chip__marker, .chip--primary .chip__remove, .chip--primary .chip__dropdown, .chip--primary .chip__info, .chip--primary .chip__count { color: var(--primary); }
+.chip--success .chip__icon, .chip--success .chip__marker, .chip--success .chip__remove, .chip--success .chip__dropdown, .chip--success .chip__info, .chip--success .chip__count,
+.chip--green .chip__icon, .chip--green .chip__marker, .chip--green .chip__remove, .chip--green .chip__dropdown, .chip--green .chip__info, .chip--green .chip__count { color: var(--st-green); }
+.chip--info .chip__icon, .chip--info .chip__marker, .chip--info .chip__remove, .chip--info .chip__dropdown, .chip--info .chip__info, .chip--info .chip__count,
+.chip--lblue .chip__icon, .chip--lblue .chip__marker, .chip--lblue .chip__remove, .chip--lblue .chip__dropdown, .chip--lblue .chip__info, .chip--lblue .chip__count { color: var(--st-lblue); }
+.chip--warning .chip__icon, .chip--warning .chip__marker, .chip--warning .chip__remove, .chip--warning .chip__dropdown, .chip--warning .chip__info, .chip--warning .chip__count,
+.chip--orange .chip__icon, .chip--orange .chip__marker, .chip--orange .chip__remove, .chip--orange .chip__dropdown, .chip--orange .chip__info, .chip--orange .chip__count { color: var(--st-orange); }
+.chip--error .chip__icon, .chip--error .chip__marker, .chip--error .chip__remove, .chip--error .chip__dropdown, .chip--error .chip__info, .chip--error .chip__count,
+.chip--red .chip__icon, .chip--red .chip__marker, .chip--red .chip__remove, .chip--red .chip__dropdown, .chip--red .chip__info, .chip--red .chip__count { color: var(--st-red); }
+.chip--dark .chip__icon, .chip--dark .chip__marker, .chip--dark .chip__remove, .chip--dark .chip__dropdown, .chip--dark .chip__info, .chip--dark .chip__count,
+.chip--grey .chip__icon, .chip--grey .chip__marker, .chip--grey .chip__remove, .chip--grey .chip__dropdown, .chip--grey .chip__info, .chip--grey .chip__count { color: var(--st-grey); }
+.chip--dpurple .chip__icon, .chip--dpurple .chip__marker, .chip--dpurple .chip__remove, .chip--dpurple .chip__dropdown, .chip--dpurple .chip__info, .chip--dpurple .chip__count { color: var(--st-dpurple); }
 
-.chip--edit.chip--accent:not(:is(.chip--disabled,[aria-disabled="true"])):hover,  .chip--edit.chip--accent:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover  { background: var(--st-primary-midlight); border-color: var(--st-primary-light); }
-.chip--edit.chip--success:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--success:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-green-midlight);   border-color: var(--st-green-light); }
-.chip--edit.chip--info:not(:is(.chip--disabled,[aria-disabled="true"])):hover,    .chip--edit.chip--info:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover    { background: var(--st-lblue-midlight);   border-color: var(--st-lblue-light); }
-.chip--edit.chip--warning:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--warning:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-orange-midlight);  border-color: var(--st-orange-light); }
-.chip--edit.chip--error:not(:is(.chip--disabled,[aria-disabled="true"])):hover,   .chip--edit.chip--error:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover   { background: var(--st-red-midlight);     border-color: var(--st-red-light); }
-.chip--edit.chip--dark:not(:is(.chip--disabled,[aria-disabled="true"])):hover,    .chip--edit.chip--dark:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover    { background: var(--st-grey-midlight);    border-color: var(--st-grey-light); }
+.chip--edit.chip--accent:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--accent:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover,
+.chip--edit.chip--primary:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--primary:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-primary-midlight); border-color: var(--st-primary-light); }
+.chip--edit.chip--success:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--success:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover,
+.chip--edit.chip--green:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--green:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-green-midlight); border-color: var(--st-green-light); }
+.chip--edit.chip--info:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--info:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover,
+.chip--edit.chip--lblue:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--lblue:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-lblue-midlight); border-color: var(--st-lblue-light); }
+.chip--edit.chip--warning:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--warning:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover,
+.chip--edit.chip--orange:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--orange:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-orange-midlight); border-color: var(--st-orange-light); }
+.chip--edit.chip--error:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--error:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover,
+.chip--edit.chip--red:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--red:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-red-midlight); border-color: var(--st-red-light); }
+.chip--edit.chip--dark:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--dark:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover,
+.chip--edit.chip--grey:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--grey:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-grey-midlight); border-color: var(--st-grey-light); }
+.chip--edit.chip--dpurple:not(:is(.chip--disabled,[aria-disabled="true"])):hover, .chip--edit.chip--dpurple:not(:is(.chip--disabled,[aria-disabled="true"])).is-hover { background: var(--st-dpurple-midlight); border-color: var(--st-dpurple-light); }
 
 /* outline + tone — только цвет рамки (Mid opacity); заливки НЕТ (прозрачный фон) */
-.chip--outline.chip--accent  { background: transparent; border-color: color-mix(in srgb, var(--primary) 56%, transparent); }
-.chip--outline.chip--success { background: transparent; border-color: var(--st-green-mid); }
-.chip--outline.chip--info    { background: transparent; border-color: var(--st-lblue-mid); }
-.chip--outline.chip--warning { background: transparent; border-color: var(--st-orange-mid); }
-.chip--outline.chip--error   { background: transparent; border-color: var(--st-red-mid); }
-.chip--outline.chip--dark    { background: transparent; border-color: var(--st-grey-mid); }
+.chip--outline.chip--accent, .chip--outline.chip--primary  { background: transparent; border-color: color-mix(in srgb, var(--primary) 56%, transparent); }
+.chip--outline.chip--success, .chip--outline.chip--green   { background: transparent; border-color: var(--st-green-mid); }
+.chip--outline.chip--info, .chip--outline.chip--lblue      { background: transparent; border-color: var(--st-lblue-mid); }
+.chip--outline.chip--warning, .chip--outline.chip--orange  { background: transparent; border-color: var(--st-orange-mid); }
+.chip--outline.chip--error, .chip--outline.chip--red       { background: transparent; border-color: var(--st-red-mid); }
+.chip--outline.chip--dark, .chip--outline.chip--grey       { background: transparent; border-color: var(--st-grey-mid); }
+.chip--outline.chip--dpurple                                 { background: transparent; border-color: var(--st-dpurple-mid); }
+
+/* ---------- аватар в статусном чипе --------------------------------------- *
+   Правило для всех статусных тонов: фон = -mid той же рампы, текст/иконка —
+   белые (--text-on-dark) для контраста на цветном фоне. Текстовая аватарка —
+   белый текст (см. замечание пользователя, 04.09.2026). */
+.chip--accent .chip__avatar, .chip--primary .chip__avatar   { background: var(--st-primary-mid); color: var(--text-on-dark); }
+.chip--success .chip__avatar, .chip--green .chip__avatar    { background: var(--st-green-mid);   color: var(--text-on-dark); }
+.chip--info .chip__avatar, .chip--lblue .chip__avatar       { background: var(--st-lblue-mid);   color: var(--text-on-dark); }
+.chip--warning .chip__avatar, .chip--orange .chip__avatar   { background: var(--st-orange-mid);  color: var(--text-on-dark); }
+.chip--error .chip__avatar, .chip--red .chip__avatar        { background: var(--st-red-mid);     color: var(--text-on-dark); }
+.chip--dark .chip__avatar, .chip--grey .chip__avatar        { background: var(--st-grey-mid);    color: var(--text-on-dark); }
+.chip--dpurple .chip__avatar                                  { background: var(--st-dpurple-mid); color: var(--text-on-dark); }
 
 /* ---------- solid tones — PROPOSED ---------------------------------------- *
    Насыщенная заливка = status base, текст и иконка белые (--c-mgrey-50).

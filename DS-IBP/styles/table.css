@@ -16,6 +16,12 @@
   overflow: hidden;
 }
 
+/* вариант «на всю высоту»: таблица — основной контент экрана и занимает всю
+   свободную высоту (минус крошки/шапка/тулбар); тело скроллится внутри.
+   Требует фиксированной высоты родителя: .screen--app (styles/layout.css). */
+.dtable--fill { flex: 1 1 auto; min-height: 0; }
+.dtable--fill .dtable__body { flex: 1 1 auto; min-height: 0; }
+
 /* ------------------------------------------------------------------ */
 /*  TOOLBAR — заголовок + счётчик + фильтр/действия                    */
 /* ------------------------------------------------------------------ */
@@ -27,6 +33,17 @@
   padding: 16px 20px;
   border-bottom: 1px solid var(--border-light);
   flex-wrap: wrap;
+}
+
+/* Тулбар-зона НАД таблицей (detached): контейнер без подложки. Стоит вне .dtable,
+   слева — TableFilter (.tfilter), справа — кнопка настройки колонок. Таблица под
+   зоной — без собственного тулбара (headless: сразу шапка, без заголовка/счётчика).
+   Вертикальный ритм варианта — 12px (заголовок → зона → таблица), задаёт экран. */
+.dtable-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 .dtable__toolbar-left { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; }
 .dtable__title-row { display: flex; align-items: baseline; gap: 10px; }

@@ -142,7 +142,13 @@
    Контейнер-якорь получает position:relative, тултип — position:absolute.
    Появление/скрытие через .is-visible.
    ========================================================================= */
-.tip-anchor { position: relative; display: inline-flex; }
+/* Якорь ставит рантайм ВОКРУГ уже свёрстанной цели, поэтому он обязан быть
+   раскладочно-прозрачным. Без min-width:0 у inline-flex автоматический минимум
+   равен min-content содержимого: якорь перестаёт сжиматься, и усечение внутри
+   (text-overflow: ellipsis у цели) не срабатывает — текст выезжает за границы
+   контейнера (ячейка таблицы, пункт меню). max-width:100% страхует тот же
+   случай вне flex-контекста. */
+.tip-anchor { position: relative; display: inline-flex; min-width: 0; max-width: 100%; }
 
 .tip.tip--floating {
   position: absolute;

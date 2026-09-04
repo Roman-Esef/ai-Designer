@@ -183,6 +183,13 @@
       '</div>';
   }
 
+  /* зона тулбара НАД таблицей (детached, без подложки): слева TableFilter,
+     справа кнопка настройки колонок; таблица под ней headless (без .dtable__toolbar) */
+  function toolbarZone(opts) {
+    return '<div class="dtable-toolbar">' + filterControl(opts) +
+      '<button class="ibtn ibtn--neutral ibtn--m" data-columns-toggle aria-haspopup="dialog" aria-label="Настроить колонки"><i data-icon="settings"></i></button></div>';
+  }
+
   function selectedCount() {
     return Object.keys(state.selected).filter(function (k) { return state.selected[k]; }).length;
   }
@@ -190,8 +197,11 @@
   function build(opts, interactive) {
     var allCols = interactive ? state.columns : defaultColumns();
     var cols = allCols.filter(function (c) { return !c.hidden; });
-    var html = '<div class="dtable" ' + (opts.state === 'loading' ? 'aria-busy="true"' : '') + '>';
-    if (opts.toolbar) html += toolbar(opts);
+    var detached = !!opts.toolbarFloat;
+    var html = '';
+    if (detached) html += toolbarZone(opts); /* тулбар-зона над таблицей, без подложки */
+    html += '<div class="dtable" ' + (opts.state === 'loading' ? 'aria-busy="true"' : '') + '>';
+    if (opts.toolbar && !detached) html += toolbar(opts);
     html += '<div class="dtable__body">';
     if (opts.state === 'empty') {
       html += emptyBody();
@@ -412,13 +422,15 @@
   }
 
   function readOpts() {
+    var float = document.getElementById('ctl-toolbar-float');
     return {
       toolbar: document.getElementById('ctl-toolbar').checked,
       title: document.getElementById('ctl-title').value || 'Таблица',
       filter: document.getElementById('ctl-filter').checked,
       presets: document.getElementById('ctl-presets').checked,
       state: document.getElementById('ctl-state').value,
-      footer: document.getElementById('ctl-footer').checked
+      footer: document.getElementById('ctl-footer').checked,
+      toolbarFloat: !!(float && float.checked)
     };
   }
 
@@ -426,20 +438,37 @@
     var opts = readOpts();
     var host = document.getElementById('demo-dtable');
     if (!host) return;
-    host.outerHTML = build(opts, true).replace('class="dtable"', 'class="dtable" id="demo-dtable"');
+    var detached = opts.toolbarFloat;
+    var html = build(opts, true);
+    /* detached: зона + таблица — два блока, нужен общий контейнер-колонка,
+       чтобы иконки/биндинги/модалка колонок покрывали и зону */
+    host.outerHTML = detached
+      ? '<div id="demo-dtable" class="dt-detached">' + html + '</div>'
+      : html.replace('class="dtable"', 'class="dtable" id="demo-dtable"');
     var root = document.getElementById('demo-dtable');
     if (window.dsIcons) window.dsIcons.apply(root);
     if (window.dsIllustrations) window.dsIllustrations.apply(root);
     bindScrollFx(root);
     if (opts.state === 'default') bindInteractivity(root);
-    if (opts.filter) bindFilterMenu(root);
+    if (detached || opts.filter) bindFilterMenu(root);
 
     var columnsBtn = root.querySelector('[data-columns-toggle]');
     if (columnsBtn) columnsBtn.addEventListener('click', openColumnsModal);
 
-    toggle('ctl-title-wrap', opts.toolbar);
-    toggle('ctl-filter-wrap', opts.toolbar);
-    toggle('ctl-presets-wrap', opts.toolbar && opts.filter);
+    /* в варианте «тулбар над таблицей» внутренний тулбар, заголовок и переключатель
+       фильтра не используются (зона с фильтром структурна); в обычном режиме
+       фильтр/пресеты неактуальны, когда выключен их носитель (тулбар/фильтр) —
+       такие свитчи скрываем целиком (is-off на label.pg-toggle) */
+    toggle('ctl-title-wrap', !detached && opts.toolbar);
+    function setToggleOff(id, off) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var lbl = el.closest('label.pg-toggle');
+      if (lbl) lbl.classList.toggle('is-off', off);
+    }
+    setToggleOff('ctl-toolbar', detached);
+    setToggleOff('ctl-filter', detached || !opts.toolbar);
+    setToggleOff('ctl-presets', !detached && (!opts.toolbar || !opts.filter));
   }
 
   function toggle(id, on) {
@@ -516,7 +545,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    ['ctl-toolbar', 'ctl-title', 'ctl-filter', 'ctl-presets', 'ctl-state', 'ctl-footer'].forEach(function (id) {
+    ['ctl-toolbar', 'ctl-toolbar-float', 'ctl-title', 'ctl-filter', 'ctl-presets', 'ctl-state', 'ctl-footer'].forEach(function (id) {
       var el = document.getElementById(id);
       if (el) { el.addEventListener('input', render); el.addEventListener('change', render); }
     });
