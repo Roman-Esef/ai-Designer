@@ -82,7 +82,7 @@ status: curated
     <div class="chart__head">
       <div class="chart__titles">
         <div class="chart__title">Движение средств по месяцам</div>
-        <div class="chart__subtitle">руб.</div>
+        <div class="chart__subtitle">RUB</div>
       </div>
       <div class="chart__toolbar">
         <div class="segctrl segctrl--xs" role="radiogroup" aria-label="Период">…</div>

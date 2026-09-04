@@ -8,7 +8,8 @@
   /* ---------- chip factory ----------
      o: {
        type:'edit'|'readonly', style:'fill'|'outline', size:'l'|'m'|'s'|'xs',
-       tone:'system'|'accent'|'success'|'info'|'warning'|'error',
+       tone:'system'|'success'|'info'|'warning'|'error'|'green'|'lblue'|'orange'|'red'|'dpurple'|'grey'|'primary'|'accent'|'dark',
+       solid:bool — заливка base-тоном + белый текст (chip--<tone>-solid),
        label, leading:null|'marker'|'badge'|'avatar', leadingIcon, badgeText, avatarText,
        removable, dropdown, count, rounded, state:'default'|'selected'|'focus'|'loading'|'invalid',
        disabled, tooltip, maxWidth
@@ -18,7 +19,7 @@
       type = 'edit', style = 'fill', size = 's', tone = 'system',
       label = 'Text', leading = null, leadingIcon,
       avatarText = 'A', avatarContent = 'text', avatarIcon = null, avatarImgId = null,
-      removable = false, dropdown = false, count = null, rounded = false,
+      removable = false, dropdown = false, count = null, rounded = false, solid = false,
       state = 'default', disabled = false, tooltip = null, maxWidth = null,
     } = o;
     // marker defaults to a small status dot; a plain "icon" leading slot defaults to a pictographic glyph
@@ -29,7 +30,7 @@
     el.classList.add('chip--' + type);
     if (style === 'outline') el.classList.add('chip--outline');
     el.classList.add('chip--' + size);
-    if (tone && tone !== 'system') el.classList.add('chip--' + tone);
+    if (tone && tone !== 'system') el.classList.add('chip--' + tone + (solid ? '-solid' : ''));
     if (rounded) el.classList.add('chip--rounded');
     if (state === 'selected') el.classList.add('chip--selected');
     if (state === 'focus') el.classList.add('chip--edit', 'is-focus');
@@ -86,7 +87,7 @@
   /* ============================ PLAYGROUND ============================ */
   (function () {
     const state = {
-      type: 'edit', style: 'fill', size: 'm', tone: 'system',
+      type: 'edit', style: 'fill', size: 'm', tone: 'system', solid: false,
       leading: 'none', avatarContent: 'text', removable: true, dropdown: false, count: false, rounded: false, chipState: 'default',
     };
     const controls = document.getElementById('pg-controls');
@@ -120,7 +121,7 @@
     controls.appendChild(select('Тип', [['edit', 'Edit'], ['readonly', 'ReadOnly']], () => state.type, v => state.type = v));
     controls.appendChild(select('Стиль', [['fill', 'Fill (Border + Fill)'], ['outline', 'Outline (Border)']], () => state.style, v => state.style = v));
     controls.appendChild(select('Размер', [['l', 'L · 40'], ['m', 'M · 32'], ['s', 'S · 24'], ['xs', 'XS · 20']], () => state.size, v => state.size = v));
-    controls.appendChild(select('Тон', [['system', 'System'], ['accent', 'Accent'], ['success', 'Success'], ['info', 'Info'], ['warning', 'Warning'], ['error', 'Error'], ['dark', 'Dark'], ['success-solid', 'Success solid'], ['warning-solid', 'Warning solid'], ['error-solid', 'Error solid'], ['dark-solid', 'Dark solid']], () => state.tone, v => state.tone = v));
+    controls.appendChild(select('Тон', [['system', 'System'], ['success', 'Success'], ['info', 'Info'], ['warning', 'Warning'], ['error', 'Error'], ['green', 'Green'], ['lblue', 'LBlue'], ['orange', 'Orange'], ['red', 'Red'], ['dpurple', 'DPurple'], ['grey', 'Grey'], ['primary', 'Primary']], () => state.tone, v => state.tone = v));
     controls.appendChild(select('Дополнительный элемент', [['none', 'Нет'], ['marker', 'Маркер'], ['icon', 'Иконка'], ['avatar', 'Аватар']], () => state.leading, v => state.leading = v));
     const avatarCtl = select('Содержимое аватара', [['text', 'Текст'], ['icon', 'Иконка'], ['image', 'Фото']], () => state.avatarContent, v => state.avatarContent = v);
     controls.appendChild(avatarCtl);
@@ -135,6 +136,8 @@
     controls.appendChild(ddToggle);
     controls.appendChild(ctlToggle('Счётчик', 'count'));
     controls.appendChild(ctlToggle('Rounded', 'rounded'));
+    const solidCtl = ctlToggle('Solid', 'solid');
+    controls.appendChild(solidCtl);
 
     function render() {
       const disabled = state.chipState === 'disabled';
@@ -142,8 +145,10 @@
       rmToggle.classList.toggle('is-off', state.type !== 'edit');
       /* содержимое аватара — только когда выбран аватар */
       avatarCtl.classList.toggle('is-off', state.leading !== 'avatar');
+      /* solid — только у статусных тонов (у system solid нет) */
+      solidCtl.classList.toggle('is-off', state.tone === 'system');
       const o = {
-        type: state.type, style: state.style, size: state.size, tone: state.tone,
+        type: state.type, style: state.style, size: state.size, tone: state.tone, solid: state.solid,
         label: 'Text', leading: state.leading === 'none' ? null : state.leading,
         avatarContent: state.avatarContent, avatarText: 'И', avatarImgId: 'chip-pg-av-img',
         removable: state.removable && state.type === 'edit',
@@ -161,7 +166,7 @@
       const cls = ['chip', 'chip--' + state.type];
       if (state.style === 'outline') cls.push('chip--outline');
       cls.push('chip--' + state.size);
-      if (state.tone !== 'system') cls.push('chip--' + state.tone);
+      if (state.tone !== 'system') cls.push('chip--' + state.tone + (state.solid ? '-solid' : ''));
       if (state.rounded) cls.push('chip--rounded');
       if (state.chipState === 'selected') cls.push('chip--selected');
       if (state.chipState === 'invalid') cls.push('chip--invalid');
@@ -396,23 +401,32 @@
   /* ============================ TONES ============================ */
   (function () {
     const g = document.getElementById('tone-grid');
-    const tones = [
-      ['system', 'System', 'Нейтральный тег / маркер без статусной окраски'],
-      ['accent', 'Accent', 'Выбранный фильтр, активный параметр'],
+    const STATUS_TONES = [
       ['success', 'Success', 'Положительный статус: активна, в сети, оплачено'],
       ['info', 'Info', 'Информационный статус: в работе, новое'],
       ['warning', 'Warning', 'Требует внимания: ожидает, на проверке'],
       ['error', 'Error', 'Ошибка: просрочено, отклонено, заблокировано'],
-      ['dark', 'Dark', 'Нейтрально-«чёрный» статус на рампе StGrey (например, Чёрная зона в RiskMetric)'],
-      ['error-solid', 'Error solid', 'Solid-заливка: базовый StRed + белый текст — критичный акцент (Красная зона)'],
-      ['dark-solid', 'Dark solid', 'Solid-заливка: базовый StGrey + белый текст — нейтрально-«чёрная» (Чёрная зона)'],
+      ['green', 'Green', 'Тональный (просто цвет): зелёный — маркер категории'],
+      ['lblue', 'LBlue', 'Тональный (просто цвет): голубой — маркер категории'],
+      ['orange', 'Orange', 'Тональный (просто цвет): оранжевый — маркер категории'],
+      ['red', 'Red', 'Тональный (просто цвет): красный — маркер категории'],
+      ['dpurple', 'DPurple', 'Тональный (просто цвет): фиолетовый — маркер категории'],
+      ['grey', 'Grey', 'Тональный (просто цвет): серый — маркер категории'],
+      ['primary', 'Primary', 'Тональный (просто цвет): изумрудный — маркер категории'],
     ];
-    tones.forEach(([tone, nm, rl]) => {
+    // system — не статусный тон (нет solid); показываем отдельно
+    const sc = document.createElement('div'); sc.className = 'tone-cell';
+    sc.appendChild(makeChip({ type: 'edit', size: 'm', tone: 'system', label: 'System', leading: 'marker', removable: true }));
+    const sn = document.createElement('div'); sn.className = 'nm'; sn.textContent = 'System'; sc.appendChild(sn);
+    const sr = document.createElement('div'); sr.className = 'rl'; sr.textContent = 'Нейтральный тег / маркер без статусной окраски'; sc.appendChild(sr);
+    g.appendChild(sc);
+
+    STATUS_TONES.forEach(([tone, nm, rl]) => {
       const c = document.createElement('div'); c.className = 'tone-cell';
-      const isStatus = ['success', 'info', 'warning', 'error', 'dark', 'success-solid', 'warning-solid', 'error-solid', 'dark-solid'].includes(tone);
-      c.appendChild(makeChip({ type: 'edit', size: 'm', tone, label: nm, leading: 'marker', removable: true, rounded: isStatus }));
+      c.appendChild(makeChip({ type: 'edit', size: 'm', tone, label: nm, leading: 'marker', rounded: true }));
+      c.appendChild(makeChip({ type: 'edit', size: 'm', tone, label: nm, leading: 'marker', rounded: true, solid: true }));
       const n = document.createElement('div'); n.className = 'nm'; n.textContent = nm; c.appendChild(n);
-      const r = document.createElement('div'); r.className = 'rl'; r.textContent = rl; c.appendChild(r);
+      const r = document.createElement('div'); r.className = 'rl'; r.textContent = rl + ' · solid-заливка — тот же тон свитчом `-solid`'; c.appendChild(r);
       g.appendChild(c);
     });
   })();
@@ -559,12 +573,18 @@
         ['Текст', '--st-disabled-dark'], ['Иконки', '--st-disabled'],
       ] },
       { name: 'Статусы — фон (Light)', rows: [
-        ['Accent', '--st-primary-light'], ['Success', '--st-green-light'], ['Info', '--st-lblue-light'],
-        ['Warning', '--st-orange-light'], ['Error', '--st-red-light'],
+        ['System', '--st-system-light'],
+        ['Primary (accent)', '--st-primary-light'], ['Green (success)', '--st-green-light'], ['LBlue (info)', '--st-lblue-light'],
+        ['Orange (warning)', '--st-orange-light'], ['Red (error)', '--st-red-light'], ['DPurple', '--st-dpurple-light'], ['Grey (dark)', '--st-grey-light'],
       ] },
       { name: 'Статусы — текст (Dark)', rows: [
-        ['Accent', '--st-primary-dark'], ['Success', '--st-green-dark'], ['Info', '--st-lblue-dark'],
-        ['Warning', '--st-orange-dark'], ['Error', '--st-red-dark'],
+        ['System', '--st-system-dark'],
+        ['Primary (accent)', '--st-primary-dark'], ['Green (success)', '--st-green-dark'], ['LBlue (info)', '--st-lblue-dark'],
+        ['Orange (warning)', '--st-orange-dark'], ['Red (error)', '--st-red-dark'], ['DPurple', '--st-dpurple-dark'], ['Grey (dark)', '--st-grey-dark'],
+      ] },
+      { name: 'Solid — заливка (base) · белый текст', rows: [
+        ['Primary (accent)', '--st-primary'], ['Green (success)', '--st-green'], ['LBlue (info)', '--st-lblue'],
+        ['Orange (warning)', '--st-orange'], ['Red (error)', '--st-red'], ['DPurple', '--st-dpurple'], ['Grey (dark)', '--st-grey'],
       ] },
     ];
     document.getElementById('color-ref').innerHTML = groups.map(g => `

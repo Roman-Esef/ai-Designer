@@ -46,7 +46,7 @@ status: curated
 
 ```
 <div class="inp-range">
-  <label class="ds-label"><span class="ds-label__text">Сумма, ₽</span></label>
+  <label class="ds-label"><span class="ds-label__text">Сумма, RUB</span></label>
   <div class="inp-range__row">
     <div class="inp inp-range__field">
       <div class="inp__field">

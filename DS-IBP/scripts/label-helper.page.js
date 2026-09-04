@@ -156,7 +156,7 @@ function classListHelper(o){ return 'ds-helper ds-helper--' + o.align + (o.statu
       const wrap = document.createElement('div'); wrap.className = 'field-mock';
       if (showLabel) wrap.appendChild(makeLabel({ text:'Название поля', icons: state.icons, align, disabled: state.status==='disabled' }));
       const box = document.createElement('div'); box.className = 'field-mock__box' + (align==='right' ? ' is-right' : '') + (state.status==='disabled' ? ' is-disabled' : '') + (state.status==='error' ? ' is-error' : '');
-      box.textContent = align==='right' ? '120 000 ₽' : 'Введите значение';
+      box.textContent = align==='right' ? '120 000 RUB' : 'Введите значение';
       wrap.appendChild(box);
       if (showHelper) wrap.appendChild(makeHelper({ text: state.status==='error' ? 'Нужно выбрать хотя бы один вариант' : 'Подсказка к заполнению', align, status: state.status, icon: state.status==='error' && state.helperIcon }));
       preview.appendChild(wrap);
@@ -293,7 +293,7 @@ function classListHelper(o){ return 'ds-helper ds-helper--' + o.align + (o.statu
   const right = document.getElementById('helper-right');
   if (right) {
     right.appendChild(makeLabel({ text:'Сумма сделки', align:'right' }));
-    const box = document.createElement('div'); box.className='field-mock__box is-right'; box.textContent='120 000 ₽'; right.appendChild(box);
+    const box = document.createElement('div'); box.className='field-mock__box is-right'; box.textContent='120 000 RUB'; right.appendChild(box);
     right.appendChild(makeHelper({ text:'С учётом комиссии', align:'right' }));
   }
   const errPlain = document.getElementById('helper-error-plain');

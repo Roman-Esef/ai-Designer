@@ -62,7 +62,7 @@ function initExamples() {
     series: [{ id: 'in', name: 'Поступления', data: IN.slice(6) }]
   }));
   mount('use-page', base({
-    size: 'l', type: 'combo', title: 'Движение средств по месяцам', subtitle: 'Поступления и списания, руб.',
+    size: 'l', type: 'combo', title: 'Движение средств по месяцам', subtitle: 'Поступления и списания, RUB',
     series: [
       { id: 'in', name: 'Поступления', data: IN, type: 'bar' },
       { id: 'out', name: 'Списания', data: OUT, type: 'bar' },
@@ -73,7 +73,7 @@ function initExamples() {
 
   /* --- анатомия --- */
   mount('anat-stage', base({
-    size: 'm', title: 'Движение средств', subtitle: 'по месяцам, руб.',
+    size: 'm', title: 'Движение средств', subtitle: 'по месяцам, RUB',
     categories: M12.slice(0, 8),
     series: [
       { id: 'in', name: 'Поступления', data: IN.slice(0, 8) },
@@ -336,7 +336,7 @@ function initPlayground() {
       legend: state.legend === 'no' ? false : (state.legend === 'bottom' ? 'bottom' : true),
       tooltip: state.tooltip === 'yes', crosshair: state.crosshair === 'yes',
       grid: state.grid, valueLabels: state.labels === 'yes',
-      brush: state.brush === 'yes', title: 'Движение средств', subtitle: 'по месяцам, руб.',
+      brush: state.brush === 'yes', title: 'Движение средств', subtitle: 'по месяцам, RUB',
       categories: cats, series: series
     };
     if (state.ref === 'yes') cfg.refLine = { value: 550e6, label: 'Цель' };

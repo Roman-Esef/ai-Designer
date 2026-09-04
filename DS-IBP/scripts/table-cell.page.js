@@ -120,7 +120,7 @@
   function valueRow(cfg) {
     var lead = cfg.leadOn ? '<span class="tc__icon tc__icon--lead">' + icon(cfg.leadGlyph, 16) + '</span>' : '';
     var pre = cfg.prefixOn ? '<span class="tc__prefix">' + esc(cfg.prefixText || 'от') + '</span>' : '';
-    var post = cfg.postfixOn ? '<span class="tc__postfix">' + esc(cfg.postfixText || '₽') + '</span>' : '';
+    var post = cfg.postfixOn ? '<span class="tc__postfix">' + esc(cfg.postfixText || 'RUB') + '</span>' : '';
     var ico = cfg.iconOn ? '<span class="tc__icon">' + icon(cfg.iconGlyph, 16) + '</span>' : '';
     var text = '<span class="tc__text' + (cfg.truncate ? ' tc__text--truncate' : '') + '">' + esc(cfg.text) + '</span>';
     return '<span class="tc__row">' + lead + pre + text + post + ico + '</span>';
@@ -606,7 +606,7 @@
 
   function render() {
     var html = '<div class="tbl__row" style="grid-template-columns:8px 1fr 1fr 1fr 8px;"><div class="th th--separator"></div>' +
-      '<div class="th"><span class="th__label">Контрагент</span></div><div class="th th--right"><span class="th__label">Сумма, ₽</span></div>' +
+      '<div class="th"><span class="th__label">Контрагент</span></div><div class="th th--right"><span class="th__label">Сумма, RUB</span></div>' +
       '<div class="th"><span class="th__label">Дата</span></div><div class="th th--separator"></div></div>';
     data.forEach(function (r, ri) {
       html += '<div class="tbl__row" style="grid-template-columns:8px 1fr 1fr 1fr 8px;"><div class="tc tc--separator"></div>';
@@ -658,7 +658,7 @@
   var cols = [
     { k: 'name',   t: 'Контрагент', w: 240 },
     { k: 'status', t: 'Статус',     w: 150 },
-    { k: 'sum',    t: 'Сумма, ₽',   w: 160, num: true },
+    { k: 'sum',    t: 'Сумма, RUB',   w: 160, num: true },
     { k: 'date',   t: 'Дата',       w: 130 },
     { k: 'mgr',    t: 'Менеджер',   w: 180 }
   ];

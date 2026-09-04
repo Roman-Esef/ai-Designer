@@ -1,11 +1,21 @@
 /* =========================================================================
    tbl-pin.js — закрепление колонок таблицы (out-of-box).
 
-   CSS `position: sticky` не работает для колонок в grid-раскладке
-   (.tbl__row — display:grid; sticky-элемент ограничен своей grid-областью,
-   т.е. собственной колонкой). Поэтому закрепление реализовано JS-ом:
-   закреплённые колонки при горизонтальном скролле контейнера получают
-   transform: translateX и удерживаются у краёв.
+   Удержание колонок — НАТИВНЫЙ CSS position: sticky (см. table-cell.css).
+   Рантайм считает только ИНСЕТЫ: для лево-закреплённой колонки `left` =
+   суммарная ширина закреплённых колонок левее, для колонки хвостового правого
+   блока `right` = суммарная ширина закреплённых колонок правее. Пишутся
+   инлайном и пересчитываются ТОЛЬКО когда меняется состав или ширины колонок
+   (закрепление, перенос, ресайз колонки, ресайз окна) — на скролл рантайм не
+   реагирует вовсе.
+
+   Почему не transform (было до 04.09.2026): удержание через translateX на
+   событии `scroll` всегда опаздывает на кадр — скролл применяет компоновщик
+   до того, как выполнится JS-обработчик. Закреплённая колонка каждый кадр
+   уезжала с контентом и возвращалась следующим кадром. На Windows дискретное
+   колесо это скрывало (коррекция успевала в паузу между щелчками), на трекпаде
+   macOS с инерционным докрутом ошибка показывалась на каждом кадре подряд и
+   читалась как дрожание закреплённых колонок.
 
    Поведение:
    1. Тогл закрепления — клик по .th__pin в шапке: переключает
@@ -17,19 +27,18 @@
         «упирается» в левый край (или в закреплённую колонку левее);
       - right-pinned — колонка входит в ХВОСТОВОЙ блок (все колонки правее
         тоже закреплены): удерживается у правого края.
-    3. Сепаратор (.th--separator/.tc--separator) прилипает вместе с примыкающей
+   3. Сепаратор (.th--separator/.tc--separator) прилипает вместе с примыкающей
       закреплённой колонкой: левый крайний сепаратор — если закреплена первая
       колонка (остаётся у левого края, колонка — за ним), правый крайний —
       если закреплена последняя (у правого края). Прилипший сепаратор несёт
       data-pin-side="left"/"right" и получает заливку --bgtable-pinned
       (см. table-cell.css) — сливается с закреплённой колонкой в сплошную полосу.
-    4. Удержание через transform НЕ должно сужать ширину прокрутки: иначе браузер
-      считает scrollWidth по визуальным (трансформированным) боксам, полоса
-      прокрутки «не доезжает» до естественной позиции закреплённой колонки,
-      и она перекрывает соседние слева ровно на свою ширину. Резерв полной
-      ширины строки — `.tbl__row { min-width: max-content }` (table-cell.css).
-    5. Пересчёт на resize/columnreorder/columnpin — при следующем скролле
-      (ширины меряются заново), плюс на window resize.
+   4. Строка обязана быть ШИРЕ скроллпорта, иначе прокручивать нечего и sticky
+      не даёт ничего. Резерв полной ширины строки — `.tbl__row { min-width:
+      max-content }` (table-cell.css), только у .tbl--scroll / .dtable__body.
+   5. Пересчёт инсетов: 'columnpin', 'columnreorder', resize окна и
+      ResizeObserver по ячейкам шапки (ресайз колонки из tbl-resize.js своего
+      события не шлёт — ловим наблюдателем).
 
    Экспорт: window.DSTablePin = { bind(tbl), bindAll(root), apply(tbl) }.
    Автоподключение: любой .tbl на странице (делегирование, как tbl-reorder).
@@ -41,38 +50,19 @@
     return el && el.closest ? el.closest('.tbl') : null;
   }
 
-  /* фактический горизонтальный скроллпорт таблицы: ближайший предок .tbl
-     (до .dtable), который реально скроллится по горизонтали; фолбэк —
-     .dtable__body или сам .tbl */
-  function hScrollport(tbl) {
-    var el = tbl;
-    while (el && !(el.classList && el.classList.contains('dtable'))) {
-      if (el.scrollWidth > el.clientWidth + 1) {
-        var cs = window.getComputedStyle(el);
-        if (cs.overflowX === 'auto' || cs.overflowX === 'scroll') return el;
-      }
-      el = el.parentElement;
-    }
-    var body = tbl.closest('.dtable__body');
-    return body || tbl;
-  }
-
-  /* анализ шапки: ширина/префиксы ячеек, разделители, закреплённые,
-     классификация (левый/правый блок) и «прилипшие» сепараторы */
+  /* анализ шапки: ширины ячеек, разделители, закреплённые, классификация
+     (левый/правый блок), «прилипшие» сепараторы и целевые инсеты */
   function analyze(headerRow) {
     var M = headerRow.children.length;
-    var width = [], isSep = [], isPin = [], prefix = [], data = [];
-    var i, acc = 0, c;
+    var width = [], isSep = [], isPin = [], data = [];
+    var i, c;
     for (i = 0; i < M; i++) {
       c = headerRow.children[i];
       isSep[i] = c.classList.contains('th--separator');
       isPin[i] = c.classList.contains('th--pinned');
       width[i] = c.getBoundingClientRect().width || 0;
-      prefix[i] = acc;
-      acc += width[i];
       if (!isSep[i]) data.push(i);
     }
-    var contentW = acc;
 
     /* правый блок = хвостовой непрерывный блок закреплённых (справа налево) */
     var rightBlock = {};
@@ -93,7 +83,7 @@
     var stickL = sepL >= 0 && firstData !== undefined && isPin[firstData];
     var stickR = sepR >= 0 && lastData !== undefined && isPin[lastData];
 
-    /* целевая левая позиция для left-pinned колонок (включая прилипший сепаратор) */
+    /* инсет left для left-pinned колонок (включая прилипший сепаратор) */
     var leftTarget = [], j, di, dj;
     var cumL = stickL ? width[sepL] : 0;
     for (j = 0; j < data.length; j++) {
@@ -110,7 +100,7 @@
       if (isPin[di] && !rightBlock[di]) { leftBoundary[di] = true; break; }
     }
 
-    /* отступ от правого края для right-pinned колонок (с прилипшим сепаратором) */
+    /* инсет right для right-pinned колонок (с прилипшим сепаратором) */
     var rightGap = [];
     var cumR = stickR ? width[sepR] : 0;
     for (j = data.length - 1; j >= 0; j--) {
@@ -120,8 +110,8 @@
     if (stickR) rightGap[sepR] = 0;
 
     return {
-      M: M, width: width, isSep: isSep, isPin: isPin, prefix: prefix,
-      contentW: contentW, rightBlock: rightBlock, rightBoundary: rightBoundary,
+      M: M, width: width, isSep: isSep, isPin: isPin,
+      rightBlock: rightBlock, rightBoundary: rightBoundary,
       leftBoundary: leftBoundary,
       sepL: stickL ? sepL : -1, sepR: stickR ? sepR : -1,
       leftTarget: leftTarget, rightGap: rightGap
@@ -133,60 +123,52 @@
     return false;
   }
 
-  function clearAllTransforms(tbl) {
+  /* сброс всего, что рантайм мог написать ячейке (включая transform от
+     предыдущей реализации — страницы могли остаться с инлайном в разметке) */
+  function resetCell(cell) {
+    if (cell.style.left) cell.style.left = '';
+    if (cell.style.right) cell.style.right = '';
+    if (cell.style.transform && /translateX/.test(cell.style.transform)) cell.style.transform = '';
+    if (cell.dataset.pinSide) delete cell.dataset.pinSide;
+  }
+
+  function clearAll(tbl) {
     tbl.querySelectorAll('.tbl__row').forEach(function (row) {
-      Array.prototype.forEach.call(row.children, function (cell) {
-        if (cell.style.transform && /translateX/.test(cell.style.transform)) cell.style.transform = '';
-        if (cell.dataset.pinSide) delete cell.dataset.pinSide;
-      });
+      Array.prototype.forEach.call(row.children, resetCell);
     });
   }
 
-  function applySticky(tbl) {
+  function applyPin(tbl) {
     var headerRow = tbl.querySelector('.tbl__row');
     if (!headerRow) return;
-    var scroller = tbl.__dsTblScroller;
-    if (!scroller) return;
     var rows = tbl.querySelectorAll('.tbl__row');
 
     var A = analyze(headerRow);
-    if (!hasPinned(A)) { clearAllTransforms(tbl); return; }
+    if (!hasPinned(A)) { clearAll(tbl); return; }
 
-    var scrollLeft = scroller.scrollLeft || 0;
-    var clientW = scroller.clientWidth || 0;
-
-    /* transform по каждому индексу строки */
-    var trList = [];
-    for (var i = 0; i < A.M; i++) {
-      var t = '';
-      var rightEdge = A.prefix[i] + A.width[i];
+    /* инсеты по индексу колонки — одинаковы для шапки и всех строк */
+    var insL = [], insR = [], i;
+    for (i = 0; i < A.M; i++) {
+      insL[i] = ''; insR[i] = '';
       if (A.isPin[i] && !A.isSep[i]) {
-        if (A.rightBlock[i]) {
-          /* right-pinned: держим правый край у clientW − rightGap */
-          var dxR = clientW - (A.rightGap[i] !== undefined ? A.rightGap[i] : 0) - rightEdge + scrollLeft;
-          t = dxR < 0 ? 'translateX(' + dxR + 'px)' : '';
-        } else {
-          /* left-pinned: держим левый край у leftTarget */
-          var dxL = (A.leftTarget[i] !== undefined ? A.leftTarget[i] : 0) - A.prefix[i] + scrollLeft;
-          t = dxL > 0 ? 'translateX(' + dxL + 'px)' : '';
-        }
+        if (A.rightBlock[i]) insR[i] = (A.rightGap[i] || 0) + 'px';
+        else insL[i] = (A.leftTarget[i] || 0) + 'px';
       } else if (i === A.sepL) {
-        /* прилипший левый сепаратор — у левого края (x=0) */
-        var dxSL = 0 - A.prefix[i] + scrollLeft;
-        t = dxSL > 0 ? 'translateX(' + dxSL + 'px)' : '';
+        insL[i] = '0px';               /* прилипший левый сепаратор — у левого края */
       } else if (i === A.sepR) {
-        /* прилипший правый сепаратор — у правого края */
-        var dxSR = clientW - rightEdge + scrollLeft;
-        t = dxSR < 0 ? 'translateX(' + dxSR + 'px)' : '';
+        insR[i] = '0px';               /* прилипший правый сепаратор — у правого края */
       }
-      trList[i] = t;
     }
 
     rows.forEach(function (row) {
       for (var i = 0; i < A.M && i < row.children.length; i++) {
         var cell = row.children[i];
         if (!cell) continue;
-        cell.style.transform = trList[i];
+        cell.style.left = insL[i];
+        cell.style.right = insR[i];
+        /* наследие transform-реализации: инлайн мог остаться в разметке экрана */
+        if (cell.style.transform && /translateX/.test(cell.style.transform)) cell.style.transform = '';
+
         if (A.isPin[i] && !A.isSep[i]) {
           /* data-pin-side — только граничной колонке блока (тень-разделитель):
              right -> левой границе правого блока (тень слева),
@@ -198,11 +180,9 @@
           if (side) cell.dataset.pinSide = side;
           else if (cell.dataset.pinSide) delete cell.dataset.pinSide;
         } else if (A.isSep[i] && (i === A.sepL || i === A.sepR)) {
-          /* прилипший сепаратор несёт data-pin-side — заливка как закреплённая
-             ячейка (см. table-cell.css): левый — 'left', правый — 'right'.
-             Прилипание = факт попадания в ветку (i === sepL/sepR, что выводится
-             из «первая/последняя колонка закреплена»), а НЕ активный transform:
-             в покое у сепаратора transform пуст, но заливка нужна всегда */
+          /* прилипший сепаратор несёт data-pin-side — он и включает ему
+             position: sticky, и красит как закреплённую ячейку
+             (см. table-cell.css): левый — 'left', правый — 'right' */
           cell.dataset.pinSide = (i === A.sepL) ? 'left' : 'right';
         } else if (cell.dataset.pinSide) {
           delete cell.dataset.pinSide;
@@ -211,26 +191,34 @@
     });
   }
 
-  function wireSticky(tbl) {
+  function wirePin(tbl) {
     if (tbl.__dsTblPin) return;
     tbl.__dsTblPin = true;
 
-    var scroller = hScrollport(tbl);
-    tbl.__dsTblScroller = scroller;
-
-    var raf = false;
-    scroller.addEventListener('scroll', function () {
+    /* пересчёт инсетов дешёвый, но дёргает layout — коалесцируем в кадр */
+    var raf = 0;
+    function schedule() {
       if (raf) return;
-      raf = true;
-      requestAnimationFrame(function () {
-        raf = false;
-        applySticky(tbl);
-      });
-    });
-    window.addEventListener('resize', function () { applySticky(tbl); });
-    /* перенос колонок/закрепление меняют состав и ширины — пересчитываем */
-    tbl.addEventListener('columnreorder', function () { applySticky(tbl); });
-    applySticky(tbl);
+      raf = requestAnimationFrame(function () { raf = 0; applyPin(tbl); });
+    }
+
+    window.addEventListener('resize', schedule);
+    /* перенос колонок и закрепление меняют состав — пересчитываем */
+    tbl.addEventListener('columnreorder', schedule);
+    tbl.addEventListener('columnpin', schedule);
+
+    /* ресайз колонки (tbl-resize.js) своего события не шлёт, а суммарная ширина
+       строки при этом может не измениться — наблюдаем ячейки шапки поимённо.
+       applyPin пишет только инсеты sticky-ячеек, размеров не меняет, поэтому
+       цикла наблюдателя тут быть не может. */
+    var headerRow = tbl.querySelector('.tbl__row');
+    if (headerRow && window.ResizeObserver) {
+      var ro = new ResizeObserver(schedule);
+      Array.prototype.forEach.call(headerRow.children, function (c) { ro.observe(c); });
+      tbl.__dsTblPinRO = ro;
+    }
+
+    applyPin(tbl);
   }
 
   /* тогл закрепления: клик по .th__pin в шапке */
@@ -251,10 +239,7 @@
       if (!cell) return;
       if (cell.classList.contains('th')) cell.classList.toggle('th--pinned', on);
       else cell.classList.toggle('tc--pinned', on);
-      if (!on) {
-        if (cell.style.transform) cell.style.transform = '';
-        if (cell.dataset.pinSide) delete cell.dataset.pinSide;
-      }
+      if (!on) resetCell(cell);
     });
 
     pin.setAttribute('aria-pressed', String(on));
@@ -268,12 +253,12 @@
     }
 
     tbl.dispatchEvent(new CustomEvent('columnpin', { bubbles: true, detail: { column: idx, pinned: on } }));
-    applySticky(tbl);
+    applyPin(tbl);
   });
 
   function bind(tbl) {
     if (!tbl) return;
-    wireSticky(tbl);
+    wirePin(tbl);
   }
   function bindAll(root) {
     (root || document).querySelectorAll('.tbl').forEach(bind);
@@ -283,5 +268,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  window.DSTablePin = { bind: bind, bindAll: bindAll, apply: applySticky };
+  window.DSTablePin = { bind: bind, bindAll: bindAll, apply: applyPin };
 })();

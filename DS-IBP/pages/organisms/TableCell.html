@@ -130,7 +130,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     Обзор компонентов
   </a>
   <div class="meta">
-    <span>Версия <b>2.011</b></span>
+    <span>Версия <b>2.013</b></span>
     <span>Обновлено <b>04.09.2026</b></span>
     <span>CSS <b>styles/table-cell.css</b></span>
     <span>Зависимости <b>checkbox, chip, icon-button, button, input, dropdown-list, tooltip, chart</b></span>
@@ -156,7 +156,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
         <div class="th th--center"><label class="cb cb--no-content cb--indeterminate"><input type="checkbox" class="cb__input" aria-label="Выбрать все строки"><span class="cb__box"><span class="cb__mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg></span></span></label><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
         <div class="th"><span class="th__label">Контрагент</span><span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-label="Закрепить колонку" aria-pressed="false"><i data-icon="pin"></i></button><button class="ibtn ibtn--neutral ibtn--s th__sort" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button></span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
         <div class="th"><span class="th__label">Статус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
-        <div class="th th--right th--sorted" aria-sort="descending"><span class="th__label">Сумма, ₽</span><span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" aria-label="Сортировка от большего к меньшему"><i data-icon="arrow-narrow-down"></i></button></span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+        <div class="th th--right th--sorted" aria-sort="descending"><span class="th__label">Сумма, RUB</span><span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" aria-label="Сортировка от большего к меньшему"><i data-icon="arrow-narrow-down"></i></button></span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
         <div class="th th--center"><span class="th__label">Действия</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
         <div class="th th--separator"></div>
       </div>
@@ -458,7 +458,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
 
 <div class="subsec" data-screen-label="Pinned">
     <h3>Закрепление колонки</h3>
-    <p class="desc">Закрепление — свойство <b>колонки</b>, а не отдельной ячейки: оно красит фоном Pinned и шапку, и все ячейки под ней, и оставляет колонку на месте при горизонтальном скролле. Взаимодействие — <b>из коробки</b>: клик по иконке <b>pin</b> в шапке закрепляет/открепляет колонку (рантайм <code class="tok">tbl-pin.js</code>); закреплённая колонка показывает <b>pin-filled</b> в тоне <code class="tok">--secondary-dark</code> постоянно. Удержание при скролле делает JS (<code class="tok">transform: translateX</code>) — CSS <code class="tok">position:sticky</code> для колонок grid-раскладки не работает. Закрепление не переносит колонку в начало.</p>
+    <p class="desc">Закрепление — свойство <b>колонки</b>, а не отдельной ячейки: оно красит фоном Pinned и шапку, и все ячейки под ней, и оставляет колонку на месте при горизонтальном скролле. Взаимодействие — <b>из коробки</b>: клик по иконке <b>pin</b> в шапке закрепляет/открепляет колонку (рантайм <code class="tok">tbl-pin.js</code>); закреплённая колонка показывает <b>pin-filled</b> в тоне <code class="tok">--secondary-dark</code> постоянно. Удержание при скролле — нативный CSS <code class="tok">position: sticky</code>; рантайм считает только инсеты <code class="tok">left</code>/<code class="tok">right</code> и пишет их инлайном при изменении состава или ширин колонок, а на сам скролл не реагирует. Закрепление не переносит колонку в начало.</p>
     <ul class="rules">
       <li><b>Left-pinned</b> — колонка не в хвостовом блоке: при скролле «упирается» в левый край контейнера или в закреплённую колонку левее.</li>
       <li><b>Right-pinned</b> — закреплённая колонка, у которой все колонки правее тоже закреплены (хвостовой блок): удерживается у правого края; тень-разделитель слева. Если правее появилась незакреплённая колонка — снова left-pinned.</li>
@@ -467,13 +467,14 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     </ul>
     <p class="desc">Фон закреплённой колонки стабилен — hover-затемнения у шапки нет. Если у колонки нет сортировки, закрепление занимает её место.</p>
     <p class="desc">Тень-разделитель блока — только на граничной колонке: у лево-закреплённого блока справа (<code class="tok">data-pin-side="left"</code>), у право-закреплённого слева (<code class="tok">data-pin-side="right"</code>). Внутренние колонки блока и сепаратор тени не несут — сливаются в сплошную полосу.</p>
-    <p class="desc">Удержание через <code class="tok">transform: translateX</code> не сужает ширину прокрутки: <code class="tok">.tbl__row { min-width: max-content }</code> резервирует полную ширину строки. Иначе браузер считает <code class="tok">scrollWidth</code> по визуальным (трансформированным) боксам, полоса прокрутки «не доезжает» до естественной позиции закреплённой колонки, и она перекрывает соседние слева ровно на свою ширину.</p>
+    <p class="desc">Условие работы закрепления — строка ШИРЕ скроллпорта: <code class="tok">.tbl__row { min-width: max-content }</code> резервирует полную ширину строки (только у <code class="tok">.tbl--scroll</code> и <code class="tok">.dtable__body</code>). Без него grid ужимает треки под контейнер, <code class="tok">scrollWidth === clientWidth</code>, прокручивать нечего — и sticky не даёт ничего.</p>
+    <p class="desc"><b>Почему не JS.</b> До 04.09.2026 колонки удерживались через <code class="tok">transform: translateX</code> на событии <code class="tok">scroll</code>. Скролл применяет компоновщик браузера, и он попадает в кадр РАНЬШЕ обработчика, поэтому закреплённая колонка каждый кадр уезжала вместе с контентом и возвращалась следующим. Дискретное колесо мыши это скрывало — коррекция успевала в паузу между щелчками; на трекпаде macOS (непрерывные дельты + инерционный докрут) ошибка показывалась на каждом кадре подряд и читалась как дрожание закреплённых колонок. Нативный sticky обрабатывается вместе со скроллом в одном кадре и этой гонки не имеет.</p>
     <div class="panel pin-demo" style="margin-top:14px;">
       <div class="tbl tbl--scroll">
         <div class="tbl__row" style="grid-template-columns:8px 200px 160px 160px 160px 8px;">
           <div class="th th--separator"></div>
           <div class="th th--pinned" aria-sort="none"><span class="th__label">Контрагент</span><span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-label="Открепить колонку" aria-pressed="true"><i data-icon="pin-filled"></i></button><button class="ibtn ibtn--neutral ibtn--s th__sort" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button></span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
-          <div class="th th--right"><span class="th__label">Лимит, ₽</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+          <div class="th th--right"><span class="th__label">Лимит, RUB</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
           <div class="th th--right"><span class="th__label">Задолженность</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
           <div class="th th--right"><span class="th__label">Просрочка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
           <div class="th th--separator"></div>
@@ -858,7 +859,7 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
                     <div class="ctl" id="ctl-postfix-wrap">
                       <div class="lbl">Postfix</div>
                       <label class="pg-toggle"><input id="ctl-postfix-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать</span></label>
-                      <div class="pg-text"><input id="ctl-postfix-text" type="text" placeholder="₽" maxlength="16"></div>
+                      <div class="pg-text"><input id="ctl-postfix-text" type="text" placeholder="RUB" maxlength="16"></div>
                     </div>
                     <div class="ctl" id="ctl-icon-wrap">
                       <div class="lbl">Иконка справа</div>
@@ -979,7 +980,7 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
       <span class="tc__icon tc__icon--lead"><i data-icon="info-circle"></i></span>
       <span class="tc__prefix">от</span>
       <span class="tc__text tc__text--truncate">Значение</span>
-      <span class="tc__postfix">₽</span>
+      <span class="tc__postfix">RUB</span>
       <span class="tc__icon tc__icon--warning"><i data-icon="alert-triangle"></i></span>
     </span>
   </div>
@@ -996,7 +997,7 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
 <div class="tc tc--skeleton" aria-busy="true"><span class="sk-line sk-line--caption" style="--sk-w:60%"></span></div>
 
 <div class="th th--sorted th--pinned" aria-sort="descending">
-  <span class="th__label">Сумма, ₽</span>
+  <span class="th__label">Сумма, RUB</span>
   <span class="th__tools">
     <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="true" aria-label="Открепить колонку"><i data-icon="pin-filled"></i></button>
     <button class="ibtn ibtn--neutral ibtn--s th__sort" aria-label="Сортировка от большего к меньшему"><i data-icon="arrow-narrow-down"></i></button>
@@ -1491,10 +1492,10 @@ DSTable.wireAll(document);
 .tbl__row { display: grid; }
 /* min-width: max-content — ТОЛЬКО у прокручиваемой по горизонтали таблицы.
    Там строка обязана резервировать полную ширину контента (сумму треков):
-   иначе transform: translateX на закреплённых ячейках двигает их визуально,
-   браузер считает scrollWidth по визуальным (трансформированным) боксам,
-   полоса прокрутки «не доезжает» до естественной позиции закреплённой колонки,
-   и она перекрывает соседние слева ровно на свою ширину.
+   иначе grid ужимает треки под ширину контейнера, scrollWidth === clientWidth,
+   прокручивать нечего — и position: sticky на колонках не даёт ничего (ездить
+   не от чего). Это же правило раньше держало корректный scrollWidth при
+   удержании колонок через transform.
    Таблице БЕЗ горизонтального скролла это правило вредит: под max-content
    доля-трек (fr) разворачивается по содержимому, колонка растягивается под
    самый длинный текст, усечение (.tc__text--truncate) не срабатывает вовсе,
@@ -1504,13 +1505,30 @@ DSTable.wireAll(document);
 .dtable__body .tbl__row { min-width: max-content; }
 .tbl__row:last-child .tc { border-bottom: none; }
 
-/* закреплённая колонка не уезжает при горизонтальном скролле таблицы.
-   CSS position:sticky для колонок grid-раскладки не работает (sticky-элемент
-   ограничен своей grid-областью = собственной колонкой) — позиционирование
-   ведёт рантайм tbl-pin.js (transform: translateX). Здесь — фон, z-index
-   (закреплённая колонка поверх скроллящегося контента) и тень-разделитель
-   по правому краю закреплённой колонки. */
+/* закреплённая колонка не уезжает при горизонтальном скролле таблицы —
+   НАТИВНЫЙ position: sticky. Раньше здесь стояло удержание через
+   transform: translateX из tbl-pin.js на событие scroll: скролл в браузере
+   обрабатывается компоновщиком и попадает в кадр РАНЬШЕ обработчика, поэтому
+   закреплённая колонка каждый кадр уезжала вместе с контентом и возвращалась
+   на место следующим кадром. На Windows дискретное колесо это скрывало, на
+   трекпаде macOS (непрерывные дельты + инерция) читалось как дрожание
+   (инцидент 04.09.2026).
+   Старое обоснование «sticky не работает для колонок grid-раскладки» неверно:
+   ограничение по grid-области не мешает, проверено — многоколоночное левое
+   закрепление и хвостовой правый блок держатся штатно. Условие одно —
+   строка шире скроллпорта (min-width: max-content выше).
+   Смещения (left/right) пишет инлайном tbl-pin.js — один раз на изменение
+   состава/ширин колонок, НЕ на скролл. Здесь — position, z-index (колонка
+   поверх скроллящегося контента) и тень-разделитель. */
 .tbl--scroll { overflow-x: auto; }
+/* sticky у всех закреплённых ячеек и у прилипшего сепаратора (у сепаратора
+   data-pin-side есть ровно тогда, когда он прилип к закреплённой крайней
+   колонке). Инсет без значения = auto, ячейка стоит на своём месте — до
+   первой записи left/right рантаймом это безопасно. */
+.tc--pinned,
+.th--pinned,
+.tc--separator[data-pin-side],
+.th--separator[data-pin-side] { position: sticky; }
 /* Тень-разделитель — только НА ГРАНИЧНЫХ колонках блока, не на внутренних:
    лево-закреплённый блок держит правую тень у СВОЕЙ правой границы
    (data-pin-side="left"), право-закреплённый — левую тень у левой границы
@@ -1539,7 +1557,9 @@ DSTable.wireAll(document);
 .tc--separator[data-pin-side] { z-index: 1; }
 .th--separator[data-pin-side] { z-index: 3; }
 .dtable__body .th--separator[data-pin-side] { z-index: 4; }
-.tbl--scroll .th--pinned { position: sticky; top: 0; } /* вертикальная липкость шапки сохраняется; горизонталь — JS */
+/* шапка липнет по двум осям сразу: top — из этого правила (или из
+   `.dtable__body .th` в table.css), left/right — инлайном от tbl-pin.js */
+.tbl--scroll .th--pinned { top: 0; }
 
 /* ================================================================== */
 /* динамика: спарклайн в ячейке — компонент Chart (type:'spark'),      */

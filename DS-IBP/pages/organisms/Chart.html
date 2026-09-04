@@ -231,7 +231,7 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;col
 
     <div class="panel">
       <ul class="rules">
-        <li><b>Заголовок</b> — что показано и в чём измеряется («Движение средств по месяцам, руб.»); единицу выносите в подзаголовок, а не в подписи оси.</li>
+        <li><b>Заголовок</b> — что показано и в чём измеряется («Движение средств по месяцам, RUB»); единицу выносите в подзаголовок, а не в подписи оси.</li>
         <li><b>Категории</b> — короткие: «Янв», «I кв.», «2025». Длинные названия — повод взять горизонтальные столбцы.</li>
         <li><b>Иконографика.</b> Внутри поля построения иконок нет. В тулбаре — только глифы ДС через <code class="tok">&lt;i data-icon&gt;</code>; экспорт — <code class="tok">download</code>.</li>
         <li><b>Нули и пропуски различаются.</b> Ноль — точка на нулевой линии, пропуск — разрыв ряда. Подменять <code class="tok">null</code> нулём нельзя.</li>
@@ -513,7 +513,7 @@ window.DS_SPLIT_SWITCH_LABELS = {
     <div class="chart__head">
       <div class="chart__titles">
         <div class="chart__title">Движение средств по месяцам</div>
-        <div class="chart__subtitle">руб.</div>
+        <div class="chart__subtitle">RUB</div>
       </div>
       <div class="chart__toolbar">
         <div class="segctrl segctrl--xs" role="radiogroup" aria-label="Период">…</div>
@@ -550,7 +550,7 @@ window.DS_SPLIT_SWITCH_LABELS = {
 <script type="text/plain" id="src-code-js">/* Chart — разметку строит рантайм scripts/ds-chart.js (window.DSChart). */
 
 const c = DSChart.make({
-  type: 'bar', size: 'm', title: 'Движение средств по месяцам', subtitle: 'руб.',
+  type: 'bar', size: 'm', title: 'Движение средств по месяцам', subtitle: 'RUB',
   categories: [...], series: [{ id: 'in', name: 'Поступления', data: [...] }],
   legend: 'top', tooltip: true, crosshair: false, grid: 'y', valueLabels: false,
   refLine: null, brush: false, toolbar: false, format: 'compact',

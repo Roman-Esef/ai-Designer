@@ -97,11 +97,11 @@
   /* =========================== USAGE =========================== */
   (function () {
     const form = document.getElementById('use-form');
-    if (form) form.appendChild(range({ label: 'Сумма сделки, ₽', helper: 'Диапазон «от» и «до»', from: { value: '100 000', live: true }, to: { value: '5 000 000', live: true } }));
+    if (form) form.appendChild(range({ label: 'Сумма сделки, RUB', helper: 'Диапазон «от» и «до»', from: { value: '100 000', live: true }, to: { value: '5 000 000', live: true } }));
     const empty = document.getElementById('use-empty');
-    if (empty) empty.appendChild(range({ label: 'Сумма, ₽', helper: 'Оба поля опциональны', from: { live: true }, to: { live: true } }));
+    if (empty) empty.appendChild(range({ label: 'Сумма, RUB', helper: 'Оба поля опциональны', from: { live: true }, to: { live: true } }));
     const one = document.getElementById('use-one');
-    if (one) one.appendChild(range({ label: 'Сумма, ₽', helper: 'Открытая граница — заполнено одно поле', from: { value: '250 000', live: true }, to: { live: true } }));
+    if (one) one.appendChild(range({ label: 'Сумма, RUB', helper: 'Открытая граница — заполнено одно поле', from: { value: '250 000', live: true }, to: { live: true } }));
   })();
 
   /* =========================== ANATOMY =========================== */
@@ -139,8 +139,8 @@
   (function () {
     const g = document.getElementById('content-demo');
     if (!g) return;
-    g.appendChild(cell('Префикс всегда присутствует', range({ label: 'Сумма, ₽', helper: 'Префиксы «От» / «До» неизменяемы', from: { value: '9 999', live: true }, to: { value: '9 999', live: true } })));
-    g.appendChild(cell('Пустое поле — без плейсхолдера', range({ label: 'Сумма, ₽', helper: 'Helper', from: { live: true }, to: { live: true } })));
+    g.appendChild(cell('Префикс всегда присутствует', range({ label: 'Сумма, RUB', helper: 'Префиксы «От» / «До» неизменяемы', from: { value: '9 999', live: true }, to: { value: '9 999', live: true } })));
+    g.appendChild(cell('Пустое поле — без плейсхолдера', range({ label: 'Сумма, RUB', helper: 'Helper', from: { live: true }, to: { live: true } })));
   })();
 
   /* =========================== BEHAVIOR =========================== */

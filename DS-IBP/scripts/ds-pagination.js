@@ -376,7 +376,7 @@
 
   /* ---------- Pagi_counters (info summary) ---------- */
   function buildInfo(o = {}) {
-    const opts = Object.assign({ items: [['Сумма дохода', '23 597 млрд ₽']], warn: 'Превышение лимита' }, o);
+    const opts = Object.assign({ items: [['Сумма дохода', '23 597 млрд RUB']], warn: 'Превышение лимита' }, o);
     const host = document.createElement('div'); host.className = 'pgn-info';
     opts.items.forEach(([label, value]) => {
       const it = document.createElement('span'); it.className = 'pgn-info__item';

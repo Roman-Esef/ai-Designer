@@ -180,7 +180,7 @@
       <li>метка — существительное без двоеточия: «ИНН контрагента», не «Введите ИНН:»;</li>
       <li>плейсхолдер не дублирует метку — это формат или пример значения («Например, 7707083893»);</li>
       <li>хелпер — короткое правило заполнения; в состоянии Error заменяется текстом ошибки;</li>
-      <li>префикс и постфикс — единицы и неизменяемые части значения (₽, %, «От»), не вводятся пользователем;</li>
+      <li>префикс и постфикс — единицы и неизменяемые части значения (RUB, %, «От»), не вводятся пользователем;</li>
       <li>текст длиннее поля прокручивается внутри однострочного поля; для заведомо длинного текста берите многострочный вариант.</li>
     </ul>
     <div class="panel"><div class="demo-grid" id="content-demo"></div></div>
@@ -359,7 +359,7 @@
     <span class="inp__lead">…search…</span>
     <span class="inp__prefix">От</span>
     <input class="inp__control" id="inn" aria-describedby="inn-h">
-    <span class="inp__postfix">₽</span>
+    <span class="inp__postfix">RUB</span>
     <span class="inp__acts">
       <button class="inp__act" aria-label="Очистить поле">…✕…</button>
       <button class="inp__act inp__act--static" aria-label="Подсказка">…ⓘ…</button>
@@ -374,7 +374,7 @@ const spec = {
   size: 'm',                       // 'm' | 's' (Table Edit)
   state: 'default',                // default/hover/focus/error/warning/disabled
   value: 'Text', placeholder: null,
-  prefix: 'От', postfix: '₽', lead: false, informer: false,   // слои текстового поля
+  prefix: 'От', postfix: 'RUB', lead: false, informer: false,   // слои текстового поля
   clear: true, multiline: false, resizable: false,
   live: true, width: 280
 };

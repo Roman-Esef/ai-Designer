@@ -146,7 +146,7 @@
     <ul class="bullets" style="margin-bottom:26px;">
       <li>префикс «От» / «До» присутствует всегда — обозначает начало и конец диапазона, неизменяем;</li>
       <li>пустое поле остаётся без плейсхолдера — отдельный плейсхолдер-текст не пишется;</li>
-      <li>метка — существительное с единицей: «Сумма, ₽», не «Введите сумму»;</li>
+      <li>метка — существительное с единицей: «Сумма, RUB», не «Введите сумму»;</li>
       <li>хелпер — правило заполнения; в состоянии Error заменяется текстом ошибки.</li>
     </ul>
     <div class="panel"><div class="demo-grid" id="content-demo"></div></div>
@@ -251,7 +251,7 @@
     <p class="desc">Кейсы, которых нет в текущей документации:</p>
     <ul class="bullets">
       <li>кросс-валидация «от ≤ до» с автоподсказкой при перестановке границ;</li>
-      <li>единица измерения (постфикс ₽/%/шт.) на уровне диапазона;</li>
+      <li>единица измерения (постфикс RUB/%/шт.) на уровне диапазона;</li>
       <li>пресеты быстрых диапазонов (чипы «за месяц», «за квартал»).</li>
     </ul>
   </div>
@@ -311,7 +311,7 @@
 
 <!-- ===== исходники для вкладки «Код» (статично) ===== -->
 <script type="text/plain" id="src-code-html"><div class="inp-range">
-  <label class="ds-label"><span class="ds-label__text">Сумма, ₽</span></label>
+  <label class="ds-label"><span class="ds-label__text">Сумма, RUB</span></label>
   <div class="inp-range__row">
     <div class="inp inp-range__field">
       <div class="inp__field">
@@ -328,7 +328,7 @@
 <script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/input-amount-range.page.js)
 // Диапазон строит общий рантайм: window.DSInputKit.makeRange({ kind: 'amount', … })
 const spec = {
-  label: 'Сумма, ₽', helper: 'Диапазон «от» и «до»',
+  label: 'Сумма, RUB', helper: 'Диапазон «от» и «до»',
   from: { value: '100 000', live: true, state: 'default' },   // .inp (InputAmount)
   to:   { value: '5 000 000', live: true, state: 'default' },
   disabled: false, width: 380

@@ -53,7 +53,7 @@ status: curated
     <span class="inp__lead">…search…</span>
     <span class="inp__prefix">От</span>
     <input class="inp__control" id="inn" aria-describedby="inn-h">
-    <span class="inp__postfix">₽</span>
+    <span class="inp__postfix">RUB</span>
     <span class="inp__acts">
       <button class="inp__act" aria-label="Очистить поле">…✕…</button>
       <button class="inp__act inp__act--static" aria-label="Подсказка">…ⓘ…</button>

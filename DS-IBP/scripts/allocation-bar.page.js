@@ -277,7 +277,7 @@ global.AllocationBar = {
 (function () {
 'use strict';
 var AB = window.AllocationBar;
-var LABEL = 'ВБС по сделке на 25.02.2026, руб.';
+var LABEL = 'ВБС по сделке на 25.02.2026, RUB';
 
 /* доменный маппинг из продукта: позиция → токен палитры */
 var DOMAIN = {
@@ -378,7 +378,7 @@ function initExamples() {
   mount('st-zero', cfg({
     items: [di('Кредит', 700000000, 70), di('Акции', 300000000, 30), di('Комиссия', 0, 0)]
   }));
-  mount('st-warn', cfg({ warning: 'Просроченная задолженность на сумму 123 млн. руб.', items: base(2) }));
+  mount('st-warn', cfg({ warning: 'Просроченная задолженность на сумму 123 млн. RUB', items: base(2) }));
 
   /* Цвета — все 12 в одном баре */
   var twelve = AB.palette.map(function (tok, i) {
@@ -453,7 +453,7 @@ function initPlayground() {
       items: state.status === 'empty' ? [] : items(),
       showPercent: state.pct === 'yes',
       showProgressBar: state.bar === 'yes',
-      warning: state.warn === 'yes' ? 'Просроченная задолженность на сумму 123 млн. руб.' : null,
+      warning: state.warn === 'yes' ? 'Просроченная задолженность на сумму 123 млн. RUB' : null,
       maxVisibleItems: parseInt(state.maxv, 10),
       maxWidth: 'none'
     }));
@@ -468,7 +468,7 @@ function initRedline() {
   if (!tbody) return;
   var probe = document.createElement('div');
   probe.style.cssText = 'position:absolute;left:-9999px;top:0;width:560px';
-  probe.appendChild(AB.make(cfg({ items: base(2), unit: 'руб.' })));
+  probe.appendChild(AB.make(cfg({ items: base(2), unit: 'RUB' })));
   document.body.appendChild(probe);
 
   try {

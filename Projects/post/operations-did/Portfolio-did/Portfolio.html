@@ -20,19 +20,24 @@
 
   /* Отступ контейнера таблицы от нижней границы экрана — 32px.
      У .screen__content уже 24px снизу (--layout-pad-bottom), добавляем 8px. */
-  .dtable { margin-bottom: 8px; }
+  .dtable { margin-bottom: var(--space-8); }
 
   /* Вариант Table «тулбар над таблицей»: вертикальный ритм 12px —
      заголовок страницы → зона тулбара → таблица (вместо дефолтных 24px). */
   .screen__content { gap: var(--space-12); }
 
   /* Форма фильтра: секции с заголовком и двухколоночной сеткой полей */
-  .fil-group { display: flex; flex-direction: column; gap: 16px; }
+  .fil-group { display: flex; flex-direction: column; gap: var(--space-16); }
   .fil-title { font: var(--type-h5-strong); color: var(--text-primary); margin: 0; }
-  .fil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .fil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-16); }
 
   /* Список чекбоксов настройки таблицы — компактнее, чем зазор тела модалки */
-  .cols-list { display: flex; flex-direction: column; gap: 8px; }
+  .cols-list { display: flex; flex-direction: column; gap: var(--space-8); }
+
+  /* Тег-флаг PE — НЕ статус, кастомный цвет по кейсу (согласовано 04.09.2026).
+     Фон/обводка = StOrange_mid, текст = --text-primary. Только токены ДС,
+     к тон-вариантам чипа не привязан, не скругляется. */
+  .chip--pe { background: var(--st-orange-mid); border-color: var(--st-orange-mid); color: var(--text-primary); }
 </style>
 </head>
 <body>
@@ -221,10 +226,10 @@
               <div class="tc tc--separator"></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1024</span></span></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Финансирование строительства логистического хаба</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Активная</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Утверждена</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">На сопровождении</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">На мониторинге ГК СБИ</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--success"><span class="chip__label">Активная</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--success"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Утверждена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--success"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">На сопровождении</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--success"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">На мониторинге ГК СБИ</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Недвижимость</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «СБИ», SBERFIN</span></span></div>
@@ -234,7 +239,7 @@
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Кредитная линия, Опцион</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ЮгСтрой»</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «СтройИнвест»</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span><span class="chip chip--s"><span class="chip__label">$</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">RUB</span></span><span class="chip chip--s chip--fit"><span class="chip__label">USD</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">15.03.2024</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">20.04.2024</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">31.12.2027</span></span></div>
@@ -250,10 +255,10 @@
               <div class="tc tc--separator"></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1025</span></span></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Приобретение сети АЗС</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__label">Черновик</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Черновик</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Черновик</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">На утверждении</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--dark"><span class="chip__label">Черновик</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Черновик</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Черновик</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">На утверждении</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Розничная торговля</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">СОКОЛ ФИНАНС</span></span></div>
@@ -263,7 +268,7 @@
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Акции</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">АО «НефтьСервис»</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">RUB</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
@@ -279,10 +284,10 @@
               <div class="tc tc--separator"></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1026</span></span></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Рефинансирование кредитного портфеля</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Ожидает подтверждения</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Ожидает подтверждения</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Ожидает подтверждения</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Утверждена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__label">Ожидает подтверждения</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Ожидает подтверждения</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Ожидает подтверждения</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--dark"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Утверждена</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Телекоммуникации</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">VPE CAPITAL, SBERFIN</span></span></div>
@@ -292,7 +297,7 @@
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Привилегированные акции, Обыкновенные акции</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ПАО «ТелекомИнвест»</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «СвязьКапитал»</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span><span class="chip chip--s"><span class="chip__label">€</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">RUB</span></span><span class="chip chip--s chip--fit"><span class="chip__label">EUR</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">02.06.2023</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">18.07.2023</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">30.06.2026</span></span></div>
@@ -308,20 +313,20 @@
               <div class="tc tc--separator"></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1027</span></span></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Развитие горнорудного месторождения</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__label">Ввод изменений</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Ввод изменений</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Ввод изменений</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Изменения ожидают передачи на мониторинг</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--info"><span class="chip__label">Ввод изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--info"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Ввод изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--info"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Ввод изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Изменения ожидают передачи на мониторинг</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Да</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Природные ресурсы</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «СБИ»</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">PE</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--pe chip--fit"><span class="chip__label">PE</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Долевое участие в капитале</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Долевое участие в капитале, Кредитный мезонин</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Доли в уставном капитале, Заём</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ГорноКапитал»</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «УралРесурс»</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">$</span></span><span class="chip chip--s"><span class="chip__label">¥</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">USD</span></span><span class="chip chip--s chip--fit"><span class="chip__label">JPY</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">10.09.2022</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">01.12.2022</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">31.12.2025</span></span></div>
@@ -337,10 +342,10 @@
               <div class="tc tc--separator"></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1028</span></span></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Кредитование застройщика жилого квартала</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__label">Погашена</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Погашена</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Погашена</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Погашена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--dpurple"><span class="chip__label">Погашена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--dpurple"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Погашена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--dpurple"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Погашена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--dpurple"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Погашена</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Недвижимость</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «СБИ», СОКОЛ ФИНАНС</span></span></div>
@@ -350,7 +355,7 @@
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Кредитная линия</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ЖилСтрой»</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «ГорСтрой»</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">RUB</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">14.02.2021</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">05.03.2021</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">28.02.2024</span></span></div>
@@ -366,10 +371,10 @@
               <div class="tc tc--separator"></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1029</span></span></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Расширение сети продовольственного ритейла</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Активная</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Утверждена</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">На сопровождении</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">На мониторинге ПАО Сбербанк</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--success"><span class="chip__label">Активная</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--success"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Утверждена</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--success"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">На сопровождении</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--success"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">На мониторинге ПАО Сбербанк</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Розничная торговля</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">VPE CAPITAL</span></span></div>
@@ -379,7 +384,7 @@
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Акции, Конвертируемый заём</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ПродуктТрейд»</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «РитейлГрупп»</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span><span class="chip chip--s"><span class="chip__label">€</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">RUB</span></span><span class="chip chip--s chip--fit"><span class="chip__label">EUR</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">22.05.2024</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">30.06.2024</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">31.12.2028</span></span></div>
@@ -395,10 +400,10 @@
               <div class="tc tc--separator"></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1030</span></span></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Строительство дата-центра</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__label">Корректировка</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Корректировка</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Корректировка</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Ожидает передачи на мониторинг</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--info"><span class="chip__label">Корректировка</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--info"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Корректировка</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--info"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Корректировка</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Ожидает передачи на мониторинг</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Телекоммуникации</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «СБИ», SBERFIN</span></span></div>
@@ -408,7 +413,7 @@
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Конвертируемый заём, Доли</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">АО «ДатаХаб»</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">$</span></span><span class="chip chip--s"><span class="chip__label">¥</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">USD</span></span><span class="chip chip--s chip--fit"><span class="chip__label">JPY</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">08.11.2023</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">15.01.2024</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">30.09.2026</span></span></div>
@@ -424,20 +429,20 @@
               <div class="tc tc--separator"></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">1031</span></span></div>
               <div class="tc tc--pinned"><span class="tc__row"><span class="tc__text tc__text--truncate">Инвестиции в фармацевтическое производство</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Подтверждение изменений</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Подтверждение изменений</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Подтверждение изменений</span></span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Направлена на передачу</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__label">Подтверждение изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">Ц</span></span><span class="chip__label">Подтверждение изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">O</span></span><span class="chip__label">Подтверждение изменений</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__avatar av av--circular"><span class="av__text">М</span></span><span class="chip__label">Направлена на передачу</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Нет</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Природные ресурсы</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">VPE CAPITAL, СОКОЛ ФИНАНС</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">PE</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--pe chip--fit"><span class="chip__label">PE</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Долевое участие в капитале</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Долевое участие в капитале, Венчурное финансирование</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Доли в уставном капитале</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ФармаПлюс»</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Группа «МедИнвест»</span></span></div>
-              <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">₽</span></span></span></div>
+              <div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">RUB</span></span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">27.07.2024</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">12.09.2024</span></span></div>
               <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">31.12.2029</span></span></div>
@@ -590,8 +595,8 @@
             <label class="ds-label" for="f-ccy"><span class="ds-label__text">Валюта сделки</span></label>
             <div class="inp__field">
               <span class="inp__chips">
-                <span class="chip chip--edit chip--s"><span class="chip__label">₽</span><span class="chip__remove" role="button" aria-label="Удалить ₽"><i data-icon="close"></i></span></span>
-                <span class="chip chip--edit chip--s"><span class="chip__label">$</span><span class="chip__remove" role="button" aria-label="Удалить $"><i data-icon="close"></i></span></span>
+                <span class="chip chip--edit chip--s chip--fit"><span class="chip__label">RUB</span><span class="chip__remove" role="button" aria-label="Удалить RUB"><i data-icon="close"></i></span></span>
+                <span class="chip chip--edit chip--s chip--fit"><span class="chip__label">USD</span><span class="chip__remove" role="button" aria-label="Удалить USD"><i data-icon="close"></i></span></span>
               </span>
               <input class="inp__control" id="f-ccy" placeholder="Выберите…">
               <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>

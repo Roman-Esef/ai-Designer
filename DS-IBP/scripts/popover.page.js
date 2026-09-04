@@ -50,7 +50,7 @@ const POP_CONTENT = {
       </div>
       <div style="display:flex; flex-direction:column; gap:4px;">
         <span style="font:var(--type-body-s); color:var(--text-inactive);">Сумма</span>
-        <span style="font:var(--type-body-m-strong); color:var(--text-primary); font-variant-numeric:tabular-nums;">2 500 000 000,00 ₽</span>
+        <span style="font:var(--type-body-m-strong); color:var(--text-primary); font-variant-numeric:tabular-nums;">2 500 000 000,00 RUB</span>
       </div>
       <div style="display:flex; flex-direction:column; gap:4px;">
         <span style="font:var(--type-body-s); color:var(--text-inactive);">Контрагент</span>

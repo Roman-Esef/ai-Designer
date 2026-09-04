@@ -20,7 +20,7 @@
     return [
       { key: 'select',  w: 44,  fixed: true },
       { key: 'name',    label: 'Контрагент',      w: 220, sort: 'none' },
-      { key: 'amount',  label: 'Сумма, ₽',        w: 140, numbers: true, sort: 'none' },
+      { key: 'amount',  label: 'Сумма, RUB',        w: 140, numbers: true, sort: 'none' },
       { key: 'status',  label: 'Статус',          w: 120, sort: 'none' },
       { key: 'owner',   label: 'Ответственный',   w: 180, sort: 'none' },
       { key: 'actions', label: 'Действие', w: 92, fixed: true }
