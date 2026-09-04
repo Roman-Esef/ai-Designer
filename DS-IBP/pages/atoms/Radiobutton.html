@@ -750,7 +750,7 @@ function wireGroup(items, onChange){
 
   const good = document.getElementById('label-good');
   const g2 = document.createElement('div'); g2.className='rb-group';
-  const t2 = document.createElement('p'); t2.className='rb-group__title'; t2.textContent='Сумма сделки, ₽';
+  const t2 = document.createElement('p'); t2.className='rb-group__title'; t2.textContent='Сумма сделки, RUB';
   const i2 = document.createElement('div'); i2.className='rb-group__items';
   [['До 100','selected'],['100 — 1 000','unselected'],['Свыше 1 000','unselected']]
     .forEach(([t,s])=> i2.appendChild(makeRb({ state:s, label:t, frozen:true })));

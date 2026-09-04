@@ -221,7 +221,7 @@
     <p class="desc tight">Контентная область (Modal_Body) не диктует состав — единственное требование: она прокручивается сама, независимо от шапки и подвала, которые остаются закреплёнными. Правила:</p>
     <div class="panel">
       <ul class="rules">
-        <li><b>Заголовок</b> — H4 Strong (22/24), короткое существительное или конструкция «Действие + объект» («Новая сделка», «Изменить условия»), без точки в конце — подробно в редполитике названий (бэклог).</li>
+        <li><b>Заголовок</b> — H4 Strong (22/24), короткое существительное или конструкция «Действие + объект» («Новая сделка», «Изменить условия»), без точки в конце — подробно в <a class="inl" href="../patterns/Redpolicy.html">Редполитике</a>.</li>
         <li><b>Крестик обязателен</b> всегда, даже если внизу есть кнопка «Закрыть» — второй способ выйти без решения.</li>
         <li><b>Отступы контентной области</b> — 24px слева и справа, 16px сверху, 24px снизу (32px — <code class="tok">.modal__body--roomy</code>, когда контенту нужен воздух); зазор между вложенными компонентами — 16px.</li>
         <li><b>Body может быть пустым, формой, таблицей или пустым состоянием</b> — модалка не задаёт для него разметку, только паддинг и скролл.</li>
@@ -384,38 +384,8 @@ onBodyScroll():
 
 <div class="subsec" data-screen-label="Redpolicy">
     <h3>Редполитика названий модалок</h3>
-    <p class="desc">Черновик на согласование с редактором. Собрано по практикам чужих ДС (Fluent 2 — Dialog · usage, Material Design — Dialogs, Carbon — Dialog pattern) и адаптировано под русский язык и наши сущности. После согласования переедет в раздел «Контент».</p>
-    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:20px;">
-      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 2.03fr 3.4fr 1.26fr 1.31fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Тип модалки</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Форма названия</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Пример</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Primary в подвале</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.03fr 3.4fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Создание сущности</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Существительное с определением</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Новая сделка</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Создать</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.03fr 3.4fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Редактирование / просмотр</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Существительное — что именно правим</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Условия сделки</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Сохранить / Закрыть</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.03fr 3.4fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Действие над объектом</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отглагольное существительное + объект в родительном падеже</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Продление лимита</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Продлить</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.03fr 3.4fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Подтверждение необратимого действия</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отглагольное существительное + объект; сам вопрос — первой строкой тела</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Удаление сделки</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Удалить</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.03fr 3.4fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Выбор из списка</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">«Выбор» + объект в родительном падеже</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Выбор контрагента</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Выбрать</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.03fr 3.4fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Массовое действие</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">С количеством объектов</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Удаление 12 сделок</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Удалить</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 2.03fr 3.4fr 1.26fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Фильтр / настройка</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Короткое существительное</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Фильтр</span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Применить</span></span></div><div class="tc tc--separator"></div></div></div>
-    </div>
-    <div class="panel" style="margin-bottom:20px;">
-      <p class="subhead">Правила формулировки</p>
-      <ul class="rules">
-        <li><b>Только утвердительная форма, без вопросов</b> — «Удаление сделки», а не «Удалить сделку?». Заголовок — название окна (ориентир в интерфейсе, аналитике и тестах), а не реплика диалога; вопрос в заголовке дублирует Primary. Сам вопрос — первой строкой тела, если он нужен.</li>
-        <li><b>С заглавной только первое слово</b> (sentence case); имена собственные — как в данных.</li>
-        <li><b>Без точки и восклицательного знака</b> в конце. Вопросительный знак не нужен, потому что вопросов нет.</li>
-        <li><b>Не склоняем имена сущностей</b> — падеж несёт родовое слово, идентификатор из данных остаётся неизменным и в кавычках: «Удаление сделки „1-Кредит-199“».</li>
-        <li><b>Без слов «окно», «диалог», «форма»</b> — тип поверхности виден и так.</li>
-        <li><b>До 40 символов, максимум 2 строки</b> — заголовок не обрезается многоточием; длинные подробности — в тело.</li>
-        <li><b>Тело не повторяет заголовок</b> — в первой строке тела стоит последствие действия, а не пересказ названия.</li>
-        <li><b>Primary — глагол того же корня, что заголовок</b> («Удаление сделки» → «Удалить»). «ОК», «Готово», «Да» — не используем.</li>
-        <li><b>Один термин на объект</b> во всём продукте — по глоссарию («сделка», а не «договор» в соседнем окне).</li>
-      </ul>
-    </div>
-    <div class="guide">
-      <div class="guide-card">
-        <span class="guide-card__tag" style="color:var(--success);">Так</span>
-        <div class="guide-card__body">Удаление сделки „1-Кредит-199“</div>
-        <div class="guide-card__cap">Тело: «Сделка и её график платежей будут удалены без возможности восстановления», Primary — «Удалить».</div>
-      </div>
-      <div class="guide-card">
-        <span class="guide-card__tag" style="color:var(--error);">Не так</span>
-        <div class="guide-card__body">Вы уверены? / Внимание! / Удалить? / Окно удаления сделки.</div>
-        <div class="guide-card__cap">Нет объекта действия, лишняя эмоция, название типа поверхности и точка в конце.</div>
-      </div>
-    </div>
-    <p class="dev-note">На согласование: (1) остаёмся ли строго в утвердительной форме для деструктивных диалогов (Material допускает вопрос в заголовке, Fluent — только со знаком вопроса); (2) нужен ли надзаголовочный лейбл-контекст, как в Carbon; (3) как называть модалки-мастера — по цели сценария или по текущему шагу.</p>
-  </div>
+    <p class="desc">Правила формулировки названий модалок и действий — на отдельной странице <a class="inl" href="../patterns/Redpolicy.html">Редполитика</a>.</p>
+  </div>>
   </section>
 
 <footer class="page-foot">

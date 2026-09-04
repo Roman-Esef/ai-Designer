@@ -119,7 +119,7 @@
     }
 
     const amount = document.getElementById('use-amount');
-    if (amount) amount.appendChild(mk({ label: 'Сумма сделки', helper: 'Лимит — 5 000 000,00', value: '1 234 567,00', postfix: '₽', width: 280, live: true }));
+    if (amount) amount.appendChild(mk({ label: 'Сумма сделки', helper: 'Лимит — 5 000 000,00', value: '1 234 567,00', postfix: 'RUB', width: 280, live: true }));
   })();
 
   /* =========================== ANATOMY =========================== */
@@ -159,7 +159,7 @@
     const g = document.getElementById('var-amount');
     if (!g) return;
     /* живой InputAmount с форматированием разрядов */
-    const node = mk({ label: 'Сумма', helper: 'Разряды по 3 знака, децималы — 2', prefix: 'От', postfix: '₽', value: '1 234 567,00', live: true });
+    const node = mk({ label: 'Сумма', helper: 'Разряды по 3 знака, децималы — 2', prefix: 'От', postfix: 'RUB', value: '1 234 567,00', live: true });
     const ctl = node._control;
     ctl.addEventListener('input', () => {
       let raw = ctl.value.replace(/[^\d.,-]/g, '').replace(/\./g, ',');
@@ -177,7 +177,7 @@
         : int;
     });
     g.appendChild(cell('InputAmount · живой ввод', node, 'Печатайте: буквы игнорируются, точка становится запятой.'));
-    g.appendChild(cell('Disabled', mk({ label: 'Сумма', helper: 'Helper', postfix: '₽', value: '1 234 567,00', state: 'disabled' })));
+    g.appendChild(cell('Disabled', mk({ label: 'Сумма', helper: 'Helper', postfix: 'RUB', value: '1 234 567,00', state: 'disabled' })));
   })();
 
   (function () {

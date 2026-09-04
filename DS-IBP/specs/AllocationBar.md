@@ -71,11 +71,11 @@ status: curated
   <div class="albar">
     <div class="albar__head">
       <div class="albar__titles">
-        <div class="albar__label">ВБС по сделке на 25.02.2026, руб.</div>
+        <div class="albar__label">ВБС по сделке на 25.02.2026, RUB</div>
         <div class="albar__sublabel">опционально</div>
       </div>
       <span class="albar__warn" title="Просроченная задолженность"><i data-icon="alert-triangle-filled"></i></span>
-      <div class="albar__total"><span>1 000 000 000,00</span><span class="albar__unit">руб.</span></div>
+      <div class="albar__total"><span>1 000 000 000,00</span><span class="albar__unit">RUB</span></div>
     </div>
     <div class="albar__bar" role="img" aria-label="Распределение: Кредит 35,00%, …">
       <div class="albar__seg" data-id="kr" style="background:var(--chart-indigo);flex-grow:35"></div>

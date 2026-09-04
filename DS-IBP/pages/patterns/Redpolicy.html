@@ -1,0 +1,239 @@
+<!-- @dsCard group="Правила и паттерны" name="Редполитика" viewport="1440x900" subtitle="Валюта · числа и единицы · названия и заголовки" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Редполитика — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-toc.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+.page{max-width:1560px;margin:0 auto;padding:clamp(40px,7vw,96px) clamp(24px,4vw,56px) 140px}
+a{color:var(--link)}a:hover{color:var(--link-dark)}
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:92ch;text-wrap:pretty}
+.section h3+p.desc{margin-top:0}
+.tbl{margin:0 0 28px}
+/* правила-список */
+.rp-list{margin:0 0 28px;padding-left:22px;font:var(--type-body-m);color:var(--text-primary);max-width:92ch;text-wrap:pretty}
+.rp-list li{margin:0 0 8px}
+.rp-list li b{font-weight:600}
+.rp-note{font:var(--type-body-m);color:var(--text-secondary);border-left:3px solid var(--c-cgrey-100);padding:2px 0 2px 16px;margin:0 0 28px;max-width:92ch;text-wrap:pretty}
+.rp-out{font:var(--type-body-m);color:var(--text-primary);background:var(--c-cgrey-50);border-radius:var(--radius-s);padding:16px 20px;margin:0 0 24px;max-width:92ch}
+.rp-out b{font-weight:600}
+/* пара «так / не так» */
+.gb{display:grid;grid-template-columns:56px 1fr;gap:2px 14px;align-items:start;border:1px solid var(--border-light);border-left-width:3px;border-radius:var(--radius-s);padding:16px 20px;margin:0 0 12px;max-width:92ch}
+.gb__tag{font:600 12px/1.4 var(--font-text),sans-serif;text-transform:uppercase;letter-spacing:.05em}
+.gb__body{font:var(--type-body-m);font-weight:600;color:var(--text-primary);text-wrap:pretty}
+.gb__cap{font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty}
+.gb--good{border-left-color:var(--success)} .gb--good .gb__tag{color:var(--success)}
+.gb--bad{border-left-color:var(--error)} .gb--bad .gb__tag{color:var(--error)}
+</style>
+</head>
+<body>
+<main class="page">
+  <a class="crumb" href="../../index.html">← Дизайн-система</a>
+  <header class="masthead">
+    <p class="eyebrow">Правила и паттерны</p>
+    <h1>Редполитика</h1>
+    <p class="meta"><span>Версия: <b>1.000</b></span><span>Обновлено: <b>04.09.2026</b></span></p>
+    <p class="lead">Редакционные правила интерфейса: как писать валюту, числа, единицы измерения и называть окна и действия. Правила с этой страницы обязательны для всех экранов и компонентов дизайн-системы.</p>
+  </header>
+
+  <section class="section" data-screen-label="Валюта">
+    <h2>Валюта</h2>
+    <p class="desc">Валюта всегда обозначается <b>3-буквенным кодом ISO 4217 прописными</b> — <code class="tok">RUB</code>, <code class="tok">USD</code>, <code class="tok">EUR</code>, <code class="tok">JPY</code>. Символы валют (<code class="tok">₽</code>, <code class="tok">$</code>, <code class="tok">€</code>, <code class="tok">¥</code>) и слова («руб.», «долл.», «евро») в интерфейсе не используются нигде.</p>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 0.34fr 0.54fr 1.2fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Код</span></div>
+        <div class="th"><span class="th__label">Символ</span></div>
+        <div class="th"><span class="th__label">Полное название</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.34fr 0.54fr 1.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text"><b>RUB</b></span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">₽</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Российский рубль</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.34fr 0.54fr 1.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text"><b>USD</b></span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">$</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Доллар США</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.34fr 0.54fr 1.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text"><b>EUR</b></span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">€</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Евро</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 0.34fr 0.54fr 1.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text"><b>JPY</b></span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">¥</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Японская иена</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+
+    <h3>Правила</h3>
+    <ul class="rp-list">
+      <li><b>Код — прописными, без точек и пробелов</b> внутри кода: <code class="tok">RUB</code>, а не <code class="tok">руб.</code>, <code class="tok">Rur</code> или <code class="tok">RUB&nbsp;.</code></li>
+      <li><b>Символ валюты не используется</b> ни в качестве значения, ни в подписи, ни в постфиксе.</li>
+      <li><b>Код — постфикс к значению</b> (после числа): <code class="tok">1&nbsp;234&nbsp;567,00&nbsp;RUB</code>. Либо единица выносится в подпись/заголовок поля: «Сумма, <code class="tok">RUB</code>».</li>
+      <li><b>Валюта-значение в реестре — чип с кодом</b>: колонка «Валюта сделки» показывает чипы <code class="tok">RUB</code>, <code class="tok">USD</code>, <code class="tok">EUR</code>, <code class="tok">JPY</code> — по чипу на каждую валюту сделки (см. экран «Текущий портфель»). Чип валюты — несжимаемый (`.chip--fit`), чтобы код показывался целиком и не обрезался до «R…».</li>
+      <li><b>Код не склоняется</b> и не переводится в русских текстах: «лимит 500&nbsp;млн&nbsp;RUB», а не «500&nbsp;млн&nbsp;рублей».</li>
+    </ul>
+
+    <div class="gb gb--good">
+      <span class="gb__tag">Так</span>
+      <div class="gb__body">1 234 567,00 RUB · Валюта сделки: RUB · лимит 500 млн RUB</div>
+      <div class="gb__cap">Код валюты прописными — постфикс к значению, в подписи или в чипе.</div>
+    </div>
+    <div class="gb gb--bad">
+      <span class="gb__tag">Не так</span>
+      <div class="gb__body">1 234 567,00 ₽ · 500 млн руб. · руб. / долл. / евро</div>
+      <div class="gb__cap">Символ или слово вместо кода ISO 4217.</div>
+    </div>
+  </section>
+
+  <section class="section" data-screen-label="Числа">
+    <h2>Числа и единицы</h2>
+    <p class="desc">Единый вид чисел и величин в интерфейсе — по всей системе, в таблицах, тайлах, карточках и формах.</p>
+    <ul class="rp-list">
+      <li><b>Разделитель разрядов — неразрывный пробел</b>: <code class="tok">1&nbsp;234&nbsp;567</code>, а не <code class="tok">1,234,567</code>.</li>
+      <li><b>Десятичный разделитель — запятая</b>: <code class="tok">1&nbsp;234&nbsp;567,00</code>.</li>
+      <li><b>Компакт для крупных значений</b> — «млн» / «млрд» с валютным кодом: <code class="tok">500&nbsp;млн&nbsp;RUB</code>, а не <code class="tok">500&nbsp;млн&nbsp;₽</code>.</li>
+      <li><b>Даты — <code class="tok">ДД.ММ.ГГГГ</code></b>: <code class="tok">15.03.2024</code>.</li>
+      <li><b>Проценты — без пробела перед знаком</b>: <code class="tok">12%</code>, <code class="tok">3,5%</code>.</li>
+      <li><b>Единицы измерения — кратко и общепонятно</b>: <code class="tok">%</code>, <code class="tok">шт.</code>, <code class="tok">м²</code>. Длинная расшифровка — в Helper, а не рядом со значением.</li>
+    </ul>
+
+    <div class="gb gb--good">
+      <span class="gb__tag">Так</span>
+      <div class="gb__body">1 234 567,00 RUB · 500 млн RUB · 12% · 15.03.2024</div>
+      <div class="gb__cap">Единый вид числа, валюта кодом, дата по формату.</div>
+    </div>
+    <div class="gb gb--bad">
+      <span class="gb__tag">Не так</span>
+      <div class="gb__body">1,234,567.00 ₽ · 500 млн руб. · 15/03/24 · 12 %</div>
+      <div class="gb__cap">Разные разделители, символ валюты, пробел перед процентом.</div>
+    </div>
+  </section>
+
+  <section class="section" data-screen-label="Названия">
+    <h2>Названия и заголовки</h2>
+    <p class="desc">Правила формулировки заголовков окон и действий. Применяются к модалкам, шапкам страниц и любым названиям, которые видит пользователь.</p>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 2.6fr 1.7fr 1.5fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Тип модалки</span></div>
+        <div class="th"><span class="th__label">Форма названия</span></div>
+        <div class="th"><span class="th__label">Пример</span></div>
+        <div class="th"><span class="th__label">Primary в подвале</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 2.6fr 1.7fr 1.5fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Создание сущности</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Существительное с определением</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Новая сделка</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Создать</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 2.6fr 1.7fr 1.5fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Редактирование / просмотр</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Существительное — что именно правим</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Условия сделки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Сохранить / Закрыть</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 2.6fr 1.7fr 1.5fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Действие над объектом</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отглагольное существительное + объект в родительном падеже</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Продление лимита</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Продлить</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 2.6fr 1.7fr 1.5fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Подтверждение необратимого действия</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отглагольное существительное + объект; сам вопрос — первой строкой тела</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Удаление сделки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Удалить</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 2.6fr 1.7fr 1.5fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Выбор из списка</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">«Выбор» + объект в родительном падеже</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Выбор контрагента</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Выбрать</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 2.6fr 1.7fr 1.5fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Массовое действие</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">С количеством объектов</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Удаление 12 сделок</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Удалить</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 2.6fr 1.7fr 1.5fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Фильтр / настройка</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Короткое существительное</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Фильтр</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Применить</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+
+    <h3>Правила формулировки</h3>
+    <ul class="rp-list">
+      <li><b>Только утвердительная форма, без вопросов</b> — «Удаление сделки», а не «Удалить сделку?». Заголовок — название окна (ориентир в интерфейсе, аналитике и тестах), а не реплика диалога; вопрос в заголовке дублирует Primary. Сам вопрос — первой строкой тела, если он нужен.</li>
+      <li><b>С заглавной только первое слово</b> (sentence case); имена собственные — как в данных.</li>
+      <li><b>Без точки и восклицательного знака</b> в конце. Вопросительный знак не нужен, потому что вопросов нет.</li>
+      <li><b>Не склоняем имена сущностей</b> — падеж несёт родовое слово, идентификатор из данных остаётся неизменным и в кавычках: «Удаление сделки „1-Кредит-199“».</li>
+      <li><b>Без слов «окно», «диалог», «форма»</b> — тип поверхности виден и так.</li>
+      <li><b>До 40 символов, максимум 2 строки</b> — заголовок не обрезается многоточием; длинные подробности — в тело.</li>
+      <li><b>Тело не повторяет заголовок</b> — в первой строке тела стоит последствие действия, а не пересказ названия.</li>
+      <li><b>Primary — глагол того же корня, что заголовок</b> («Удаление сделки» → «Удалить»). «ОК», «Готово», «Да» — не используем.</li>
+      <li><b>Один термин на объект</b> во всём продукте — по глоссарию («сделка», а не «договор» в соседнем окне).</li>
+    </ul>
+
+    <div class="gb gb--good">
+      <span class="gb__tag">Так</span>
+      <div class="gb__body">Удаление сделки „1-Кредит-199“</div>
+      <div class="gb__cap">Тело: «Сделка и её график платежей будут удалены без возможности восстановления», Primary — «Удалить».</div>
+    </div>
+    <div class="gb gb--bad">
+      <span class="gb__tag">Не так</span>
+      <div class="gb__body">Вы уверены? / Внимание! / Удалить? / Окно удаления сделки.</div>
+      <div class="gb__cap">Нет объекта действия, лишняя эмоция, название типа поверхности и точка в конце.</div>
+    </div>
+
+    <p class="rp-note">На согласование: (1) остаёмся ли строго в утвердительной форме для деструктивных диалогов (Material допускает вопрос в заголовке, Fluent — только со знаком вопроса); (2) нужен ли надзаголовочный лейбл-контекст, как в Carbon; (3) как называть модалки-мастера — по цели сценария или по текущему шагу.</p>
+  </section>
+
+  <footer class="page-foot">
+    <span>Дизайн-система · Редполитика</span>
+    <span>Редполитика · ISO 4217 · числа и единицы · названия</span>
+  </footer>
+</main>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-toc.js"></script>
+</body>
+</html>

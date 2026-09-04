@@ -91,7 +91,7 @@
       items: [
         { label: 'Локальные компоненты',  href: 'pages/patterns/LocalComponents.html' },
         { label: 'Главная страница · роли', href: 'pages/patterns/HomeRoles.html' },
-        { label: 'Редполитика',           soon: true },
+        { label: 'Редполитика',           href: 'pages/patterns/Redpolicy.html' },
         { label: 'Тон оф войс',           soon: true },
         { label: 'Паттерны интерфейса',   soon: true }
       ],

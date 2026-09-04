@@ -16,7 +16,7 @@ purpose: Манифест спек компонентов. Читай нужну
 | ButtonTest | specs/ButtonTest.md | styles/button.css | spinner | 1.011 |
 | Chart | specs/Chart.md | styles/chart.css | tooltip, alert, skeleton, segment-control, icon-button, button, table-cell | 1.000 |
 | Checkbox | specs/Checkbox.md | styles/checkbox.css | label-helper | 1.006 |
-| Chip | specs/Chip.md | styles/chip.css | label-helper, spinner | 1.010 |
+| Chip | specs/Chip.md | styles/chip.css | label-helper, spinner | 1.013 |
 | Colors | specs/Colors.md | — | — | 1.002 |
 | ContextMenu | specs/ContextMenu.md | styles/context-menu.css | button | 1.007 |
 | DatePicker | specs/DatePicker.md | styles/datepicker.css | icon-button, button | 1.004 |
@@ -55,7 +55,7 @@ purpose: Манифест спек компонентов. Читай нужну
 | Splitter | specs/Splitter.md | styles/splitter.css | button | 1.003 |
 | Switch | specs/Switch.md | styles/switch.css | label-helper, spinner | 1.007 |
 | Table | specs/Table.md | styles/table.css | table-cell, pagination, table-filter, button, button-group, icon-button, chip, checkbox, illustration, modal, context-menu | 1.009 |
-| TableCell | specs/TableCell.md | styles/table-cell.css | checkbox, chip, icon-button, button, tooltip, chart | 2.012 |
+| TableCell | specs/TableCell.md | styles/table-cell.css | checkbox, chip, icon-button, button, tooltip, chart | 2.013 |
 | TableFilter | specs/TableFilter.md | styles/table-filter.css | button, icon-button, chip, badge, modal, tab, input, checkbox | 1.007 |
 | Tab | specs/Tab.md | styles/tab.css | — | 1.009 |
 | Tile | specs/Tile.md | styles/tile.css | icon-button, button, link, chip, badge, alert, divider | 1.010 |

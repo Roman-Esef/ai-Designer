@@ -390,7 +390,7 @@
     controls.appendChild(groupHead('Обрамление'));
     const prefixCtl = textInput('Префикс', () => state.prefixText, v => state.prefixText = v, 'напр. ≈');
     controls.appendChild(prefixCtl);
-    const postfixCtl = textInput('Постфикс', () => state.postfixText, v => state.postfixText = v, 'напр. ₽');
+    const postfixCtl = textInput('Постфикс', () => state.postfixText, v => state.postfixText = v, 'напр. RUB');
     controls.appendChild(postfixCtl);
     controls.appendChild(iconPick('Иконка слева', () => state.iconLeft, v => state.iconLeft = v));
 
@@ -574,12 +574,12 @@
     if (!host) return;
     const tiles = [
       ['Icon-left · любая иконка', 'Глиф не зафиксирован — любая иконка из библиотеки, если она несёт смысл — источник, категорию, тип данных. Не интерактивна.', makeROF({ label: 'Внешняя АС', value: 'ЕКС', iconLeft: 'search' })],
-      ['Prefix / Postfix', 'Короткий текст вокруг значения — аббревиатура, единица измерения, валюта (см. правила ниже).', makeROF({ label: 'Курс', prefix: '≈', value: '92,4', postfix: '₽/$' })],
+      ['Prefix / Postfix', 'Короткий текст вокруг значения — аббревиатура, единица измерения, валюта (см. правила ниже).', makeROF({ label: 'Курс', prefix: '≈', value: '92,4', postfix: 'RUB/USD' })],
       ['Icon-right · copy', 'Клик копирует значение в буфер обмена и на 1,3 с показывает подтверждение.', makeROF({ label: 'ID во внешней АС', value: '123456789012', iconRight: 'copy', iconRightAction: 'copy' })],
       ['Icon-right · tooltip', 'Индикатор требует внимания — при наведении показывает тултип с пояснением. Глиф и цвет (neutral/warning) настраиваются отдельно от действия.', makeROF({ label: 'Дата платежа', value: '22.02.2023', iconRight: 'alert-triangle-filled', iconRightAction: 'tooltip', iconRightTone: 'warning', iconRightTip: 'Платёж просрочен на 4 дня' })],
       ['Аффикс: слишком длинный текст', 'Если в префикс/постфикс попал слишком длинный текст — он обрезается многоточием и на наведении показывает полный текст в тултипе — вместо того чтобы растягивать строку.', makeROF({ label: 'Курс', prefix: 'Приблизительный курс на сегодня', value: '92,4' })],
       ['Без Label', 'Лейбл можно скрыть, если контекст и так понятен (например, в компактной таблице).', makeROF({ showLabel: false, value: 'Значение без подписи' })],
-      ['Align · right', 'Правое выравнивание — для числовых и денежных значений в колонке.', makeROF({ label: 'Сумма сделки', value: '120 000', postfix: '₽', align: 'right' })],
+      ['Align · right', 'Правое выравнивание — для числовых и денежных значений в колонке.', makeROF({ label: 'Сумма сделки', value: '120 000', postfix: 'RUB', align: 'right' })],
     ];
     tiles.forEach(([name, desc, node]) => {
       const t = document.createElement('div'); t.className = 'slot-tile';
@@ -680,7 +680,7 @@
       w.style.cssText = 'width:224px;display:grid;gap:14px;';
       w.append(
         makeROF(clamp ? { label: 'Способ доставки', value: DELIVERY, clampMode: '2' } : { label: 'Способ доставки', value: DELIVERY }),
-        makeROF({ label: 'Стоимость доставки', value: '1 200', postfix: '₽' }),
+        makeROF({ label: 'Стоимость доставки', value: '1 200', postfix: 'RUB' }),
       );
       return w;
     }
@@ -706,7 +706,7 @@
     const icG = document.getElementById('ic-good-affix'); if (icG) icG.innerHTML = GOOD;
     const icB = document.getElementById('ic-bad-affix'); if (icB) icB.innerHTML = BAD;
     const good = document.getElementById('affix-good');
-    if (good) good.appendChild(makeROF({ label: 'Курс', prefix: '≈', value: '92,4', postfix: '₽/$' }));
+    if (good) good.appendChild(makeROF({ label: 'Курс', prefix: '≈', value: '92,4', postfix: 'RUB/USD' }));
     const bad = document.getElementById('affix-bad');
     if (bad) bad.appendChild(makeROF({ label: 'Курс', prefix: 'Приблизительный курс на сегодня', value: '92,4' }));
   })();
