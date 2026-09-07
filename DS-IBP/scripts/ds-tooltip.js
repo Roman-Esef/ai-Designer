@@ -241,6 +241,7 @@
       rich: opts.rich || false,
       title: opts.title || '',
       action: opts.action || '',
+      zIndex: opts.zIndex != null ? opts.zIndex : (d.tooltipZindex != null ? parseFloat(d.tooltipZindex) : null),
     };
 
     var tip = resolveTip(target, opts);
@@ -272,7 +273,7 @@
         if (current && current !== api) current.hide(true);
         /* anchor — цель тултипа: из модалки слой уезжает в её скрим, иначе
            тултип рисуется под подложкой (z-index 30 против 1000) */
-        if (window.DSFloat) DSFloat.mount(tip, { anchor: target });
+        if (window.DSFloat) DSFloat.mount(tip, { anchor: target, zIndex: conf.zIndex });
         reposition();
         tip.classList.add('is-visible');
         current = api;
@@ -382,6 +383,7 @@
     el.setAttribute('data-tooltip', text);
     el.setAttribute('data-tooltip-truncated', 'only');
     el.setAttribute('data-tooltip-multiline', 'yes');
+    if (o && o.zIndex != null) el.setAttribute('data-tooltip-zindex', o.zIndex);
     var api = window.DSTooltip.bind(el);
     el.__dsTrunc = api;
     return api;

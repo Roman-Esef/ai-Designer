@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="../../styles/nav-panel.css">
 <link rel="stylesheet" href="../../styles/context-menu.css">
 <link rel="stylesheet" href="../../styles/modal.css">
+<link rel="stylesheet" href="../../styles/tooltip.css">
 <link rel="stylesheet" href="../../styles/ds-docs.css">
 <link rel="stylesheet" href="../../styles/table-cell.css">
 <style>
@@ -74,7 +75,7 @@
   .el-tag { font: var(--type-body-xs); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; }
   .el-demo { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; }
   .el-demo--rail { width:56px; }
-  .el-demo--drawer { width:260px; }
+  .el-demo--drawer { width:320px; }
   .el-demo .nav { height:auto; width:auto; box-shadow:none; border-radius:0; border-right:none; }
   .el-demo .nav__top, .el-demo .nav__footer { height:auto; min-height:0; overflow:visible; }
   .el-demo .nav__list { overflow:visible; scrollbar-gutter:auto; }
@@ -151,7 +152,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.017</b></span><span>Обновлено: <b>06.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.019</b></span><span>Обновлено: <b>07.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>NavPanel · Панель навигации</h1>
     <p class="lead">Главная навигация приложения в левой части каждой страницы. Отображает все разделы продукта, сгруппированные по подразделениям и типам. Один компонент — три режима: свёрнутый <b>Rail</b>, развёрнутый-оверлей <b>Drawer</b> и закреплённый <b>Fixed</b>.</p>
@@ -466,6 +467,7 @@
 <script src="../../scripts/icons-data.js"></script>
 <script src="../../scripts/ibp-home.js"></script>
 <script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-float.js"></script>
 <script src="../../scripts/ds-tooltip.js"></script>
 <script src="../../scripts/ds-modal.js"></script>
 <script src="../../scripts/ds-nav-panel.js"></script>
@@ -507,7 +509,6 @@
       <span class="nav__user-text">
         <span class="nav__user-name">Александров Петр Константинович</span>
         <span class="nav__user-role">Финансист ДИД</span><!-- должность — заглушка, меняется по роли -->
-        <span class="nav__user-org">SMB Недвижимость +2</span>
       </span>
     </a>
     <button class="ibtn ibtn--neutral ibtn--m nav__logout" data-modal="nav-role-modal" aria-label="Сменить роль / выйти"><i data-icon="logout"></i></button>
@@ -534,8 +535,8 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
    NavPanel — «Панель навигации» (организм).
    Левая панель навигации приложения. Три режима одного компонента:
      .nav--rail   — свёрнутый, только иконки (56px), без тени, тултип по hover;
-     .nav--drawer — развёрнутый-оверлей (272px), тень --shadow-modal-form;
-     .nav--fixed  — закреплённый развёрнутый (272px), без тени, шов справа.
+     .nav--drawer — развёрнутый-оверлей (320px), тень --shadow-modal-form;
+      .nav--fixed  — закреплённый развёрнутый (320px), без тени, шов справа.
    Только токены ДС. Иконки — <i data-icon>; бейдж — компонент Badge;
    аватар — Avatar; бургер/пин/логаут — IconButton.
    ========================================================================= */
@@ -552,7 +553,7 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
 
 .nav {
   --nav-rail-w:   56px;
-  --nav-drawer-w: 272px;
+  --nav-drawer-w: 320px;
   --nav-item-h:   44px;
 
   box-sizing: border-box;
@@ -579,7 +580,7 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
 .nav-layout { display: block; min-height: 100vh; }
 .nav-layout > .nav { position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; }
 .nav-layout > *:not(.nav) { margin-left: var(--nav-rail-w, 56px); transition: margin-left .15s ease; }
-.nav-layout:has(.nav--fixed) > *:not(.nav) { margin-left: var(--nav-drawer-w, 272px); }
+.nav-layout:has(.nav--fixed) > *:not(.nav) { margin-left: var(--nav-drawer-w, 320px); }
 
 /* ========================================================================== *
    TOP — бургер (+ пин в развёрнутых режимах)
@@ -698,7 +699,7 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.nav__badge { flex: none; margin-left: 8px; }
+.nav__badge { flex: none; margin-left: auto; }
 
 /* ---------- состояния пункта ---------------------------------------------- */
 .nav__item:hover { background: var(--bgtable-row-hover); color: var(--text-primary); }
@@ -734,7 +735,7 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
    иконок, индент под текст родителя (12 отступ + 24 иконка + 12 зазор = 48).
    В Rail каретка и под-список скрыты — клик по родителю разворачивает панель.
    ========================================================================== */
-.nav__caret { flex: none; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-inactive); transition: transform .15s ease; }
+.nav__caret { flex: none; margin-left: auto; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-inactive); transition: transform .15s ease; }
 .nav__caret :is(svg,[data-icon]) { width: 16px; height: 16px; }
 .nav__item--acc[aria-expanded="true"] .nav__caret { transform: rotate(180deg); color: var(--text-secondary); }
 
@@ -788,7 +789,7 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
    ========================================================================== */
 .nav__footer {
   flex: none;
-  height: 76px;
+  height: 60px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -813,7 +814,6 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
 .nav__user-text { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .nav__user-name { font: var(--type-body-s-strong); color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nav__user-role { font: var(--type-body-xs); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.nav__user-org  { font: var(--type-body-xs); color: var(--text-inactive); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nav__logout { flex: none; }
 
 .nav--rail .nav__user-text,

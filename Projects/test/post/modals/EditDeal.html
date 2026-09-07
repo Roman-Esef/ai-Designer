@@ -1,0 +1,97 @@
+<!-- Фрагмент модалки «Редактирование сделки» (форма, Modal w6).
+     Чистая разметка: один корневой элемент .modal-scrim.
+     Вшивается ассемблером assemble.mjs по метке <ds-include src="modals/EditDeal.html">.
+     Триггеры: кнопка «Создать сделку» в шапке страницы и «Изменить» в строке таблицы —
+     оба с data-modal="deal-form-scrim" (одна форма на создание и редактирование).
+     Двухколоночная раскладка полей — класс .frm-grid, объявлен в <style> index.html
+     (раскладка на токенах; своих стилей компонентов фрагмент не несёт). -->
+<div class="modal-scrim" id="deal-form-scrim" hidden>
+  <div class="modal modal--w6" role="dialog" aria-modal="true" aria-labelledby="deal-form-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="deal-form-title">Редактирование сделки</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div class="frm-grid">
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-num"><span class="ds-label__text">Номер сделки</span></label>
+          <div class="inp__box">
+            <div class="inp__field">
+              <input class="inp__control" id="d-num" value="D-000471" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-cp"><span class="ds-label__text">Контрагент</span></label>
+          <div class="inp__box">
+            <div class="inp__field">
+              <input class="inp__control" id="d-cp" value="ООО «ЮгСтрой»">
+            </div>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth frm-grid__span-2">
+          <label class="ds-label" for="d-name"><span class="ds-label__text">Наименование сделки</span></label>
+          <div class="inp__box">
+            <div class="inp__field">
+              <input class="inp__control" id="d-name" value="Кредитная линия «ЮгСтрой»">
+            </div>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-prod"><span class="ds-label__text">Продукт</span></label>
+          <div class="inp__field" data-ddl="d-prod-list">
+            <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">Кредитная линия</span><span class="chip__remove" role="button" aria-label="Удалить Кредитная линия"><i data-icon="close"></i></span></span></span>
+            <input class="inp__control" id="d-prod">
+            <span class="inp__acts"><button class="inp__act" aria-label="Очистить поле"><i data-icon="close"></i></button><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="d-prod-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+            <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+            <hr class="ddl__divider">
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="true"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Кредитная линия</span></span></button>
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Банковская гарантия</span></span></button>
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Аккредитив</span></span></button>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-status"><span class="ds-label__text">Статус</span></label>
+          <div class="inp__field" data-ddl="d-status-list">
+            <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">Активна</span><span class="chip__remove" role="button" aria-label="Удалить Активна"><i data-icon="close"></i></span></span></span>
+            <input class="inp__control" id="d-status">
+            <span class="inp__acts"><button class="inp__act" aria-label="Очистить поле"><i data-icon="close"></i></button><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="d-status-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+            <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+            <hr class="ddl__divider">
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="true"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Активна</span></span></button>
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Черновик</span></span></button>
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">На доработке</span></span></button>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-amount"><span class="ds-label__text">Сумма, RUB</span></label>
+          <div class="inp__box">
+            <div class="inp__field">
+              <input class="inp__control" id="d-amount" value="1 240 500,00" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-date"><span class="ds-label__text">Дата сделки</span></label>
+          <div class="inp__field">
+            <input class="inp__control" id="d-date" value="15.03.2026" inputmode="numeric">
+            <span class="inp__acts">
+              <button class="inp__act" aria-label="Очистить поле"><i data-icon="close"></i></button>
+              <button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button type="button" class="btn btn--accent btn--m"><span class="btn__label">Сохранить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>

@@ -58,7 +58,7 @@ status: curated
 ### Разметка · HTML (эталонная реализация ДС)
 
 ```
-<div class="inp is-open">
+<div class="inp inp--m is-open">
   <label class="ds-label" for="ac"><span class="ds-label__text">Контрагент</span></label>
   <div class="inp__field" role="combobox" aria-expanded="true" aria-controls="ac-list">
     <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">Value 1</span><span class="chip__remove" role="button">…✕…</span></span></span>

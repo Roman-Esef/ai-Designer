@@ -119,6 +119,11 @@
     return s;
   }
   function footerHTML() {
+    /* Футер — из каталога (единая разметка, строки организации нет). Фолбэк
+       для страниц без ibp-home.js. */
+    if (window.IBPHome && window.IBPHome.footerHTML) {
+      return window.IBPHome.footerHTML(CURRENT_ROLE, { logoutModal: 'nav-role-modal', logoutLabel: 'Сменить роль / выйти' });
+    }
     return '<div class="nav__footer">'
       + '<a class="nav__user" href="#" aria-label="Открыть личный кабинет">'
       + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
@@ -126,7 +131,6 @@
       + '<span class="nav__user-name">Александров Петр Константинович</span>'
       /* должность — заглушка, меняется по роли (CURRENT_ROLE) */
       + '<span class="nav__user-role">' + CURRENT_ROLE + '</span>'
-      + '<span class="nav__user-org">SMB Недвижимость +2</span>'
       + '</span></a>'
       + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" data-modal="nav-role-modal" aria-label="Сменить роль / выйти">' + ic('logout') + '</button>'
       + '</div>';

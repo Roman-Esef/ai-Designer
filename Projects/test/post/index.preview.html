@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<!--
+  Источник экрана «Сделки» (пилот модульной структуры: страница + отдельные
+  файлы модалок и таблиц, вшиваемые ассемблером).
+
+  Как устроено:
+  - index.html            — каркас страницы и метки <ds-include src="…">.
+  - tables/DealsTable.html — таблица-реестр (вшивается в контент).
+  - modals/*.html          — модальные окна (вшиваются в конец body).
+  - assemble.mjs           — вшивает фрагменты в index.preview.html.
+
+  ОТКРЫВАТЬ ДВОЙНЫМ КЛИКОМ нужно index.preview.html (собранный самодостаточный
+  файл). Сам index.html — источник: без сборки модалки/таблица на месте меток
+  не появятся (ds-include.js грузит их fetch-ем, который по file:// не работает).
+
+  Пути — три уровня до DS-IBP/ (../../../), потому что экран лежит в
+  Projects/test/post/, а не плоско в Projects/test/.
+-->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сделки — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка этого экрана ──────────────────────────────────────────────
+     Здесь только grid / flex / gap и только на токенах.
+     .frm-grid — двухколоночная сетка полей формы в модалке «Редактирование
+     сделки» (modals/EditDeal.html): у модальных форм своего класса в ДС нет,
+     раскладку полей задаёт экран; компонентная часть — классы .inp из ДС. */
+  .frm-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-stack);
+  }
+  .frm-grid__span-2 { grid-column: span 2; }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <!-- ── Боковое меню ────────────────────────────────────────────────────── -->
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Post</div>
+        <a class="nav__item nav__item--selected" href="#" aria-current="page"><span class="nav__ico"><i data-icon="corporate-transactions"></i></span><span class="nav__label">Сделки</span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <div class="nav__user">
+        <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Александров Пётр</span><span class="nav__user-role">Аналитик</span></span>
+      </div>
+      <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <!-- ── Рабочая область (app-shell: фикс. вьюпорт, таблица занимает
+       оставшуюся высоту — .screen--app + .dtable--fill на таблице) ───────── -->
+  <div class="screen screen--app">
+
+    <nav class="crumbs" aria-label="Хлебные крошки">
+      <li class="crumbs__item"><a class="link link--muted" href="#">Главная</a></li>
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Сделки</span>
+      </li>
+    </nav>
+
+    <main class="screen__content">
+
+      <!-- ── Шапка страницы ───────────────────────────────────────────────── -->
+      <div class="phead">
+        <div class="phead__main">
+          <div class="phead__title-row">
+            <div class="phead__title-group">
+              <h1 class="phead__title">Сделки</h1>
+            </div>
+          </div>
+          <div class="phead__subtitle">
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="calendar"></i></span>Обновлено 07.09.2026</span>
+          </div>
+        </div>
+        <div class="phead__actions">
+          <button class="btn btn--outline btn--m"><i data-icon="download"></i><span class="btn__label">Выгрузить</span></button>
+          <button class="btn btn--accent btn--m" data-modal="deal-form-scrim"><i data-icon="add"></i><span class="btn__label">Создать сделку</span></button>
+        </div>
+      </div>
+
+      <!-- ── Таблица — отдельный файл tables/DealsTable.html ──────────────── -->
+      <!-- Фрагмент таблицы «Сделки» (реестр). Чистая разметка: один корневой элемент,
+     без <html>/<head>/<link>/<script> — стили даёт единственный ds.css страницы.
+     Вшивается в страницу ассемблером assemble.mjs по метке
+       <ds-include src="tables/DealsTable.html"></ds-include>
+     Модалки, на которые ссылаются триггеры (data-modal=…), лежат в modals/*.html —
+     id скримов связываются в собранном документе.
+     Порядок строк: по убыванию суммы — колонка «Сумма, RUB» объявлена
+     отсортированной (th--sorted, aria-sort="descending"); данные обязаны
+     подтверждать заявленное состояние (урок Л35). -->
+<div class="dtable dtable--fill">
+  <div class="dtable__toolbar">
+    <div class="dtable__toolbar-left">
+      <h3 class="dtable__title">Сделки</h3>
+      <span class="dtable__count">128</span>
+    </div>
+    <div class="dtable__toolbar-right">
+      <div class="tfilter" role="group" aria-label="Фильтр таблицы">
+        <button class="btn btn--outline btn--s tfilter__open" aria-haspopup="dialog" aria-expanded="false" data-modal="filter-scrim">
+          <i data-icon="filter"></i><span class="btn__label">Фильтр</span>
+        </button>
+        <span class="chip chip--edit chip--m tfilter__applied" tabindex="0">
+          <span class="chip__label">Применено: 2</span>
+          <span class="chip__remove" role="button" aria-label="Сбросить все фильтры"><i data-icon="close"></i></span>
+        </span>
+      </div>
+      <button class="ibtn ibtn--neutral ibtn--m" aria-label="Настроить колонки" data-table-settings><i data-icon="settings"></i></button>
+    </div>
+  </div>
+
+  <div class="dtable__body">
+    <div class="tbl" data-table data-sort-rows>
+      <!-- Шапка. grid-template-columns ОДИНАКОВЫЙ у шапки и у всех строк -->
+      <div class="tbl__row tbl__row--head" style="grid-template-columns:8px 44px minmax(180px,2fr) minmax(140px,1.3fr) 150px 130px 120px 96px minmax(8px,1fr);">
+        <div class="th th--separator"></div>
+        <div class="th th--select">
+          <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать все"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
+          <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+        </div>
+        <div class="th" aria-sort="none" data-sort-type="text">
+          <span class="th__label">Контрагент</span>
+          <span class="th__tools">
+            <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="counterparty" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button>
+          </span>
+          <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+        </div>
+        <div class="th" aria-sort="none" data-sort-type="text">
+          <span class="th__label">Продукт</span>
+          <span class="th__tools">
+            <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="product" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button>
+          </span>
+          <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+        </div>
+        <div class="th th--right th--sorted" aria-sort="descending" data-sort-type="number">
+          <span class="th__label">Сумма, RUB</span>
+          <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="amount" aria-label="Сортировать"><i data-icon="arrow-narrow-down"></i></button></span>
+          <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+        </div>
+        <div class="th" aria-sort="none" data-sort-type="text">
+          <span class="th__label">Статус</span>
+          <span class="th__tools">
+            <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="status" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button>
+          </span>
+          <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+        </div>
+        <div class="th" aria-sort="none" data-sort-type="date">
+          <span class="th__label">Дата сделки</span>
+          <span class="th__tools">
+            <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="date" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button>
+          </span>
+          <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+        </div>
+        <div class="th th--center"><span class="th__label">Действия</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+        <div class="th th--separator"></div>
+      </div>
+
+      <!-- Строки по убыванию суммы (450 М → 1,24 М) — согласовано с th--sorted.
+           Состояния — на строке (--hover/--focus/--selected). Контролы в строке
+           обёрнуты в <span class="tc__controls"> (не <div>): сенсор layout-check
+           считает ячейки строк по <div>, вложенный <div> ломал бы Б8. -->
+      <div class="tbl__row" style="grid-template-columns:8px 44px minmax(180px,2fr) minmax(140px,1.3fr) 150px 130px 120px 96px minmax(8px,1fr);">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--select">
+          <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
+        </div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">АО «Транснефть»</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Кредит</span></span></div>
+        <div class="tc tc--numbers" data-sort-value="450000000"><span class="tc__row"><span class="tc__text">450 000 000,00</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__label">На рассмотрении</span></span></span></div>
+        <div class="tc" data-sort-value="2026-09-01"><span class="tc__row"><span class="tc__text">01.09.2026</span></span></div>
+        <div class="tc tc--center">
+          <span class="tc__controls">
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Изменить сделку" data-modal="deal-form-scrim"><i data-icon="edit"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить сделку" data-modal="delete-scrim"><i data-icon="trash"></i></button>
+          </span>
+        </div>
+        <div class="tc tc--separator"></div>
+      </div>
+
+      <div class="tbl__row" style="grid-template-columns:8px 44px minmax(180px,2fr) minmax(140px,1.3fr) 150px 130px 120px 96px minmax(8px,1fr);">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--select">
+          <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
+        </div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">ПАО «Северсталь»</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Овердрафт</span></span></div>
+        <div class="tc tc--numbers" data-sort-value="315000000"><span class="tc__row"><span class="tc__text">315 000 000,00</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Активна</span></span></span></div>
+        <div class="tc" data-sort-value="2026-01-28"><span class="tc__row"><span class="tc__text">28.01.2026</span></span></div>
+        <div class="tc tc--center">
+          <span class="tc__controls">
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Изменить сделку" data-modal="deal-form-scrim"><i data-icon="edit"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить сделку" data-modal="delete-scrim"><i data-icon="trash"></i></button>
+          </span>
+        </div>
+        <div class="tc tc--separator"></div>
+      </div>
+
+      <div class="tbl__row" style="grid-template-columns:8px 44px minmax(180px,2fr) minmax(140px,1.3fr) 150px 130px 120px 96px minmax(8px,1fr);">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--select">
+          <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
+        </div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">ПАО «Газпром нефть»</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Банковская гарантия</span></span></div>
+        <div class="tc tc--numbers" data-sort-value="89500000"><span class="tc__row"><span class="tc__text">89 500 000,00</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="chip chip--s chip--info"><span class="chip__label">На рассмотрении</span></span></span></div>
+        <div class="tc" data-sort-value="2026-06-02"><span class="tc__row"><span class="tc__text">02.06.2026</span></span></div>
+        <div class="tc tc--center">
+          <span class="tc__controls">
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Изменить сделку" data-modal="deal-form-scrim"><i data-icon="edit"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить сделку" data-modal="delete-scrim"><i data-icon="trash"></i></button>
+          </span>
+        </div>
+        <div class="tc tc--separator"></div>
+      </div>
+
+      <div class="tbl__row" style="grid-template-columns:8px 44px minmax(180px,2fr) minmax(140px,1.3fr) 150px 130px 120px 96px minmax(8px,1fr);">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--select">
+          <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
+        </div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">АО «РЖД Логистика»</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Аккредитив</span></span></div>
+        <div class="tc tc--numbers" data-sort-value="52400000"><span class="tc__row"><span class="tc__text">52 400 000,00</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">Черновик</span></span></span></div>
+        <div class="tc" data-sort-value="2026-08-20"><span class="tc__row"><span class="tc__text">20.08.2026</span></span></div>
+        <div class="tc tc--center">
+          <span class="tc__controls">
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Изменить сделку" data-modal="deal-form-scrim"><i data-icon="edit"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить сделку" data-modal="delete-scrim"><i data-icon="trash"></i></button>
+          </span>
+        </div>
+        <div class="tc tc--separator"></div>
+      </div>
+
+      <div class="tbl__row" style="grid-template-columns:8px 44px minmax(180px,2fr) minmax(140px,1.3fr) 150px 130px 120px 96px minmax(8px,1fr);">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--select">
+          <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
+        </div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">ООО «СтройИнвест»</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Кредитная линия</span></span></div>
+        <div class="tc tc--numbers" data-sort-value="18900000"><span class="tc__row"><span class="tc__text">18 900 000,00</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">Черновик</span></span></span></div>
+        <div class="tc" data-sort-value="2026-08-30"><span class="tc__row"><span class="tc__text">30.08.2026</span></span></div>
+        <div class="tc tc--center">
+          <span class="tc__controls">
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Изменить сделку" data-modal="deal-form-scrim"><i data-icon="edit"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить сделку" data-modal="delete-scrim"><i data-icon="trash"></i></button>
+          </span>
+        </div>
+        <div class="tc tc--separator"></div>
+      </div>
+
+      <div class="tbl__row" style="grid-template-columns:8px 44px minmax(180px,2fr) minmax(140px,1.3fr) 150px 130px 120px 96px minmax(8px,1fr);">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--select">
+          <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
+        </div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">ООО «МеталлТрейд»</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Кредитная линия</span></span></div>
+        <div class="tc tc--numbers" data-sort-value="12300000"><span class="tc__row"><span class="tc__text">12 300 000,00</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">На доработке</span></span></span></div>
+        <div class="tc" data-sort-value="2026-07-11"><span class="tc__row"><span class="tc__text">11.07.2026</span></span></div>
+        <div class="tc tc--center">
+          <span class="tc__controls">
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Изменить сделку" data-modal="deal-form-scrim"><i data-icon="edit"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить сделку" data-modal="delete-scrim"><i data-icon="trash"></i></button>
+          </span>
+        </div>
+        <div class="tc tc--separator"></div>
+      </div>
+
+      <div class="tbl__row" style="grid-template-columns:8px 44px minmax(180px,2fr) minmax(140px,1.3fr) 150px 130px 120px 96px minmax(8px,1fr);">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--select">
+          <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
+        </div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">ООО «АгроХолдинг»</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Банковская гарантия</span></span></div>
+        <div class="tc tc--numbers" data-sort-value="7480000"><span class="tc__row"><span class="tc__text">7 480 000,00</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__label">Отклонена</span></span></span></div>
+        <div class="tc" data-sort-value="2026-05-19"><span class="tc__row"><span class="tc__text">19.05.2026</span></span></div>
+        <div class="tc tc--center">
+          <span class="tc__controls">
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Изменить сделку" data-modal="deal-form-scrim"><i data-icon="edit"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить сделку" data-modal="delete-scrim"><i data-icon="trash"></i></button>
+          </span>
+        </div>
+        <div class="tc tc--separator"></div>
+      </div>
+
+      <div class="tbl__row" style="grid-template-columns:8px 44px minmax(180px,2fr) minmax(140px,1.3fr) 150px 130px 120px 96px minmax(8px,1fr);">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--select">
+          <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать строку"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
+        </div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">ООО «ЮгСтрой»</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="tc__text">Кредитная линия</span></span></div>
+        <div class="tc tc--numbers" data-sort-value="1240500"><span class="tc__row"><span class="tc__text">1 240 500,00</span></span></div>
+        <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Активна</span></span></span></div>
+        <div class="tc" data-sort-value="2026-03-15"><span class="tc__row"><span class="tc__text">15.03.2026</span></span></div>
+        <div class="tc tc--center">
+          <span class="tc__controls">
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Изменить сделку" data-modal="deal-form-scrim"><i data-icon="edit"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить сделку" data-modal="delete-scrim"><i data-icon="trash"></i></button>
+          </span>
+        </div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dtable__footer">
+    <div data-pagination data-total="128" data-page="1" data-page-size="50"></div>
+  </div>
+</div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Модальные окна — каждый файл modals/*.html, вшивается в конец body,
+     чтобы ds.js при загрузке собранного документа уже видел скримы ───────── -->
+<!-- Фрагмент модалки фильтра (TableFilter .tfm, неотъемлема часть кнопки «Фильтр»).
+     Чистая разметка: один корневой элемент .modal-scrim, без <html>/<head>.
+     Вшивается ассемблером assemble.mjs по метке <ds-include src="modals/Filter.html">.
+     Кнопка-триггер лежит в tables/DealsTable.html и ссылается data-modal="filter-scrim". -->
+<div class="modal-scrim" id="filter-scrim" hidden>
+  <div class="modal modal--w6 tfm" role="dialog" aria-modal="true" aria-labelledby="filter-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="filter-title">Фильтр</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body modal__body--flush">
+      <div class="tfm__body">
+        <nav class="tabs tabs--vert tfm__nav" aria-label="Разделы фильтра">
+          <button type="button" class="tab tab--m tab--vert tab--selected" aria-current="true" data-target="tfm-sec-general"><span class="tab__label">Общая информация</span><span class="tab__badge" hidden>0</span></button>
+          <button type="button" class="tab tab--m tab--vert" data-target="tfm-sec-dates"><span class="tab__label">Сроки</span><span class="tab__badge" hidden>0</span></button>
+        </nav>
+        <div class="tfm__panel">
+
+          <section class="tfm__sec" id="tfm-sec-general" aria-labelledby="tfm-sec-general-t">
+            <p class="tfm__sec-title" id="tfm-sec-general-t">Общая информация</p>
+            <div class="tfm__grid">
+              <div class="inp inp--m">
+                <label class="ds-label" for="f-cp"><span class="ds-label__text">Контрагент</span></label>
+                <div class="inp__field"><input class="inp__control" id="f-cp"></div>
+              </div>
+              <div class="inp inp--m">
+                <label class="ds-label" for="f-status"><span class="ds-label__text">Статус</span></label>
+                <div class="inp__field" data-ddl="f-status-list">
+                  <span class="inp__chips">
+                    <span class="chip chip--edit chip--s"><span class="chip__label">Активна</span><span class="chip__remove" role="button" aria-label="Удалить Активна"><i data-icon="close"></i></span></span>
+                    <span class="chip chip--edit chip--s"><span class="chip__label">На рассмотрении</span><span class="chip__remove" role="button" aria-label="Удалить На рассмотрении"><i data-icon="close"></i></span></span>
+                  </span>
+                  <input class="inp__control" id="f-status">
+                  <span class="inp__acts"><button class="inp__act" aria-label="Очистить поле"><i data-icon="close"></i></button><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+                </div>
+                <div id="f-status-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+                  <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+                  <hr class="ddl__divider">
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="true"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Активна</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="true"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">На рассмотрении</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Черновик</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">На доработке</span></span></button>
+                </div>
+              </div>
+              <div class="inp inp--m">
+                <label class="ds-label" for="f-prod"><span class="ds-label__text">Продукт</span></label>
+                <div class="inp__field" data-ddl="f-prod-list">
+                  <input class="inp__control" id="f-prod">
+                  <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+                </div>
+                <div id="f-prod-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+                  <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+                  <hr class="ddl__divider">
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Кредитная линия</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Банковская гарантия</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Аккредитив</span></span></button>
+                </div>
+              </div>
+              <div class="inp inp--m">
+                <label class="ds-label" for="f-desk"><span class="ds-label__text">Деск</span></label>
+                <div class="inp__field" data-ddl="f-desk-list">
+                  <input class="inp__control" id="f-desk">
+                  <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+                </div>
+                <div id="f-desk-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+                  <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+                  <hr class="ddl__divider">
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Корпоративный</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Недвижимость</span></span></button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="tfm__sec" id="tfm-sec-dates" aria-labelledby="tfm-sec-dates-t">
+            <p class="tfm__sec-title" id="tfm-sec-dates-t">Сроки</p>
+            <div class="tfm__grid">
+              <div class="inp-range inp-range--date tfm__span-2">
+                <label class="ds-label"><span class="ds-label__text">Дата сделки</span></label>
+                <div class="inp-range__row">
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">От</span>
+                      <input class="inp__control" id="f-date-from" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">
+                      <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                  <span class="inp-range__line" aria-hidden="true"></span>
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">До</span>
+                      <input class="inp__control" id="f-date-to" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">
+                      <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="inp-range inp-range--date tfm__span-2">
+                <label class="ds-label"><span class="ds-label__text">Дата изменения</span></label>
+                <div class="inp-range__row">
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">От</span>
+                      <input class="inp__control" id="f-mdate-from" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">
+                      <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                  <span class="inp-range__line" aria-hidden="true"></span>
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">До</span>
+                      <input class="inp__control" id="f-mdate-to" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">
+                      <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Очистить фильтр</span></button>
+        <button type="button" class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Применить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+<!-- Фрагмент модалки «Редактирование сделки» (форма, Modal w6).
+     Чистая разметка: один корневой элемент .modal-scrim.
+     Вшивается ассемблером assemble.mjs по метке <ds-include src="modals/EditDeal.html">.
+     Триггеры: кнопка «Создать сделку» в шапке страницы и «Изменить» в строке таблицы —
+     оба с data-modal="deal-form-scrim" (одна форма на создание и редактирование).
+     Двухколоночная раскладка полей — класс .frm-grid, объявлен в <style> index.html
+     (раскладка на токенах; своих стилей компонентов фрагмент не несёт). -->
+<div class="modal-scrim" id="deal-form-scrim" hidden>
+  <div class="modal modal--w6" role="dialog" aria-modal="true" aria-labelledby="deal-form-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="deal-form-title">Редактирование сделки</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div class="frm-grid">
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-num"><span class="ds-label__text">Номер сделки</span></label>
+          <div class="inp__box">
+            <div class="inp__field">
+              <input class="inp__control" id="d-num" value="D-000471" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-cp"><span class="ds-label__text">Контрагент</span></label>
+          <div class="inp__box">
+            <div class="inp__field">
+              <input class="inp__control" id="d-cp" value="ООО «ЮгСтрой»">
+            </div>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth frm-grid__span-2">
+          <label class="ds-label" for="d-name"><span class="ds-label__text">Наименование сделки</span></label>
+          <div class="inp__box">
+            <div class="inp__field">
+              <input class="inp__control" id="d-name" value="Кредитная линия «ЮгСтрой»">
+            </div>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-prod"><span class="ds-label__text">Продукт</span></label>
+          <div class="inp__field" data-ddl="d-prod-list">
+            <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">Кредитная линия</span><span class="chip__remove" role="button" aria-label="Удалить Кредитная линия"><i data-icon="close"></i></span></span></span>
+            <input class="inp__control" id="d-prod">
+            <span class="inp__acts"><button class="inp__act" aria-label="Очистить поле"><i data-icon="close"></i></button><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="d-prod-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+            <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+            <hr class="ddl__divider">
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="true"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Кредитная линия</span></span></button>
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Банковская гарантия</span></span></button>
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Аккредитив</span></span></button>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-status"><span class="ds-label__text">Статус</span></label>
+          <div class="inp__field" data-ddl="d-status-list">
+            <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">Активна</span><span class="chip__remove" role="button" aria-label="Удалить Активна"><i data-icon="close"></i></span></span></span>
+            <input class="inp__control" id="d-status">
+            <span class="inp__acts"><button class="inp__act" aria-label="Очистить поле"><i data-icon="close"></i></button><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="d-status-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+            <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+            <hr class="ddl__divider">
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="true"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Активна</span></span></button>
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Черновик</span></span></button>
+            <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">На доработке</span></span></button>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-amount"><span class="ds-label__text">Сумма, RUB</span></label>
+          <div class="inp__box">
+            <div class="inp__field">
+              <input class="inp__control" id="d-amount" value="1 240 500,00" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="d-date"><span class="ds-label__text">Дата сделки</span></label>
+          <div class="inp__field">
+            <input class="inp__control" id="d-date" value="15.03.2026" inputmode="numeric">
+            <span class="inp__acts">
+              <button class="inp__act" aria-label="Очистить поле"><i data-icon="close"></i></button>
+              <button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button type="button" class="btn btn--accent btn--m"><span class="btn__label">Сохранить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+<!-- Фрагмент модалки подтверждения удаления (Modal w3, тон danger).
+     Чистая разметка: один корневой элемент .modal-scrim.
+     Вшивается ассемблером assemble.mjs по метке <ds-include src="modals/DeleteConfirm.html">.
+     Триггер — кнопка «Удалить сделку» в строке таблицы, data-modal="delete-scrim". -->
+<div class="modal-scrim" id="delete-scrim" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="delete-title">Удалить сделку</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <p>Сделка будет удалена без возможности восстановления. Продолжить?</p>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button type="button" class="btn btn--accent btn--m btn--danger"><span class="btn__label">Удалить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="../../../DS-IBP/scripts/ds.js"></script>
+</body>
+</html>

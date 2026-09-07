@@ -1,0 +1,131 @@
+<!-- Фрагмент модалки фильтра (TableFilter .tfm, неотъемлема часть кнопки «Фильтр»).
+     Чистая разметка: один корневой элемент .modal-scrim, без <html>/<head>.
+     Вшивается ассемблером assemble.mjs по метке <ds-include src="modals/Filter.html">.
+     Кнопка-триггер лежит в tables/DealsTable.html и ссылается data-modal="filter-scrim". -->
+<div class="modal-scrim" id="filter-scrim" hidden>
+  <div class="modal modal--w6 tfm" role="dialog" aria-modal="true" aria-labelledby="filter-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="filter-title">Фильтр</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body modal__body--flush">
+      <div class="tfm__body">
+        <nav class="tabs tabs--vert tfm__nav" aria-label="Разделы фильтра">
+          <button type="button" class="tab tab--m tab--vert tab--selected" aria-current="true" data-target="tfm-sec-general"><span class="tab__label">Общая информация</span><span class="tab__badge" hidden>0</span></button>
+          <button type="button" class="tab tab--m tab--vert" data-target="tfm-sec-dates"><span class="tab__label">Сроки</span><span class="tab__badge" hidden>0</span></button>
+        </nav>
+        <div class="tfm__panel">
+
+          <section class="tfm__sec" id="tfm-sec-general" aria-labelledby="tfm-sec-general-t">
+            <p class="tfm__sec-title" id="tfm-sec-general-t">Общая информация</p>
+            <div class="tfm__grid">
+              <div class="inp inp--m">
+                <label class="ds-label" for="f-cp"><span class="ds-label__text">Контрагент</span></label>
+                <div class="inp__field"><input class="inp__control" id="f-cp"></div>
+              </div>
+              <div class="inp inp--m">
+                <label class="ds-label" for="f-status"><span class="ds-label__text">Статус</span></label>
+                <div class="inp__field" data-ddl="f-status-list">
+                  <span class="inp__chips">
+                    <span class="chip chip--edit chip--s"><span class="chip__label">Активна</span><span class="chip__remove" role="button" aria-label="Удалить Активна"><i data-icon="close"></i></span></span>
+                    <span class="chip chip--edit chip--s"><span class="chip__label">На рассмотрении</span><span class="chip__remove" role="button" aria-label="Удалить На рассмотрении"><i data-icon="close"></i></span></span>
+                  </span>
+                  <input class="inp__control" id="f-status">
+                  <span class="inp__acts"><button class="inp__act" aria-label="Очистить поле"><i data-icon="close"></i></button><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+                </div>
+                <div id="f-status-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+                  <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+                  <hr class="ddl__divider">
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="true"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Активна</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="true"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">На рассмотрении</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Черновик</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">На доработке</span></span></button>
+                </div>
+              </div>
+              <div class="inp inp--m">
+                <label class="ds-label" for="f-prod"><span class="ds-label__text">Продукт</span></label>
+                <div class="inp__field" data-ddl="f-prod-list">
+                  <input class="inp__control" id="f-prod">
+                  <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+                </div>
+                <div id="f-prod-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+                  <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+                  <hr class="ddl__divider">
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Кредитная линия</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Банковская гарантия</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Аккредитив</span></span></button>
+                </div>
+              </div>
+              <div class="inp inp--m">
+                <label class="ds-label" for="f-desk"><span class="ds-label__text">Деск</span></label>
+                <div class="inp__field" data-ddl="f-desk-list">
+                  <input class="inp__control" id="f-desk">
+                  <span class="inp__acts"><button class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+                </div>
+                <div id="f-desk-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-multiselectable="true">
+                  <button class="ddl__item ddl__item--checkbox ddl__item--all" role="option" aria-checked="mixed"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Выбрать всё</span></span></button>
+                  <hr class="ddl__divider">
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Корпоративный</span></span></button>
+                  <button class="ddl__item ddl__item--checkbox" role="option" aria-checked="false"><span class="ddl__item-check"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></span><span class="ddl__item-body"><span class="ddl__item-label">Недвижимость</span></span></button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="tfm__sec" id="tfm-sec-dates" aria-labelledby="tfm-sec-dates-t">
+            <p class="tfm__sec-title" id="tfm-sec-dates-t">Сроки</p>
+            <div class="tfm__grid">
+              <div class="inp-range inp-range--date tfm__span-2">
+                <label class="ds-label"><span class="ds-label__text">Дата сделки</span></label>
+                <div class="inp-range__row">
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">От</span>
+                      <input class="inp__control" id="f-date-from" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">
+                      <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                  <span class="inp-range__line" aria-hidden="true"></span>
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">До</span>
+                      <input class="inp__control" id="f-date-to" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">
+                      <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="inp-range inp-range--date tfm__span-2">
+                <label class="ds-label"><span class="ds-label__text">Дата изменения</span></label>
+                <div class="inp-range__row">
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">От</span>
+                      <input class="inp__control" id="f-mdate-from" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">
+                      <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                  <span class="inp-range__line" aria-hidden="true"></span>
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">До</span>
+                      <input class="inp__control" id="f-mdate-to" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">
+                      <span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Очистить фильтр</span></button>
+        <button type="button" class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Применить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>

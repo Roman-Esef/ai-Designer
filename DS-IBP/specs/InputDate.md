@@ -53,7 +53,7 @@ status: curated
 ### Разметка · HTML (эталонная реализация ДС)
 
 ```
-<div class="inp">
+<div class="inp inp--m">
   <label class="ds-label" for="d1"><span class="ds-label__text">Дата подписания</span></label>
   <div class="inp__field">
     <input class="inp__control" id="d1" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">

@@ -1,0 +1,21 @@
+<!-- Фрагмент модалки подтверждения удаления (Modal w3, тон danger).
+     Чистая разметка: один корневой элемент .modal-scrim.
+     Вшивается ассемблером assemble.mjs по метке <ds-include src="modals/DeleteConfirm.html">.
+     Триггер — кнопка «Удалить сделку» в строке таблицы, data-modal="delete-scrim". -->
+<div class="modal-scrim" id="delete-scrim" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="delete-title">Удалить сделку</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <p>Сделка будет удалена без возможности восстановления. Продолжить?</p>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button type="button" class="btn btn--accent btn--m btn--danger"><span class="btn__label">Удалить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>

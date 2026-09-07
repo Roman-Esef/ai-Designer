@@ -55,7 +55,7 @@ status: curated
 ### Разметка · HTML (эталонная реализация ДС)
 
 ```
-<div class="inp">
+<div class="inp inp--m">
   <label class="ds-label" for="inn"><span class="ds-label__text">ИНН</span></label>
   <div class="inp__field">
     <span class="inp__lead">…search…</span>
