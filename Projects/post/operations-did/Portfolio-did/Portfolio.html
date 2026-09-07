@@ -740,16 +740,17 @@
       s += '</div>';
     });
     s += '</div>';
-    s += '<div class="nav__footer">'
-      + '<a class="nav__user" href="#" aria-label="Открыть личный кабинет">'
-      + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
-      + '<span class="nav__user-text">'
-      + '<span class="nav__user-name">Александров Петр Константинович</span>'
-      + '<span class="nav__user-role">' + role + '</span>'
-      + '<span class="nav__user-org">SMB Недвижимость +2</span>'
-      + '</span></a>'
-      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти">' + ic('logout') + '</button>'
-      + '</div>';
+    s += (window.IBPHome && window.IBPHome.footerHTML)
+      ? window.IBPHome.footerHTML(role)
+      : '<div class="nav__footer">'
+        + '<a class="nav__user" href="#" aria-label="Открыть личный кабинет">'
+        + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
+        + '<span class="nav__user-text">'
+        + '<span class="nav__user-name">Александров Петр Константинович</span>'
+        + '<span class="nav__user-role">' + role + '</span>'
+        + '</span></a>'
+        + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>'
+        + '</div>';
     nav.innerHTML = s;
     if (window.DSNavPanel) window.DSNavPanel.bind(nav);
   }

@@ -1,12 +1,13 @@
 /* =========================================================================
    Design System — IconButton
    Безрамочная кнопка-иконка. РАЗМЕР КОМПОНЕНТА В ЛЕЙАУТЕ = РАЗМЕР ИКОНКИ
-   (L 24 · M 20 · S 16). Круглый стейт-слой — это отдельный слой (::before),
-   который появляется на hover/pressed и ВЫХОДИТ ЗА ГРАНИЦЫ кнопки, никак не
-   влияя на её размер в потоке. Он же расширяет зону клика (pointer-events).
+   (L 24 · M 20 · S 16). Квадратный (скруглённый control) стейт-слой — это
+   отдельный слой (::before), который появляется на hover/pressed и ВЫХОДИТ ЗА
+   ГРАНИЦЫ кнопки, никак не влияя на её размер в потоке. Он же расширяет зону
+   клика (pointer-events).
    Tones:  neutral (--secondary) · primary · danger · contrast
    States: default · hover · pressed · focus · selected · disabled · loading
-   Shape:  circle (default) · square
+   Shape:  square (default) · circle
    Variant: embedded (без стейт-слоя — для полей ввода/плотных тулбаров)
    Requires: typography.css, colors.css
    ========================================================================= */
@@ -55,7 +56,7 @@
   transform: translate(-50%, -50%);
   width: var(--ibtn-layer-w, 32px);
   height: var(--ibtn-layer-w, 32px);
-  border-radius: var(--radius-circle);
+  border-radius: var(--radius-control);
   background: transparent;
   transition: background-color .15s ease;
   pointer-events: auto;   /* стейт-слой ловит клики → зона клика больше иконки */
@@ -72,14 +73,15 @@
 .ibtn--s { width: 16px; height: 16px; }
 .ibtn--l::before { width: 40px; height: 40px; }
 .ibtn--m::before { width: 32px; height: 32px; }
-.ibtn--s::before { width: 24px; height: 24px; }
+.ibtn--s::before { width: 24px; height: 24px; border-radius: var(--radius-control-s); }
 .ibtn--l :is(svg,[data-icon]), .ibtn--l .spin{ width: 24px; height: 24px; }
 .ibtn--m :is(svg,[data-icon]), .ibtn--m .spin{ width: 20px; height: 20px; }
 .ibtn--s :is(svg,[data-icon]), .ibtn--s .spin{ width: 16px; height: 16px; }
-/* square / embedded — стейт-слой со скруглением control вместо круга */
-.ibtn--l.ibtn--square::before, .ibtn--l.ibtn--embedded::before { border-radius: var(--radius-control); }
-.ibtn--m.ibtn--square::before, .ibtn--m.ibtn--embedded::before { border-radius: var(--radius-control); }
-.ibtn--s.ibtn--square::before, .ibtn--s.ibtn--embedded::before { border-radius: var(--radius-control-s); }
+/* Форма стейт-слоя. По умолчанию — квадрат со скруглением control (radius-control
+   для L/M, radius-control-s для S, заданы в базовом и размерных правилах выше);
+   круг — явный модификатор .ibtn--circle. .ibtn--square оставлен как алиас для
+   обратной совместимости: с ним ничего не добавляется, дефолт и так квадратный. */
+.ibtn--circle::before { border-radius: var(--radius-circle); }
 
 /* ---------- tones (цвет иконки; стейт-слой миксуется из currentColor) ----- */
 .ibtn--neutral  { color: var(--secondary); }

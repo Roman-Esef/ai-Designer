@@ -49,7 +49,7 @@ status: curated
 <div class="inp-range">
   <label class="ds-label"><span class="ds-label__text">Сумма, RUB</span></label>
   <div class="inp-range__row">
-    <div class="inp inp-range__field">
+    <div class="inp inp--m inp-range__field">
       <div class="inp__field">
         <span class="inp__prefix">От</span>
         <input class="inp__control" inputmode="decimal">
@@ -57,7 +57,7 @@ status: curated
       </div>
     </div>
     <span class="inp-range__line" aria-hidden="true"></span>
-    <div class="inp inp-range__field">…префикс «До»…</div>
+    <div class="inp inp--m inp-range__field">…префикс «До»…</div>
   </div>
   <span class="ds-helper ds-helper--left">Helper</span>
 </div>

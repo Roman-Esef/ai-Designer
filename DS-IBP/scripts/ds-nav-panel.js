@@ -210,21 +210,24 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { bindAll(document); });
   else bindAll(document);
 
-  /* Тултип на усечённой подписи пункта/футера (спека, «Контент»): подпись
-     пункта — усечение многоточием + тултип; футер — ФИО/должность/
-     организация тоже усекаются. Механизм общий — DSTooltip.truncated().
-     Фокус приходит на пункт (.nav__item) и строку пользователя (.nav__user),
-     подписи живут внутри — поэтому opts.host.
-     В Rail подпись не усекается (position:fixed, ширина по контенту) —
-     isTruncated отсекает, и собственный rail-тултип (placeRailLabels)
-     не конфликтует с механизмом. Заголовок блока (.nav__block-label)
-     не регистрируем: спека тултип для него не обещает. */
+   /* Тултип на усечённой подписи пункта/футера (спека, «Контент»): подпись
+      пункта — усечение многоточием + тултип; футер — ФИО и должность тоже
+      усекаются. Механизм общий — DSTooltip.truncated().
+      Фокус приходит на пункт (.nav__item) и строку пользователя (.nav__user),
+      подписи живут внутри — поэтому opts.host.
+      Строки организации в футере нет (удалена), поэтому .nav__user-org не
+      регистрируем. В Rail подпись не усекается (position:fixed, ширина по
+      контенту) — isTruncated отсекает, и собственный rail-тултип
+      (placeRailLabels) не конфликтует с механизмом. Заголовок блока
+      (.nav__block-label) не регистрируем: спека тултип для него не обещает.
+      zIndex:2000 — тултип рисуется ВЫШЕ панели (.nav в .nav-layout несёт
+      z-index:1000), иначе в развёрнутом виде он остаётся под панелью. */
   var truncatedHandle = null;
   function registerTrunc() {
     if (truncatedHandle || !window.DSTooltip) return;
     truncatedHandle = window.DSTooltip.truncated(
-      '.nav__label, .nav__user-name, .nav__user-role, .nav__user-org',
-      { host: '.nav__item, .nav__user' }
+      '.nav__label, .nav__user-name, .nav__user-role',
+      { host: '.nav__item, .nav__user', zIndex: 2000 }
     );
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { registerTrunc(); });

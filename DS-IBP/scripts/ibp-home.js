@@ -12,7 +12,8 @@
 
    Экспорт: window.IBPHome = {
      groups (полный каталог), roles, rolesList,
-     itemsFor(role) → группы роли, tileHTML(item) → разметка NavTile
+     itemsFor(role) → группы роли, tileHTML(item) → разметка NavTile,
+     user, footerHTML(role, opts) → футер панели (строка пользователя + выход)
    }
    ========================================================================= */
 (function () {
@@ -132,12 +133,39 @@
     return Object.keys(ROLES);
   }
 
+  /* Пользователь в футере панели (строка пользователя — ссылка на личный
+     кабинет + кнопка выхода). Вынесено в каталог, чтобы экраны и демо не
+     дублировали футер: правки футера (например, удаление строки организации)
+     тянутся из ДС. */
+  var USER = { name: 'Александров Петр Константинович', initials: 'АП' };
+
+  /* Разметка футера (.nav__footer). role — имя текущей роли (подставляется в
+     строку пользователя). opts.logoutModal / opts.logoutLabel — для кнопки
+     выхода демо (смена роли: data-modal + aria-label), без них — обычный
+     выход с aria-label «Выйти». opts.initials / opts.name — переопределения. */
+  function footerHTML(role, opts) {
+    opts = opts || {};
+    var logout = '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout"'
+      + (opts.logoutModal ? ' data-modal="' + opts.logoutModal + '"' : '')
+      + ' aria-label="' + (opts.logoutLabel || 'Выйти') + '"><i data-icon="logout"></i></button>';
+    return '<div class="nav__footer">'
+      + '<a class="nav__user" href="#" aria-label="Открыть личный кабинет">'
+      + '<span class="av av--circular av--m"><span class="av__text">' + (opts.initials || USER.initials) + '</span></span>'
+      + '<span class="nav__user-text">'
+      + '<span class="nav__user-name">' + (opts.name || USER.name) + '</span>'
+      + '<span class="nav__user-role">' + role + '</span>'
+      + '</span></a>'
+      + logout + '</div>';
+  }
+
   window.IBPHome = {
     groups: GROUPS,
     roles: ROLES,
     rolesList: rolesList,
     defaultRole: DEFAULT_ROLE,
     itemsFor: itemsFor,
-    tileHTML: tileHTML
+    tileHTML: tileHTML,
+    user: USER,
+    footerHTML: footerHTML
   };
 })();

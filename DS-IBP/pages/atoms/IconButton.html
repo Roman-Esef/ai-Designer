@@ -145,10 +145,10 @@
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.010</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.011</b></span><span>Обновлено: <b>07.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>IconButton</h1>
-    <p class="lead">Безрамочная кнопка с одной иконкой и круглым стейт-слоем (риплом). Цвет рипла соответствует цвету иконки. Тоны Neutral / Primary / Danger / Contrast, размеры L / M / S, состояния Default / Hover / Pressed / Focus / Disabled / Loading, режим-переключатель и встроенный вариант для полей ввода.</p>
+    <p class="lead">Безрамочная кнопка с одной иконкой и квадратным (скруглённым control) стейт-слоем (риплом). Цвет рипла соответствует цвету иконки. Тоны Neutral / Primary / Danger / Contrast, размеры L / M / S, состояния Default / Hover / Pressed / Focus / Disabled / Loading, режим-переключатель и встроенный вариант для полей ввода.</p>
   </header>
 
 
@@ -181,7 +181,7 @@
   <!-- ANATOMY -->
   <section class="section" data-screen-label="Anatomy">
     <h2>Анатомия</h2>
-    <p class="desc">Компонент состоит из иконки и круглого стейт-слоя вокруг неё. Стейт-слой появляется на Hover / Pressed и заполняет всю область компонента; его цвет — это полупрозрачный оттенок цвета иконки. Кликабельная область равна размеру компонента.</p>
+    <p class="desc">Компонент состоит из иконки и квадратного (скруглённого control) стейт-слоя вокруг неё. Стейт-слой появляется на Hover / Pressed и заполняет всю область компонента; его цвет — это полупрозрачный оттенок цвета иконки. Кликабельная область равна размеру компонента.</p>
     <div class="panel">
       <div class="anat">
         <div class="anat__stage">
@@ -189,7 +189,7 @@
         </div>
         <ul class="anat__legend">
           <li><span class="n"></span><span class="t"><span class="k">Иконка</span><span class="d"> — задаёт тон; размер привязан к размеру кнопки</span></span></li>
-          <li><span class="n"></span><span class="t"><span class="k">Стейт-слой (рипл)</span><span class="d"> — круг, оттенок цвета иконки, виден на Hover / Pressed</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Стейт-слой (рипл)</span><span class="d"> — квадрат со скруглением control, оттенок цвета иконки, виден на Hover / Pressed (круг — только с явным `ibtn--circle`)</span></span></li>
           <li><span class="n"></span><span class="t"><span class="k">Область клика</span><span class="d"> — равна размеру компонента (L 40 · M 32 · S 24)</span></span></li>
         </ul>
       </div>
@@ -222,7 +222,7 @@
 
 <div class="subsec" data-screen-label="Embedded">
     <h3>Встроенный вариант (поля и тулбары)</h3>
-    <p class="desc">В полях ввода и плотных тулбарах круглый стейт-слой избыточен. Встроенный вариант (<code class="tok">ibtn--embedded</code>) убирает рипл: в покое иконка нейтральная, на Hover она окрашивается в Primary. Это и есть состояние «Hover (Input)». Наведите на иконку очистки:</p>
+    <p class="desc">В полях ввода и плотных тулбарах стейт-слой избыточен. Встроенный вариант (<code class="tok">ibtn--embedded</code>) убирает рипл: в покое иконка нейтральная, на Hover она окрашивается в Primary. Это и есть состояние «Hover (Input)». Наведите на иконку очистки:</p>
     <div class="panel" style="margin-bottom:20px;">
       <div class="row" id="field-row" style="gap:28px;"></div>
     </div>
@@ -239,6 +239,14 @@
       <div class="row" id="badge-row" style="gap:32px;"></div>
     </div>
   </div>
+
+<div class="subsec" data-screen-label="Shape">
+    <h3>Форма стейт-слоя</h3>
+    <p class="desc">По умолчанию стейт-слой квадратный со скруглением контрола (<code class="tok">--radius-control</code>). Круглый стейт-слой — только с явным модификатором <code class="tok">.ibtn--circle</code>. Наведите на примеры:</p>
+    <div class="panel">
+      <div class="row" id="shape-row" style="gap:40px;"></div>
+    </div>
+  </div>
   </section>
 
   <!-- SIZES -->
@@ -248,13 +256,13 @@
       <b>L&nbsp;— 24</b> · самостоятельные действия, тулбары &nbsp;·&nbsp; <b>M&nbsp;— 20</b> · карточки, шапки, действия в Alert &nbsp;·&nbsp; <b>S&nbsp;— 16</b> · таблицы, поля ввода.</p>
     <div class="panel" style="margin-bottom:20px;"><div class="row" id="sizes-row" style="gap:40px;"></div></div>
     <div class="panel" style="padding:0;overflow:hidden;">
-      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Кнопка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Иконка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Стейт-слой</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Скругление (square)</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24 × 24</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">40 (круг)</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">20 × 20</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">20</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">32 (круг)</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">16 × 16</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">16</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24 (круг)</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">6</span></span></div><div class="tc tc--separator"></div></div></div>
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Кнопка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Иконка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Стейт-слой</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Скругление (квадрат, по умолчанию)</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24 × 24</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">40 (квадрат)</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">20 × 20</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">20</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">32 (квадрат)</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">8</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.72fr 0.77fr 0.72fr 0.9fr 1.31fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">16 × 16</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">16</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">24 (квадрат)</span></span></div><div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">6</span></span></div><div class="tc tc--separator"></div></div></div>
     </div>
   
 <div class="subsec" data-screen-label="Radius">
     <h3>Радиус скругления</h3>
-    <p class="desc">Скругление относится к стейт-слою — сама иконка фона не имеет. По умолчанию слой круглый; варианты <code class="tok">.ibtn--square</code> и <code class="tok">.ibtn--embedded</code> берут радиус контрола своего размера.</p>
-    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L / M / S — круглая, по умолчанию</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L — square, embedded</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M — square, embedded</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S — square, embedded</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+    <p class="desc">Скругление относится к стейт-слою — сама иконка фона не имеет. По умолчанию слой квадратный (радиус контрола своего размера); круг — только с явным <code class="tok">.ibtn--circle</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L / M / S — квадратная, по умолчанию</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 / 8 / 6</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control / --radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">L — круг (circular)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">M — круг (circular)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">S — круг (circular)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">50%</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-circle</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
   </div>
   </section>
 
@@ -468,13 +476,13 @@ const UI = {
 /* ---------- IconButton factory ----------
    o: { tone, size, icon, state, shape, embedded, selected, loading, label, badge, frozen } */
 function makeIB(o = {}) {
-  const { tone='neutral', size='m', icon='edit', state='default', shape='circle',
+  const { tone='neutral', size='m', icon='edit', state='default', shape='square',
           embedded=false, selected=false, loading=false, label='Действие',
           badge=null, frozen=false } = o;
   const b = document.createElement('button');
   b.type = 'button';
   b.className = 'ibtn ibtn--' + tone + ' ibtn--' + size;
-  if (shape === 'square') b.classList.add('ibtn--square');
+  if (shape === 'circle') b.classList.add('ibtn--circle');
   if (embedded) b.classList.add('ibtn--embedded');
   if (selected) b.classList.add('ibtn--selected');
   if (loading)  b.classList.add('ibtn--loading');
@@ -627,6 +635,13 @@ function makeIB(o = {}) {
   });
 })();
 
+/* ---------- SHAPE (форма стейт-слоя): квадрат по умолчанию + круг ---------- */
+(function(){
+  const row = document.getElementById('shape-row');
+  row.appendChild(makeIB({ tone:'neutral', size:'l', icon:'edit', shape:'square', label:'Квадрат (по умолчанию)' }));
+  row.appendChild(makeIB({ tone:'neutral', size:'l', icon:'edit', shape:'circle', label:'Круг (ibtn--circle)' }));
+})();
+
 /* ---------- TOOLBAR ---------- */
 (function(){
   const tb = document.getElementById('toolbar');
@@ -733,7 +748,7 @@ document.getElementById('ic-good').innerHTML = UI.good;
 /* ---------- PLAYGROUND ---------- */
 (function(){
   const state = {
-    tone:'primary', size:'l', icon:'edit', state:'default', shape:'circle',
+    tone:'primary', size:'l', icon:'edit', state:'default', shape:'square',
     embedded:false, selected:false, loading:false, badge:false,
   };
   const controls = document.getElementById('pg-controls');
@@ -770,7 +785,7 @@ document.getElementById('ic-good').innerHTML = UI.good;
   controls.appendChild(select('Состояние',
     [['default','Default'],['hover','Hover'],['pressed','Pressed'],['focus','Focus'],['disabled','Disabled'],['loading','Loading']],
     ()=>state.state, v=>state.state=v));
-  controls.appendChild(select('Форма', [['circle','Круг'],['square','Квадрат']], ()=>state.shape, v=>state.shape=v));
+  controls.appendChild(select('Форма', [['square','Квадрат'],['circle','Круг']], ()=>state.shape, v=>state.shape=v));
 
   controls.appendChild(ctlToggle('Встроенный (input)','embedded'));
   controls.appendChild(ctlToggle('Выбран (toggle)','selected'));
@@ -791,7 +806,7 @@ document.getElementById('ic-good').innerHTML = UI.good;
     box.appendChild(makeIB(o));
 
     const cls=['ibtn','ibtn--'+state.tone,'ibtn--'+state.size];
-    if (state.shape==='square') cls.push('ibtn--square');
+    if (state.shape==='circle') cls.push('ibtn--circle');
     if (state.embedded) cls.push('ibtn--embedded');
     if (state.selected) cls.push('ibtn--selected');
     if (state.state==='loading') cls.push('ibtn--loading');
@@ -812,7 +827,7 @@ document.getElementById('ic-good').innerHTML = UI.good;
   document.body.appendChild(host);
   function measure(sz){
     const b  = makeIB({ tone:'neutral', size:sz, icon:'edit' });
-    const sq = makeIB({ tone:'neutral', size:sz, icon:'edit', shape:'square' });
+    const sq = makeIB({ tone:'neutral', size:sz, icon:'edit', shape:'circle' });
     const ld = makeIB({ tone:'neutral', size:sz, loading:true });
     host.appendChild(b); host.appendChild(sq); host.appendChild(ld);
     const cs = getComputedStyle(b);
@@ -834,9 +849,9 @@ document.getElementById('ic-good').innerHTML = UI.good;
   const rows = [
     ['Кнопка (Ш × В) = область клика', z => r(d[z].w)+' × '+r(d[z].h)+' px'],
     ['Иконка', z => r(d[z].icon)+' px'],
-    ['Стейт-слой (круг)', z => r(d[z].w)+' px'],
-    ['Радиус · circle', z => d[z].radC],
-    ['Радиус · square', z => d[z].radS],
+    ['Стейт-слой (квадрат)', z => r(d[z].w)+' px'],
+    ['Радиус · square (по умолчанию)', z => d[z].radC],
+    ['Радиус · circle', z => d[z].radS],
     ['Спиннер (loading)', z => r(d[z].spin)+' px / кольцо '+r(d[z].spinB)+' px'],
   ];
   tbody.innerHTML = rows.map(([label, fn]) =>
@@ -901,18 +916,19 @@ document.getElementById('ic-good').innerHTML = UI.good;
 <script type="text/plain" id="src-code-js">// Выжимка API (полный код — инлайн-скрипт страницы)
 function makeIB(o) {
   // o: { tone:'neutral'|'primary'|'danger'|'contrast', size:'l'|'m'|'s', icon, shape:'circle'|'square', state, embedded?, selected?, badge? }
-  // button.ibtn.ibtn--<tone>.ibtn--<size>(.ibtn--square)(.ibtn--embedded)(.ibtn--selected) → <i data-icon> / спиннер при loading
+  // button.ibtn.ibtn--<tone>.ibtn--<size>(.ibtn--circle)(.ibtn--embedded)(.ibtn--selected) → <i data-icon> / спиннер при loading
   // embedded — для ячеек таблиц/полей; selected — состояние «выбрано» (toggle)
 }</script>
 <script type="text/plain" id="src-code-css">/* =========================================================================
    Design System — IconButton
    Безрамочная кнопка-иконка. РАЗМЕР КОМПОНЕНТА В ЛЕЙАУТЕ = РАЗМЕР ИКОНКИ
-   (L 24 · M 20 · S 16). Круглый стейт-слой — это отдельный слой (::before),
-   который появляется на hover/pressed и ВЫХОДИТ ЗА ГРАНИЦЫ кнопки, никак не
-   влияя на её размер в потоке. Он же расширяет зону клика (pointer-events).
+   (L 24 · M 20 · S 16). Квадратный (скруглённый control) стейт-слой — это
+   отдельный слой (::before), который появляется на hover/pressed и ВЫХОДИТ ЗА
+   ГРАНИЦЫ кнопки, никак не влияя на её размер в потоке. Он же расширяет зону
+   клика (pointer-events).
    Tones:  neutral (--secondary) · primary · danger · contrast
    States: default · hover · pressed · focus · selected · disabled · loading
-   Shape:  circle (default) · square
+   Shape:  square (default) · circle
    Variant: embedded (без стейт-слоя — для полей ввода/плотных тулбаров)
    Requires: typography.css, colors.css
    ========================================================================= */
@@ -961,7 +977,7 @@ function makeIB(o) {
   transform: translate(-50%, -50%);
   width: var(--ibtn-layer-w, 32px);
   height: var(--ibtn-layer-w, 32px);
-  border-radius: var(--radius-circle);
+  border-radius: var(--radius-control);
   background: transparent;
   transition: background-color .15s ease;
   pointer-events: auto;   /* стейт-слой ловит клики → зона клика больше иконки */
@@ -978,14 +994,15 @@ function makeIB(o) {
 .ibtn--s { width: 16px; height: 16px; }
 .ibtn--l::before { width: 40px; height: 40px; }
 .ibtn--m::before { width: 32px; height: 32px; }
-.ibtn--s::before { width: 24px; height: 24px; }
+.ibtn--s::before { width: 24px; height: 24px; border-radius: var(--radius-control-s); }
 .ibtn--l :is(svg,[data-icon]), .ibtn--l .spin{ width: 24px; height: 24px; }
 .ibtn--m :is(svg,[data-icon]), .ibtn--m .spin{ width: 20px; height: 20px; }
 .ibtn--s :is(svg,[data-icon]), .ibtn--s .spin{ width: 16px; height: 16px; }
-/* square / embedded — стейт-слой со скруглением control вместо круга */
-.ibtn--l.ibtn--square::before, .ibtn--l.ibtn--embedded::before { border-radius: var(--radius-control); }
-.ibtn--m.ibtn--square::before, .ibtn--m.ibtn--embedded::before { border-radius: var(--radius-control); }
-.ibtn--s.ibtn--square::before, .ibtn--s.ibtn--embedded::before { border-radius: var(--radius-control-s); }
+/* Форма стейт-слоя. По умолчанию — квадрат со скруглением control (radius-control
+   для L/M, radius-control-s для S, заданы в базовом и размерных правилах выше);
+   круг — явный модификатор .ibtn--circle. .ibtn--square оставлен как алиас для
+   обратной совместимости: с ним ничего не добавляется, дефолт и так квадратный. */
+.ibtn--circle::before { border-radius: var(--radius-circle); }
 
 /* ---------- tones (цвет иконки; стейт-слой миксуется из currentColor) ----- */
 .ibtn--neutral  { color: var(--secondary); }

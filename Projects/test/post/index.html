@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--
+  Источник экрана «Сделки» (пилот модульной структуры: страница + отдельные
+  файлы модалок и таблиц, вшиваемые ассемблером).
+
+  Как устроено:
+  - index.html            — каркас страницы и метки <ds-include src="…">.
+  - tables/DealsTable.html — таблица-реестр (вшивается в контент).
+  - modals/*.html          — модальные окна (вшиваются в конец body).
+  - assemble.mjs           — вшивает фрагменты в index.preview.html.
+
+  ОТКРЫВАТЬ ДВОЙНЫМ КЛИКОМ нужно index.preview.html (собранный самодостаточный
+  файл). Сам index.html — источник: без сборки модалки/таблица на месте меток
+  не появятся (ds-include.js грузит их fetch-ем, который по file:// не работает).
+
+  Пути — три уровня до DS-IBP/ (../../../), потому что экран лежит в
+  Projects/test/post/, а не плоско в Projects/test/.
+-->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сделки — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка этого экрана ──────────────────────────────────────────────
+     Здесь только grid / flex / gap и только на токенах.
+     .frm-grid — двухколоночная сетка полей формы в модалке «Редактирование
+     сделки» (modals/EditDeal.html): у модальных форм своего класса в ДС нет,
+     раскладку полей задаёт экран; компонентная часть — классы .inp из ДС. */
+  .frm-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-stack);
+  }
+  .frm-grid__span-2 { grid-column: span 2; }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <!-- ── Боковое меню ────────────────────────────────────────────────────── -->
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Post</div>
+        <a class="nav__item nav__item--selected" href="#" aria-current="page"><span class="nav__ico"><i data-icon="corporate-transactions"></i></span><span class="nav__label">Сделки</span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <div class="nav__user">
+        <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Александров Пётр</span><span class="nav__user-role">Аналитик</span></span>
+      </div>
+      <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <!-- ── Рабочая область (app-shell: фикс. вьюпорт, таблица занимает
+       оставшуюся высоту — .screen--app + .dtable--fill на таблице) ───────── -->
+  <div class="screen screen--app">
+
+    <nav class="crumbs" aria-label="Хлебные крошки">
+      <li class="crumbs__item"><a class="link link--muted" href="#">Главная</a></li>
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Сделки</span>
+      </li>
+    </nav>
+
+    <main class="screen__content">
+
+      <!-- ── Шапка страницы ───────────────────────────────────────────────── -->
+      <div class="phead">
+        <div class="phead__main">
+          <div class="phead__title-row">
+            <div class="phead__title-group">
+              <h1 class="phead__title">Сделки</h1>
+            </div>
+          </div>
+          <div class="phead__subtitle">
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="calendar"></i></span>Обновлено 07.09.2026</span>
+          </div>
+        </div>
+        <div class="phead__actions">
+          <button class="btn btn--outline btn--m"><i data-icon="download"></i><span class="btn__label">Выгрузить</span></button>
+          <button class="btn btn--accent btn--m" data-modal="deal-form-scrim"><i data-icon="add"></i><span class="btn__label">Создать сделку</span></button>
+        </div>
+      </div>
+
+      <!-- ── Таблица — отдельный файл tables/DealsTable.html ──────────────── -->
+      <ds-include src="tables/DealsTable.html" css="none"></ds-include>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Модальные окна — каждый файл modals/*.html, вшивается в конец body,
+     чтобы ds.js при загрузке собранного документа уже видел скримы ───────── -->
+<ds-include src="modals/Filter.html" css="none"></ds-include>
+<ds-include src="modals/EditDeal.html" css="none"></ds-include>
+<ds-include src="modals/DeleteConfirm.html" css="none"></ds-include>
+
+<script src="../../../DS-IBP/scripts/ds.js"></script>
+</body>
+</html>

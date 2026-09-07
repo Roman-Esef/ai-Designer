@@ -449,13 +449,13 @@ css: `styles/divider.css` · deps: [button]
 
 ## IconButton
 css: `styles/icon-button.css` · deps: [badge, spinner]
-**Оси:** тон (neutral/primary/danger/contrast) · размер (L/M/S = размеру иконки) · режим-переключатель (selected) · встроенный вариант (`--embedded`, без рипла) · бейдж.
+**Оси:** тон (neutral/primary/danger/contrast) · размер (L/M/S = размеру иконки) · форма стейт-слоя (квадрат — по умолчанию / круг `.ibtn--circle`) · режим-переключатель (selected) · встроенный вариант (`--embedded`, без рипла) · бейдж.
 **Инварианты:** обязателен `aria-label` — нет видимого текста.
 **Корнер-кейсы:** `.ibtn{flex:none}` — не сжимается в тесном flex-ряду.
-**Классы:** .ibtn · .ibtn--neutral / --primary / --danger / --contrast · .ibtn--l / --m / --s · .ibtn--square · .ibtn--embedded · .ibtn--selected · .ibtn--loading · disabled · .is-hover / .is-pressed / .is-focus · .spin.spin--current · .ibtn__badge · aria-label · aria-pressed
+**Классы:** .ibtn · .ibtn--neutral / --primary / --danger / --contrast · .ibtn--l / --m / --s · .ibtn--circle (круг, явный) · .ibtn--embedded · .ibtn--selected · .ibtn--loading · disabled · .is-hover / .is-pressed / .is-focus · .spin.spin--current · .ibtn__badge · aria-label · aria-pressed (форма по умолчанию — квадрат, radius-control; .ibtn--square — алиас, нооп)
 **Диагностика:** «Кнопка сжимается в тесном flex-ряду» → `.ibtn{flex:none}` — по спеке не должна сжиматься, проверить переопределение flex · «Скринридер не озвучивает кнопку» → отсутствует `aria-label`
 
-Безрамочная кнопка с одной иконкой и круглым стейт-слоем (риплом).
+Безрамочная кнопка с одной иконкой и квадратным (скруглённым control) стейт-слоем (риплом).
 
 ```html
 <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Редактировать">
@@ -488,7 +488,7 @@ css: styles/illustration.css · deps: — · 1.003
 
 ## Layout (Каркас экрана)
 css: `styles/layout.css` · deps: [nav-panel, breadcrumbs, spacing] · 1.009
-**Оси:** режим навигации (rail 56 / drawer оверлей / fixed 272) · тип контента (тайлы .grid12 / таблица во всю ширину / карточка сущности) · высота вьюпорта (обычный / app-shell `.screen--app`).
+**Оси:** режим навигации (rail 56 / drawer оверлей / fixed 320) · тип контента (тайлы .grid12 / таблица во всю ширину / карточка сущности) · высота вьюпорта (обычный / app-shell `.screen--app`).
 **Инварианты:** между панелью и рабочей областью отступа нет; между крошками и контентом отступ 8px (--layout-pad-top); поля контентной области — 8px сверху, 24px слева/справа и 24px снизу; зона крошек 44px и её поля 24px принадлежат компоненту Breadcrumbs, экран их не задаёт; крошки и контент выровнены по одной вертикали; **у экрана горизонтального скролла не бывает никогда — адаптивная вёрстка закладывается при проектировании, объект за границей экрана — баг**; исключение — контейнер со скроллом в собственной раскладке (тело таблицы, отдельный тайл), не сама рабочая область; скроллится только контент — крошки sticky, панель fixed на 100vh со своим внутренним скроллом списка; сетка не дублируется — .grid12/.col-N из Spacing; **единственная/основная таблица страницы занимает всю свободную высоту** (минус крошки/шапка/тулбар) — `.screen--app` на `.screen` + `.dtable--fill` на таблице, тело скроллится внутри; тайлы над/под таблицей — индивидуально, но таблица по умолчанию всё равно на оставшуюся высоту.
 **Классы:** .nav-layout · .screen · .screen--app (фикс. вьюпорт 100vh, overflow:hidden; .screen__content min-height:0) · .screen > .crumbs (sticky) · .screen__content · .grid12 / .col-N · токены --layout-pad-top 8 / --layout-pad-x 24 / --layout-pad-bottom 24 / --layout-crumbs-h 44 / --layout-block-gap 24.
 **Диагностика:** «крошки и заголовок на разных вертикалях» → переопределены поля, должно быть 24 и там, и там · «зазор между крошками и контентом не 8px» → у .screen__content переопределён padding-top (должен быть var(--space-8)) или у .crumbs задан margin-bottom (должен быть 0) · «крошки уезжают при скролле» → .crumbs не прямой ребёнок .screen · «контент прижат к панели» → потерян .nav-layout · «главная таблица не заполняет высоту / тело не скроллится» → нет `.screen--app` (родитель без фикс. высоты) или на таблице нет `.dtable--fill`.
@@ -519,7 +519,7 @@ css: `styles/input.css` · deps: [label-helper, tooltip, chip]
 Базовое поле ввода текста. База `.inp` (метка + поле Input_Content + хелпер) общая для InputText / InputDate / InputAutocomplete. Текстовый слой: иконка слева (любая из библиотеки ДС, не привязана к поиску), префикс, значение, постфикс. Действия справа: информер → крестик очистки (или «показать/скрыть» для пароля — крестика тогда нет) → календарь → шеврон. Опционально — счётчик символов (`maxLength`, справа под полем) и resize по вертикали у многострочного (`--resizable`). Размеры M (40px) / S (32px, только Table Edit). Состояния: Default/Hover/Focus/Error/ErrorFocus/Warning/WarningFocus/Disabled.
 
 ```html
-<div class="inp">
+<div class="inp inp--m">
   <label class="ds-label" for="inn"><span class="ds-label__text">ИНН</span></label>
   <div class="inp__field">
     <span class="inp__lead">…search…</span>
@@ -550,7 +550,7 @@ css: `styles/input.css` · deps: [label-helper, tooltip]
 Поле ввода даты: маска ДД.ММ.ГГГГ (в placeholder) + кнопка-календарь, поднимающая DatePicker (отдельный компонент, TBD). База `.inp` общая с InputText. Действия: крестик очистки · информер (опц.) · календарь (фиксированный, всегда последний). `input[inputmode="numeric"]`, разделители подставляются автоматически. Размеры и состояния — как у InputText.
 
 ```html
-<div class="inp">
+<div class="inp inp--m">
   <label class="ds-label" for="d1"><span class="ds-label__text">Дата подписания</span></label>
   <div class="inp__field">
     <input class="inp__control" id="d1" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
@@ -577,7 +577,7 @@ css: `styles/input.css` · deps: [label-helper, checkbox, chip, tooltip, dropdow
 Корнер-кейс: живой filter-демо (`input-autocomplete.page.js`) закрывается по клику вне/Esc; стрелочная клавиатура (↑↓/Enter активной опции) в демо ещё не реализована — только клик (13.08.2026).
 
 ```html
-<div class="inp is-open">
+<div class="inp inp--m is-open">
   <label class="ds-label" for="ac"><span class="ds-label__text">Контрагент</span></label>
   <div class="inp__field" role="combobox" aria-expanded="true" aria-controls="ac-list">
     <span class="inp__chips"><span class="chip chip--edit chip--s"><span class="chip__label">Value 1</span><span class="chip__remove" role="button">…✕…</span></span></span>
@@ -614,7 +614,7 @@ css: `styles/input-range.css` · deps: [input, label-helper, tooltip]
 <div class="inp-range">
   <label class="ds-label"><span class="ds-label__text">Сумма, RUB</span></label>
   <div class="inp-range__row">
-    <div class="inp inp-range__field">
+    <div class="inp inp--m inp-range__field">
       <div class="inp__field">
         <span class="inp__prefix">От</span>
         <input class="inp__control" inputmode="decimal">
@@ -622,7 +622,7 @@ css: `styles/input-range.css` · deps: [input, label-helper, tooltip]
       </div>
     </div>
     <span class="inp-range__line" aria-hidden="true"></span>
-    <div class="inp inp-range__field">…префикс «До»…</div>
+    <div class="inp inp--m inp-range__field">…префикс «До»…</div>
   </div>
   <span class="ds-helper ds-helper--left">Helper</span>
 </div>
@@ -643,7 +643,7 @@ css: `styles/input-range.css` · deps: [input, label-helper, tooltip]
 <div class="inp-range inp-range--date">
   <label class="ds-label"><span class="ds-label__text">Период сделки</span></label>
   <div class="inp-range__row">
-    <div class="inp inp-range__field">
+    <div class="inp inp--m inp-range__field">
       <div class="inp__field">
         <span class="inp__prefix">От</span>
         <input class="inp__control" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">
@@ -654,7 +654,7 @@ css: `styles/input-range.css` · deps: [input, label-helper, tooltip]
       </div>
     </div>
     <span class="inp-range__line" aria-hidden="true"></span>
-    <div class="inp inp-range__field">…префикс «До»…</div>
+    <div class="inp inp--m inp-range__field">…префикс «До»…</div>
   </div>
   <span class="ds-helper ds-helper--left">Helper</span>
 </div>
@@ -761,11 +761,11 @@ css: `styles/modal.css` · js: `scripts/ds-modal.js` · deps: [button, icon-butt
 ## NavPanel
 css: `styles/nav-panel.css` · deps: [icon-button, badge, avatar]
 **Оси:** режим (rail/drawer/fixed) · элементы (burger/item/item+badge/footer/divider/пункт-родитель, каждый в двух обликах Rail/Drawer) · сворачивание drawer кликом вне / Esc (только не-fixed).
-**Инварианты:** три режима — один компонент, не три разных; в Rail подпись скрыта и появляется только тултипом. **Хост-контракт — из коробки:** оборачивать `.nav` + контент в `.nav-layout` (сам компонент это уже умеет через CSS `:has()`) — `.nav` всегда `position:fixed;height:100vh`, отступ контента = ширине Rail и в Rail, и в Drawer (оверлей, не раздвигает), увеличивается до 272px только в `nav--fixed`.
+**Инварианты:** три режима — один компонент, не три разных; в Rail подпись скрыта и появляется только тултипом. **Хост-контракт — из коробки:** оборачивать `.nav` + контент в `.nav-layout` (сам компонент это уже умеет через CSS `:has()`) — `.nav` всегда `position:fixed;height:100vh`, отступ контента = ширине Rail и в Rail, и в Drawer (оверлей, не раздвигает), увеличивается до 320px только в `nav--fixed`.
 **Классы:** `.nav` · `.nav--rail` / `.nav--drawer` / `.nav--fixed` · `.nav__top` · `.nav__burger` / `.nav__pin` · `.nav__list` · `.nav__block` · `.nav__block-label` · `.nav__item` · `.nav__item--selected` / `.nav__item--disabled` · `.nav__item--acc` · `.nav__caret` · `.nav__sub` / `.nav__sub-in` · `.nav__ico` / `.nav__label` / `.nav__badge` · `.nav__footer` / `.nav__user` / `.nav__logout`
 **Диагностика:** «В Rail подпись пункта видна постоянно» → должна быть скрыта, появляться только тултипом на hover/focus · «Иконки/бургер/аватар не на одной вертикальной линии» → все три должны считаться от общей оси 28px, не выравниваться по отдельности · «Подпись пункта/футера в drawer обрезана, тултипа нет» → нужен `scripts/ds-tooltip.js` (подписи `.nav__label`/`.nav__user-*` регистрирует `ds-nav-panel.js` через `DSTooltip.truncated`)
 
-Главная навигация приложения слева. Три режима: `nav--rail` (56px, иконки, тултип по hover, без тени), `nav--drawer` (272px, оверлей, тень Shadow4.0_modalform), `nav--fixed` (272px, закреплён, шов справа). Drawer (не fixed) сворачивается в rail кликом вне `.nav` или по Esc; клики внутри открытых модалок (например, смена роли из футера) панель не сворачивают. Список = «Главная» + navigation-block'и (заголовок-секция + пункты), внизу футер: строка пользователя — ссылка на личный кабинет + кнопка выхода. Иконки пунктов — глифы раздела Menu (specs/Icons.md). Пункт с тайлом-со-ссылками (`item.tile.links`) — аккордеон-родитель `.nav__item--acc`: ссылки тайла — под-пунктами `.nav__sub` (без иконок, по умолчанию свёрнуты).
+Главная навигация приложения слева. Три режима: `nav--rail` (56px, иконки, тултип по hover, без тени), `nav--drawer` (320px, оверлей, тень Shadow4.0_modalform), `nav--fixed` (320px, закреплён, шов справа). Drawer (не fixed) сворачивается в rail кликом вне `.nav` или по Esc; клики внутри открытых модалок (например, смена роли из футера) панель не сворачивают. Список = «Главная» + navigation-block'и (заголовок-секция + пункты), внизу футер: строка пользователя — ссылка на личный кабинет + кнопка выхода. Иконки пунктов — глифы раздела Menu (specs/Icons.md). Пункт с тайлом-со-ссылками (`item.tile.links`) — аккордеон-родитель `.nav__item--acc`: ссылки тайла — под-пунктами `.nav__sub` (без иконок, по умолчанию свёрнуты).
 
 ```html
 <nav class="nav nav--rail" aria-label="Главное меню">
@@ -790,7 +790,7 @@ css: `styles/nav-panel.css` · deps: [icon-button, badge, avatar]
   <div class="nav__footer">
     <a class="nav__user" href="#" aria-label="Открыть личный кабинет">
       <span class="av av--circular av--m"><span class="av__text">АП</span></span>
-      <span class="nav__user-text"><span class="nav__user-name">Александров Петр</span><span class="nav__user-role">Финансист ДИД</span><span class="nav__user-org">SMB Недвижимость +2</span></span>
+      <span class="nav__user-text"><span class="nav__user-name">Александров Петр</span><span class="nav__user-role">Финансист ДИД</span></span>
     </a>
     <button class="ibtn ibtn--neutral ibtn--m nav__logout" data-modal="nav-role-modal" aria-label="Сменить роль / выйти"><i data-icon="logout"></i></button>
   </div>
@@ -798,7 +798,7 @@ css: `styles/nav-panel.css` · deps: [icon-button, badge, avatar]
 <!-- Развёрнутый вид — nav--drawer (подписи видимы, тень, оверлей). Fixed: nav--fixed (шов справа, без тени). -->
 ```
 
-Пункт: Default текст/иконка `--text-secondary`; Hover заливка `--bgtable-row-hover`; Selected заливка `--bgtable-row-focus` + подпись Strong; Disabled `--text-inactive` + бейдж `badge--muted`. Высота пункта 44px, иконка 24, badge XS accent. **Бургер, пин и выход — строго `ibtn--m`**: вертикальная ось панели (28px от левого края во всех режимах) рассчитана в `styles/nav-panel.css` именно от него (`top 18 + 10 = 28`); `ibtn--s` ломает выравнивание бургера с иконками пунктов и аватаром. **Строка пользователя в футере — ссылка на личный кабинет** (`<a class="nav__user" aria-label="Открыть личный кабинет">`), ховер фоном по всей полосе (`.nav__footer:hover`); должность — заглушка по текущей роли; **кнопка `.nav__logout` открывает модалку смены ролей** (`data-modal`). Состав меню — по роли из `scripts/ibp-home.js` (`window.IBPHome`, единый каталог с тайлами главной; `tile: null` — пункт без тайла); мастер-состав групп и модель ролей (full/partial) — в specs/NavPanel.md. Полная анатомия: specs/NavPanel.md.
+Пункт: Default текст/иконка `--text-secondary`; Hover заливка `--bgtable-row-hover`; Selected заливка `--bgtable-row-focus` + подпись Strong; Disabled `--text-inactive` + бейдж `badge--muted`. Высота пункта 44px, иконка 24, badge XS accent. **Бургер, пин и выход — строго `ibtn--m`**: вертикальная ось панели (28px от левого края во всех режимах) рассчитана в `styles/nav-panel.css` именно от него (`top 18 + 10 = 28`); `ibtn--s` ломает выравнивание бургера с иконками пунктов и аватаром. **Строка пользователя в футере — ссылка на личный кабинет** (`<a class="nav__user" aria-label="Открыть личный кабинет">`), ховер фоном по всей полосе (`.nav__footer:hover`); должность — заглушка по текущей роли; **разметка футера — `IBPHome.footerHTML(role)`** (единая, строки организации нет); **каретка аккордеона прижата вправо** (`margin-left:auto`, независимо от длины подписи); **кнопка `.nav__logout` открывает модалку смены ролей** (`data-modal`). Состав меню — по роли из `scripts/ibp-home.js` (`window.IBPHome`, единый каталог с тайлами главной; `tile: null` — пункт без тайла); мастер-состав групп и модель ролей (full/partial) — в specs/NavPanel.md. Полная анатомия: specs/NavPanel.md.
 
 **Из коробки:** подключить `scripts/ds-nav-panel.js` — самоинициализация по `.nav`: бургер сворачивает/разворачивает панель (rail ↔ последний развёрнутый режим), пин переключает drawer ↔ fixed (aria-pressed и иконка pin-menu/unpin-menu меняются сами), подписи пунктов в rail позиционируются как тултипы (`position:fixed`, пересчёт по hover/focus, скроллу списка и resize), пункт-родитель `.nav__item--acc` (рендер — по `item.tile.links`, по умолчанию свёрнут) раскрывает/сворачивает под-список (в rail клик разворачивает панель). Закреплённый (fixed) режим живой панели (внутри `.nav-layout`) сохраняется в `localStorage` (`ibp.navpanel.mode`) и восстанавливается при переходе на другую страницу; переход в rail/drawer ключ очищает. Настройки на панели: `data-nav-collapsed-mode` (drawer|fixed — куда разворачивает бургер), `data-nav-modes="no"` (только rail-тултипы, режимы не переключаются), `data-nav-auto="no"` (не подключать). API: `DSNavPanel.bind(nav, opts)`, `bindAll(root)`, `setMode(nav, mode)`, `placeRailLabels(nav)`. Событие `ds-nav-mode` на `.nav` с `detail {mode, prev}`.
 

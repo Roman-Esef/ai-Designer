@@ -25,19 +25,19 @@ purpose: Манифест спек компонентов. Читай нужну
 | EmptyState | specs/EmptyState.md | styles/empty-state.css | illustration, button | 1.002 |
 | Elevation | specs/Elevation.md | styles/shadow.css | — | 1.002 |
 | Entity | specs/Entity.md | styles/entity.css | avatar, chip, icon-button, button, badge | 1.007 |
-| IconButton | specs/IconButton.md | styles/icon-button.css | badge, spinner | 1.010 |
+| IconButton | specs/IconButton.md | styles/icon-button.css | badge, spinner | 1.011 |
 | Icons | specs/Icons.md | — | — | 1.000 |
 | Illustrations | specs/Illustrations.md | styles/illustration.css | — | 1.004 |
 | Layout | specs/Layout.md | styles/layout.css | nav-panel, breadcrumbs, spacing | 1.009 |
-| InputAmountRange | specs/InputAmountRange.md | styles/input-range.css | input, label-helper, tooltip | 1.006 |
-| InputAutocomplete | specs/InputAutocomplete.md | styles/input.css | label-helper, checkbox, chip, tooltip, dropdown-list | 1.015 |
-| InputDate | specs/InputDate.md | styles/input.css | label-helper, tooltip | 1.012 |
-| InputDateRange | specs/InputDateRange.md | styles/input-range.css | input, label-helper, tooltip | 1.009 |
-| InputText | specs/InputText.md | styles/input.css | label-helper, tooltip, chip | 1.011 |
+| InputAmountRange | specs/InputAmountRange.md | styles/input-range.css | input, label-helper, tooltip | 1.007 |
+| InputAutocomplete | specs/InputAutocomplete.md | styles/input.css | label-helper, checkbox, chip, tooltip, dropdown-list | 1.016 |
+| InputDate | specs/InputDate.md | styles/input.css | label-helper, tooltip | 1.013 |
+| InputDateRange | specs/InputDateRange.md | styles/input-range.css | input, label-helper, tooltip | 1.010 |
+| InputText | specs/InputText.md | styles/input.css | label-helper, tooltip, chip | 1.012 |
 | LabelHelper | specs/LabelHelper.md | styles/label-helper.css | checkbox, radio, switch | 1.005 |
 | Link | specs/Link.md | styles/link.css | breadcrumbs | 1.007 |
 | Modal | specs/Modal.md | styles/modal.css | button, icon-button, label-helper, checkbox | 1.007 |
-| NavPanel | specs/NavPanel.md | styles/nav-panel.css | icon-button, badge, avatar | 1.017 |
+| NavPanel | specs/NavPanel.md | styles/nav-panel.css | icon-button, badge, avatar | 1.019 |
 | NavTile | specs/NavTile.md | styles/nav-tile.css | illustration, link | 1.011 |
 | PageHeader | specs/PageHeader.md | styles/page-header.css | button, icon-button, chip, badge, context-menu, tooltip, breadcrumbs | 1.010 |
 | Pagination | specs/Pagination.md | styles/pagination.css | dropdown-list, checkbox, label-helper, button, splitter | 1.010 |

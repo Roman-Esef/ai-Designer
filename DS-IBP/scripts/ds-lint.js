@@ -1021,7 +1021,7 @@ async function pageChecks(p, P, opts, out) {
     const gateNA = html.match(/<!--\s*FIDELITY-GATE:\s*N\/A\s*·\s*нет исходного макета\s*·\s*([\d.]+)\s*-->/i);
     const gate = gatePass || gateNA;
     if (!gate) say('BLOCKER', 'G1', 'нет строки <!-- FIDELITY-GATE: PASS · ширина <N> · ДД.ММ.ГГГГ --> (сборка по макету) или <!-- FIDELITY-GATE: N/A · нет исходного макета · ДД.ММ.ГГГГ --> (сборка по тексту) сразу после <!DOCTYPE html> — гейт не отмечен как пройденный в самом файле');
-    else if (changed && gate[1] !== (opts.today || today())) say('WARN', 'G1', 'экран правился, а дата в FIDELITY-GATE = ' + gate[1] + ', сегодня ' + (opts.today || today()) + ' — гейт нужно перепрогнать после правки и обновить дату');
+    else if (changed && gate[1] !== (opts.today || today()) && !p.split('/').includes('fixtures')) say('WARN', 'G1', 'экран правился, а дата в FIDELITY-GATE = ' + gate[1] + ', сегодня ' + (opts.today || today()) + ' — гейт нужно перепрогнать после правки и обновить дату');
   }
   /* C1 — карточка @dsCard первой строкой */
   if (!/^<!--\s*@dsCard\b/.test(html)) say('BLOCKER', 'C1', 'первая строка — не <!-- @dsCard … -->');
