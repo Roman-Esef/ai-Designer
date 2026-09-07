@@ -22,13 +22,15 @@
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function fmtFull(dt) { return dt.getDate() + ' ' + MONTHS[dt.getMonth()].toLowerCase() + ' ' + dt.getFullYear(); }
 
-  /* маска поля — ММ.ДД.ГГГГ (месяц.день.год) */
-  function formatDate(dt) { return dt ? pad(dt.getMonth() + 1) + '.' + pad(dt.getDate()) + '.' + dt.getFullYear() : ''; }
+  /* маска поля — ДД.ММ.ГГГГ (день.месяц.год, российский порядок — редполитика
+     05.09.2026: было ММ.ДД.ГГГГ, расходилось с TableCell data-sort-type="date"
+     и реальными датами продукта, везде день первым) */
+  function formatDate(dt) { return dt ? pad(dt.getDate()) + '.' + pad(dt.getMonth() + 1) + '.' + dt.getFullYear() : ''; }
   function parseDate(str) {
     if (!str) return null;
     var p = String(str).split('.');
     if (p.length !== 3) return null;
-    var mm = +p[0], dd = +p[1], yy = +p[2];
+    var dd = +p[0], mm = +p[1], yy = +p[2];
     if (!mm || !dd || String(p[2]).length !== 4) return null;
     var dt = new Date(yy, mm - 1, dd);
     return (dt.getMonth() === mm - 1 && dt.getDate() === dd) ? dt : null;
@@ -301,5 +303,51 @@
     }
   });
 
-  window.DSDatePicker = { makeCalendar: makeCalendar, openPicker: openPicker, parseDate: parseDate, formatDate: formatDate };
+  /* ------------------------------------------------------------------ */
+  /* Маска ручного ввода — ДД.ММ.ГГГГ, из коробки.                       */
+  /*                                                                     */
+  /* Раньше маска жила только в scripts/input-date.page.js (демо-скрипт   */
+  /* страницы документации) и на экраны не попадала вовсе: поле даты      */
+  /* показывало плейсхолдер «ДД.ММ.ГГГГ», а принимало любой текст без     */
+  /* точек — набранное руками значение не разбиралось ни календарём, ни   */
+  /* фильтром потребителя (инцидент: фильтр «Сроки», портфель ДИД,        */
+  /* 05.09.2026).                                                        */
+  /*                                                                     */
+  /* Слушатель стоит в фазе ПЕРЕХВАТА на document: значение обязано быть  */
+  /* нормализовано до того, как его прочитают обработчики, навешенные на  */
+  /* сам контрол (у потребителя это разбор даты в фильтре, у ds-input.js  */
+  /* — пересчёт крестика очистки). В фазе всплытия маска опаздывала бы на */
+  /* один символ.                                                        */
+  /*                                                                     */
+  /* Поле даты узнаётся структурно — кнопка календаря в действиях или     */
+  /* обёртка .inp-range--date; отдельного хука разметка не ставит.        */
+  /* Отказаться от маски на конкретном поле — data-no-datemask на .inp.   */
+  /* ------------------------------------------------------------------ */
+  function isDateField(ctl) {
+    if (!ctl || !ctl.classList || !ctl.classList.contains('inp__control')) return false;
+    var inp = ctl.closest ? ctl.closest('.inp') : null;
+    if (!inp || inp.hasAttribute('data-no-datemask')) return false;
+    if (inp.closest('.inp-range--date')) return true;
+    return !!inp.querySelector('.inp__act[aria-label="Открыть календарь"]');
+  }
+  function maskValue(raw) {
+    var d = String(raw == null ? '' : raw).replace(/[^0-9]/g, '').slice(0, 8);
+    var out = d.slice(0, 2);
+    if (d.length > 2) out += '.' + d.slice(2, 4);
+    if (d.length > 4) out += '.' + d.slice(4, 8);
+    return out;
+  }
+  document.addEventListener('input', function (e) {
+    var ctl = e.target;
+    if (!isDateField(ctl)) return;
+    var out = maskValue(ctl.value);
+    if (ctl.value === out) return;
+    /* каретка держится у конца ввода: маска дописывает точки за курсором,
+       поэтому позиция пересчитывается по числу цифр слева от неё */
+    var atEnd = ctl.selectionStart === ctl.value.length;
+    ctl.value = out;
+    if (atEnd && ctl.setSelectionRange) ctl.setSelectionRange(out.length, out.length);
+  }, true);
+
+  window.DSDatePicker = { makeCalendar: makeCalendar, openPicker: openPicker, parseDate: parseDate, formatDate: formatDate, maskValue: maskValue };
 })();

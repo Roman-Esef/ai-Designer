@@ -33,8 +33,8 @@
   }
 
   function init() {
-    // no-op guard: только на страницах-хостах (<main class="page">); на карточках @dsCard,
-    // тянущих ds-toc.js через _ds_bundle.js, контейнера нет — молча выходим.
+    // no-op guard: только на страницах-хостах (<main class="page">); там, где скрипт
+    // подключён без этого контейнера, — молча выходим.
     if (!document.querySelector('main.page')) return;
     ensureCss();
     var sections = document.querySelectorAll('main section.section');

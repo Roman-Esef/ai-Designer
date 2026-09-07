@@ -62,7 +62,6 @@
     var placement = o.placement || 'bottom';
     var align = o.align || 'start';
     var flip = o.flip !== false;
-    var op = o.offsetParent || menu.offsetParent || menu.parentElement;
     var br = bounds(o.boundary || null);
     var tr = trigger.getBoundingClientRect();
     var mw = menu.offsetWidth, mh = menu.offsetHeight;
@@ -89,19 +88,24 @@
       y = Math.min(Math.max(br.top + GUARD, y), Math.max(br.top + GUARD, br.bottom - mh - GUARD));
     }
 
-    /* из координат вьюпорта — в координаты позиционирующего предка */
-    var ox = -(window.pageXOffset || 0), oy = -(window.pageYOffset || 0);
-    if (getComputedStyle(menu).position === 'fixed') { ox = 0; oy = 0; }
-    else if (op && op !== document.body && op !== document.documentElement) {
-      var opr = op.getBoundingClientRect(), cs = getComputedStyle(op);
-      ox = opr.left + (parseFloat(cs.borderLeftWidth) || 0) - op.scrollLeft;
-      oy = opr.top + (parseFloat(cs.borderTopWidth) || 0) - op.scrollTop;
+    /* из координат вьюпорта — в left/top элемента (см. DSFloat.apply).
+       Если DSFloat не подключён (страницы-документация грузят рантайм точечно),
+       работаем прежним инлайн-пересчётом — элемент остаётся absolute. */
+    var Float = window.DSFloat;
+    if (Float) {
+      Float.apply(menu, x, y, o.offsetParent);
+    } else {
+      var fl = o.offsetParent || menu.offsetParent || menu.parentElement;
+      var fOx = -(window.pageXOffset || 0), fOy = -(window.pageYOffset || 0);
+      if (getComputedStyle(menu).position === 'fixed') { fOx = 0; fOy = 0; }
+      else if (fl && fl !== document.body && fl !== document.documentElement) {
+        var fOpr = fl.getBoundingClientRect(), fCs = getComputedStyle(fl);
+        fOx = fOpr.left + (parseFloat(fCs.borderLeftWidth) || 0) - fl.scrollLeft;
+        fOy = fOpr.top + (parseFloat(fCs.borderTopWidth) || 0) - fl.scrollTop;
+      }
+      menu.style.left = Math.round(x - fOx) + 'px';
+      menu.style.top = Math.round(y - fOy) + 'px';
     }
-    /* пишем только при изменении: лишняя запись стилей провоцирует
-       reflow → scroll → repositioning по кругу */
-    var nl = Math.round(x - ox) + 'px', nt = Math.round(y - oy) + 'px';
-    if (menu.style.left !== nl) menu.style.left = nl;
-    if (menu.style.top !== nt) menu.style.top = nt;
     setOrigin(menu, placement, align);
     return { placement: placement, align: align };
   }
@@ -280,6 +284,7 @@
       if (wasHidden) menu.removeAttribute('hidden');
       menu.classList.add('is-open');
       trigger.setAttribute('aria-expanded', 'true');
+      if (window.DSFloat) DSFloat.mount(menu, { anchor: trigger });
       reposition();
       if (conf.dismiss) current = api;
       if (conf.autoFocus) { var f = items(menu)[0]; if (f) focusItem(menu, f); }
@@ -291,6 +296,7 @@
       menu.classList.remove('is-open');
       menu.querySelectorAll('.menu__sub.is-open').forEach(function (s) { s.classList.remove('is-open'); });
       trigger.setAttribute('aria-expanded', 'false');
+      if (window.DSFloat) DSFloat.unmount(menu);
       if (wasHidden) menu.setAttribute('hidden', '');
       if (current === api) current = null;
       if (returnFocus) trigger.focus();

@@ -71,7 +71,6 @@
     var gap = o.gap == null ? GAP : o.gap;
     var placement = o.placement || 'bottom';
     var align = o.align || 'start';
-    var op = o.offsetParent || pop.offsetParent || pop.parentElement;
     var br = bounds(o.boundary || null);
     var tr = trigger.getBoundingClientRect();
     var pw = pop.offsetWidth, ph = pop.offsetHeight;
@@ -109,15 +108,23 @@
       y = Math.min(Math.max(br.top + GUARD, y), Math.max(br.top + GUARD, br.bottom - ph - GUARD));
     }
 
-    /* из координат вьюпорта — в координаты позиционирующего предка */
-    var ox = -(window.pageXOffset || 0), oy = -(window.pageYOffset || 0);
-    if (op && op !== document.body && op !== document.documentElement) {
-      var opr = op.getBoundingClientRect(), cs = getComputedStyle(op);
-      ox = opr.left + (parseFloat(cs.borderLeftWidth) || 0) - op.scrollLeft;
-      oy = opr.top + (parseFloat(cs.borderTopWidth) || 0) - op.scrollTop;
+    /* из координат вьюпорта — в left/top элемента (см. DSFloat.apply).
+       Если DSFloat не подключён (страницы-документация грузят рантайм точечно),
+       работаем прежним инлайн-пересчётом — элемент остаётся absolute. */
+    var Float = window.DSFloat;
+    if (Float) {
+      Float.apply(pop, x, y, o.offsetParent);
+    } else {
+      var fl = o.offsetParent || pop.offsetParent || pop.parentElement;
+      var fOx = -(window.pageXOffset || 0), fOy = -(window.pageYOffset || 0);
+      if (fl && fl !== document.body && fl !== document.documentElement) {
+        var fOpr = fl.getBoundingClientRect(), fCs = getComputedStyle(fl);
+        fOx = fOpr.left + (parseFloat(fCs.borderLeftWidth) || 0) - fl.scrollLeft;
+        fOy = fOpr.top + (parseFloat(fCs.borderTopWidth) || 0) - fl.scrollTop;
+      }
+      pop.style.left = Math.round(x - fOx) + 'px';
+      pop.style.top = Math.round(y - fOy) + 'px';
     }
-    pop.style.left = (x - ox) + 'px';
-    pop.style.top = (y - oy) + 'px';
     setMods(pop, placement, align);
 
     /* стрелка всегда смотрит в центр триггера — даже после clamp и flip */
@@ -205,6 +212,7 @@
       if (current && current !== api) current.close();
       pop.classList.add('is-open');
       trigger.setAttribute('aria-expanded', 'true');
+      if (window.DSFloat) DSFloat.mount(pop, { anchor: trigger });
       reposition();
       syncShadow();
       current = api;
@@ -219,6 +227,7 @@
       if (!isOpen()) return api;
       pop.classList.remove('is-open');
       trigger.setAttribute('aria-expanded', 'false');
+      if (window.DSFloat) DSFloat.unmount(pop);
       if (current === api) current = null;
       if (returnFocus) trigger.focus();
       return api;

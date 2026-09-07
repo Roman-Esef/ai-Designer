@@ -851,21 +851,47 @@ function showTip(inst, rows, title, e, total) {
   }
   tip.style.display = '';
   tip.classList.add('is-visible');
+  if (window.DSFloat) {
+    DSFloat.mount(tip, { pointerEvents: false, anchor: inst.root });
+    inst._tipClient = { clientX: e.clientX, clientY: e.clientY };
+    /* tooltip теперь position:fixed (в общем слое) — на скролле не ведёт себя
+       за графиком, как раньше absolute#plot. Держим его у курсора: пока тултип
+       показан, пересчитываем от последних вьюпортных координат мыши. */
+    if (!inst._tipScroll) {
+      inst._tipScroll = function () { if (inst.tip && inst._tipClient) moveTip(inst, inst._tipClient); };
+      window.addEventListener('scroll', inst._tipScroll, true);
+    }
+  }
   moveTip(inst, e);
 }
 function moveTip(inst, e) {
   var tip = inst.tip; if (!tip) return;
   var box = inst.plot.getBoundingClientRect();
-  var x = e.clientX - box.left + 14, y = e.clientY - box.top + 14;
   var w = tip.offsetWidth, h = tip.offsetHeight;
-  if (x + w > box.width) x = Math.max(0, e.clientX - box.left - w - 14);
-  if (y + h > box.height) y = Math.max(0, y - h - 28);
-  tip.style.left = Math.round(x) + 'px';
-  tip.style.top = Math.round(y) + 'px';
+  if (window.DSFloat) {
+    /* пере-якоренный тултип — position:fixed, координаты вьюпорта;
+       кламп по вьюпортному rect plot (не вылезать за график) */
+    var vx = e.clientX + 14, vy = e.clientY + 14;
+    if (vx + w > box.right) vx = Math.max(box.left, e.clientX - w - 14);
+    if (vy + h > box.bottom) vy = Math.max(box.top, e.clientY - h - 28);
+    DSFloat.apply(tip, vx, vy);
+    inst._tipClient = { clientX: e.clientX, clientY: e.clientY };
+  } else {
+    /* absolute внутри plot — исходная plot-относительная логика */
+    var x = e.clientX - box.left + 14, y = e.clientY - box.top + 14;
+    if (x + w > box.width) x = Math.max(0, e.clientX - box.left - w - 14);
+    if (y + h > box.height) y = Math.max(0, y - h - 28);
+    tip.style.left = Math.round(x) + 'px';
+    tip.style.top = Math.round(y) + 'px';
+  }
 }
 function hideTip(inst) {
   if (!inst.tip) return;
   inst.tip.classList.remove('is-visible');
+  if (window.DSFloat) {
+    if (inst._tipScroll) { window.removeEventListener('scroll', inst._tipScroll, true); inst._tipScroll = null; }
+    DSFloat.unmount(inst.tip);
+  }
   inst.tip.style.display = 'none';
 }
 

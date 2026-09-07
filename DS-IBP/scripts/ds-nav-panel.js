@@ -31,6 +31,21 @@
 
   var MODES = ['rail', 'drawer', 'fixed'];
   var RAIL_GAP = 10; /* зазор от правого края панели до подписи-тултипа */
+  var STORE_KEY = 'ibp.navpanel.mode'; /* fixed переживает переходы между страницами */
+
+  function savedMode() {
+    try { return window.localStorage.getItem(STORE_KEY); } catch (e) { return null; }
+  }
+  function persistMode(mode) {
+    try {
+      if (mode === 'fixed') window.localStorage.setItem(STORE_KEY, 'fixed');
+      else window.localStorage.removeItem(STORE_KEY);
+    } catch (e) {}
+  }
+  /* «живая» панель каркаса — только внутри .nav-layout (демо документации не трогаем) */
+  function livePanel(nav) {
+    return nav.closest && !!nav.closest('.nav-layout');
+  }
 
   function icon(el, name) {
     if (!el) return;
@@ -80,6 +95,8 @@
     } else {
       placeRailLabels(nav);
     }
+    /* закреплённый (fixed) режим живой панели сохраняется — переживает переходы между страницами */
+    if (livePanel(nav)) persistMode(mode);
     nav.dispatchEvent(new CustomEvent('ds-nav-mode', { bubbles: true, detail: { mode: mode, prev: prev } }));
     return mode;
   }
@@ -91,6 +108,13 @@
     var expanded = opts.expandedMode || d.navCollapsedMode || (modeOf(nav) === 'rail' ? 'drawer' : modeOf(nav));
     var modes = opts.modes !== false && d.navModes !== 'no';
     nav.__dsNavModes = modes;
+
+    /* восстановление: если панель была закреплена на предыдущей странице (fixed),
+       прилетаем сразу в fixed; бургер после сворачивания снова раскрывает в fixed */
+    if (livePanel(nav) && modes && savedMode() === 'fixed' && modeOf(nav) !== 'fixed') {
+      expanded = 'fixed';
+      setMode(nav, 'fixed');
+    }
 
     function toggleRail() {
       var cur = modeOf(nav);
@@ -185,6 +209,26 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { bindAll(document); });
   else bindAll(document);
+
+  /* Тултип на усечённой подписи пункта/футера (спека, «Контент»): подпись
+     пункта — усечение многоточием + тултип; футер — ФИО/должность/
+     организация тоже усекаются. Механизм общий — DSTooltip.truncated().
+     Фокус приходит на пункт (.nav__item) и строку пользователя (.nav__user),
+     подписи живут внутри — поэтому opts.host.
+     В Rail подпись не усекается (position:fixed, ширина по контенту) —
+     isTruncated отсекает, и собственный rail-тултип (placeRailLabels)
+     не конфликтует с механизмом. Заголовок блока (.nav__block-label)
+     не регистрируем: спека тултип для него не обещает. */
+  var truncatedHandle = null;
+  function registerTrunc() {
+    if (truncatedHandle || !window.DSTooltip) return;
+    truncatedHandle = window.DSTooltip.truncated(
+      '.nav__label, .nav__user-name, .nav__user-role, .nav__user-org',
+      { host: '.nav__item, .nav__user' }
+    );
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { registerTrunc(); });
+  else registerTrunc();
 
   window.DSNavPanel = { bind: bind, bindAll: bindAll, setMode: setMode, placeRailLabels: placeRailLabels };
 })();

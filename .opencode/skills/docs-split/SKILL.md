@@ -43,6 +43,14 @@ node .opencode/skills/docs-split/tooling/docs-split.mjs <cmd> [page] [--css DS-I
 | `check <page>` | баланс тегов (вне `<script>`), остатки `ds-toc.js`/`pg-kit.js`/`ds-toc.css`, `.splitpane--app`, один `</body></html>`, 3 `src-code`, panes. Код выхода 1 при FAIL |
 | `verify <page>` | temp-копия в ту же папку + харнесс + headless Chrome `--dump-dom` → компактная диагностика + автоассерты (main.ds-split, TOC, код). Копия удаляется |
 
+## Уроки раскатки
+
+Перед раскаткой и перед приёмкой страницы — `references/lessons.md` рядом с
+этим файлом: разобранные дефекты конструктора, общего слоя и тулчейна.
+Вынесены из общей выжимки `screen-review` 06.09.2026 — их предмет страница
+документации, а ту выжимку читают перед каждой сборкой экрана. Архив общий,
+номера сквозные: `screen-review/references/lessons-raw.md`.
+
 ## Шаги раскатки (по странице)
 
 1. `map` — сверить статус/тип конструктора.

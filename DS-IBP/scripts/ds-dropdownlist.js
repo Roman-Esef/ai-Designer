@@ -20,7 +20,9 @@
    Поведение по спеке: список раскрывается под полем, ширина = ширине поля,
    разворот вверх при нехватке места, клавиатура (↑ ↓ Home End Enter Space
    typeahead Esc) без потери фокуса из поля — активная опция получает класс
-   .is-focus и aria-activedescendant; закрытие по клику вне / Esc / выбору
+   .is-focus и aria-activedescendant. На ОТКРЫТИИ активной опции нет: фокус
+   один и он на поле-триггере, подсветка в списке появляется только после
+   первого шага клавишами (до 05.09.2026 подсвечивалась первая строка); закрытие по клику вне / Esc / выбору
    (кроме множественного выбора).
    ========================================================================= */
 (function () {
@@ -42,7 +44,6 @@
   function place(list, field, o) {
     o = o || {};
     var gap = o.gap == null ? GAP : o.gap;
-    var op = o.offsetParent || list.offsetParent || list.parentElement;
     var br = bounds(o.boundary || null);
     var fr = field.getBoundingClientRect();
     list.style.width = fr.width + 'px';
@@ -51,14 +52,23 @@
     var placement = (o.placement === 'top') || (below < lh + gap + GUARD && above > below) ? 'top' : 'bottom';
     var y = placement === 'top' ? fr.top - gap - lh : fr.bottom + gap;
     var x = fr.left;
-    var ox = -(window.pageXOffset || 0), oy = -(window.pageYOffset || 0);
-    if (op && op !== document.body && op !== document.documentElement) {
-      var opr = op.getBoundingClientRect(), cs = getComputedStyle(op);
-      ox = opr.left + (parseFloat(cs.borderLeftWidth) || 0) - op.scrollLeft;
-      oy = opr.top + (parseFloat(cs.borderTopWidth) || 0) - op.scrollTop;
+    /* из координат вьюпорта — в left/top элемента (см. DSFloat.apply).
+       Если DSFloat не подключён (страницы-документация грузят рантайм точечно),
+       работаем прежним инлайн-пересчётом — элемент остаётся absolute. */
+    var Float = window.DSFloat;
+    if (Float) {
+      Float.apply(list, x, y, o.offsetParent);
+    } else {
+      var fl = o.offsetParent || list.offsetParent || list.parentElement;
+      var fOx = -(window.pageXOffset || 0), fOy = -(window.pageYOffset || 0);
+      if (fl && fl !== document.body && fl !== document.documentElement) {
+        var fOpr = fl.getBoundingClientRect(), fCs = getComputedStyle(fl);
+        fOx = fOpr.left + (parseFloat(fCs.borderLeftWidth) || 0) - fl.scrollLeft;
+        fOy = fOpr.top + (parseFloat(fCs.borderTopWidth) || 0) - fl.scrollTop;
+      }
+      list.style.left = Math.round(x - fOx) + 'px';
+      list.style.top = Math.round(y - fOy) + 'px';
     }
-    list.style.left = Math.round(x - ox) + 'px';
-    list.style.top = Math.round(y - oy) + 'px';
     list.style.setProperty('--ddl-origin', (placement === 'top' ? 'bottom' : 'top') + ' left');
     return placement;
   }
@@ -169,9 +179,28 @@
       list.classList.add('is-open');
       field.classList.add('is-open');
       field.setAttribute('aria-expanded', 'true');
+      /* Слой DSFloat живёт в корне body с z-index 40, а .modal-scrim — 1000:
+         список, открытый из поля ВНУТРИ модалки, рисовался под её подложкой
+         и не ловил клики (инцидент: фильтр портфеля ДИД, 05.09.2026). Плюс
+         DSModal.lockPage() ставит inert на всех детей body, кроме скримов, —
+         уже созданный общий слой становился недоступен указателю. Поэтому
+         поле из модалки монтирует список в свой скрим: position:fixed и
+         координаты вьюпорта от этого не меняются, а стек и inert — да. */
+      /* куда монтировать — решает общий слой по якорю (DSFloat.mount):
+         из модалки список уезжает в её скрим, иначе в общий слой */
+      if (window.DSFloat) DSFloat.mount(list, { anchor: field });
       reposition();
-      var sel = list.querySelector('.ddl__item[aria-selected="true"]') || items(list)[0];
-      setActive(sel);
+      /* На открытии активной опции НЕТ. Раньше подсвечивалась выбранная, а при
+         её отсутствии — первая строка: список открывался с уже «наведённой»
+         строкой, и пользователь видел два фокуса сразу — рамку на поле и
+         подсветку в списке. Фокус остаётся на поле-триггере (он и держит
+         реальный фокус, список — popup), а активная опция появляется только
+         когда пользователь пошёл по списку клавишами.
+         Выбранную опцию всё равно подкручиваем в зону видимости: в длинном
+         справочнике список обязан открыться там, где стоит текущее значение,
+         но подсвечивает её собственное правило [aria-selected], а не .is-focus. */
+      var sel = list.querySelector('.ddl__item[aria-selected="true"]');
+      if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: 'nearest' });
       current = api;
       return api;
     }
@@ -181,6 +210,7 @@
       field.classList.remove('is-open');
       field.setAttribute('aria-expanded', 'false');
       setActive(null);
+      if (window.DSFloat) DSFloat.unmount(list);
       if (current === api) current = null;
       if (returnFocus) field.focus();
       return api;
@@ -195,8 +225,17 @@
       }
       var list_ = items(list);
       var i = list_.indexOf(activeEl);
-      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(list_[(i + 1 + list_.length) % list_.length]); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(list_[(i - 1 + list_.length) % list_.length]); }
+      /* активной опции ещё нет (список только открыли) — идём от выбранной,
+         а если и её нет, то ArrowDown даёт первую опцию, ArrowUp — последнюю */
+      var fresh = i < 0;
+      if (fresh) i = list_.indexOf(list.querySelector('.ddl__item[aria-selected="true"]'));
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActive(i < 0 ? list_[0] : list_[(i + 1) % list_.length]);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActive(i < 0 ? list_[list_.length - 1] : list_[(i - 1 + list_.length) % list_.length]);
+      }
       else if (e.key === 'Home') { e.preventDefault(); setActive(list_[0]); }
       else if (e.key === 'End') { e.preventDefault(); setActive(list_[list_.length - 1]); }
       else if (e.key === 'Enter' || (e.key === ' ' && conf.multiple)) { e.preventDefault(); if (activeEl) activeEl.click(); }
@@ -204,7 +243,7 @@
       else if (e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey) {
         clearTimeout(bufT); buf += e.key.toLowerCase();
         bufT = setTimeout(function () { buf = ''; }, 700);
-        var from = (i < 0 ? 0 : i + 1);
+        var from = (i < 0 ? 0 : i + 1);   /* активной нет — ищем с начала списка */
         for (var n = 0; n < list_.length; n++) {
           var it = list_[(from + n) % list_.length];
           var lab = (it.querySelector('.ddl__item-label') || it).textContent.trim().toLowerCase();

@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="../../styles/colors.css">
 <link rel="stylesheet" href="../../styles/radius.css">
 <link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/button.css">
 <link rel="stylesheet" href="../../styles/icon-button.css">
 <link rel="stylesheet" href="../../styles/badge.css">
 <link rel="stylesheet" href="../../styles/avatar.css">
@@ -150,7 +151,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.014</b></span><span>Обновлено: <b>03.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.017</b></span><span>Обновлено: <b>06.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>NavPanel · Панель навигации</h1>
     <p class="lead">Главная навигация приложения в левой части каждой страницы. Отображает все разделы продукта, сгруппированные по подразделениям и типам. Один компонент — три режима: свёрнутый <b>Rail</b>, развёрнутый-оверлей <b>Drawer</b> и закреплённый <b>Fixed</b>.</p>
@@ -286,7 +287,7 @@
 
     <div class="subsec" data-screen-label="FixedBehavior">
       <h3>Fixed — закреплённая панель</h3>
-      <p class="desc">По клику на кнопку в правом верхнем углу панель закрепляется на странице: контент подстраивается под новую ширину контентной области, иконка в кнопке меняется с <code class="tok">pin-menu</code> на <code class="tok">unpin-menu</code>. Повторный клик открепляет панель и возвращает её в режим Drawer.</p>
+      <p class="desc">По клику на кнопку в правом верхнем углу панель закрепляется на странице: контент подстраивается под новую ширину контентной области, иконка в кнопке меняется с <code class="tok">pin-menu</code> на <code class="tok">unpin-menu</code>. Повторный клик открепляет панель и возвращает её в режим Drawer. Закреплённое состояние сохраняется между страницами: при переходе на другую страницу панель остаётся развёрнутой и закреплённой (<code class="tok">localStorage</code>).</p>
     </div>
 
     <div class="subsec" data-screen-label="NestedBehavior">
@@ -398,7 +399,11 @@
 //    клик по .nav__item--acc →
 //      rail: развернуть панель в drawer;
 //      drawer/fixed: переключить aria-expanded
-//    (каретка .nav__caret крутится, под-список .nav__sub раскрывается в потоке).</span></code></pre>
+//    (каретка .nav__caret крутится, под-список .nav__sub раскрывается в потоке).</span>
+
+<span class="tk-cm">// 8. Закрепление между страницами (fixed):
+//    переход в fixed на живой панели (.nav-layout) → сохранить в localStorage;
+//    при загрузке: сохранённый fixed → восстановить режим; rail/drawer → очистить.</span></code></pre>
     </div>
     <p class="dev-note">Это алгоритм поверх вашего стека, не готовый сниппет. Разметку панели и режимы см. в <code class="tok">nav-panel.page.js</code> (функция <code class="tok">buildNav</code>).</p>
   </section>
@@ -461,6 +466,7 @@
 <script src="../../scripts/icons-data.js"></script>
 <script src="../../scripts/ibp-home.js"></script>
 <script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-tooltip.js"></script>
 <script src="../../scripts/ds-modal.js"></script>
 <script src="../../scripts/ds-nav-panel.js"></script>
 <script src="../../scripts/nav-panel.page.js"></script>
@@ -533,6 +539,16 @@ DSNavPanel.setMode(navEl, 'drawer');   // 'rail' | 'drawer' | 'fixed'
    Только токены ДС. Иконки — <i data-icon>; бейдж — компонент Badge;
    аватар — Avatar; бургер/пин/логаут — IconButton.
    ========================================================================= */
+
+/* Парные `[hidden]` — правило B11 линтера.
+   Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
+   (0,0,0), а правило класса ниже — (0,1,0): класс побеждает, и атрибут `hidden`
+   на компоненте молча перестаёт работать. Разметка при этом выглядит правильной,
+   скрипт исправно ставит атрибут, а элемент виден. Этот дефект чинили поштучно
+   шесть раз (Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002,
+   InputText 1.010, Chip 1.015), после чего закрыли на уровне соглашения:
+   корень компонента, объявивший `display`, объявляет и пару к нему. */
+.nav[hidden] { display: none; }
 
 .nav {
   --nav-rail-w:   56px;

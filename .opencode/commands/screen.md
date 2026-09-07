@@ -16,3 +16,8 @@ agent: ai-designer
 
 Результат — два файла в `Projects/test/`: `<Имя>.html` и
 `<Имя>.screen.md`.
+
+Если приёмка нашла дефекты и они починены — заход закрывается уроком: скилл
+`lessons` (`.opencode/skills/lessons/SKILL.md`), запись с полем «Закрепление»,
+затем `lessons-cli add --from <черновик>`, `check` и `state`. Вердикты
+показать пользователю: `check` обязан дать БЛОКЕР 0.

@@ -1,0 +1,55 @@
+/* =========================================================================
+   Design System — Table Settings (модалка «Настройка таблицы»)
+   Демо-хром модалки, которую собирает рантайм scripts/ds-table-settings.js.
+   Классы: описание, список колонок, строка (checkbox + pin + drag),
+   индикатор места вставки при перетаскивании.
+   Только токены ДС. Не часть таблицы (TableCell) — это хром модалки;
+   подключается страницей/экраном вместе с modal.css, checkbox.css,
+   divider.css, button.css, icon-button.css.
+   ========================================================================= */
+
+/* Парные `[hidden]` — правило B11 линтера.
+   Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
+   (0,0,0), а правило класса ниже — (0,1,0): класс побеждает, и атрибут `hidden`
+   на компоненте молча перестаёт работать. Разметка при этом выглядит правильной,
+   скрипт исправно ставит атрибут, а элемент виден. Этот дефект чинили поштучно
+   шесть раз (Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002,
+   InputText 1.010, Chip 1.015), после чего закрыли на уровне соглашения:
+   корень компонента, объявивший `display`, объявляет и пару к нему. */
+.col-list[hidden],
+.col-item[hidden] { display: none; }
+
+/* описание «Выберите столбцы для отображения» — Body M, вторичный цвет */
+.col-desc {
+  font: var(--type-body-m);
+  color: var(--text-secondary);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* список колонок */
+.col-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* строка колонки: чекбокс видимости + закрепление + драг */
+.col-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+.col-item.is-dragging { opacity: .4; }
+/* индикатор места вставки — линия --primary (как .tbl__guide) */
+.col-item.drop-before { box-shadow: inset 0 2px 0 0 var(--primary); }
+.col-item.drop-after  { box-shadow: inset 0 -2px 0 0 var(--primary); }
+
+/* компоненты строки */
+.col-item .cb       { flex: 1; min-width: 0; }   /* чекбокс занимает свободное место */
+.col-item__pin      { flex: none; }               /* кнопка закрепления */
+.col-item__drag     { flex: none; cursor: grab; } /* ручка перетаскивания */

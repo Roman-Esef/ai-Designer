@@ -152,7 +152,7 @@
           return '<button class="ddl__item" role="option" aria-selected="' + (k === 0) + '"><span class="ddl__item-body"><span class="ddl__item-label">' + t + '</span></span></button>';
         }).join('') + '</div>';
     }
-    var ph = kind === 'date' ? 'ММ.ДД.ГГГГ' : 'Значение';
+    var ph = kind === 'date' ? 'ДД.ММ.ГГГГ' : 'Значение';
     return '<div class="inp inp--s inp--fullwidth' + (isErr ? ' inp--error' : '') + (open ? ' is-open' : '') + '">' +
       '<div class="inp__field"' + (kind === 'autocomplete' ? ' role="combobox" aria-expanded="' + open + '"' : '') + '>' +
       '<input class="inp__control" value="' + esc(cfg.text) + '" placeholder="' + ph + '" aria-label="Значение ячейки"' +

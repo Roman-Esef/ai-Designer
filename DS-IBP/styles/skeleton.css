@@ -1,4 +1,17 @@
 /* Skeleton — переиспользуемый плейсхолдер загрузки: Line (текстовая строка), Block (геометрическая форма) и Surface (шиммер прямо на существующем элементе — свой размер/радиус сохраняются) + общий шиммер. Токены — colors.css, radius.css. */
+/* Парные `[hidden]` — правило B11 линтера.
+   Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
+   (0,0,0), а правило класса ниже — (0,1,0): класс побеждает, и атрибут `hidden`
+   на компоненте молча перестаёт работать. Разметка при этом выглядит правильной,
+   скрипт исправно ставит атрибут, а элемент виден. Этот дефект чинили поштучно
+   шесть раз (Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002,
+   InputText 1.010, Chip 1.015), после чего закрыли на уровне соглашения:
+   корень компонента, объявивший `display`, объявляет и пару к нему. */
+.sk-line[hidden],
+.sk-block[hidden],
+.sk-group[hidden],
+.sk-row[hidden] { display: none; }
+
 .sk-line,.sk-block,.sk-surface{background:linear-gradient(90deg, var(--st-disabled-light) 25%, var(--st-disabled-midlight) 37%, var(--st-disabled-light) 63%);background-size:400% 100%;animation:sk-shimmer 1.6s ease infinite}
 .sk-line{display:block;height:var(--sk-h, 16px);width:var(--sk-w, 100%);border-radius:var(--radius-xs)}
 .sk-line--title{height:20px}

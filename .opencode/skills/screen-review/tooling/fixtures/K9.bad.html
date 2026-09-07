@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- ФИКСТУРА сенсора layout-check. Это НЕ экран продукта и не открывается в
+     браузере: файл существует только как вход для проверки самого сторожа,
+     поэтому относительные пути до ds.css/ds.js намеренно не разрешаются.
+     `_base.ok.html` — эталон без дефектов: на нём ни одно правило не обязано
+     давать FAIL. Каждая пара <ID>.bad.html / <ID>.ok.html отличается от базы
+     ровно одним дефектом — иначе проверка сторожа проверяет не то. -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Фикстура — IBP</title>
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary); background: var(--bg-page);
+  }
+  .fx-grid { display: grid; gap: var(--layout-block-gap); }
+</style>
+</head>
+<body>
+  <div class="nav-layout">
+    <aside class="nav nav--rail">
+      <div class="nav__list">
+        <a class="nav__item nav__item--selected"><i class="nav__ico" data-icon="folder"></i><span class="nav__label">Сделки</span></a>
+      </div>
+      <button class="ibtn ibtn--neutral ibtn--m nav__pin" type="button" aria-label="Закрепить панель"><i data-icon="pin"></i></button>
+      <div class="nav__footer"><span class="nav__user-text">Иванов И. И.</span></div>
+    </aside>
+
+    <div class="screen">
+      <nav class="crumbs"><a class="crumbs__item">Главная</a></nav>
+      <main class="screen__content">
+        <header class="phead">
+          <h1 class="phead__title">Реестр сделок</h1>
+        </header>
+        <div class="phead__actions">
+          <button type="button" class="ibtn ibtn--m" aria-label="Настроить таблицу" data-modal="fx-modal"><i data-icon="settings"></i></button>
+        </div>
+
+        <div class="tile-row">
+          <section class="tile" style="grid-column:span 12">
+            <header class="tile__header"><div class="tile__header-main"><div class="tile__title-row"><h3 class="tile__title">Условия</h3></div></div></header>
+            <div class="tile__grid" style="grid-template-columns:repeat(4,1fr)">
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Номер сделки</span></span><div class="rof__row"><span class="rof__value">DL-2024-000481</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Сумма</span></span><div class="rof__row"><span class="rof__value">1 240 500,00</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Валюта</span></span><div class="rof__row"><div class="rof__value rof__value--chips"><span class="chip chip--fit"><span class="chip__label">RUB</span></span></div></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Дата подписания</span></span><div class="rof__row"><span class="rof__value">20.04.2024</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Статус</span></span><div class="rof__row"><div class="rof__value rof__value--chips"><span class="chip"><span class="chip__label">Активна</span></span></div></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Менеджер</span></span><div class="rof__row"><span class="rof__value">Иванов И. И.</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Срок</span></span><div class="rof__row"><span class="rof__value">31.12.2025</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Ставка</span></span><div class="rof__row"><span class="rof__value">12,50</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Поле 1</span></span><div class="rof__row"><span class="rof__value">1,00</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Поле 2</span></span><div class="rof__row"><span class="rof__value">2,00</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Поле 3</span></span><div class="rof__row"><span class="rof__value">3,00</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Поле 4</span></span><div class="rof__row"><span class="rof__value">4,00</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Поле 5</span></span><div class="rof__row"><span class="rof__value">5,00</span></div></div>
+            </div>
+          </section>
+        </div>
+        <div class="dtable">
+          <div class="dtable__body">
+            <div class="tbl tbl--scroll" data-table>
+              <div class="tbl__row tbl__row--head" style="grid-template-columns:8px 200px 160px 8px">
+                <div class="th th--separator"></div>
+                <div class="th">Сделка</div>
+                <div class="th">Сумма</div>
+                <div class="th th--separator"></div>
+              </div>
+              <div class="tbl__row" style="grid-template-columns:8px 200px 160px 8px">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__text">DL-2024-000481</span></div>
+                <div class="tc tc--numbers"><span class="tc__text">1 240 500,00</span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-scrim" id="fx-modal" hidden>
+    <div class="modal modal--w4">
+      <div class="modal__head"><h2 class="modal__title">Настройка</h2></div>
+      <div class="modal__body"><p>Состав колонок</p></div>
+    </div>
+  </div>
+  <script src="../../DS-IBP/scripts/ds.js"></script>
+</body>
+</html>

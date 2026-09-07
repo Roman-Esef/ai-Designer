@@ -71,7 +71,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.001</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.002</b></span><span>Обновлено: <b>05.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>EmptyState</h1>
     <p class="lead">Иллюстрация, заголовок, текст и опциональные действия — для пустого списка/таблицы, отсутствия результатов поиска, первого входа без данных и полноэкранных ошибок. Показывает, что произошло, и что можно сделать дальше.</p>
@@ -592,6 +592,13 @@ function renderIllu() { if (window.DSIllustrations) window.DSIllustrations.rende
    там Spinner/Skeleton. Токены — colors.css, radius.css, typography.css.
    Иллюстрация — .illu из illustration.css (собственная палитра, не тонируется). */
 .es { display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; }
+/* [hidden] той же специфичности (0,1,0), что и правило выше, подключается
+   позже базового UA-стиля и без явного правила проигрывает каскад: пустое
+   состояние, скрытое атрибутом hidden (потребитель переключает его вместе с
+   .tbl/.dtable__footer), оставалось бы видимым под таблицей всегда.
+   Тот же класс дефекта, что чинили в Modal 1.005 (.modal-scrim[hidden]),
+   Tab 1.006 (.tab__badge[hidden]) и TableCell 2.015 (.tbl__row[hidden]). */
+.es[hidden] { display: none; }
 .es__body { display: flex; flex-direction: column; }
 .es__title { margin: 0; color: var(--text-primary); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .es__text { margin: 0; color: var(--text-secondary); text-wrap: pretty; overflow-wrap: break-word; }

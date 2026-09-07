@@ -1,0 +1,52 @@
+<!-- @dsCard group="Fixtures" name="R-base" viewport="1440x900" -->
+<!-- ФИКСТУРА линтера: B5. Получена из `_base.ok.html` ОДНОЙ заменой
+     генератором пар — «отличается эталона одним изменением» здесь свойство
+     изготовления, а не обещание в комментарии.
+     ДЕФЕКТ: нативная <table> вместо .tbl (Table/TableCell).
+     Правило обязано ПАДАТЬ здесь и МОЛЧАТЬ на эталоне — `lessons-cli verify`. -->
+<!DOCTYPE html>
+<!-- ФИКСТУРА линтера, ряд правил R (каскад раскатки docs-split). Это НЕ
+     страница документации и не открывается в браузере: файл существует только
+     как вход для проверки самих правил. В индекс и в реестры не входит —
+     ds-lint читает ровно те файлы, что переданы аргументом.
+     `_base.ok.html` — эталон: ни одно правило ряда R на нём не срабатывает.
+     Каждая пара <ID>.bad.html отличается от эталона ровно одним дефектом.
+     Разметка и классы — только из ДС (урок Л69: образец, собранный по памяти,
+     задаёт выдуманный язык всему, что от него произошло). -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фикстура R — Дизайн-система</title>
+<link rel="stylesheet" href="../styles/typography.css">
+<link rel="stylesheet" href="../styles/colors.css">
+<link rel="stylesheet" href="../styles/docs-split.css">
+<link rel="stylesheet" href="../styles/splitter.css">
+<link rel="stylesheet" href="../styles/segment-control.css">
+<link rel="stylesheet" href="../styles/input.css">
+<link rel="stylesheet" href="../styles/ds-toc.css">
+<style>
+  .fx-note { font: var(--type-body-m); color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<main class="page ds-split">
+  <p class="meta">Версия: <b>1.000</b> · Обновлено: <b>06.09.2026</b></p>
+  <div class="splitpane">
+    <div class="splitpane__a">
+      <div id="pg-controls">
+        <div class="ctl"><span class="lbl">Вариант</span></div>
+        <div class="inp inp--m"><div class="inp__field"><input class="inp__control"></div></div>
+      </div>
+    </div>
+    <div class="splitpane__b">
+      <p class="fx-note">Область предпросмотра.</p>
+      <table><tbody><tr><td>1</td></tr></tbody></table>
+    </div>
+  </div>
+</main>
+<script src="../scripts/ds-toc.js"></script>
+<script src="../scripts/ds-splitter.js"></script>
+<script src="../scripts/docs-split.js"></script>
+</body>
+</html>

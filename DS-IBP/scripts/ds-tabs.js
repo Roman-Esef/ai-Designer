@@ -304,5 +304,28 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { wireAll(document); });
   else wireAll(document);
 
+  /* Тултип на усечённой подписи таба (спека, «Переполнение»): вертикальный
+     таб с длинным текстом обрезается многоточием, а по наведению/фокусу
+     показывается полный текст. Механизм общий — DSTooltip.truncated();
+     тут регистрируется селектор подписи. Фокус приходит на сам таб (.tab),
+     подпись .tab__label живёт внутри — поэтому opts.host.
+     Disabled-таб событий не даёт (pointer-events:none), его усечённую
+     подпись читаем сканом refresh() с хук-классом .tab--has-tooltip
+     (стили/tab.css:347 — хук заведён давно, но его никто не ставил).
+     Горизонтальные табы подписи при этом не усекают (ширина по контенту) —
+     isTruncated отсекает, тултип не появится. */
+  var truncatedHandle = null;
+  function registerTrunc() {
+    if (truncatedHandle || !window.DSTooltip) return;
+    truncatedHandle = window.DSTooltip.truncated('.tab__label', {
+      host: '.tab',
+      disabled: '.tab--disabled, .tab[aria-disabled="true"]',
+      disabledClass: 'tab--has-tooltip',
+      init: false,
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { registerTrunc(); if (truncatedHandle) truncatedHandle.refresh(document); });
+  else { registerTrunc(); if (truncatedHandle) truncatedHandle.refresh(document); }
+
   window.DSTabs = { tabs: tabs, segment: segment, positionThumb: positionThumb, wireAll: wireAll };
 })();

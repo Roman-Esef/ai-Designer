@@ -1,8 +1,8 @@
 ---
 component: ButtonTest
 title: "Button Test"
-version: "1.011"
-updated: "31.08.2026"
+version: "1.012"
+updated: "05.09.2026"
 page: pages/atoms/ButtonTest.html
 css: styles/button.css
 deps: [spinner]
@@ -17,4 +17,5 @@ status: auto
 - Зарегистрирована в реестрах: `scripts/ds-nav.js` (левая панель, группа «Атомы») и `index.html` (карточка в разделе «Атомы»).
 
 ## Инварианты
+- Корень компонента объявляет парное `[hidden] { display: none }`: браузерное правило имеет специфичность (0,0,0) и приходит из UA-стиля, а `display` компонента — (0,1,0) и перебивает его, из-за чего атрибут `hidden` молча перестаёт работать. Соглашение ДС от 05.09.2026, охраняется правилом B11 линтера.
 Совпадают с `specs/Buttons.md` — компонент не менялся.

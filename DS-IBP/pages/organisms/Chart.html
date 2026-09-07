@@ -80,7 +80,7 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;col
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.000</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.002</b></span><span>Обновлено: <b>05.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>Chart</h1>
     <p class="lead">Графики данных: столбчатые, линейные, области, круговые, точечные, водопад и спарклайн — одна анатомия на все типы. Предметной области компонент не знает: подписи серий, категории и числа приходят данными. Цвета серий — палитра <code class="tok">--chart-*</code> из <a class="inl" href="../foundations/Colors.html">Colors</a>, тултип — <a class="inl" href="../molecules/Tooltip.html">Tooltip</a>, служебные состояния — <a class="inl" href="../molecules/Alert.html">Alert</a> и <a class="inl" href="../atoms/Skeleton.html">Skeleton</a>, переключатель периода — <a class="inl" href="../molecules/SegmentControl.html">SegmentControl</a>.</p>
@@ -570,6 +570,16 @@ const c = DSChart.make({
    Зависимости: colors.css, typography.css, radius.css, tooltip.css,
    skeleton.css, alert.css, button.css, icon-button.css, segment-control.css.
    ========================================================================= */
+
+/* Парные `[hidden]` — правило B11 линтера.
+   Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
+   (0,0,0), а правило класса ниже — (0,1,0): класс побеждает, и атрибут `hidden`
+   на компоненте молча перестаёт работать. Разметка при этом выглядит правильной,
+   скрипт исправно ставит атрибут, а элемент виден. Этот дефект чинили поштучно
+   шесть раз (Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002,
+   InputText 1.010, Chip 1.015), после чего закрыли на уровне соглашения:
+   корень компонента, объявивший `display`, объявляет и пару к нему. */
+.chart[hidden] { display: none; }
 
 .chart-host{--chart-h:220px;--chart-gap:12px;--chart-tick-fg:var(--text-inactive);--chart-grid:var(--border-light);--chart-axis:var(--border-primary);--chart-label-fg:var(--text-secondary);--chart-bar-r:var(--radius-2xs);--chart-line-w:2px;display:block;min-width:0;container-type:inline-size;container-name:chart}
 .chart-host[data-size="s"]{--chart-h:132px;--chart-gap:8px}

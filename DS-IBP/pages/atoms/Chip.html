@@ -166,7 +166,7 @@
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.013</b></span><span>Обновлено: <b>04.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.018</b></span><span>Обновлено: <b>05.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>Chip</h1>
     <p class="lead">Чип — компактный интерактивный элемент для фильтрации и группировки данных. Применяется как <b>тег</b>, <b>маркер</b> и <b>статус</b>, входит в состав чиплиста и InputAutocomplete. Два типа — <b>Edit</b> и <b>ReadOnly</b>, два стиля — <b>Fill</b> и <b>Outline</b>.</p>
@@ -432,7 +432,8 @@
       </ul>
       <div class="chiplist" id="a11y-focus-demo" style="margin-bottom:22px;"></div>
       <ul class="bullets">
-        <li>Disabled-чип исключён из таб-порядка (<code class="tok">pointer-events:none</code>), но если текст обрезан — класс <code class="tok">.chip--has-tooltip</code> возвращает наведение для тултипа; полный текст дублируйте в <code class="tok">title</code>;</li>
+        <li>усечённая подпись объясняет себя тултипом из коробки (<code class="tok">scripts/ds-chip.js</code> + <code class="tok">scripts/ds-tooltip.js</code>): по первому наведению или фокусу рантайм навешивает тултип с полным текстом и показывает его только при реальном усечении — <code class="tok">data-tooltip</code> руками писать не нужно, а оставленный <code class="tok">title</code> рантайм заберёт в текст и снимет, чтобы поверх не всплыл нативный;</li>
+        <li>Disabled-чип исключён из таб-порядка (<code class="tok">pointer-events:none</code>), но если текст обрезан — класс <code class="tok">.chip--has-tooltip</code> возвращает наведение для тултипа; класс ставит рантайм при загрузке, чипу, построенному позже, — вызов <code class="tok">DSChip.refresh(root)</code>;</li>
         <li>не полагайтесь только на тон (цвет) для критичных статусов (например, Error против Success) — для пользователей с нарушениями цветовосприятия дублируйте смысл маркером/иконкой;</li>
         <li>для чипов-фильтров с выбором (<code class="tok">chip--selected</code>, Предложение) рекомендуем <code class="tok">aria-pressed</code> на каждом чипе и <code class="tok">role="group"</code> на чиплисте.</li>
       </ul>
@@ -486,8 +487,10 @@
       </div>
       <pre><code id="code-js"><span class="tk-cm">// 1. Hover — только для Edit и только когда не disabled: чистый CSS (:hover)</span>
 
-<span class="tk-cm">// 2. Обрезка текста: когда scrollWidth элемента &gt; clientWidth (текст обрезан</span>
-<span class="tk-cm">//    ellipsis) — добавить title с полным текстом. Работает и для Disabled (chip--has-tooltip возвращает pointer-events)</span>
+<span class="tk-cm">// 2. Обрезка текста: когда scrollWidth подписи &gt; clientWidth (текст обрезан</span>
+<span class="tk-cm">//    ellipsis) — показать тултип с полным текстом. Из коробки (ds-chip.js): по первому</span>
+<span class="tk-cm">//    наведению/фокусу подпись получает data-tooltip + data-tooltip-truncated="only" и</span>
+<span class="tk-cm">//    привязку ds-tooltip.js. Работает и для Disabled (chip--has-tooltip возвращает pointer-events)</span>
 
 <span class="tk-cm">// 3. Удаление: клик по chip__remove ИЛИ Backspace/Delete на сфокусированном чипе →</span>
 <span class="tk-cm">//    анимация исчезновения (opacity+scale) → удалить из DOM → перенести фокус на соседний чип</span>
@@ -640,6 +643,22 @@ function makeChip(o) {
    Extras:  rounded (999px pill) · max-width 320px → ellipsis + tooltip
    Requires: typography.css, colors.css
    ========================================================================= */
+
+/* Парные `[hidden]` — правило B11 линтера.
+   Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
+   (0,0,0), а правило класса ниже — (0,1,0): класс побеждает, и атрибут `hidden`
+   на компоненте молча перестаёт работать. Разметка при этом выглядит правильной,
+   скрипт исправно ставит атрибут, а элемент виден. Этот дефект чинили поштучно
+   шесть раз (Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002,
+   InputText 1.010, Chip 1.015), после чего закрыли на уровне соглашения:
+   корень компонента, объявивший `display`, объявляет и пару к нему. */
+.chiplist[hidden] { display: none; }
+
+/* [hidden] той же специфичности (0,1,0), что и .chip { display: inline-flex }:
+   без парного правила атрибут не работает. Свёрнутые в «+N» чипы прячет
+   ds-input.js именно им (см. Modal 1.005, TableCell 2.015, Tab 1.010,
+   EmptyState 1.002 — тот же класс дефекта). */
+.chip[hidden] { display: none; }
 
 .chip {
   /* size tokens — overridden per size modifier */

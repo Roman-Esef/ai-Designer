@@ -98,7 +98,7 @@
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.001</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.002</b></span><span>Обновлено: <b>05.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>Skeleton</h1>
     <p class="lead">Плейсхолдер загрузки, повторяющий геометрию будущего контента: строка текста (<code class="tok">.sk-line</code>), форма (<code class="tok">.sk-block</code>) и шиммер прямо на существующем элементе (<code class="tok">.sk-surface</code>) с общим шиммером. Показывает структуру раньше данных — макет не прыгает, когда контент приходит.</p>
@@ -635,6 +635,19 @@ function skGroup(lines) { /* .sk-group — колонка линий */ }
 function skRow(blockOpts, lines) { /* .sk-row — блок + колонка линий */ }
 // Скелетон — только анимация shimmer (--sk-anim); форма — .sk-line/.sk-block</script>
 <script type="text/plain" id="src-code-css">/* Skeleton — переиспользуемый плейсхолдер загрузки: Line (текстовая строка), Block (геометрическая форма) и Surface (шиммер прямо на существующем элементе — свой размер/радиус сохраняются) + общий шиммер. Токены — colors.css, radius.css. */
+/* Парные `[hidden]` — правило B11 линтера.
+   Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
+   (0,0,0), а правило класса ниже — (0,1,0): класс побеждает, и атрибут `hidden`
+   на компоненте молча перестаёт работать. Разметка при этом выглядит правильной,
+   скрипт исправно ставит атрибут, а элемент виден. Этот дефект чинили поштучно
+   шесть раз (Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002,
+   InputText 1.010, Chip 1.015), после чего закрыли на уровне соглашения:
+   корень компонента, объявивший `display`, объявляет и пару к нему. */
+.sk-line[hidden],
+.sk-block[hidden],
+.sk-group[hidden],
+.sk-row[hidden] { display: none; }
+
 .sk-line,.sk-block,.sk-surface{background:linear-gradient(90deg, var(--st-disabled-light) 25%, var(--st-disabled-midlight) 37%, var(--st-disabled-light) 63%);background-size:400% 100%;animation:sk-shimmer 1.6s ease infinite}
 .sk-line{display:block;height:var(--sk-h, 16px);width:var(--sk-w, 100%);border-radius:var(--radius-xs)}
 .sk-line--title{height:20px}

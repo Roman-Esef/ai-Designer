@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- Шаблон экрана на IBP DS. Новый экран = копия этого файла (copy_files) + точечные правки.
+<!-- Шаблон экрана на IBP DS. Новый экран = копия этого файла + точечные правки.
+     Копировать обычными средствами оболочки (cp / Copy-Item): инструмента
+     `copy_files` в контуре нет, ссылка на него порождала фиктивное «выполнено»
+     (урок Л37 — шаг обязан быть исполнимой командой с кодом выхода).
      Контекст для сборки: specs/_cheatsheet.md (обзор всех компонентов) + specs/<Имя>.md точечно.
      CSS компонентов не читать — классы и DOM уже в спеках. -->
 <html lang="ru">
@@ -7,6 +10,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Экран — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/logo.svg">
 <link rel="stylesheet" href="../../ds.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; }

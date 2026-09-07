@@ -28,9 +28,12 @@ const NODE = process.execPath;
 const DS_LINT = path.join(ROOT, 'scripts', 'ds-lint-cli.mjs');
 const DOCS_SPLIT = path.join(WS, '.opencode', 'skills', 'docs-split', 'tooling', 'docs-split.mjs');
 
-const page = process.argv[2];
+const argv = process.argv.slice(2);
+const withVerify = argv.includes('--with-verify') || !!process.env.DS_CHROME;
+const skipped = [];
+const page = argv.find((a) => !a.startsWith('--'));
 if (!page) {
-  console.error('Использование: node scripts/ds-check.mjs <страница>');
+  console.error('Использование: node scripts/ds-check.mjs <страница> [--with-verify]');
   process.exit(2);
 }
 
@@ -49,7 +52,13 @@ const steps = [
 ];
 if (isDocsSplit) {
   steps.push(['docs-split check', [DOCS_SPLIT, 'check', pageWs]]);
-  steps.push(['docs-split verify', [DOCS_SPLIT, 'verify', pageWs]]);
+  /* Шаг живости запускает headless-браузер. В рабочем контуре это запрещено
+     (ds-rules §9), Chrome там нет, и шаг падал кодом 2 — «ВЕРДИКТ: FAIL» стал
+     штатным состоянием гейта на всех раскатанных страницах. Гейт, который
+     всегда красный, не несёт сигнала (это класс урока Л37). Теперь шаг явный:
+     флаг --with-verify или заданный DS_CHROME. */
+  if (withVerify) steps.push(['docs-split verify', [DOCS_SPLIT, 'verify', pageWs]]);
+  else skipped.push('docs-split verify (нужен браузер; включить — флагом --with-verify или переменной DS_CHROME)');
 }
 
 let failed = 0;
@@ -67,5 +76,6 @@ for (const [name, args] of steps) {
 }
 
 console.log('\n' + '='.repeat(40));
+for (const s of skipped) console.log(`ПРОПУЩЕН: ${s}`);
 console.log(failed === 0 ? 'ВЕРДИКТ: OK' : `ВЕРДИКТ: FAIL (${failed} шаг(а))`);
 process.exit(failed === 0 ? 0 : 1);

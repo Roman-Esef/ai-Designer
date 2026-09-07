@@ -1,8 +1,8 @@
 ---
 component: PageHeader
 title: "PageHeader"
-version: "1.009"
-updated: "03.09.2026"
+version: "1.010"
+updated: "05.09.2026"
 page: pages/organisms/PageHeader.html
 runtime: scripts/ds-menu.js, scripts/ds-actions-overflow.js
 css: styles/page-header.css
@@ -16,6 +16,7 @@ status: curated
 PageHeader — заголовок страницы рабочей области: идентифицирует открытую сущность (сделка, инструмент, раздел) и несёт основные действия страницы. Состоит из независимых частей: неразрывная группа Title (+IconLeft, +Edit), Chips, кнопка возврата (Return), Subtitle, Actions (+MenuButton). Адаптируется вплоть до мобильной раскладки. Breadcrumbs — отдельный компонент, ставится строкой НАД PageHeader.
 
 ## Инварианты
+- Корень компонента объявляет парное `[hidden] { display: none }`: браузерное правило имеет специфичность (0,0,0) и приходит из UA-стиля, а `display` компонента — (0,1,0) и перебивает его, из-за чего атрибут `hidden` молча перестаёт работать. Соглашение ДС от 05.09.2026, охраняется правилом B11 линтера.
 - Заголовок многострочный, без усечения (`.phead__title{white-space:normal}`) — эллипсиса и тултипа по обрезке у него нет и не планируется.
 - Переполнение `.phead__actions` в меню «Ещё» — общий рантайм `scripts/ds-actions-overflow.js` (opt-in `data-actions-overflow`), тот же принцип, что у переполнения табов (`ds-tabs.js`).
 - IconLeft + Title + Edit — неразрывная группа (`.phead__title-group`), не переносится отдельно от заголовка при wrap.

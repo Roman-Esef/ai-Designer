@@ -130,8 +130,8 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     Обзор компонентов
   </a>
   <div class="meta">
-    <span>Версия <b>2.013</b></span>
-    <span>Обновлено <b>04.09.2026</b></span>
+    <span>Версия <b>2.018</b></span>
+    <span>Обновлено <b>05.09.2026</b></span>
     <span>CSS <b>styles/table-cell.css</b></span>
     <span>Зависимости <b>checkbox, chip, icon-button, button, input, dropdown-list, tooltip, chart</b></span>
   </div>
@@ -257,7 +257,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
       <div class="tbl__row tbl__row--focus" style="grid-template-columns:8px 1.4fr 1fr 1fr 8px;">
         <div class="tc tc--separator"></div>
         <div class="tc tc--input"><div class="inp inp--s inp--fullwidth is-focus"><div class="inp__field"><input class="inp__control" value="Услуги подряда" aria-label="Наименование"><span class="inp__acts"><button class="inp__act" aria-label="Очистить поле" tabindex="-1"><i data-icon="close"></i></button></span></div></div></div>
-        <div class="tc tc--input"><div class="inp inp--s inp--fullwidth"><div class="inp__field"><input class="inp__control" placeholder="ММ.ДД.ГГГГ" inputmode="numeric" aria-label="Дата"><span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog" tabindex="-1"><i data-icon="calendar"></i></button></span></div></div></div>
+        <div class="tc tc--input"><div class="inp inp--s inp--fullwidth"><div class="inp__field"><input class="inp__control" placeholder="ДД.ММ.ГГГГ" inputmode="numeric" aria-label="Дата"><span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog" tabindex="-1"><i data-icon="calendar"></i></button></span></div></div></div>
         <div class="tc tc--input tc--numbers tc--error"><div class="inp inp--s inp--fullwidth inp--error"><div class="inp__field"><input class="inp__control" value="-5" aria-label="Количество" style="text-align:right;"></div></div></div>
         <div class="tc tc--separator"></div>
       </div>
@@ -417,7 +417,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
   <!-- BEHAVIOR -->
   <section class="section" data-screen-label="Behavior">
     <h2>Поведение</h2>
-    <p class="desc">Усечение текста, раскрытие дерева, сортировка и закрепление колонки, изменение ширины и порядка колонок, выбор и фокус строки, скрытые действия, редактируемые ячейки, навигация по сетке.</p>
+    <p class="desc">Усечение текста, свёртка чипов в «+N», раскрытие дерева, сортировка и закрепление колонки, изменение ширины и порядка колонок, выбор и фокус строки, скрытые действия, редактируемые ячейки, навигация по сетке.</p>
 
 <div class="subsec" data-screen-label="Truncate">
     <h3>Усечение текста</h3>
@@ -428,6 +428,18 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
         <div class="tbl__row" style="grid-template-columns:8px 1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Короткое имя</span></span></div><div class="tc tc--separator"></div></div>
       </div>
       <p class="ex-cap">Наведите курсор на первую строку — тултип показывает полное значение; вторая короче ячейки и тултипа не получает.</p>
+    </div>
+  </div>
+
+<div class="subsec" data-screen-label="ChipOverflow">
+    <h3>Свёртка чипов «+N»</h3>
+    <p class="desc">Чип в ячейке несжимаем (<code class="tok">.chip--fit</code> — код валюты, тег категории читаются целиком), поэтому стек из нескольких чипов в узкой колонке уезжал бы под соседнюю ячейку. Рантайм считает ширину колонки сам: не поместившиеся чипы получают <code class="tok">hidden</code>, последним встаёт чип-счётчик <code class="tok">[data-tc-count]</code> с тултипом со списком скрытых значений. Хук — сама разметка: два и более чипа в одном контейнере ячейки. Один чип не сворачивается никогда — он усекает подпись внутри плашки; если не помещается даже один, в ячейке остаётся только счётчик. Пересчёт идёт и при изменении ширины колонки ручкой <code class="tok">.th__resize</code>.</p>
+    <div class="panel" style="margin-top:14px;">
+      <div class="tbl" data-table style="max-width:320px;">
+        <div class="tbl__row" style="grid-template-columns:8px 150px minmax(8px,1fr);"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">RUB</span></span><span class="chip chip--s chip--fit"><span class="chip__label">USD</span></span><span class="chip chip--s chip--fit"><span class="chip__label">EUR</span></span><span class="chip chip--s chip--fit"><span class="chip__label">JPY</span></span></span></div><div class="tc tc--separator"></div></div>
+        <div class="tbl__row" style="grid-template-columns:8px 150px minmax(8px,1fr);"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="chip chip--s chip--fit"><span class="chip__label">RUB</span></span><span class="chip chip--s chip--fit"><span class="chip__label">USD</span></span></span></div><div class="tc tc--separator"></div></div>
+      </div>
+      <p class="ex-cap">Первая ячейка не вмещает четыре значения — лишние свёрнуты в «+N», наведение показывает их списком. Вторая помещается целиком и остаётся нетронутой.</p>
     </div>
   </div>
 
@@ -1011,14 +1023,23 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
 
 DSTable.wireAll(document);
 
-// Сортировка: клик по [data-sort] в шапке — none → asc → desc → none,
-// глиф и aria-sort синхронны; событие 'sort' с { column, dir }.
+// Сортировка: клик по [data-sort] в шапке — none → asc → desc → none; рантайм сам меняет
+// глиф, aria-sort, aria-label и подсветку .th--sorted, активна одна колонка, стартовое
+// направление читается из aria-sort разметки. Значение data-sort — ключ поля данных, оно же
+// приходит в событии 'sort' с { column, dir }.
+// Порядок строк: опция data-sort-rows на .tbl — рантайм переставляет строки сам (тип колонки —
+// data-sort-type="date|number|text" на .th, иначе по данным; пустые внизу; none возвращает
+// исходный порядок). Механизм макета: значения берутся из DOM. Реестр на бэкенде атрибут
+// не ставит и сортирует на сервере по событию 'sort'.
 // Закрепление (tbl-pin.js): клик по .th__pin — фон Pinned у всей колонки, pin → pin-filled,
 // aria-pressed, событие 'columnpin'; удержание при скролле — JS (transform): left-pinned у левого
 // края, right-pinned (хвостовой блок) у правого; примыкающий сепаратор прилипает с колонкой.
 // Дерево: .tc__twisty переключает aria-expanded и показ дочерних строк ([data-parent] = id узла).
 // Выбор строк: чекбокс строки красит .tbl__row--selected, чекбокс шапки держит промежуточное состояние.
-// Фокус строки: клик по строке ставит .tbl__row--focus.
+// Фокус строки: клик по строке ставит .tbl__row--focus; строка-шапка исключена — рантайм
+// узнаёт её по наличию .th внутри, класс tbl__row--head ставить не обязательно.
+// Но внутри .dtable__body этот класс ОБЯЗАТЕЛЕН по другой причине: на нём держится
+// липкая шапка (Table 1.013) — на самой .th sticky по вертикали не работает.
 // Усечение: .tc__text--truncate получает тултип с полным текстом (нужен ds-tooltip.js).
 
 // API: DSTable.wire(tblEl, opts) → { el, selected(), sort(column, dir), refresh() } · wireAll(root).
@@ -1490,6 +1511,12 @@ DSTable.wireAll(document);
   background: var(--bg-tile);
 }
 .tbl__row { display: grid; }
+/* [hidden] той же специфичности, что и правило выше (0,1,0) — подключается
+   позже базового UA-стиля и без явного правила проигрывает каскад: строка,
+   скрытая атрибутом hidden (сворачивание дерева в ds-table.js, скрытие
+   строк вне текущей страницы пагинации на экране), оставалась бы видимой.
+   Тот же класс дефекта, что чинили в Modal 1.005 (.modal-scrim[hidden]). */
+.tbl__row[hidden] { display: none; }
 /* min-width: max-content — ТОЛЬКО у прокручиваемой по горизонтали таблицы.
    Там строка обязана резервировать полную ширину контента (сумму треков):
    иначе grid ужимает треки под ширину контейнера, scrollWidth === clientWidth,

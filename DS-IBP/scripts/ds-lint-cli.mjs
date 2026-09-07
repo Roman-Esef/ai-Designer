@@ -2,7 +2,7 @@
    DS-LINT-CLI — локальный запуск ds-lint.js из терминала (Node).
 
    ds-lint.js сам по себе не исполняемый: он ждёт хелперы readFile/ls
-   от харнеса run_script. Эта обёртка даёт их через node:fs и вызывает
+   снаружи. Эта обёртка даёт их через node:fs и вызывает
    dsLint.run(...). Сам линтер не трогается.
 
    Запуск:
@@ -20,7 +20,7 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.vscode', 'uploads', 'screenshots']);
 
-// хелперы в том же контракте, что даёт run_script харнеса ДС
+// хелперы в том же контракте, который ждёт линтер
 const readFile = (p) => fsReadFile(path.join(ROOT, p), 'utf8');
 const ls = async (dir) => {
   const entries = await readdir(path.join(ROOT, dir || '.'), { withFileTypes: true });
@@ -42,4 +42,25 @@ const report = parity
   : await run(targets, { changed: targets });
 
 console.log(report);
-process.exit(/^BLOCKER\s+[1-9]/m.test(report) || /NEEDS-WORK/.test(report) ? 1 : 0);
+const bad = /^BLOCKER\s+[1-9]/m.test(report) || /NEEDS-WORK/.test(report);
+
+/* Журнал прогонов (.opencode/skills/screen-review/tooling/runs.jsonl) — сигнал
+   «сторож сработал / замолчал / вернулся» для самообучения агентов. Импорт
+   МЯГКИЙ: ДС обязана линтоваться и без агентской оснастки, а запись в журнал
+   не имеет права уронить проверку. Фикстуры не логируются — их отсекает
+   сам runlog. */
+try {
+  const { logRun, isFixture } = await import('../../.opencode/skills/screen-review/tooling/runlog.mjs');
+  if (!targets.some(isFixture)) {
+    logRun({
+      tool: 'линтер',
+      // при пакетном прогоне путь не пишется целиком: 61 путь в строке журнала
+      // читать нечем, а привязка кода к файлу всё равно остаётся в самом отчёте
+      target: parity ? '--parity' : (targets.length > 3 ? targets.length + ' файлов' : (targets.join(' ') || '(глобальные)')),
+      verdict: bad ? 'NEEDS-WORK' : 'PASS',
+      text: report,
+    });
+  }
+} catch { /* оснастки нет — линтер работает как работал */ }
+
+process.exit(bad ? 1 : 0);

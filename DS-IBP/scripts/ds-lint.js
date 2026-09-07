@@ -1,14 +1,14 @@
 /* ============================================================
    DS-LINT — статический ревизор целостности страниц ДС (группы A–D, P).
    ВНИМАНИЕ: это НЕ браузерный скрипт. Не подключать на страницах.
-   Запуск только из run_script:
+   Сам по себе не исполняется — ждёт хелперы readFile/ls снаружи.
+   Запуск через обёртку, из корня ДС:
 
-     const src = await readFile('scripts/ds-lint.js');
-     const { run } = new Function('readFile', 'ls', src + ';return dsLint;')(readFile, ls);
-     log(await run(['pages/atoms/Badge.html'], { changed: ['pages/atoms/Badge.html'] }));
+     node scripts/ds-lint-cli.mjs pages/atoms/Badge.html
+     node scripts/ds-check.mjs pages/atoms/Badge.html   # линтер + проверки docs-split
 
    Отчёт — плоский текст, только нарушения. Живые проверки (группа E) —
-   в skills/ds-integrity-check.md, отдельным батч-сниппетом для eval_js.
+   в skills/ds-integrity-check.md, сниппетом для консоли браузера.
 
    Группа P — гейт парности «документация = код» (Фаза 3, P0 аудита разделов).
    Запускается отдельно, страницы не нужны:
@@ -22,7 +22,7 @@ const CONTRACT_DIRS = ['pages/atoms/', 'pages/molecules/', 'pages/organisms/'];
 // реестры (index/ds-nav/спеки) ведутся для этих папок
 const REGISTRY_DIRS = ['pages/foundations/', 'pages/atoms/', 'pages/molecules/', 'pages/organisms/'];
 // у страниц-экранов и rnd свои разделы и своя роль
-const SKIP_ALL = [/^index\.html$/, /^thumbnail\.html$/, /^templates\//];
+const SKIP_ALL = [/^index\.html$/, /^templates\//];
 // CSS документации и экранов — намеренно вне ds.css/styles.css (не компоненты ДС)
 const CSS_NOT_IN_BUNDLE = ['ds-docs.css', 'ds-nav.css', 'ds-toc.css', 'pg-kit.css', 'docs-split.css', 'input-pages.css', 'screens.css'];
 // hex, которые легальны: демо-тени и шахматная подложка прозрачности
@@ -34,7 +34,7 @@ const HEX_ALLOW = [/^#(fff|ffffff|000|000000)$/i, /^rgba?\(\s*255\s*,\s*255\s*,\
 // пары «скрипт ↔ его CSS» (сами скрипты умеют подтягивать стиль, потому WARN)
 const JS_CSS_PAIRS = [['ds-nav.js', 'ds-nav.css'], ['ds-toc.js', 'ds-toc.css'], ['pg-kit.js', 'pg-kit.css']];
 // рантаймы, которые ds.js (RulesAudit W0/K0) догружает сам — экран не должен подключать их напрямую
-const DS_JS_BUNDLES = ['icons-data.js', 'ds-icons.js', 'screens-chrome.js', 'ds-tabs.js', 'ds-tile.js', 'ds-menu.js', 'ds-popover.js', 'ds-tooltip.js', 'ds-modal.js', 'ds-table.js', 'tbl-resize.js', 'tbl-reorder.js', 'tbl-pin.js', 'ds-pagination.js', 'ds-riskmetric.js', 'ds-alert.js', 'ds-chip.js', 'ds-allocationbar.js', 'ds-notify.js', 'ds-datepicker.js', 'input-kit.js', 'ds-nav-panel.js', 'ds-splitter.js', 'ds-illustrations.js'];
+const DS_JS_BUNDLES = ['icons-data.js', 'ds-icons.js', 'ds-float.js', 'screens-chrome.js', 'ds-tabs.js', 'ds-tile.js', 'ds-menu.js', 'ds-popover.js', 'ds-tooltip.js', 'ds-modal.js', 'ds-table.js', 'tbl-resize.js', 'tbl-reorder.js', 'tbl-pin.js', 'ds-pagination.js', 'ds-riskmetric.js', 'ds-alert.js', 'ds-chip.js', 'ds-allocationbar.js', 'ds-notify.js', 'ds-datepicker.js', 'input-kit.js', 'ds-nav-panel.js', 'ds-splitter.js', 'ds-illustrations.js'];
 // утилитарные классы разметки документации — владельца в styles/* не имеют
 const CLASS_IGNORE = new Set(['page', 'section', 'masthead', 'meta', 'lead', 'eyebrow', 'crumb', 'desc', 'panel', 'row', 'col', 'grid', 'card', 'note', 'name', 'c', 'n', 'is-off']);
 // F5 — реестр «анатомия компонента взята целиком, не урезана под текущий вид». Каждый
@@ -59,7 +59,32 @@ const SHRINK_OK = {
 // B9 — обёртки, которые рантайм вставляет ВОКРУГ уже свёрстанного элемента.
 // Такая обёртка обязана быть раскладочно прозрачной, иначе она меняет поведение
 // чужой разметки, которая сама по себе написана правильно.
+/* B11 — корни, которым парное [hidden] не нужно, с причиной (стиль ANATOMY_CONTRACTS/SHRINK_OK) */
+const HIDDEN_PAIR_OK = {
+  screen: 'каркас рабочей области — существует ровно один на странице, скрывать нечем и незачем',
+  'nav-layout': 'внешний каркас страницы, там же',
+  'chart-host': 'слот под канвас графика: скрывается контейнер-потребитель, а не хост',
+};
+
 const RUNTIME_WRAPPERS = /(\w+)\.parentNode\.insertBefore\(\s*(\w+)\s*,\s*(\w+)\s*\)/g;
+
+// B10 — geometry-свойства (transform/left/right/top/bottom), которые рантайму МОЖНО
+// считать на событии scroll. Ключ — «файл:функция», чтобы подавление не накрывало
+// весь файл: новая запись геометрии в том же рантайме снова потребует обоснования.
+// Общая причина всех записей: это плавающий слой в координатах вьюпорта (position:
+// fixed), привязанный к якорю ВНУТРИ прокручиваемого предка. При скролле он обязан
+// пересчитаться, а CSS-эквивалента нет — CSS Anchor Positioning в ДС не применяется.
+// Отставание на кадр здесь остаётся, но альтернативы ему нет; у sticky-удержания
+// колонок она есть, поэтому там это дефект (см. B10 в skills/ds-integrity-check.md).
+const SCROLL_GEOMETRY_OK = {
+  'ds-tooltip.js:place': 'floating-тултип: position:fixed относительно якоря, следует за ним при скролле любого предка',
+  'ds-popover.js:place': 'floating-поповер: то же — слой вне потока, координаты вьюпорта',
+  'ds-dropdownlist.js:place': 'floating-список: раскрывается вне потока (боундари/флип), координаты вьюпорта',
+  'ds-menu.js:place': 'floating-меню: слой вне потока, координаты вьюпорта',
+  'ds-datepicker.js:reposition': 'floating-календарь: слой вне потока, координаты вьюпорта',
+  'ds-float.js:apply': 'общий слой пере-якорения: плавающий элемент пере-якорен в .ds-float-layer (position:fixed), координаты вьюпорта — закладка на скролл любого предка',
+  'ds-nav-panel.js:placeRailLabels': 'rail-подписи панели навигации — тултипы position:fixed вне скролл-контейнера списка'
+};
 
 // нативные таблицы и устаревшие сетки-справочники
 // плюс: служебный тост «Скопировано» на страницах-каталогах и галочки внутри контролов ДС
@@ -99,6 +124,29 @@ const splitTopLevel = (sel) => {
   return out;
 };
 const today = () => { const d = new Date(); const p = (n) => String(n).padStart(2, '0'); return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear(); };
+/* тело блока: от первой `{` после from (не дальше span символов) до парной `}`.
+   Строки и комментарии со скобками не разбираем — линтер и так регексовый, а у
+   рантаймов ДС такой код в сигнатурах функций не встречается. Нужно B10. */
+const braceBody = (s, from, span) => {
+  const open = s.indexOf('{', from);
+  if (open < 0 || open - from > (span === undefined ? 200 : span)) return '';
+  let d = 0;
+  for (let i = open; i < s.length; i++) {
+    if (s[i] === '{') d++;
+    else if (s[i] === '}') { d--; if (!d) return s.slice(open + 1, i); }
+  }
+  return '';
+};
+/* карта локальных функций файла: имя → тело. Объявления и присваивания
+   (function f(){}, var f = function(){}, const f = (…) => {}). Нужно B10. */
+const localFns = (js) => {
+  const map = new Map();
+  for (const m of js.matchAll(/function\s+([A-Za-z_$][\w$]*)\s*\(/g)) map.set(m[1], braceBody(js, m.index));
+  for (const m of js.matchAll(/(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:function\b|\()/g)) {
+    if (!map.has(m[1])) map.set(m[1], braceBody(js, m.index));
+  }
+  return map;
+};
 
 async function tree() {
   const files = new Set(), seen = new Set();
@@ -229,6 +277,57 @@ async function globalChecks(P, out) {
     }
   }
 
+  /* B11 — компонент, объявивший display, но не объявивший `[hidden]`.
+     Браузерное `[hidden] { display: none }` имеет специфичность (0,0,0) и живёт в
+     UA-стиле, то есть подключается РАНЬШЕ любого CSS ДС. Правило компонента
+     `.x { display: flex }` имеет ту же весовую категорию по важности, но большую
+     специфичность (0,1,0) — и побеждает. Итог: атрибут `hidden` на компоненте не
+     работает вовсе, причём молча: разметка выглядит правильной, скрипт выставляет
+     атрибут, а элемент виден.
+     Этот класс дефекта чинили поштучно шесть раз — Modal 1.005 (.modal-scrim),
+     TableCell 2.015 (.tbl__row), Tab 1.010 (.tab__badge), EmptyState 1.002 (.es),
+     InputText 1.010 (.inp__act), Chip 1.015 (.chip) — каждый раз по факту поломки
+     на живом экране. Отличить статикой «этот класс реально переключают атрибутом»
+     от «не переключают» нельзя: элемент почти всегда получают через переменную или
+     чужую функцию, а не селектором в точке присваивания `.hidden`. Поэтому правило
+     не ищет виновных, а закрывает саму возможность (доктрина ds-rules §9 «что нельзя
+     измерить — делаем структурно невозможным»): корень компонента, задающий display,
+     обязан рядом объявить `.x[hidden] { display: none }`.
+     Проверяются только КОРНИ (класс без `__` и `--`) и только CSS компонентов —
+     хром документации (CSS_NOT_IN_BUNDLE) не в счёт.
+     Заведено 05.09.2026 как INFO с 80 находками в 44 файлах; в тот же день список
+     разобран целиком (пары проставлены всем корням), и правило поднято до WARN —
+     теперь оно охраняет достигнутый ноль, а не описывает долг. Новый компонент,
+     объявивший display без пары, попадёт в отчёт сразу. */
+  {
+    const pairedAll = new Set();
+    const rootsByFile = new Map();
+    for (const f of P.styleFiles) {
+      if (CSS_NOT_IN_BUNDLE.includes(base(f))) continue;
+      const css = (P.src && P.src.get(f)) || (await readFile(f).catch(() => ''));
+      const clean = css.replace(/\/\*[\s\S]*?\*\//g, '');
+      for (const m of clean.matchAll(/\.([-\w]+)\[hidden\]/g)) pairedAll.add(m[1]);
+      const roots = new Map();
+      for (const m of clean.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        const sel = m[1].trim().match(/^\.([-\w]+)$/);
+        if (!sel) continue;
+        const cls = sel[1];
+        if (cls.includes('__') || cls.includes('--')) continue;   // корень, не элемент и не модификатор
+        if (HIDDEN_PAIR_OK[cls]) continue;
+        const d = m[2].match(/display\s*:\s*([-\w]+)/);
+        if (!d || /^(none|contents)$/.test(d[1])) continue;
+        roots.set(cls, d[1]);
+      }
+      if (roots.size) rootsByFile.set(f, roots);
+    }
+    for (const [f, roots] of rootsByFile) {
+      const miss = [...roots].filter(([c]) => !pairedAll.has(c));
+      if (!miss.length) continue;
+      out.push(['WARN', 'B11', f + ': ' + miss.map(([c, d]) => '.' + c + ' (display:' + d + ')').join(', ')
+        + ' — нет парного [hidden] { display: none }, атрибут hidden на компоненте молча не сработает']);
+    }
+  }
+
   /* B9 — обёртка рантайма меняет раскладку чужой разметки. Рантаймы ДС вставляют свои
      обёртки ВОКРУГ уже свёрстанного элемента (`X.parentNode.insertBefore(W, X)`), поэтому
      обёртка обязана быть раскладочно прозрачной: `max-width: 100%`, а для flex/inline-flex
@@ -258,6 +357,56 @@ async function globalChecks(P, out) {
         if (miss.length) out.push(['WARN', 'B9', runtimes[i] + ' оборачивает чужой элемент в .' + cls
           + ', а обёртка не раскладочно прозрачна — нет ' + miss.join(' и ')
           + '; подключение рантайма изменит раскладку правильной разметки']);
+      }
+    }
+  }
+
+  /* B10 — рантайм считает геометрию на событии `scroll`. Скролл применяет компоновщик
+     браузера, и новый offset попадает в кадр РАНЬШЕ, чем выполнится JS-обработчик:
+     любая правка geometry-свойства (`transform`, `left`/`right`/`top`/`bottom`) из
+     scroll-хендлера отстаёт минимум на кадр. Элемент каждый кадр уезжает вместе с
+     контентом и возвращается следующим. На Windows дискретное колесо это скрывает —
+     коррекция успевает в паузу между щелчками; на трекпаде macOS (непрерывные дельты
+     + инерционный докрут) ошибка показывается на каждом кадре подряд и читается как
+     дрожание (инцидент tbl-pin.js, 04.09.2026: закреплённые колонки таблицы дрожали
+     на MacBook, на Windows дефект был невидим — то есть уезжал к пользователю).
+     Удержание элемента при скролле делается CSS-ом (`position: sticky`), а рантайм
+     считает только инсеты — по событию изменения состава, не по скроллу.
+     Ищем записи в теле scroll-хендлера и в локальных функциях, до которых он
+     дотягивается за два вызова (`scroll → requestAnimationFrame(…) → apply()` —
+     ровно тот случай). Легальные исключения — SCROLL_GEOMETRY_OK, ключ «файл:функция». */
+  {
+    const GEO = /\.style\.(transform|left|right|top|bottom)\s*=[^=]/;
+    const GEO_SET = /\.style\.setProperty\(\s*['"](transform|left|right|top|bottom)['"]/;
+    const scripts = P.list.filter((f) => /^scripts\/.+\.js$/.test(f) && !/ds-lint/.test(base(f)));
+    const srcs = await Promise.all(scripts.map((f) => P.src.get(f) || readFile(f).catch(() => '')));
+    for (let i = 0; i < scripts.length; i++) {
+      const js = srcs[i], name = base(scripts[i]);
+      const fns = localFns(js);
+      const queue = [];
+      for (const m of [...js.matchAll(/addEventListener\(\s*['"]scroll['"]\s*,\s*/g),
+                       ...js.matchAll(/\.onscroll\s*=\s*/g)]) {
+        const at = m.index + m[0].length;
+        const id = js.slice(at, at + 60).match(/^([A-Za-z_$][\w$]*)\s*[,)]/);
+        if (id) { if (fns.has(id[1])) queue.push([id[1], fns.get(id[1]), 0]); }
+        else queue.push(['<inline>', braceBody(js, at, 60), 0]);
+      }
+      const seen = new Set();
+      while (queue.length) {
+        const [fn, body, depth] = queue.shift();
+        if (!body || seen.has(fn)) continue;
+        seen.add(fn);
+        const g = body.match(GEO) || body.match(GEO_SET);
+        if (g && !SCROLL_GEOMETRY_OK[name + ':' + fn]) {
+          /* WARN, а не BLOCKER: по «Как расширять» (п.4) новое правило первый цикл
+             живёт как WARN и повышается после подтверждения на реальных страницах */
+          out.push(['WARN', 'B10', scripts[i] + ': ' + fn + '() пишет .style.' + g[1]
+            + ' по событию scroll — коррекция отстаёт на кадр от компоновщика (на трекпаде macOS это дрожание, на колесе Windows незаметно);'
+            + ' удержание при скролле — position: sticky, рантайм считает только инсеты по изменению состава']);
+        }
+        if (depth < 2) for (const c of body.matchAll(/([A-Za-z_$][\w$]*)\s*\(/g)) {
+          if (fns.has(c[1]) && !seen.has(c[1])) queue.push([c[1], fns.get(c[1]), depth + 1]);
+        }
       }
     }
   }
@@ -412,14 +561,30 @@ async function parityChecks(P, out) {
   for (const f of [...runtimeJs, ...pagesOfSpecs, 'index.html']) {
     if (SHADOW_RUNTIMES.test(f)) continue;
     const s4 = src.get(f) || '';
-    const scope4 = /\.js$/.test(f) ? s4 : all(/<script[\s\S]*?<\/script>/gi, s4, 0).join('\n');
-    const trunc = new Set();
-    for (const m of scope4.matchAll(RX_TRUNC)) { const v = (m[1] ?? m[2] ?? '').trim(); if (v) trunc.add(v.split(/\s+/).pop()); }
-    const isTrunc = (c) => trunc.has(c) && [...P.cssClasses].some((k) => k !== c && k.startsWith(c));
-    const toks4 = uniq([...all(RX.classNameAssign, scope4), ...all(RX.cls, scope4)].filter((a) => !/['"`+]|\$\{/.test(a)).flatMap((a) => a.split(/\s+/)).filter(Boolean)).filter((c) => !isTrunc(c));
-    for (const c of toks4.filter((c) => !parityIgnore(c) && !knownStrict(c) && !localDoc.has(c) && !isBemRoot(c) && !/-$/.test(c))) {
-      if (/^(card__|file$)/.test(c) && f === 'index.html') continue;
+    /* `<script type="text/plain">` — НЕ рантайм, а статичный образец кода для
+       вкладки «Код». Класс оттуда никто не вешает: его предлагают скопировать.
+       Раньше блок читался как рантайм, и P4 сообщал «рантайм вешает
+       .demo-panel» про строку из документации — тот же класс дефекта, что
+       урок Л53 (во вход правила попало содержимое, кодом не являющееся).
+       Находка не теряется: она уходит под P3 «код-панель предлагает». */
+    const blocks4 = /\.js$/.test(f) ? [s4] : all(/<script[\s\S]*?<\/script>/gi, s4, 0);
+    const isPlain = (b) => /<script[^>]*type\s*=\s*["']text\/plain["']/i.test(b);
+    const scope4 = blocks4.filter((b) => !isPlain(b)).join('\n');
+    const scopeDocs = blocks4.filter(isPlain).join('\n');
+    const classTokens = (scope) => {
+      const trunc = new Set();
+      for (const m of scope.matchAll(RX_TRUNC)) { const v = (m[1] ?? m[2] ?? '').trim(); if (v) trunc.add(v.split(/\s+/).pop()); }
+      const isTrunc = (c) => trunc.has(c) && [...P.cssClasses].some((k) => k !== c && k.startsWith(c));
+      return uniq([...all(RX.classNameAssign, scope), ...all(RX.cls, scope)].filter((a) => !/['"`+]|\$\{/.test(a)).flatMap((a) => a.split(/\s+/)).filter(Boolean))
+        .filter((c) => !isTrunc(c))
+        .filter((c) => !parityIgnore(c) && !knownStrict(c) && !localDoc.has(c) && !isBemRoot(c) && !/-$/.test(c))
+        .filter((c) => !(/^(card__|file$)/.test(c) && f === 'index.html'));
+    };
+    for (const c of classTokens(scope4)) {
       out.push(['BLOCKER', 'P4', f + ": рантайм вешает ." + c + ' — в styles/*.css такого класса нет']);
+    }
+    for (const c of classTokens(scopeDocs)) {
+      out.push(['BLOCKER', 'P3', f + ': код-панель предлагает .' + c + ' — в styles/*.css такого класса нет']);
     }
   }
   for (const f of [...pageJs, ...pagesOfSpecs, 'index.html']) {
@@ -436,14 +601,46 @@ async function parityChecks(P, out) {
 }
 
 /* ---------- проверки страницы ---------- */
+/* Сбалансированный кусок разметки от открывающего тега на позиции `at` до его
+   пары. Нужен там, где важна ВЛОЖЕННОСТЬ, а не совпадение строки: «класс есть
+   на странице» и «класс есть в этом узле» — разные утверждения, и первое
+   вместо второго дало 20 ложных замечаний R2. */
+function tagSlice(html, at) {
+  const tag = (html.slice(at).match(/^<([a-z]+)/) || [])[1];
+  if (!tag) return '';
+  const rx = new RegExp('</?' + tag + '\\b', 'gi');
+  rx.lastIndex = at;
+  let depth = 0, m;
+  while ((m = rx.exec(html))) {
+    if (m[0][1] === '/') { depth--; if (depth === 0) return html.slice(at, m.index); }
+    else depth++;
+  }
+  return html.slice(at);
+}
+
 async function pageChecks(p, P, opts, out) {
   const html = P.src.get(p);
   const dir = p.split('/').slice(0, -1).join('/');
   const name = base(p).replace(/\.html$/, '');
   const inContract = CONTRACT_DIRS.some((d) => p.startsWith(d));
   const inRegistry = REGISTRY_DIRS.some((d) => p.startsWith(d));
-  const isScreen = p.startsWith('pages/screens/');
-  const markup = html.replace(RX.styleBlock, '').replace(/<script[\s\S]*?<\/script>/gi, '');
+  /* Экран — это и `pages/screens/`, и любой файл ВНЕ дерева ДС: экраны живут
+     в `Projects/**` и приходят сюда путём `../Projects/test/Имя.html`. Без
+     второго условия к экрану применялся контракт docs-страницы, и любой экран
+     получал ложные C1/C2 («нет @dsCard», «нет Версия/Обновлено»). */
+  const isScreen = p.startsWith('pages/screens/') || p.startsWith('../');
+  /* Комментарий — не разметка. Вырезается вместе со <style> и <script>: текст
+     комментария неотличим от разметки для строкового правила, и страница,
+     ОБЪЯСНЯЮЩАЯ в комментарии «здесь нужен data-tabs», этим объяснением
+     правило и глушила. Поймано на фикстурах: F3.bad и A6.bad не срабатывали,
+     потому что их собственное пояснение содержало искомые `data-tabs` и
+     `<main class="page"`. Сенсор экранов вырезает комментарии с 06.09.2026 по
+     той же причине; здесь асимметрия дожила до первого корпуса фикстур.
+     `html` остаётся сырым: C1 читает первую строку — саму карточку @dsCard. */
+  const markup = html
+    .replace(RX.styleBlock, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '');
   const styleSrc = (html.match(RX.styleBlock) || []).join('\n');
   const links = all(RX.link, html);
   const scripts = all(RX.src, html);
@@ -460,10 +657,20 @@ async function pageChecks(p, P, opts, out) {
   for (const [js, css] of JS_CSS_PAIRS) {
     if (scripts.some((s) => base(s) === js) && !linkNames.includes(css) && !hasBundle) say('WARN', 'A1', js + ' подключён без ' + css);
   }
-  /* A2 — компонентный CSS не подключён */
+  /* A2 — компонентный CSS не подключён.
+     Классы берутся и из разметки, и из парного *.page.js: `markup` вырезает
+     <script>, поэтому разметка, которую страница рисует своим скриптом
+     (демо-модалки, конструктор), правилу была не видна — так прожил урок Л41
+     (`.dvd` в `columnsModalHtml` при неподключённом divider.css).
+     Пару берём из <script src>, а НЕ из имени страницы: транслитерация
+     неверна (DatePicker.html → datepicker.page.js, RiskMetric → riskmetric).
+     Токены с ${…} из шаблонных строк отбрасываем — это не классы. */
   if (!hasBundle) {
     const local = new Set(all(/\.(-?[a-zA-Z][a-zA-Z0-9_-]*)/g, styleSrc.replace(/\{[^{}]*\}/g, '{}')));
-    const used = uniq(all(RX.cls, markup).join(' ').split(/\s+/).filter(Boolean));
+    const pageJs = uniq(scripts.map(base).filter((f) => /\.page\.js$/.test(f)));
+    const jsSrc = (await Promise.all(pageJs.map((f) => readFile('scripts/' + f).catch(() => '')))).join('\n');
+    const used = uniq([...all(RX.cls, markup), ...all(RX.cls, jsSrc)]
+      .join(' ').split(/\s+/).filter((c) => c && !/[${}]/.test(c)));
     const missing = new Map();
     for (const c of used) {
       if (local.has(c) || CLASS_IGNORE.has(c)) continue;
@@ -494,6 +701,153 @@ async function pageChecks(p, P, opts, out) {
     if (dsJsCount > 1) say('WARN', 'A7', 'ds.js подключён ' + dsJsCount + ' раза');
     if (direct.length) say('BLOCKER', 'A7', 'рантайм(ы) подключены мимо ds.js: ' + uniq(direct.map(base)).join(', '));
   }
+  /* ---------- R* — каскад раскатки docs-split ----------
+     Пункты К1/К2/К6/К10 чек-листа screen-review живут здесь, а не в сенсоре
+     экранов: их предмет — страница документации, а сенсор такую страницу не
+     принимает вовсе (на ней первым делом падают Б1 и Б5 — «нет каркаса
+     экрана»), и до К-проверок дело не доходило. Правило, до входа которого
+     инструмент не добирается, закрытием не является.
+     Буква R («раскатка») выбрана свободной: A/B/C/D/F/G/L/P заняты здесь,
+     латинская K принадлежит ряду геометрии сенсора. */
+  if (!isScreen && /class="page ds-split"/.test(markup)) {
+    /* R1 (К1) — `.splitpane--app` переводит `.splitpane__a/b` в display:block
+       (splitter.css) и рвёт собственную flex-раскладку панелей: пропадает
+       скролл, центрирование и якоря. Если страница задаёт панелям flex сама,
+       модификатор либо снимается, либо перебивается !important. */
+    if (/\bsplitpane--app\b/.test(markup)) {
+      const panelFlex = [...styleSrc.matchAll(/\.splitpane__[ab][^{}]*\{([^{}]*)\}/g)]
+        .filter((m) => /display\s*:\s*flex/.test(m[1]));
+      const unguarded = panelFlex.filter((m) => !/display\s*:\s*flex\s*!important/.test(m[1]));
+      if (unguarded.length) {
+        say('BLOCKER', 'R1', '.splitpane--app вместе с собственной flex-раскладкой панелей: splitter.css переводит .splitpane__a/b в display:block и перебивает страницу — нужен display:flex!important либо снять модификатор');
+      }
+    }
+
+    /* R2 (К2) — сегмент-контрол в колонке конструктора растягивается
+       `align-items:stretch` по умолчанию (`.ctl-col` — flex-колонка без
+       `align-items`), и серый трек уходит за сегменты. Лечится
+       `align-self:flex-start` у самого контрола.
+
+       Смотрим ТОЛЬКО внутрь `#pg-controls` — исходного контейнера контролов,
+       из которого `docs-split.js` собирает колонку. Первая версия искала
+       `segctrl` по всей странице и дала 20 замечаний там, где сегмент-контрол
+       стоит в демо документируемого компонента, а не в конструкторе:
+       «класс встречается на странице» и «класс стоит в этом узле» — разные
+       утверждения (вход правила не был назван, класс дефектов Л48). */
+    const pgAt = markup.search(/<[a-z]+[^>]*id="pg-controls"/);
+    if (pgAt >= 0) {
+      const controls = tagSlice(markup, pgAt);
+      if (/\bsegctrl\b/.test(controls) && !/segctrl[^{}]*\{[^{}]*align-self\s*:\s*flex-start/.test(styleSrc)) {
+        say('WARN', 'R2', 'segctrl внутри #pg-controls без align-self:flex-start — в колонке .ctl-col трек растянется на всю ширину и уйдёт за сегменты');
+      }
+    }
+
+    /* R3 (К6) сознательно НЕ реализовано. Пункт чек-листа звучит как «порядок
+       скриптов важен», но его условие — «если страничный скрипт читает
+       состояние рантайма В МОМЕНТ СОБЫТИЯ». Порядок сам по себе дефектом не
+       является: проверка «рантайм после page.js» дала 11 блокеров на рабочих
+       страницах (там последним подключается `ds-nav.js`, к конструктору
+       отношения не имеющий). Отличить «читает состояние рантайма» от «читает
+       свой демо-DOM» статикой нельзя — `tab.page.js` ставит `aria-selected`
+       своим же элементам. К6 помечен суждением в coverage.json. */
+
+    /* R5 (К8) — подпись свитча статична и не меняется от положения. Свитч
+       называет опцию действием в On-состоянии («Показывать проценты»); пара
+       `{ on, off }` в словаре означает, что подпись переименовывается при
+       выключении, и пользователь читает разные слова про один и тот же
+       переключатель. Допустимы строка или `{ label, on? }`. */
+    const dictSrc = (html.match(/DS_SPLIT_SWITCH_LABELS\s*=\s*\{[\s\S]*?\n\s*\}/) || [''])[0];
+    if (dictSrc) {
+      for (const entry of dictSrc.matchAll(/\{([^{}]*)\}/g)) {
+        const body = entry[1];
+        if (/(^|[,{\s])on\s*:/.test(body) && /(^|[,{\s])off\s*:/.test(body)) {
+          say('BLOCKER', 'R5', 'DS_SPLIT_SWITCH_LABELS: запись { on, off } — подпись свитча меняется при переключении. Свитч называет опцию действием в On-состоянии; допустимы строка или { label, on? }');
+          break;
+        }
+      }
+    }
+
+    /* R6 (К9) — свитч конструктора: (а) бинарный селект обязан нести подпись
+       в `.lbl` — `docs-split.js` читает подпись только оттуда, и `.ds-label`
+       даёт свитч без текста (урок NavTile); (б) самописная кнопка-тумблер
+       `button.toggle` с `aria-pressed` вместо штатного `pg-toggle` (это R8:
+       части (а) и (б) пункта независимы, и у каждой своя пара фикстур —
+       один идентификатор на две части доказывал бы только одну).
+       Смотрим внутрь `#pg-controls`: сегмент-контрол или тумблер в демо
+       документируемого компонента — не предмет этого правила. */
+    if (pgAt >= 0) {
+      const controls = tagSlice(markup, pgAt);
+      for (const ctl of controls.matchAll(/<div[^>]*class="[^"]*\bctl\b[^"]*"[^>]*>/g)) {
+        const body = tagSlice(controls, ctl.index);
+        const opts = [...body.matchAll(/<option\b/g)].length;
+        if (opts !== 2) continue;                       // не бинарный селект — в свитч не превратится
+        const lbl = body.match(/class="[^"]*\blbl\b[^"]*"[^>]*>([\s\S]*?)</);
+        if (!lbl || !strip(lbl[1]).trim()) {
+          say('BLOCKER', 'R6', 'бинарный селект в #pg-controls без непустой подписи в .lbl — docs-split.js читает подпись только из .lbl, свитч выйдет без текста');
+          break;
+        }
+      }
+      if (/<button[^>]*class="[^"]*\btoggle\b[^"]*"[^>]*aria-pressed/.test(controls)
+          || /<button[^>]*aria-pressed[^>]*class="[^"]*\btoggle\b/.test(controls)) {
+        say('BLOCKER', 'R8', 'самописная кнопка-тумблер button.toggle[aria-pressed] в #pg-controls — бинарная опция задаётся бинарным селектом, docs-split.js сам делает из него pg-toggle');
+      }
+    }
+
+    /* R7 (К11) — групповой заголовок конструктора предшествует СВОИМ
+       контролам. `docs-split.js` переносит прямых детей `#pg-controls` в
+       колонку в исходном порядке, поэтому заголовок, за которым сразу идёт
+       другой заголовок или ничего, встанет пустой стопкой вверху колонки
+       (урок ReadOnlyField). */
+    if (pgAt >= 0) {
+      const controls = tagSlice(markup, pgAt);
+      const heads = [...controls.matchAll(/<div[^>]*class="[^"]*\bpg__grouphead\b[^"]*"[^>]*>/g)];
+      for (const h of heads) {
+        const after = controls.slice(h.index + tagSlice(controls, h.index).length);
+        const next = after.match(/<div[^>]*class="([^"]*)"/);
+        if (!next || /\bpg__grouphead\b/.test(next[1])) {
+          say('BLOCKER', 'R7', 'групповой заголовок .pg__grouphead без своих контролов следом — в колонке конструктора он встанет пустой стопкой вверху');
+          break;
+        }
+      }
+    }
+
+    /* R4 (К10) — остатки flex-раскладки конструктора ДО docs-split: в колонке
+       `.ctl-col` такие правила растягивают поля по высоте и дают огромные
+       отступы (урок Л2, Pagination). Живые page-стили контролов остаются —
+       ловим только связку «селектор конструктора + раскладочное свойство». */
+    for (const rule of styleSrc.matchAll(/([^{}]*\b(?:pg__controls|pg__widthctl)\b[^{}]*)\{([^{}]*)\}/g)) {
+      if (!/\bflex\b|\bflex-wrap\b|\bflex\s*:|\bgrid-template\b/.test(rule[2])) continue;
+      say('WARN', 'R4', 'остаток старой раскладки конструктора в <style>: «' + rule[1].trim().slice(0, 60) + '» задаёт раскладку — при раскатке docs-split такие правила удаляются');
+    }
+  }
+
+  /* B12 — поле ввода без размерного модификатора.
+
+     Размер M перестал быть молчаливым дефолтом `.inp` и стал модификатором
+     `.inp--m` (input.css, 06.09.2026): раньше класс, который разметка вешала
+     руками, не делал ничего, спека объявляла пару M/S симметричной, а рантайм
+     класс намеренно не ставил. После правки цена пропуска обратная: `.inp`
+     без размера теряет высоту, паддинги, gap и шрифт — и это МОЛЧАЛИВО,
+     потому что `height: var(--inp-h)` без значения даёт `height: auto`.
+
+     Вход — разметка страницы И парный `*.page.js`: поля рисуют оба
+     (`table-filter.page.js` собирает семь штук строками). Пара берётся из
+     `<script src>`, а не из имени страницы — транслитерация неверна (Л41). */
+  {
+    const pageJsNames = uniq(scripts.map(base).filter((f) => /\.page\.js$/.test(f)));
+    const pageJsSrc = (await Promise.all(pageJsNames.map((f) => readFile('scripts/' + f).catch(() => '')))).join('\n');
+    const noSize = [];
+    for (const m of (html + '\n' + pageJsSrc).matchAll(/class="([^"]*)"/g)) {
+      const tokens = m[1].split(/\s+/).filter(Boolean);
+      if (!tokens.includes('inp')) continue;
+      if (tokens.some((t) => t === 'inp--m' || t === 'inp--s')) continue;
+      noSize.push(m[1]);
+    }
+    if (noSize.length) {
+      say('BLOCKER', 'B12', '.inp без размерного модификатора (' + noSize.length + '): class="' + noSize[0] + '" — размер задают только .inp--m / .inp--s, без них поле теряет высоту, паддинги и шрифт молча');
+    }
+  }
+
   /* A5 — битые относительные ссылки */
   const refs = uniq([...links, ...scripts, ...all(RX.href, html), ...all(RX.imgSrc, html)])
     .filter((h) => h && !/^(https?:|mailto:|#|data:|\/)/.test(h))
@@ -501,8 +855,22 @@ async function pageChecks(p, P, opts, out) {
   for (const r of refs) {
     const clean = r.split(/[?#]/)[0];
     const segs = (dir ? dir.split('/') : []);
-    for (const s of clean.split('/')) { if (s === '..') segs.pop(); else if (s !== '.') segs.push(s); }
+    /* `..` на пустом пути — выход ВЫШЕ корня ДС. Раньше `segs.pop()` на пустом
+       массиве молча ничего не делал, побег терялся, и ссылка наружу выглядела
+       как внутренняя: `pages/patterns/../../../Projects/…` превращалась в
+       `Projects/…` и падала блокером «битая», хотя файл существует. */
+    let escaped = false;
+    for (const s of clean.split('/')) {
+      if (s === '..') { if (segs.length) segs.pop(); else escaped = true; }
+      else if (s !== '.') segs.push(s);
+    }
     const abs = segs.join('/');
+    /* Ссылка, ведущая ВНЕ дерева ДС, этим индексом не проверяется: `P.files`
+       строится обходом только внутри DS-IBP (`tree()`). У экрана из
+       `Projects/**` ссылка `../../DS-IBP/ds.css` корректна, но индексом не
+       покрыта. Молчим, а не врём: несуществующий файл снаружи поймает не
+       линтер, а открытие страницы. */
+    if (escaped || abs.startsWith('..')) continue;
     if (!P.files.has(abs)) say('BLOCKER', 'A5', 'битая ссылка ' + r + ' → ' + abs);
   }
   /* ---------- группа L — правила раскладки (решения 21.08.2026) ----------
@@ -644,7 +1012,7 @@ async function pageChecks(p, P, opts, out) {
     }
   }
   /* G1 — гейт фиделити макету (skills/mockup-fidelity-review.md) отмечен не в чате, а в
-     самом файле: без строки-маркера ready_for_verification вызывать нельзя (правило
+     самом файле: без строки-маркера экран сдавать нельзя (правило
      процесса, не мнение) — самоотчёт в переписке не переживает новую сессию/другого
      агента и не проверяем постфактум. Дата в маркере обязана совпадать с датой правки
      (тот же принцип, что C3), иначе разметка могла измениться уже ПОСЛЕ прогона гейта. */

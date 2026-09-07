@@ -54,7 +54,9 @@
       .catch(function (err) {
         console.error('ds-include: не удалось загрузить ' + src, err);
         var stub = document.createElement('div');
-        stub.className = 'lc-include-error';
+        // класса здесь нет намеренно: оформление заглушки задано инлайн, а
+        // селектора .lc-include-error нет ни в styles/*.css, ни в разметке —
+        // это был мёртвый код, а не задел на будущее (урок Л32, правило P4)
         stub.style.cssText = 'padding:12px;border:1px dashed var(--border-error,#d33);color:var(--text-error,#d33);font:var(--type-body-s,13px sans-serif)';
         stub.textContent = 'Компонент не загрузился: ' + src;
         el.replaceWith(stub);

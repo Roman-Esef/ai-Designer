@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="../../styles/alert.css">
 <link rel="stylesheet" href="../../styles/modal.css">
 <link rel="stylesheet" href="../../styles/skeleton.css">
+<link rel="stylesheet" href="../../styles/spinner.css">
 <link rel="stylesheet" href="../../styles/ds-docs.css">
 <link rel="stylesheet" href="../../styles/table-cell.css">
 <style>
@@ -137,7 +138,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.005</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.007</b></span><span>Обновлено: <b>06.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>Modal</h1>
     <p class="lead">Modal — не отдельный компонент, а свод правил построения модальных форм. Обязательны две части с фиксированной анатомией — шапка (<b>Modal_Top</b>: заголовок + крестик) и подвал (<b>Modal_Bottom</b>: опциональные кнопки слева, кнопки действий справа). Между ними — контентная область, которая может содержать что угодно: форму, таблицу, пустое состояние.</p>
@@ -511,6 +512,16 @@ DSModal.open(scrim, { guarded: true, nested: true, onClose(ok) {} });
              icon-button.css
    ========================================================================= */
 
+/* Парные `[hidden]` — правило B11 линтера.
+   Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
+   (0,0,0), а правило класса ниже — (0,1,0): класс побеждает, и атрибут `hidden`
+   на компоненте молча перестаёт работать. Разметка при этом выглядит правильной,
+   скрипт исправно ставит атрибут, а элемент виден. Этот дефект чинили поштучно
+   шесть раз (Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002,
+   InputText 1.010, Chip 1.015), после чего закрыли на уровне соглашения:
+   корень компонента, объявивший `display`, объявляет и пару к нему. */
+.modal[hidden] { display: none; }
+
 :root {
   /* ---------------------------------------------------------------------
      Шкала ширины — по колонкам сетки экрана. Шаг = число колонок, которые
@@ -575,10 +586,13 @@ DSModal.open(scrim, { guarded: true, nested: true, onClose(ok) {} });
   z-index: var(--modal-z);
   background: var(--modal-scrim);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Центрирование модалки — `margin: auto` на .modal, а не align-items/justify-content:
+     при переполнении модалка прижимается к началу и не клипает верх. */
   padding: var(--modal-viewport-guard);
-  overflow-y: auto; /* если модалка выше вьюпорта — скроллится весь скрим, а не только тело */
+  /* overflow не задан: модалка всегда ≤ 80vh (--modal-max-h), скрим поверх вьюпорта
+     не скроллится, скроллится только .modal__body (правило Modal). ScrollHeight скрима
+     может включать контентную высоту модалки до ужатия (Chrome считает по flex-basis),
+     но без overflow это не прокручивается. */
   box-sizing: border-box;
 }
 .modal-scrim--nested { z-index: var(--modal-z-nested); }
@@ -612,6 +626,8 @@ DSModal.open(scrim, { guarded: true, nested: true, onClose(ok) {} });
   flex-direction: column;
   flex-shrink: 0; /* внутри flex-скрима модалка никогда не сжимается молча —
                      если места не хватает, скрим должен скроллиться, а не врать про ширину */
+  margin: auto; /* безопасное центрирование в скриме: центрируется, когда влезает;
+                   при переполнении прижимается к началу (не клипает верх) */
   background: var(--modal-bg);
   border-radius: var(--modal-radius);
   box-shadow: var(--modal-shadow);
