@@ -159,7 +159,7 @@
 
   <header class="masthead">
     <a class="crumb" href="../../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Дизайн-система</a>
-    <div class="meta"><span>Версия: <b>1.006</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.007</b></span><span>Обновлено: <b>05.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>Toast</h1>
     <p class="lead">Тёмная пилюля-уведомление, всплывающая у верхней границы рабочей области по центру, — индикатор запуска <b>фонового</b> или <b>блокирующего</b> процесса. Два режима: <b>ToastBar</b> (фоновый, авто-скрытие, стек до трёх) и <b>ToastLoader</b> (блокирующий, со спиннером и затемнением). Ведущий слот — спиннер или статус-иконка (взаимоисключающие); тоны Neutral · Success · Error · Info.</p>
@@ -603,6 +603,18 @@ const spec = {
    Requires: typography.css, colors.css, radius.css
    (опц. shadow.css для --elevation-2, icons — currentColor SVG)
    ========================================================================= */
+
+/* Парные `[hidden]` — правило B11 линтера.
+   Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
+   (0,0,0), а правило класса ниже — (0,1,0): класс побеждает, и атрибут `hidden`
+   на компоненте молча перестаёт работать. Разметка при этом выглядит правильной,
+   скрипт исправно ставит атрибут, а элемент виден. Этот дефект чинили поштучно
+   шесть раз (Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002,
+   InputText 1.010, Chip 1.015), после чего закрыли на уровне соглашения:
+   корень компонента, объявивший `display`, объявляет и пару к нему. */
+.toast[hidden],
+.toast-stack[hidden],
+.toast-layer[hidden] { display: none; }
 
 :root {
   /* геометрия пилюли — токены, а не хардкод */

@@ -6,22 +6,15 @@
   'use strict';
   const K = window.DSInputKit;
   const mk = K.makeInput;
-  const MASK = 'ММ.ДД.ГГГГ';
+  const MASK = 'ДД.ММ.ГГГГ';
 
-  /* маска даты: цифры + автоточки */
-  function attachMask(ctl) {
-    ctl.setAttribute('inputmode', 'numeric');
-    ctl.addEventListener('input', () => {
-      const d = ctl.value.replace(/\D/g, '').slice(0, 8);
-      let out = d.slice(0, 2);
-      if (d.length > 2) out += '.' + d.slice(2, 4);
-      if (d.length > 4) out += '.' + d.slice(4, 8);
-      ctl.value = out;
-    });
-  }
+  /* Маска ДД.ММ.ГГГГ — из коробки, рантайм ds-datepicker.js (делегированный
+     слушатель input в фазе перехвата). Своей копии страница больше не держит:
+     она расходилась бы с рантаймом, и демо показывало бы поведение, которого
+     нет на экранах (до 05.09.2026 так и было — маска существовала ТОЛЬКО тут). */
   function mkDate(spec) {
     const node = mk(Object.assign({ calendar: true, placeholder: spec.value ? null : MASK }, spec));
-    attachMask(node._control);
+    node._control.setAttribute('inputmode', 'numeric');
     return node;
   }
 
@@ -94,7 +87,7 @@
         label: !table && state.label ? 'Label' : null,
         helper: !table && state.helper ? 'Helper' : null,
         informer: state.informer,
-        value: state.fill === 'value' ? '12.21.2022' : null,
+        value: state.fill === 'value' ? '21.12.2022' : null,
         tip: state.state === 'error-focus' ? 'Текст ошибки' : (state.state === 'warning-focus' ? 'Указана информация, которая не блокирует действие, но требует внимания пользователя' : null),
         live: true,
         width: 260,
@@ -116,7 +109,7 @@
     const form = document.getElementById('use-form');
     if (form) form.appendChild(mkDate({ label: 'Дата подписания', helper: 'Не раньше даты договора', clear: false, live: true, width: 260 }));
     const filled = document.getElementById('use-filled');
-    if (filled) filled.appendChild(mkDate({ label: 'Плановая дата транша', helper: 'Helper', value: '12.21.2022', live: true, width: 260 }));
+    if (filled) filled.appendChild(mkDate({ label: 'Плановая дата транша', helper: 'Helper', value: '21.12.2022', live: true, width: 260 }));
     const table = document.getElementById('use-table');
     if (table) table.appendChild(mkDate({ size: 's', table: true, lead: true, clear: false, live: true, width: 220 }));
   })();
@@ -125,7 +118,7 @@
   (function () {
     const el = document.getElementById('anat-diagram');
     if (!el) return;
-    el.appendChild(mkDate({ label: 'Label', helper: 'Helper', informer: true, value: '12.21.2022', width: 280 }));
+    el.appendChild(mkDate({ label: 'Label', helper: 'Helper', informer: true, value: '21.12.2022', width: 280 }));
   })();
 
   /* =========================== VARIANTS =========================== */
@@ -137,8 +130,8 @@
     }
     const gi = document.getElementById('var-informer');
     if (gi) {
-      gi.appendChild(cell('Без информера (по умолчанию)', mkDate({ label: 'Label', value: '12.21.2022' })));
-      gi.appendChild(cell('С информером', mkDate({ label: 'Label', value: '12.21.2022', informer: true })));
+      gi.appendChild(cell('Без информера (по умолчанию)', mkDate({ label: 'Label', value: '21.12.2022' })));
+      gi.appendChild(cell('С информером', mkDate({ label: 'Label', value: '21.12.2022', informer: true })));
     }
     const gt = document.getElementById('var-table');
     if (gt) {
@@ -164,7 +157,7 @@
     const g = document.getElementById('content-demo');
     if (!g) return;
     g.appendChild(cell('Пустое поле — маска-плейсхолдер', mkDate({ label: 'Дата подписания', helper: 'Helper', clear: false, live: true })));
-    g.appendChild(cell('Заполненное поле', mkDate({ label: 'Дата подписания', helper: 'Helper', value: '12.21.2022', live: true })));
+    g.appendChild(cell('Заполненное поле', mkDate({ label: 'Дата подписания', helper: 'Helper', value: '21.12.2022', live: true })));
   })();
 
   /* =========================== BEHAVIOR =========================== */
@@ -172,14 +165,14 @@
     const g = document.getElementById('beh-mask');
     if (!g) return;
     const node = mkDate({ label: 'Label', helper: 'Вводите цифры — точки подставятся сами', clear: false, live: true, width: 280 });
-    g.appendChild(cell('Маска · живой ввод', node, 'Попробуйте: «12212022» → «12.21.2022».'));
+    g.appendChild(cell('Маска · живой ввод', node, 'Попробуйте: «21122022» → «21.12.2022».'));
   })();
 
   /* календарь по кнопке — живой DatePicker (ds-datepicker.js) */
   (function () {
     const g = document.getElementById('beh-picker');
     if (!g) return;
-    g.appendChild(cell('Кнопка-календарь · живой выбор', mkDate({ label: 'Дата подписания', helper: 'Нажмите на иконку календаря', value: '10.15.2025', live: true, width: 280 }), 'Клик по календарю поднимает DatePicker; выбор даты пишет её в поле.'));
+    g.appendChild(cell('Кнопка-календарь · живой выбор', mkDate({ label: 'Дата подписания', helper: 'Нажмите на иконку календаря', value: '15.10.2025', live: true, width: 280 }), 'Клик по календарю поднимает DatePicker; выбор даты пишет её в поле.'));
   })();
 
   /* =========================== STATES =========================== */
@@ -195,7 +188,7 @@
       g.appendChild(cell(title, mkDate({
         label: 'Label',
         helper: 'Helper',
-        value: '12.21.2022',
+        value: '21.12.2022',
         state: st,
         informer: st === 'disabled',
         tip: st === 'error-focus' ? 'Текст ошибки' : (st === 'warning-focus' ? 'Указана информация, которая не блокирует действие, но требует внимания пользователя' : null),
@@ -207,7 +200,7 @@
     const g = document.getElementById('states-fill');
     if (!g) return;
     g.appendChild(cell('Пусто', mkDate({ label: 'Label', helper: 'Helper', clear: false, informer: true })));
-    g.appendChild(cell('Заполнено', mkDate({ label: 'Label', helper: 'Helper', value: '12.21.2022', informer: true })));
+    g.appendChild(cell('Заполнено', mkDate({ label: 'Label', helper: 'Helper', value: '21.12.2022', informer: true })));
   })();
 
   /* =========================== TYPOGRAPHY =========================== */
@@ -215,8 +208,8 @@
     const tb = document.querySelector('#typo-table tbody');
     if (!tb) return;
     [
-      ['Значение · M', '12.21.2022', '--type-body-m'],
-      ['Значение · S (Table Edit)', '12.21.2022', '--type-body-s'],
+      ['Значение · M', '21.12.2022', '--type-body-m'],
+      ['Значение · S (Table Edit)', '21.12.2022', '--type-body-s'],
       ['Label', 'Label', '--type-body-xs'],
       ['Helper', 'Helper', '--type-body-xs'],
     ].forEach(([part, sample, token]) => {
@@ -278,8 +271,8 @@
     const holder = document.createElement('div');
     holder.style.cssText = 'position:absolute; left:-9999px; top:0; visibility:hidden;';
     document.body.appendChild(holder);
-    const m = mkDate({ label: 'L', helper: 'H', value: '12.21.2022' });
-    const s = mkDate({ size: 's', table: true, value: '12.21.2022' });
+    const m = mkDate({ label: 'L', helper: 'H', value: '21.12.2022' });
+    const s = mkDate({ size: 's', table: true, value: '21.12.2022' });
     holder.appendChild(m); holder.appendChild(s);
     const fm = getComputedStyle(m._field), fs = getComputedStyle(s._field);
     [

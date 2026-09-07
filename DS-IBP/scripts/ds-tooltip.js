@@ -5,10 +5,14 @@
    Экспорт: window.DSTooltip = {
      bind(target, opts) → api | null   — навесить поведение на цель
      bindAll(root)                      — обойти [data-tooltip] и цели с
-                                          aria-describedby на .tip внутри root
+                                           aria-describedby на .tip внутри root
      make(text, opts) → HTMLElement     — собрать разметку тултипа
      place(tip, target, opts) → {placement, align}  — позиционирование + flip
      hideAll()                          — скрыть показанный тултип
+     truncated(selector, opts) → handle — «усечено → тултип» одной регистрацией
+                                           (см. механизм ниже; владельцы —
+                                           Chip, Tab, NavPanel, ReadOnlyField,
+                                           Table)
      current() → api | null
    }
 
@@ -107,7 +111,6 @@
     var gap = o.gap == null ? GAP : o.gap;
     var placement = o.placement || 'top';
     var align = o.align || 'center';
-    var op = o.offsetParent || tip.offsetParent || tip.parentElement;
     var br = bounds(o.boundary || null);
     var tr = target.getBoundingClientRect();
     var tw = tip.offsetWidth, th = tip.offsetHeight;
@@ -146,15 +149,23 @@
       if (clamp) y = Math.min(Math.max(br.top + GUARD, y), Math.max(br.top + GUARD, br.bottom - th - GUARD));
     }
 
-    /* координаты вьюпорта → координаты позиционирующего предка */
-    var ox = -(window.pageXOffset || 0), oy = -(window.pageYOffset || 0);
-    if (op && op !== document.body && op !== document.documentElement) {
-      var opr = op.getBoundingClientRect(), cs = getComputedStyle(op);
-      ox = opr.left + (parseFloat(cs.borderLeftWidth) || 0) - op.scrollLeft;
-      oy = opr.top + (parseFloat(cs.borderTopWidth) || 0) - op.scrollTop;
+    /* координаты вьюпорта — в left/top элемента (см. DSFloat.apply).
+       Если DSFloat не подключён (страницы-документация грузят рантайм точечно),
+       работаем прежним инлайн-пересчётом — элемент остаётся absolute. */
+    var Float = window.DSFloat;
+    if (Float) {
+      Float.apply(tip, x, y, o.offsetParent);
+    } else {
+      var fl = o.offsetParent || tip.offsetParent || tip.parentElement;
+      var fOx = -(window.pageXOffset || 0), fOy = -(window.pageYOffset || 0);
+      if (fl && fl !== document.body && fl !== document.documentElement) {
+        var fOpr = fl.getBoundingClientRect(), fCs = getComputedStyle(fl);
+        fOx = fOpr.left + (parseFloat(fCs.borderLeftWidth) || 0) - fl.scrollLeft;
+        fOy = fOpr.top + (parseFloat(fCs.borderTopWidth) || 0) - fl.scrollTop;
+      }
+      tip.style.left = Math.round(x - fOx) + 'px';
+      tip.style.top = Math.round(y - fOy) + 'px';
     }
-    tip.style.left = (x - ox) + 'px';
-    tip.style.top = (y - oy) + 'px';
     setMods(tip, placement, align);
 
     var arrow = tip.querySelector('.tip__arrow');
@@ -259,6 +270,9 @@
       if (!allowed()) return api;
       var run = function () {
         if (current && current !== api) current.hide(true);
+        /* anchor — цель тултипа: из модалки слой уезжает в её скрим, иначе
+           тултип рисуется под подложкой (z-index 30 против 1000) */
+        if (window.DSFloat) DSFloat.mount(tip, { anchor: target });
         reposition();
         tip.classList.add('is-visible');
         current = api;
@@ -271,6 +285,7 @@
       clearTimeout(showT);
       var run = function () {
         tip.classList.remove('is-visible');
+        if (window.DSFloat) DSFloat.unmount(tip);
         if (current === api) current = null;
       };
       /* rich интерактивен: курсор может перейти с цели в тултип */
@@ -310,6 +325,140 @@
 
   function hideAll() { if (current) current.hide(true); }
 
+  /* ------------------------------------------------------------------ */
+  /* «Усечено → тултип»: делегированный механизм без владельца per файл  */
+  /* ------------------------------------------------------------------ *
+     Правило «короткая строка усеклась многоточием → по наведению/фокусу
+     показываем полный текст тултипом» повторялось в каждом владельце
+     своим кодом (и в двух местах — ds-chip.js и ds-table.js — двумя
+     почти одинаковыми реализациями, CM-1). Одна запись в чит-шите, а
+     реализация — в четырёх файлах: правило чинилось в одном из четырёх
+     и молча не работало в остальных. Владельцы регистрируют свой
+     селектор одной строкой: DSTooltip.truncated('.tab__label', opts).
+
+     Привязка ленивая, делегированием по pointerover/focusin: цель
+     получает data-tooltip + data-tooltip-truncated="only" +
+     data-tooltip-multiline="yes" и первый показ вручную. Почему лениво —
+     элементы (чипы в стеке, ячейки реестра) создаются динамически, а
+     ds-tooltip.js за DOM не следит. Тултип показывается ТОЛЬКО когда цель
+     реально усечена (isTruncated), поэтому короткие подписи проходят без
+     тултипа.
+
+     Два пути, потому что фокус и наведение целятся в разные элементы:
+     hover приходит на сам усечённый элемент, focus — на хост-предок
+     (чип, таб, пункт меню), внутри которого живёт подпись. opts.host
+     задаёт селектор такого хоста.
+
+     Общие функции — см. attachTrunc / textOf / isTruncated ниже. */
+
+  /* текст цели мимо чужих тултипов: ds-tooltip.js кладёт копию значения в
+     .tip[role=tooltip] рядом с целью, и textContent удвоился бы */
+  function textOf(el) {
+    var out = '';
+    Array.prototype.forEach.call(el.childNodes, function (n) {
+      if (n.nodeType === 3) { out += n.nodeValue; return; }
+      if (n.nodeType !== 1) return;
+      if (n.getAttribute && n.getAttribute('role') === 'tooltip') return;
+      out += n.textContent;
+    });
+    return out.replace(/\s+/g, ' ').trim();
+  }
+
+  /* усечение — либо по ширине (ellipsis), либо по высоте (line-clamp) */
+  function isTruncated(el) {
+    return el.scrollWidth - el.clientWidth > 1 || el.scrollHeight - el.clientHeight > 1;
+  }
+
+  function attachTrunc(el, o) {
+    if (!window.DSTooltip) return null;
+    if (el.__dsTrunc) return el.__dsTrunc;
+    if (o && o.skip && o.skip(el)) return null;
+    /* текст — в очерёдности: преданный data-tooltip → title (пишут
+       конструкторы и старые потребители) → сама подпись */
+    var text = o && o.text ? o.text(el)
+      : (el.getAttribute('data-tooltip') || el.getAttribute('title') || textOf(el));
+    if (!text) return null;
+    el.removeAttribute('title');
+    el.setAttribute('data-tooltip', text);
+    el.setAttribute('data-tooltip-truncated', 'only');
+    el.setAttribute('data-tooltip-multiline', 'yes');
+    var api = window.DSTooltip.bind(el);
+    el.__dsTrunc = api;
+    return api;
+  }
+
+  /* truncated(selector, opts) → handle { refresh(root) }
+     selector        — усечённый элемент (подпись). Может быть списком через
+                       «,» — closest/querySelectorAll воспринимают как есть.
+     opts.host       — селектор фокус-хоста: focus приходит на него, а не на
+                       подпись (chip→.chip, tab→.tab, nav→.nav__item/.nav__user).
+     opts.disabled   — селектор хостов с pointer-events:none (disabled-чипы/
+                       табы), у которых событий нет вовсе — их нельзя поймать
+                       делегированием, только сканом.
+     opts.disabledClass — класс (a la .chip--has-tooltip), возвращающий
+                       pointer-events, чтобы усечённая подпись всё же читалась.
+     opts.skip(el)   — предикат; вернуть true — пропустить (счётчики «+N»).
+     opts.text(el)   — свой извлекатель текста.
+     opts.init = false — не запускать refresh() самому (владелец зовёт сам). */
+  function truncated(sel, o) {
+    o = o || {};
+    var doc = document;
+    var hostSel = o.host || null;
+    var hasHost = !!hostSel;
+
+    function findHover(target) {
+      return target.closest ? target.closest(sel) : null;
+    }
+
+    doc.addEventListener('pointerover', function (e) {
+      var el = findHover(e.target);
+      if (!el || el.__dsTrunc) return;
+      var api = attachTrunc(el, o);
+      if (api) api.show(false);
+    }, true);
+
+    doc.addEventListener('focusin', function (e) {
+      var els;
+      if (hasHost) {
+        var host = e.target.closest ? e.target.closest(hostSel) : null;
+        if (!host) return;
+        els = host.querySelectorAll(sel);
+      } else {
+        var direct = e.target.closest ? e.target.closest(sel) : null;
+        els = direct ? [direct] : [];
+      }
+      Array.prototype.forEach.call(els, function (el) {
+        if (!isTruncated(el)) return;
+        var api = el.__dsTrunc || attachTrunc(el, o);
+        if (!api) return;
+        api.show(true);
+        var blurEl = hasHost ? e.target.closest(hostSel) : e.target;
+        if (blurEl && !blurEl.__dsTruncBlur) {
+          blurEl.__dsTruncBlur = true;
+          blurEl.addEventListener('blur', function () { DSTooltip.hideAll(); });
+        }
+      });
+    }, true);
+
+    function refresh(root) {
+      if (!o.disabled || !window.DSTooltip) return;
+      (root || doc).querySelectorAll(o.disabled).forEach(function (host) {
+        var el = host.querySelector(sel);
+        if (!el || el.__dsTrunc) return;
+        if (!isTruncated(el)) return;
+        if (o.skip && o.skip(el)) return;
+        if (o.disabledClass) host.classList.add(o.disabledClass);
+        attachTrunc(el, o);
+      });
+    }
+
+    if (o.init !== false) {
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { refresh(); });
+      else refresh();
+    }
+    return { refresh: refresh };
+  }
+
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideAll(); });
   function onReflow() { if (current) current.place(); }
   window.addEventListener('resize', onReflow);
@@ -321,6 +470,6 @@
   window.DSTooltip = {
     bind: bind, bindAll: bindAll, make: make, place: place,
     hideAll: hideAll, current: function () { return current; },
-    ARROW_INSET: ARROW_INSET, SHOW_DELAY: SHOW_DELAY,
+    truncated: truncated, ARROW_INSET: ARROW_INSET, SHOW_DELAY: SHOW_DELAY,
   };
 })();

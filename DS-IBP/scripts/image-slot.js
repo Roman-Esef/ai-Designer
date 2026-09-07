@@ -1,4 +1,3 @@
-// @ds-adherence-ignore -- omelette starter scaffold (raw elements/hex/px by design)
 /* BEGIN USAGE */
 /**
  * <image-slot> — user-fillable image placeholder.

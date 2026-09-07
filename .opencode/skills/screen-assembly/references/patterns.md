@@ -44,8 +44,15 @@ updated: "26.08.2026"
     </div>
   </div>
 
+  <!-- TableFilter: кнопка «Фильтр» и модалка `.tfm` — НЕОТЪЕМЛЕМЫЕ части (как
+       чип+поповер у RiskMetric). Собираешь фильтр → собираешь и модалку по
+       specs/TableFilter.md: .modal--w6.tfm + .modal__body--flush > .tfm__body
+       (.tfm__nav табы-якоря + .tfm__panel с .tfm__sec). Автокомплиты — data-ddl,
+       заполненному полю — .inp__act[aria-label="Очистить поле"], футер справа
+       «Очистить фильтр» + «Применить». -->
+
   <div class="dtable__body">
-    <div class="tbl" data-table>
+    <div class="tbl" data-table data-sort-rows>
       <!-- Шапка. grid-template-columns ОДИНАКОВЫЙ у шапки и у всех строк.
            Первая и последняя ячейки — служебные разделители по 8px.
            Замыкающий разделитель забирает остаток: minmax(8px,1fr). -->
@@ -59,14 +66,14 @@ updated: "26.08.2026"
           <span class="th__label">Контрагент</span>
           <span class="th__tools">
             <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
-            <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button>
+            <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="counterparty" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button>
           </span>
           <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
         </div>
         <div class="th"><span class="th__label">Продукт</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
-        <div class="th th--right th--sorted" aria-sort="descending">
-          <span class="th__label">Сумма, ₽</span>
-          <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort><i data-icon="arrow-narrow-down"></i></button></span>
+        <div class="th th--right th--sorted" aria-sort="descending" data-sort-type="number">
+          <span class="th__label">Сумма, RUB</span>
+          <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="amount"><i data-icon="arrow-narrow-down"></i></button></span>
           <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
         </div>
         <div class="th"><span class="th__label">Статус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
@@ -126,6 +133,15 @@ updated: "26.08.2026"
 </div>
 ```
 
+**Про пагинацию.** Пагинатор всегда прижат к правому краю строки — это держит
+CSS (`margin-left:auto` на `.pgn-row__right`), а не разметка: левый слот
+`.pgn-row__left` опционален (только под инфо-сводку/счётчики), на правый край он
+не влияет. Выбор размера страницы — обычный `.pgn__pagesize` (текст
+`pgn__pagesize-label` + чеврон `.pgn__pagesize-btn`): вертикальное центрирование
+даёт CSS, вручную `ddl-anchor` его не добавлять и ничего не выравнивать.
+Предпочтительный способ сборки колонтитула — `data-pagination` на пустом `<div>`
+(рантайм рисует всё сам, см. runtime-hooks.md).
+
 **Про ширины колонок.** `grid-template-columns` пишется на каждой строке и в
 шапке — значения обязаны совпадать посимвольно. Схема: `8px` (разделитель) →
 колонки данных → `minmax(8px,1fr)` (замыкающий разделитель забирает остаток,
@@ -151,6 +167,18 @@ updated: "26.08.2026"
 `aria-sort="ascending|descending"`, глиф `arrow-narrow-up` / `arrow-narrow-down`.
 У остальных сортируемых — `aria-sort="none"` и глиф `arrow-up-down`.
 Несортируемая колонка кнопки `th__sort` не имеет вовсе.
+
+У кнопки `.th__sort` — `data-sort="<ключ поля>"` со значением (не пустой
+атрибут): ключ уходит в событие `sort` и им сортирует бэкенд. Глиф, `aria-sort`,
+`aria-label` и подсветку `.th--sorted` рантайм меняет сам.
+
+Порядок строк в макете — опция `data-sort-rows` на `.tbl` (Table 1.010): рантайм
+переставляет строки сам, реестру на бэкенде она не нужна. Тип значений колонки —
+`data-sort-type="date|number|text"` на `.th` (иначе определяется по данным);
+машиночитаемое значение ячейки — `data-sort-value` на `.tc`, иначе `.tc__text`
+и подписи чипов (голый `textContent` не берётся: `ds-tooltip.js` дописывает
+в ячейку копию значения). Пустые всегда внизу, `dir="none"` возвращает исходный
+порядок.
 
 ---
 

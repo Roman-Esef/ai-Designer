@@ -43,6 +43,9 @@
       lead bool (иконка поиска) · prefix · postfix
       value · placeholder · multiline bool
       summary ('Value 1, +4') · chips [..] · ext [..] (внешний стек)
+        (демо-чипы статичны: `data-input-static` держит их как нарисованы,
+         сворачивание в «+N» — работа ds-input.js на рабочих полях и на
+         демо с live:true)
       clear · informer · calendar · chevron bool · open bool
       tip: текст тултипа ошибки/предупреждения (показывается при *-focus)
       live bool — рабочий ввод (крестик чистит поле)
@@ -52,7 +55,7 @@
     const s = spec;
     const root = document.createElement('div');
     const size = s.size || 'm';
-    root.className = 'inp' + (size === 'm' ? '' : ' inp--' + size); // M — база, класса inp--m в CSS нет
+    root.className = 'inp inp--' + size; // размер объявляется всегда: M — такой же модификатор, как S
     if (s.table) root.classList.add('inp--table');
     if (s.multiline) root.classList.add('inp--multiline');
     if (s.multiline && s.resizable) root.classList.add('inp--resizable');
@@ -63,6 +66,12 @@
     if (st === 'hover') root.classList.add('is-hover');
     if (st === 'focus' || st.endsWith('-focus')) root.classList.add('is-focus');
     if (s.open) root.classList.add('is-open');
+    /* Витрина состояний, а не рабочее поле: страницы документации показывают
+       в том числе ПУСТОЕ поле с крестиком очистки — это демонстрация элемента,
+       а на рабочем экране такого быть не должно (крестик живёт по значению).
+       Флаг снимает поле с обслуживания ds-input.js; `live: true` возвращает
+       его обратно — так помечены интерактивные демо. */
+    if (!s.live) root.setAttribute('data-input-static', '');
     if (s.width === 'auto') root.style.width = 'auto';
     else if (s.width) root.style.width = s.width + 'px';
 
@@ -231,7 +240,7 @@
 
     function field(side, sub) {
       sub = sub || {};
-      const placeholder = kind === 'date' ? 'ММ.ДД.ГГГГ' : null; /* Amount: пустое поле без плейсхолдера */
+      const placeholder = kind === 'date' ? 'ДД.ММ.ГГГГ' : null; /* Amount: пустое поле без плейсхолдера */
       const fspec = Object.assign({
         size,
         width: 'auto',

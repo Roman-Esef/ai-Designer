@@ -192,7 +192,11 @@
     const gf = document.getElementById('var-chips-field');
     if (gf) {
       gf.appendChild(cell('Немного значений', mk({ label: 'Label', chevron: true, chips: ['Value 1', 'Value 2'] })));
-      gf.appendChild(cell('Переполнение → «+N»', mk({ label: 'Label', chevron: true, chips: ['Value 1', 'Value 2', '+3'] })));
+      /* живое демо: чипы настоящие, «+N» считает и рисует рантайм ds-input.js
+         по фактической ширине поля. Раньше здесь стоял нарисованный чип '+3' —
+         страница показывала правило, которого в коде не существовало. */
+      gf.appendChild(cell('Переполнение → «+N»', mk({ label: 'Label', chevron: true, live: true, width: 260,
+        chips: ['Value 1', 'Value 2', 'Value 3', 'Value 4', 'Value 5'] }), 'Счётчик считает рантайм по ширине поля — сузьте окно, число изменится.'));
       gf.appendChild(cell('Размер S · чип XS', mk({ size: 's', table: true, chevron: true, chips: ['Value 1', '+2'] })));
     }
 

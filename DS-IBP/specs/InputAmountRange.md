@@ -1,8 +1,8 @@
 ---
 component: InputAmountRange
 title: "InputAmountRange"
-version: "1.005"
-updated: "21.08.2026"
+version: "1.007"
+updated: "06.09.2026"
 page: pages/molecules/InputAmountRange.html
 page_js: scripts/input-amount-range.page.js
 css: styles/input-range.css
@@ -16,6 +16,7 @@ status: curated
 Поле ввода числового диапазона: два InputAmount с префиксами «От» / «До», размещённых горизонтально и соединённых линией Range_Line, с общей меткой сверху и общим хелпером снизу. Каждое поле — самостоятельный экземпляр `.inp` со своими состояниями.
 
 ## Инварианты
+- Корень компонента объявляет парное `[hidden] { display: none }`: браузерное правило имеет специфичность (0,0,0) и приходит из UA-стиля, а `display` компонента — (0,1,0) и перебивает его, из-за чего атрибут `hidden` молча перестаёт работать. Соглашение ДС от 05.09.2026, охраняется правилом B11 линтера.
 - Только размер M (40px) — размера S нет.
 - Поля независимы — hover/focus/error одного не влияют на другое; оба могут быть в ошибке одновременно.
 - Range_Line — декоративная линия между полями (`::before`), не интерактивна, не участвует в фокусе/табе.
@@ -77,7 +78,7 @@ status: curated
 | `.inp-range / --m` | корень диапазона: метка + строка полей + хелпер |
 | `.inp-range--disabled` | весь диапазон заблокирован; красит Range_Line как бордер disabled |
 | `.inp-range__row` | горизонтальная строка: поле · Range_Line · поле |
-| `.inp-range__field` | поле — экземпляр `.inp.inp--m`, гибкая ширина (min-width от контента) |
+| `.inp-range__field` | поле — экземпляр `.inp.inp--m` (модификатор размера обязателен, см. InputText), гибкая ширина (min-width от контента) |
 | `.inp-range__line` | Range_Line; `aria-hidden="true"`, 1px, цвет `--border-primary` |
 | `.inp__prefix` | префикс «От»/«До», всегда присутствует |
 | `.inp--error / --warning / --disabled` | статус на каждом поле независимо (см. InputText) |

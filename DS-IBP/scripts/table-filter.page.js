@@ -333,20 +333,20 @@
       return '<section class="tfm__sec" id="tfm-sec-general" aria-labelledby="tfm-sec-general-t">' +
         '<p class="tfm__sec-title" id="tfm-sec-general-t">Общая информация</p>' +
         '<div class="tfm__grid">' +
-          '<div class="inp"><label class="ds-label" for="tfm-name"><span class="ds-label__text">Название сделки</span></label>' +
+          '<div class="inp inp--m"><label class="ds-label" for="tfm-name"><span class="ds-label__text">Название сделки</span></label>' +
             '<div class="inp__field"><input class="inp__control" id="tfm-name" placeholder="Например, 1-Кредит-199"></div></div>' +
-          '<div class="inp"><label class="ds-label" for="tfm-client"><span class="ds-label__text">Клиент</span></label>' +
+          '<div class="inp inp--m"><label class="ds-label" for="tfm-client"><span class="ds-label__text">Клиент</span></label>' +
             '<div class="inp__field"><input class="inp__control" id="tfm-client" placeholder="Наименование или ИНН"></div></div>' +
-          '<div class="inp tfm__span-2"><label class="ds-label"><span class="ds-label__text">Территориальный банк</span></label>' +
+          '<div class="inp inp--m tfm__span-2"><label class="ds-label"><span class="ds-label__text">Территориальный банк</span></label>' +
             '<div class="inp__field"><span class="inp__chips">' +
               '<span class="chip chip--edit chip--s"><span class="chip__label">ЦА</span><span class="chip__remove" role="button" aria-label="Убрать ЦА">' + glyph('close') + '</span></span>' +
               '<span class="chip chip--edit chip--s"><span class="chip__label">МБ</span><span class="chip__remove" role="button" aria-label="Убрать МБ">' + glyph('close') + '</span></span>' +
             '</span><input class="inp__control" placeholder="Добавить…"><span class="inp__acts"><button class="inp__act" aria-label="Показать список">' + glyph('chevron-down') + '</button></span></div></div>' +
-          '<div class="inp"><label class="ds-label"><span class="ds-label__text">Группа продуктов</span></label>' +
+          '<div class="inp inp--m"><label class="ds-label"><span class="ds-label__text">Группа продуктов</span></label>' +
             '<div class="inp__field"><span class="inp__chips">' +
               '<span class="chip chip--edit chip--s"><span class="chip__label">Кредиты</span><span class="chip__remove" role="button" aria-label="Убрать Кредиты">' + glyph('close') + '</span></span>' +
             '</span><input class="inp__control" placeholder="Добавить…"><span class="inp__acts"><button class="inp__act" aria-label="Показать список">' + glyph('chevron-down') + '</button></span></div></div>' +
-          '<div class="inp"><label class="ds-label" for="tfm-cur"><span class="ds-label__text">Валюта</span></label>' +
+          '<div class="inp inp--m"><label class="ds-label" for="tfm-cur"><span class="ds-label__text">Валюта</span></label>' +
             '<div class="inp__field"><input class="inp__control" id="tfm-cur" placeholder="Все валюты"><span class="inp__acts"><button class="inp__act" aria-label="Показать список">' + glyph('chevron-down') + '</button></span></div></div>' +
           '<label class="cb cb--selected tfm__span-2"><input type="checkbox" class="cb__input" checked>' +
             '<span class="cb__box"><span class="cb__mark">' + glyph('check') + '</span></span>' +
@@ -361,13 +361,13 @@
         '<div class="inp-range inp-range--date tfm__span-2">' +
           '<label class="ds-label"><span class="ds-label__text">' + label + '</span></label>' +
           '<div class="inp-range__row">' +
-            '<div class="inp inp-range__field"><div class="inp__field">' +
+            '<div class="inp inp--m inp-range__field"><div class="inp__field">' +
               '<span class="inp__prefix">От</span>' +
               '<input class="inp__control" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">' +
               '<span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog">' + glyph('calendar') + '</button></span>' +
             '</div></div>' +
             '<span class="inp-range__line" aria-hidden="true"></span>' +
-            '<div class="inp inp-range__field"><div class="inp__field">' +
+            '<div class="inp inp--m inp-range__field"><div class="inp__field">' +
               '<span class="inp__prefix">До</span>' +
               '<input class="inp__control" inputmode="numeric" placeholder="ДД.ММ.ГГГГ">' +
               '<span class="inp__acts"><button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog">' + glyph('calendar') + '</button></span>' +
@@ -477,7 +477,7 @@
         '<footer class="modal__foot"><div class="modal__foot-left">' +
           '<button type="button" class="btn btn--transparent btn--m tfm-save"><i data-icon="bookmark-add"></i><span class="btn__label">Сохранить пресет</span></button>' +
           '</div><div class="modal__foot-right">' +
-          '<button type="button" class="btn btn--transparent btn--m tfm-clear"><span class="btn__label">Очистить</span></button>' +
+          '<button type="button" class="btn btn--transparent btn--m tfm-clear"><span class="btn__label">Очистить фильтр</span></button>' +
           '<button type="button" class="btn btn--accent btn--m tfm-apply"><span class="btn__label">Применить</span></button>' +
         '</div></footer>';
 
@@ -535,7 +535,7 @@
         if (!save) return;
         nested(scrim, {
           title: 'Сохранить пресет', confirmLabel: 'Сохранить', width: 3,
-          body: '<div class="inp"><label class="ds-label"><span class="ds-label__text">Название пресета</span></label><div class="inp__field"><input class="inp__control nested-name" placeholder="Например, Мои сделки"></div></div>',
+          body: '<div class="inp inp--m"><label class="ds-label"><span class="ds-label__text">Название пресета</span></label><div class="inp__field"><input class="inp__control nested-name" placeholder="Например, Мои сделки"></div></div>',
           onConfirm: (s) => {
             const name = (s.querySelector('.nested-name').value || '').trim() || 'Новый пресет';
             const exists = presets.find(p => p.name === name);

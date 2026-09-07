@@ -57,7 +57,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.009</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.013</b></span><span>Обновлено: <b>06.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>InputDate</h1>
     <p class="lead">Компонент ввода даты: поле с маской и кнопкой-календарём. При фокусе на поле или по кнопке-календарю поднимается <a class="inl" href="DatePicker.html">DatePicker</a>. Построен на той же базе Input_Content, что и <a class="inl" href="InputText.html">InputText</a> и <a class="inl" href="InputAutocomplete.html">InputAutocomplete</a>, — состояния и размеры общие.</p>
@@ -153,7 +153,7 @@
     <h2>Контент</h2>
     <p class="desc tight">Правила контента:</p>
     <ul class="bullets" style="margin-bottom:26px;">
-      <li>маска — <code class="tok">ММ.ДД.ГГГГ</code>; шаблон настраивается на уровне продукта и одинаков во всех полях экрана;</li>
+      <li>маска — <code class="tok">ДД.ММ.ГГГГ</code>; шаблон настраивается на уровне продукта и одинаков во всех полях экрана;</li>
       <li>пустое поле показывает маску как плейсхолдер — отдельный плейсхолдер-текст не пишется;</li>
       <li>метка — существительное: «Дата подписания», не «Введите дату»;</li>
       <li>хелпер — правило заполнения («Не раньше даты договора»); в состоянии Error заменяется текстом ошибки.</li>
@@ -174,7 +174,7 @@
 
     <div class="subsec" data-screen-label="DatePicker">
       <h3>DatePicker</h3>
-      <p class="desc">При фокусе на поле под ним поднимается календарь DatePicker; клик по кнопке-календарю открывает его явно. Выбор даты в календаре записывает значение в поле (маска ММ.ДД.ГГГГ) и закрывает календарь. Календарь — компонент <a class="inl" href="DatePicker.html">DatePicker</a>; здесь он подключён рантаймом <code class="tok">ds-datepicker.js</code> — кликните по кнопке-календарю в примерах ниже.</p>
+      <p class="desc">При фокусе на поле под ним поднимается календарь DatePicker; клик по кнопке-календарю открывает его явно. Выбор даты в календаре записывает значение в поле (маска ДД.ММ.ГГГГ) и закрывает календарь. Календарь — компонент <a class="inl" href="DatePicker.html">DatePicker</a>; здесь он подключён рантаймом <code class="tok">ds-datepicker.js</code> — кликните по кнопке-календарю в примерах ниже.</p>
       <div class="panel"><div class="demo-grid" id="beh-picker"></div></div>
       <p class="desc" style="display:none;"></p>
     </div>
@@ -277,7 +277,7 @@
 
   <footer class="page-foot">
     <span>Дизайн-система · InputDate</span>
-    <span>m / s · маска ММ.ДД.ГГГГ · calendar / clear / informer · error / warning / disabled</span>
+    <span>m / s · маска ДД.ММ.ГГГГ · calendar / clear / informer · error / warning / disabled</span>
   </footer>
 
             </div><!-- /docs-main -->
@@ -320,6 +320,7 @@
 <script src="../../scripts/icons-data.js"></script>
 <script src="../../scripts/ds-datepicker.js"></script>
 <script src="../../scripts/input-kit.js"></script>
+<script src="../../scripts/ds-input.js"></script>
 <script src="../../scripts/ds-nav.js"></script>
 <script src="../../scripts/ds-splitter.js"></script>
 <script src="../../scripts/ds-tabs.js"></script>
@@ -330,10 +331,10 @@
 <script src="../../scripts/docs-split.js"></script>
 
 <!-- ===== исходники для вкладки «Код» (статично) ===== -->
-<script type="text/plain" id="src-code-html"><div class="inp">
+<script type="text/plain" id="src-code-html"><div class="inp inp--m">
   <label class="ds-label" for="d1"><span class="ds-label__text">Дата подписания</span></label>
   <div class="inp__field">
-    <input class="inp__control" id="d1" placeholder="ММ.ДД.ГГГГ" inputmode="numeric">
+    <input class="inp__control" id="d1" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
     <span class="inp__acts">
       <button class="inp__act" aria-label="Очистить поле">…✕…</button>
       <button class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog">…📅…</button>
@@ -344,10 +345,10 @@
 <script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/input-date.page.js)
 // Поле строит общий рантайм: window.DSInputKit.makeInput({ calendar: true, … })
 const spec = {
-  label: 'Дата подписания', placeholder: 'ММ.ДД.ГГГГ', inputmode: 'numeric',
+  label: 'Дата подписания', placeholder: 'ДД.ММ.ГГГГ', inputmode: 'numeric',
   size: 'm',                       // 'm' | 's' (Table Edit)
   state: 'default',                // default/hover/focus/error/warning/disabled
-  value: '12.21.2022',             // null → маска-плейсхолдер
+  value: '21.12.2022',             // null → маска-плейсхолдер
   calendar: true, clear: true, informer: false,
   live: true, width: 260
 };
@@ -362,6 +363,17 @@ const spec = {
    label-helper.css (метка/хелпер), chip.css (чипы автокомплита).
    Размеры: M (базовый, 40px) · S (Table Edit, 32px).
    ============================================================ */
+
+/* Парные `[hidden]` — правило B11 линтера.
+   Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
+   (0,0,0), а правило класса ниже — (0,1,0): класс побеждает, и атрибут `hidden`
+   на компоненте молча перестаёт работать. Разметка при этом выглядит правильной,
+   скрипт исправно ставит атрибут, а элемент виден. Этот дефект чинили поштучно
+   шесть раз (Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002,
+   InputText 1.010, Chip 1.015), после чего закрыли на уровне соглашения:
+   корень компонента, объявивший `display`, объявляет и пару к нему. */
+.inp[hidden],
+.inp-ext[hidden] { display: none; }
 
 .inp {
   display: inline-flex;
@@ -533,6 +545,15 @@ textarea.inp__control { resize: none; line-height: 20px; }
 }
 .inp__chips .chip { flex: none; }
 .inp__chips .chip:last-child { flex: 0 1 auto; min-width: 48px; }
+/* чип-счётчик «+N» (ds-input.js) стоит последним, но сжиматься не должен:
+   правило последнего чипа выше рассчитано на значение переменной длины,
+   а счётчик — короткая фиксированная подпись, обязанная показаться целиком */
+.inp__chips .chip--fit:last-child { flex: none; min-width: 0; }
+/* ...а сжимаемым становится последнее ВИДИМОЕ значение (его помечает ds-input.js):
+   когда в поле не влезает даже одно значение вместе с «+N», оно усекается
+   эллипсисом внутри плашки, а не выталкивает счётчик за границу поля.
+   Через :nth-last-child это не выражается — в счёт попали бы и скрытые чипы. */
+.inp__chips .chip[data-inp-last] { flex: 0 1 auto; min-width: 48px; }
 
 /* ---------- действия (Input_Action) ---------- */
 .inp__acts {
@@ -561,6 +582,12 @@ textarea.inp__control { resize: none; line-height: 20px; }
 .inp__act:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .inp__act--static { cursor: default; color: var(--secondary); }
 .inp__act--static:hover { color: var(--secondary); }
+/* [hidden] той же специфичности (0,1,0), что и .inp__act { display: inline-flex },
+   подключается позже базового UA-стиля и без явного правила проигрывает каскад.
+   Крестиком очистки по значению управляет ds-input.js через атрибут hidden —
+   без этой строки он не прятался бы вовсе. Тот же класс дефекта, что чинили
+   в Modal 1.005, TableCell 2.015, Tab 1.010, EmptyState 1.002. */
+.inp__act[hidden] { display: none; }
 .inp__act--chev { transition: color .15s ease, transform .15s ease; }
 .inp.is-open .inp__act--chev { transform: rotate(180deg); }
 

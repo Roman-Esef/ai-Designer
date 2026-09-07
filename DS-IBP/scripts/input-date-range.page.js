@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   const K = window.DSInputKit;
-  const MASK = 'ММ.ДД.ГГГГ';
+  const MASK = 'ДД.ММ.ГГГГ';
 
   /* маска даты на живом поле */
   function attachMask(ctl) {
@@ -164,7 +164,7 @@
     const gm = document.getElementById('beh-mask');
     if (gm) {
       const node = range({ label: 'Период', helper: 'Вводите цифры — точки подставятся сами', from: { live: true }, to: { live: true } });
-      gm.appendChild(cell('Маска · живой ввод', node, 'Попробуйте: «12212022» → «12.21.2022».'));
+      gm.appendChild(cell('Маска · живой ввод', node, 'Попробуйте: «21122022» → «21.12.2022».'));
     }
     const gi = document.getElementById('beh-independent');
     if (gi) {

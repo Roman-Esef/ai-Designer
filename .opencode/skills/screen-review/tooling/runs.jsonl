@@ -1,0 +1,17 @@
+{"n":1,"t":"2026-09-06T17:38:36.696Z","tool":"аудит","target":"DS-IBP","verdict":"OK","codes":["1","3","5"]}
+{"n":2,"t":"2026-09-06T17:41:44.655Z","tool":"линтер","target":"61 файлов","verdict":"PASS","codes":["D4","C3","D7","B4","C5","D6","L3","G1","B3"]}
+{"n":3,"t":"2026-09-06T17:41:45.214Z","tool":"линтер","target":"(глобальные)","verdict":"PASS","codes":["D4"]}
+{"n":4,"t":"2026-09-06T17:41:45.531Z","tool":"линтер","target":"--parity","verdict":"PASS","codes":["P2","P5"]}
+{"n":5,"t":"2026-09-06T17:50:20.098Z","tool":"сенсор","target":"Projects/post/operations-did/Portfolio-did/Portfolio.html","verdict":"OK","codes":[]}
+{"n":6,"t":"2026-09-06T17:50:20.350Z","tool":"сенсор","target":"Projects/post/operations-did/mainPage/index.html","verdict":"FAIL","codes":["Б6"]}
+{"n":7,"t":"2026-09-06T17:50:48.288Z","tool":"аудит","target":"DS-IBP","verdict":"OK","codes":["1","3","5"]}
+{"n":8,"t":"2026-09-06T17:50:54.791Z","tool":"линтер","target":"61 файлов","verdict":"PASS","codes":["D4","C3","D7","B4","C5","D6","L3","G1","B3"]}
+{"n":9,"t":"2026-09-06T17:50:55.362Z","tool":"линтер","target":"(глобальные)","verdict":"PASS","codes":["D4"]}
+{"n":10,"t":"2026-09-06T17:50:55.681Z","tool":"линтер","target":"--parity","verdict":"PASS","codes":["P2","P5"]}
+{"n":11,"t":"2026-09-06T18:12:19.486Z","tool":"линтер","target":"61 файлов","verdict":"PASS","codes":["D4","C3","D7","B4","C5","D6","L3","G1","B3"]}
+{"n":12,"t":"2026-09-06T18:14:44.946Z","tool":"линтер","target":"../Projects/post/operations-did/Portfolio-did/Portfolio.html","verdict":"NEEDS-WORK","codes":["F5","G1","D4"]}
+{"n":13,"t":"2026-09-06T18:23:50.736Z","tool":"аудит","target":"DS-IBP","verdict":"OK","codes":["1","3","5"]}
+{"n":14,"t":"2026-09-06T18:23:58.018Z","tool":"линтер","target":"61 файлов","verdict":"PASS","codes":["D4","C3","D7","B4","C5","D6","L3","G1","B3"]}
+{"n":15,"t":"2026-09-06T18:23:58.591Z","tool":"линтер","target":"(глобальные)","verdict":"PASS","codes":["D4"]}
+{"n":16,"t":"2026-09-06T18:23:58.956Z","tool":"линтер","target":"--parity","verdict":"PASS","codes":["P2","P5"]}
+{"n":17,"t":"2026-09-06T18:23:59.202Z","tool":"сенсор","target":"Projects/post/operations-did/Portfolio-did/Portfolio.html","verdict":"OK","codes":[]}

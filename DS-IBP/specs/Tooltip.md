@@ -1,8 +1,8 @@
 ---
 component: Tooltip
 title: "Tooltip"
-version: "2.005"
-updated: "04.09.2026"
+version: "2.008"
+updated: "05.09.2026"
 page: pages/molecules/Tooltip.html
 page_js: scripts/tooltip.page.js
 runtime: scripts/ds-tooltip.js
@@ -23,12 +23,15 @@ status: auto
 |---|---|
 | Автоподключение | `<button data-tooltip="Удалить">` — рантайм оборачивает цель в `.tip-anchor` и строит `.tip`; либо своя разметка: цель с `aria-describedby` на `.tip` внутри `.tip-anchor` |
 | Настройки на цели | `data-tooltip-placement` (top\|bottom\|left\|right, деф. top) · `data-tooltip-align` (start\|center\|end, center) · `data-tooltip-type` (main\|error) · `data-tooltip-gap` (8) · `data-tooltip-delay` (400) · `data-tooltip-flip="no"` · `data-tooltip-boundary="<селектор>"` · `data-tooltip-truncated="only"` · `data-tooltip-multiline="yes"` |
-| API | `bind(target, opts)` · `bindAll(root)` · `make(text, opts)` · `place(tip, target, opts)` · `hideAll()` · `current()` |
+| API | `bind(target, opts)` · `bindAll(root)` · `make(text, opts)` · `place(tip, target, opts)` · `hideAll()` · `current()` · `truncated(selector, opts)` |
 | Что даёт | 12 позиций, авто-flip стороны и выравнивания, clamp по границе, стрелка доводится до центра цели, 400 мс по hover / мгновенно по focus, мгновенное скрытие, Esc, один показанный тултип одновременно, rich остаётся открытым под курсором (300 мс), детект усечения по `scrollWidth > clientWidth` |
+| «Усечено → тултип» | `DSTooltip.truncated('.подпись', { host, disabled, disabledClass, skip, text })` — одна регистрация на владельца: lazy-делегирование по pointerover/focusin, тултип показывается только при реальном усечении. `host` — хост, на который приходит фокус (chip→`.chip`, tab→`.tab`, nav→`.nav__item`/`.nav__user`); `disabled`/`disabledClass` — скан `pointer-events:none` элементов (усечённая подпись disabled-чипа/таба, хука вида `.x--has-tooltip`); `skip`/`text` — исключения и свой извлекатель. Регистрируют Chip, Tab, NavPanel, ReadOnlyField, Table |
 
 `tooltip.page.js` после экстракции только собирает демо-разметку и вызывает этот рантайм.
 
 ## Инварианты
+- Плавающий слой, открытый ИЗ модалки, монтируется в её скрим, а не в общий слой `.ds-float-layer`: правило слоя, `DSFloat.mount(el, { anchor })` (см. Elevation). Своей проверки «а не в модалке ли я» компонент не держит.
+- Корень компонента объявляет парное `[hidden] { display: none }`: браузерное правило имеет специфичность (0,0,0) и приходит из UA-стиля, а `display` компонента — (0,1,0) и перебивает его, из-за чего атрибут `hidden` молча перестаёт работать. Соглашение ДС от 05.09.2026, охраняется правилом B11 линтера.
 - По умолчанию одна строка с эллипсисом; перенос — только через явный `.tip--multiline` (или `data-tooltip-multiline="yes"` на цели), иначе длинный текст обрезается тихо.
 - Якорь `.tip-anchor` раскладочно прозрачен (`min-width:0; max-width:100%`): рантайм оборачивает им уже свёрстанную цель, и якорь не должен мешать ей сжиматься.
 - `.tip--rich` — единственный интерактивный тултип (курсор может зайти внутрь); обычный тултип неинтерактивен и закрывается при уходе курсора.
@@ -36,6 +39,7 @@ status: auto
 - Стрелка показана по умолчанию (в отличие от Menu/DropdownList/Popover, где она выключена) — отключается явно `.tip--no-arrow`.
 
 ## Диагностика
+- «Тултип не виден внутри модалки» → рантайм старше 2.007: тултип монтировался в общий слой `DSFloat` (`z-index: 30`) под скрим модалки (`z-index: 1000`) и попадал под её `inert` — элемент создавался и помечался видимым, но рисовался за подложкой. С 2.007 `show()` передаёт в `mount` якорь (цель тултипа), и слой сам выбирает скрим
 - «Длинный текст в тултипе обрезается многоточием» → добавить `.tip--multiline`, иначе текст ограничен одной строкой по спеке
 - «Тултип закрывается при наведении на его содержимое» → ожидаемо для обычного тултипа; для интерактивного контента использовать `.tip--rich`
 - «После подключения тултипа текст цели перестал усекаться и вылез за контейнер» → якорь без `min-width:0` не сжимался (inline-flex, автоминимум = min-content); исправлено в 2.005, отдельных правок на экране не требуется

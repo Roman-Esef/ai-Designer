@@ -9,14 +9,16 @@
 1. Скопировать `templates/admin/admin.html` в корень проекта продукта (рядом с `_ds/`).
    Поправить путь до стилей: `../../ds.css` → `_ds/<папка ДС>/ds.css`, так же для
    `icons-data.js`/`ds-icons.js`.
-2. Сгенерировать реестр — `run_script` в проекте продукта:
+2. Сгенерировать реестр — одной командой из корня проекта продукта:
 
-   ```js
-   const src = await readFile('_ds/<папка ДС>/scripts/ds-registry.js');
-   const { build } = new Function('readFile', 'ls', src + ';return dsRegistry;')(readFile, ls);
-   const reg = await build({ ls, readFile, rulesVersion: '<версия LocalComponents.html в ДС>' });
-   await saveFile('registry.json', JSON.stringify(reg, null, 2));
    ```
+   node _ds/<папка ДС>/scripts/ds-registry-cli.mjs --rules <версия LocalComponents.html в ДС>
+   ```
+
+   Обёртка сама даёт генератору хелперы чтения файлов и пишет `registry.json` рядом.
+   Папки по умолчанию — `kit/components`, `screens`, `requirements`; другие пути —
+   через `--components` / `--screens` / `--requirements`, другой выход — `--out`.
+   Код выхода 1 означает расхождения уровня blocker (перечислены в выводе).
 
 3. Открыть `admin.html`.
 

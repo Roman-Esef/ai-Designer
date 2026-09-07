@@ -1,13 +1,14 @@
 /* ============================================================
    DS-REGISTRY — сборщик реестра продукта (этап 2 «Генератор панели и реестра»).
    ВНИМАНИЕ: это НЕ браузерный скрипт, как ds-lint.js. На страницах не подключается.
-   Запуск только из run_script, В ПРОЕКТЕ ПРОДУКТА (эта ДС подключена туда как _ds/<папка>):
+   Сам по себе не исполняется — ждёт хелперы readFile/ls снаружи. Запуск через
+   обёртку, ИЗ КОРНЯ ПРОЕКТА ПРОДУКТА (эта ДС подключена туда как _ds/<папка>):
 
-     const src = await readFile('_ds/<папка ДС>/scripts/ds-registry.js');
-     const { build } = new Function('readFile', 'ls', src + ';return dsRegistry;')(readFile, ls);
-     const reg = await build({ ls, readFile, rulesVersion: '1.003' }); // версия страницы
-                                                                        // LocalComponents в подключённой ДС
-     await saveFile('registry.json', JSON.stringify(reg, null, 2));
+     node _ds/<папка ДС>/scripts/ds-registry-cli.mjs --rules 1.003
+                       // --rules — версия страницы LocalComponents в подключённой ДС
+
+   Обёртка пишет registry.json рядом; путь и папки переопределяются флагами
+   (--root, --out, --components/--screens/--requirements). См. templates/admin/README.md.
 
    registry.json — машинная таблица (структура в build() ниже). admin.html
    (templates/admin/ в этой ДС) — человеческое представление: fetch('./registry.json')

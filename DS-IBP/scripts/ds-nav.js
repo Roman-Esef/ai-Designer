@@ -207,8 +207,8 @@
 
   function mount() {
     // no-op guard: монтируемся только на страницах-хостах навигации (index и документация
-    // имеют <main class="page">). На карточках @dsCard, которые тянут ds-nav.js через
-    // _ds_bundle.js, такого контейнера нет — молча выходим и не ломаем карточку/index.
+    // имеют <main class="page">). Там, где скрипт подключён без этого контейнера, —
+    // молча выходим и ничего не ломаем.
     if (!document.querySelector('main.page')) return;
     if (document.body.classList.contains('ds-has-nav')) return;
     ensureCss();

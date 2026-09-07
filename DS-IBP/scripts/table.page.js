@@ -27,6 +27,7 @@
     ];
   }
   var state = { columns: defaultColumns(), selected: {} };
+  var columnsSnapshot = null; /* снимок колонок на момент открытия модалки настройки; для «Отменить»/Escape/клика по скриму */
 
   function movableCols() { return state.columns.filter(function (c) { return !c.fixed; }); }
 
@@ -43,14 +44,7 @@
   function ariaSort(c) { return c.sort === 'asc' ? 'ascending' : c.sort === 'desc' ? 'descending' : 'none'; }
 
   function togglePin(idx) {
-    var wasPinned = state.columns[idx].pinned;
-    state.columns.forEach(function (c) { c.pinned = false; });
-    if (!wasPinned) {
-      state.columns[idx].pinned = true;
-      var col = state.columns.splice(idx, 1)[0];
-      var firstMovable = state.columns.findIndex(function (c) { return !c.fixed; });
-      state.columns.splice(firstMovable, 0, col);
-    }
+    state.columns[idx].pinned = !state.columns[idx].pinned;
   }
 
   function cycleSort(idx) {
@@ -78,7 +72,7 @@
         '<span class="th__resize" data-resize-idx="' + i + '" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>' +
         '</div>';
     }).join('');
-    return '<div class="tbl__row" style="grid-template-columns:' + gridTemplate(cols) + ';">' +
+    return '<div class="tbl__row tbl__row--head" style="grid-template-columns:' + gridTemplate(cols) + ';">' +
       '<div class="th th--separator"></div>' + cells + '<div class="th th--separator"></div>' +
       '</div>';
   }
@@ -335,9 +329,9 @@
   /* ---------------- модалка настройки колонок ---------------- */
   function columnListItem(c, idx) {
     return '<li class="col-item" draggable="true" data-col-order-idx="' + idx + '">' +
-      '<span class="col-item__drag" aria-hidden="true"><i data-icon="drag-dots"></i></span>' +
       '<label class="cb' + (c.hidden ? '' : ' cb--selected') + '"><input type="checkbox" class="cb__input" data-col-visible="' + idx + '"' + (c.hidden ? '' : ' checked') + '><span class="cb__box"><span class="cb__mark">' + (c.hidden ? '' : CHECK) + '</span></span><span class="cb__content"><span class="cb__label">' + c.label + '</span></span></label>' +
-      '<button class="ibtn ibtn--neutral ibtn--s col-item__pin" data-col-pin="' + idx + '" aria-pressed="' + (c.pinned ? 'true' : 'false') + '" aria-label="' + (c.pinned ? 'Открепить колонку' : 'Закрепить колонку') + '"><i data-icon="' + (c.pinned ? 'pin-filled' : 'pin') + '"></i></button>' +
+      '<button class="ibtn ibtn--neutral ibtn--m col-item__pin" data-col-pin="' + idx + '" aria-pressed="' + (c.pinned ? 'true' : 'false') + '" aria-label="' + (c.pinned ? 'Открепить колонку' : 'Закрепить колонку') + '"><i data-icon="' + (c.pinned ? 'pin-filled' : 'pin') + '"></i></button>' +
+      '<button type="button" class="ibtn ibtn--neutral ibtn--m col-item__drag" draggable="true" aria-label="Перетащить"><i data-icon="drag-dots"></i></button>' +
       '</li>';
   }
 
@@ -346,78 +340,146 @@
     return '<div class="modal-scrim" id="dt-columns-scrim">' +
       '<div class="modal modal--w4" role="dialog" aria-modal="true" aria-labelledby="dt-columns-title">' +
         '<header class="modal__head">' +
-          '<h2 class="modal__title" id="dt-columns-title">Колонки</h2>' +
-          '<button type="button" class="ibtn ibtn--neutral ibtn--l" data-columns-close aria-label="Закрыть"><i data-icon="close"></i></button>' +
+          '<h2 class="modal__title" id="dt-columns-title">Настройка таблицы</h2>' +
+          '<button type="button" class="ibtn ibtn--neutral ibtn--l" data-columns-cancel aria-label="Закрыть"><i data-icon="close"></i></button>' +
         '</header>' +
         '<div class="modal__body">' +
-          '<div class="col-actions">' +
-            '<button class="btn btn--transparent btn--xs" data-cols-all><span class="btn__label">Выбрать все</span></button>' +
-            '<button class="btn btn--transparent btn--xs" data-cols-none><span class="btn__label">Сбросить все</span></button>' +
-          '</div>' +
+          '<p class="col-desc" id="dt-columns-desc">Выберите столбцы для отображения</p>' +
+          '<label class="cb" id="dt-cols-parent"><input type="checkbox" class="cb__input" data-cols-parent><span class="cb__box"><span class="cb__mark"></span></span><span class="cb__content"><span class="cb__label">Выбрать все</span></span></label>' +
+          '<hr class="dvd dvd--h">' +
           '<ul class="col-list" id="dt-col-list">' + items + '</ul>' +
         '</div>' +
         '<footer class="modal__foot">' +
           '<div class="modal__foot-left"></div>' +
-          '<div class="modal__foot-right"><button class="btn btn--accent btn--m" data-columns-close><span class="btn__label">Готово</span></button></div>' +
+          '<div class="modal__foot-right">' +
+            '<button class="btn btn--transparent btn--m" data-columns-cancel><span class="btn__label">Отменить</span></button>' +
+            '<button class="btn btn--accent btn--m" data-columns-apply><span class="btn__label">Применить</span></button>' +
+          '</div>' +
         '</footer>' +
       '</div>' +
     '</div>';
   }
 
+  /* родительский чекбокс «Выбрать все» (правило Checkbox «родитель ↔ дети»):
+     checked — все подвижные видимы, unchecked — все скрыты, indeterminate — частично */
+  function syncParentCheckbox() {
+    var host = document.getElementById('dt-cols-parent');
+    if (!host) return;
+    var input = host.querySelector('input');
+    var mark = host.querySelector('.cb__mark');
+    var movable = movableCols();
+    var visible = movable.filter(function (c) { return !c.hidden; }).length;
+    var all = movable.length > 0 && visible === movable.length;
+    var some = visible > 0 && visible < movable.length;
+    input.checked = all;
+    input.indeterminate = some;
+    host.classList.toggle('cb--selected', all);
+    host.classList.toggle('cb--indeterminate', some);
+    mark.innerHTML = all ? CHECK : some ? MINUS : '';
+  }
+
   function refreshColumnsModal() {
     var list = document.getElementById('dt-col-list');
-    if (!list) return;
-    list.innerHTML = state.columns.map(function (c, i) { return c.fixed ? '' : columnListItem(c, i); }).join('');
-    if (window.dsIcons) window.dsIcons.apply(list);
+    if (list) {
+      list.innerHTML = state.columns.map(function (c, i) { return c.fixed ? '' : columnListItem(c, i); }).join('');
+      if (window.dsIcons) window.dsIcons.apply(list);
+    }
+    syncParentCheckbox();
   }
 
   function openColumnsModal() {
     closeColumnsModal();
+    columnsSnapshot = state.columns.map(function (c) { return Object.assign({}, c); });
     var wrap = document.createElement('div');
     wrap.innerHTML = columnsModalHtml();
     document.body.appendChild(wrap.firstChild);
     var scrim = document.getElementById('dt-columns-scrim');
     if (window.dsIcons) window.dsIcons.apply(scrim);
-    scrim.addEventListener('click', function (e) { if (e.target === scrim) closeColumnsModal(); });
+    syncParentCheckbox();
+    scrim.addEventListener('click', function (e) { if (e.target === scrim) cancelColumns(); });
     scrim.addEventListener('click', function (e) {
-      if (e.target.closest('[data-columns-close]')) closeColumnsModal();
-      if (e.target.closest('[data-cols-all]')) { movableCols().forEach(function (c) { c.hidden = false; }); refreshColumnsModal(); render(); }
-      if (e.target.closest('[data-cols-none]')) { movableCols().forEach(function (c) { c.hidden = true; }); refreshColumnsModal(); render(); }
+      if (e.target.closest('[data-columns-cancel]')) cancelColumns();
+      if (e.target.closest('[data-columns-apply]')) applyColumns();
       var pin = e.target.closest('[data-col-pin]');
       if (pin) {
         togglePin(parseInt(pin.getAttribute('data-col-pin'), 10));
-        refreshColumnsModal(); render();
+        refreshColumnsModal();
       }
     });
     scrim.addEventListener('change', function (e) {
       var vis = e.target.closest('[data-col-visible]');
-      if (vis) { state.columns[parseInt(vis.getAttribute('data-col-visible'), 10)].hidden = !e.target.checked; refreshColumnsModal(); render(); }
+      if (vis) { state.columns[parseInt(vis.getAttribute('data-col-visible'), 10)].hidden = !e.target.checked; refreshColumnsModal(); }
+      var parent = e.target.closest('[data-cols-parent]');
+      if (parent) {
+        var all = e.target.checked;
+        movableCols().forEach(function (c) { c.hidden = !all; });
+        refreshColumnsModal();
+      }
     });
     var list = scrim.querySelector('#dt-col-list');
-    var dragIdx = null;
+    var dragIdx = null, dropTarget = null, dropBefore = false;
+    function clearDropIndicator() {
+      list.querySelectorAll('.col-item').forEach(function (el) { el.classList.remove('drop-before', 'drop-after'); });
+      dropTarget = null;
+    }
     list.addEventListener('dragstart', function (e) {
       var li = e.target.closest('.col-item'); if (!li) return;
       dragIdx = parseInt(li.getAttribute('data-col-order-idx'), 10);
       li.classList.add('is-dragging');
     });
-    list.addEventListener('dragend', function (e) { var li = e.target.closest('.col-item'); if (li) li.classList.remove('is-dragging'); });
-    list.addEventListener('dragover', function (e) { e.preventDefault(); });
-    list.addEventListener('drop', function (e) {
+    list.addEventListener('dragend', function (e) {
+      var li = e.target.closest('.col-item');
+      if (li) li.classList.remove('is-dragging');
+      clearDropIndicator();
+    });
+    list.addEventListener('dragover', function (e) {
       e.preventDefault();
-      var li = e.target.closest('.col-item'); if (!li || dragIdx === null) return;
+      var li = e.target.closest('.col-item');
+      list.querySelectorAll('.col-item').forEach(function (el) { el.classList.remove('drop-before', 'drop-after'); });
+      dropTarget = null;
+      if (!li) return;
       var targetIdx = parseInt(li.getAttribute('data-col-order-idx'), 10);
       if (targetIdx === dragIdx) return;
+      var r = li.getBoundingClientRect();
+      dropBefore = (e.clientY - r.top) < (r.height / 2);
+      li.classList.add(dropBefore ? 'drop-before' : 'drop-after');
+      dropTarget = targetIdx;
+    });
+    list.addEventListener('dragleave', function (e) {
+      if (!list.contains(e.relatedTarget)) clearDropIndicator();
+    });
+    list.addEventListener('drop', function (e) {
+      e.preventDefault();
+      var target = dropTarget;
+      var before = dropBefore;
+      clearDropIndicator();
+      if (dragIdx === null || target === null) return;
       var col = state.columns.splice(dragIdx, 1)[0];
-      state.columns.splice(targetIdx, 0, col);
+      var insertAt = target;
+      if (target > dragIdx) insertAt -= 1;
+      if (!before) insertAt += 1;
+      state.columns.splice(insertAt, 0, col);
       dragIdx = null;
-      refreshColumnsModal(); render();
+      refreshColumnsModal();
     });
     document.addEventListener('keydown', escCloseColumns);
   }
-  function escCloseColumns(e) { if (e.key === 'Escape') closeColumnsModal(); }
+  /* отмена: вернуть снимок колонок, перерисовать таблицу и закрыть модалку */
+  function cancelColumns() {
+    if (columnsSnapshot) state.columns = columnsSnapshot.map(function (c) { return Object.assign({}, c); });
+    render();
+    closeColumnsModal();
+  }
+  /* применить: перерисовать таблицу с текущими изменениями и закрыть */
+  function applyColumns() {
+    render();
+    closeColumnsModal();
+  }
+  function escCloseColumns(e) { if (e.key === 'Escape') cancelColumns(); }
   function closeColumnsModal() {
     var scrim = document.getElementById('dt-columns-scrim');
     if (scrim) scrim.remove();
+    columnsSnapshot = null;
     document.removeEventListener('keydown', escCloseColumns);
   }
 
