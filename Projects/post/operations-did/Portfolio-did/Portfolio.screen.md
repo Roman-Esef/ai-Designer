@@ -3,9 +3,9 @@ screen: Portfolio
 title: Текущий портфель ДИД
 file: Projects/post/operations-did/Portfolio-did/Portfolio.html
 source: ТЗ — Uploads/03-09-2026/Текущий портфель.md
-version: "1.024"
+version: "1.025"
 created: "03.09.2026"
-updated: "05.09.2026"
+updated: "10.09.2026"
 design_system: IBP DS
 components: [Layout, NavPanel, Breadcrumbs, Link, LabelHelper, PageHeader, Table, TableCell, TableFilter, Pagination, Modal, Tab, Chip, Avatar, Checkbox, InputText, InputAutocomplete, InputDateRange, EmptyState, Divider, IconButton, Buttons]
 ---
@@ -60,8 +60,9 @@ components: [Layout, NavPanel, Breadcrumbs, Link, LabelHelper, PageHeader, Table
 Контентная область — 12 колонок, зазор 16px. Единственный блок контента —
 таблица на всю ширину. Горизонтального скролла у рабочей области нет —
 горизонтальный скролл только внутри тела таблицы (`.tbl--scroll`). Отступ
-таблицы от нижней границы экрана — 32px (24px поля контентной области + 8px
-`margin-bottom` таблицы).
+таблицы от нижней границы экрана — 24px: это нижнее поле контентной области,
+собственного `margin-bottom` у таблицы нет (правило каркаса — низ одинаков для
+всех типов контента).
 
 **Высота таблицы — правило каркаса** (Layout `.screen--app` + Table `.dtable--fill`):
 таблица как единственный/основной блок занимает **всю свободную высоту экрана**
@@ -75,9 +76,10 @@ components: [Layout, NavPanel, Breadcrumbs, Link, LabelHelper, PageHeader, Table
 | 1 | Зона тулбара | Table (`.dtable-toolbar`) | 12 | слева TableFilter, справа настройка колонок |
 | 2 | Таблица «Сделки» | Table (`.dtable--fill`, headless) | 12 | 23 колонки, без тулбара (сразу шапка), пагинация |
 
-Вертикальный ритм — **12px** (вариант Table «тулбар над таблицей»): заголовок
-страницы → зона тулбара → таблица. Задано в собственном `<style>` экрана:
-`.screen__content { gap: var(--space-12) }` (вместо дефолтных 24px).
+Вертикальный ритм — **12px**: заголовок страницы → зона тулбара → таблица. Это
+описанный вариант каркаса (Layout, раздел «Экран-реестр: состав и отступы»), а не
+самодеятельность экрана; значение экран задаёт единственной раскладочной строкой
+в своём `<style>`: `.screen__content { gap: var(--space-12) }`.
 
 ## 6. Таблица «Сделки»
 

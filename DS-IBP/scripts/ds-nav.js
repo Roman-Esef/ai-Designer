@@ -105,7 +105,9 @@
     {
       cat: 'RND',
       items: [
-        { label: 'Общий бэклог',            href: 'pages/rnd/Backlog.html' }
+        { label: 'Канбан-доска',            href: 'pages/rnd/Kanban.html' },
+        { label: 'Общий бэклог',            href: 'pages/rnd/Backlog.html' },
+        { label: 'Табы второго уровня',     href: 'pages/rnd/TabsLevel2.html' }
       ]
     }
   ];
