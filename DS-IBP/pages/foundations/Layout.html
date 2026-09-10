@@ -19,6 +19,12 @@
 <link rel="stylesheet" href="../../styles/ds-nav.css">
 <link rel="stylesheet" href="../../styles/ds-docs.css">
 <link rel="stylesheet" href="../../styles/table-cell.css">
+<!-- нужны пробе-измерителю в layout.page.js: высота зоны тулбара (.dtable-toolbar
+     с Button S внутри) и шапки страницы читаются с живого экземпляра -->
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/table.css">
+<link rel="stylesheet" href="../../styles/table-filter.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
 <style>
 code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 /* ---- демо-каркас: схема экрана в натуральную величину ---- */
@@ -49,6 +55,41 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .lay-rows{display:flex;flex-direction:column}
 .lay-rows div{height:36px;border-bottom:1px solid var(--border-light)}
 .lay-rows div:first-child{background:var(--bgtable-row-focus)}
+/* ---- режим «стартовая страница»: превью повторяет каркас главной ---- */
+/* пороги перестроения демонстрируются слайдером ширины, поэтому нижнюю границу
+   контента снимаем: с min-width:1080px слайдер до 900px просто не доехал бы */
+.lay-frame.is-home .screen__content{min-width:0}
+.lay-frame.is-home .screen > .crumbs{min-width:0}
+/* фоновая иллюстрация — часть каркаса главной: cover за контентом, opacity .6 */
+.lay-home{position:relative;min-height:100%}
+.lay-home::before{content:"";position:absolute;inset:0;background:url("../../assets/illustrations/background-illustration.svg") center/cover no-repeat;opacity:.6;pointer-events:none}
+.lay-home .grid12{position:relative}
+.lay-group{display:flex;flex-direction:column;gap:16px;min-width:0}
+.lay-group__head{font:var(--type-h5-strong);color:var(--text-primary);margin:0}
+.lay-ntile{height:190px}
+/* перестроение как на главной: пара .col-3/.colw-6, затем свой третий шаг.
+   Третий шаг обязан иметь ту же специфичность (0,2,0) и стоять ниже — иначе
+   правило пары (.grid12 > [class*="colw-"]) его перебьёт и на 900px группы
+   останутся в 6 колонках. */
+@container screen (max-width: 1700px){ .lay-home .grid12 > [class*="colw-"]{grid-column:span var(--colw)} }
+@container screen (max-width: 900px){ .lay-home .grid12 > .lay-group{grid-column:span 12} }
+/* ---- режим «экран-реестр»: превью повторяет каркас реестра ---- */
+/* app-shell: страница не скроллится, скролл живёт внутри тела таблицы */
+.lay-frame.is-table .screen{overflow-x:auto;overflow-y:hidden}
+/* вертикальный ритм реестра — 12px (шапка → зона тулбара → таблица) */
+.lay-frame.is-table .screen__content{gap:var(--space-12)}
+.lay-phead--reg{height:40px;align-items:center;justify-content:space-between}
+.lay-btn{height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:var(--radius-control);background:var(--primary);color:var(--text-on-dark);font:var(--type-body-s);white-space:nowrap}
+.lay-toolbar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;height:32px}
+.lay-toolbar__l{display:flex;align-items:center;gap:4px;min-width:0}  /* зазор .tfilter — 4px */
+.lay-pill{height:32px;display:inline-flex;align-items:center;padding:0 12px;border:1px solid var(--border-light);border-radius:var(--radius-control);background:var(--bg-tile);font:var(--type-body-s);color:var(--text-secondary);white-space:nowrap}
+.lay-pill--chip{background:var(--bgtable-row-focus)}
+.lay-sq{width:32px;height:32px;border-radius:var(--radius-control);background:var(--c-cgrey-200);flex:none}
+.lay-tbl{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-xl);overflow:hidden}
+.lay-tbl__body{flex:1 1 auto;min-height:0;overflow:auto}
+.lay-tbl__head{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:16px;height:44px;padding:0 16px;background:var(--bg-tile);border-bottom:1px solid var(--border-light)}
+.lay-tbl__head i{height:12px;border-radius:var(--radius-xs);background:var(--c-cgrey-200);flex:none}
+.lay-tbl__foot{flex:none;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px;border-top:1px solid var(--border-light);font:var(--type-body-s);color:var(--text-secondary)}
 /* подсветка зон — как на разборе макета */
 .is-zones .crumbs{background:color-mix(in srgb, var(--error) 12%, transparent)}
 .is-zones .screen__content{position:relative}
@@ -112,7 +153,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.009</b></span><span>Обновлено: <b>03.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.009</b></span><span>Обновлено: <b>10.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Основы</p>
     <h1>Каркас экрана</h1>
     <p class="lead">Любой экран продукта складывается из одних и тех же зон: панель навигации слева, рабочая область справа, внутри рабочей области зона хлебных крошек над контентной областью. Стартовая страница с навигационными тайлами, реестр с таблицей и карточка сущности отличаются только содержимым контентной области — зоны, поля и правила скролла у них одинаковые.</p>
@@ -159,10 +200,24 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
     <h3>Тип контента</h3>
     <p class="desc">Контентная область принимает три типовых наполнения. Поля 24px одинаковы для всех: таблица тоже стоит в полях, а не вплотную к краю. Полноэкранных режимов, снимающих боковые поля, в продукте нет.</p>
     <ul class="rules">
-      <li><b>Тайлы</b> — сетка <code class="tok">.grid12</code>, группы навигационных тайлов по колонкам (стартовая страница).</li>
-      <li><b>Таблица</b> — реестр во всю ширину контентной области: заголовок, фильтр, таблица, пагинация.</li>
+      <li><b>Стартовая страница</b> — сетка <code class="tok">.grid12</code>, группы навигационных тайлов по колонкам. Состав блоков и отступы разобраны ниже, в разделе «Стартовая страница: состав и отступы».</li>
+      <li><b>Таблица</b> — реестр во всю ширину контентной области: заголовок страницы, зона тулбара, таблица, пагинация. Состав блоков и отступы разобраны ниже, в разделе «Экран-реестр: состав и отступы».</li>
       <li><b>Карточка сущности</b> — заголовок PageHeader и блоки-тайлы в сетке (карточка сделки, корпоративный запрос).</li>
     </ul>
+    <h3>Стартовая страница: состав и отступы</h3>
+    <p class="desc">Точка входа в продукт: навигационные тайлы, разложенные по группам. Шапки страницы у неё нет — заголовок несёт каждая группа, — и контентная область содержит ровно один блок: сетку групп. Эталон — главная страница направления ДИД.</p>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:32px"><div id="homeTable"></div></div>
+    <p class="desc"><b>Видимый ритм — 16px, а не 24px.</b> Зазор блоков контентной области здесь не работает ни разу: блок один. Всё, что видно между объектами, — зазор сетки <code class="tok">--grid-gutter</code>, одинаковый по горизонтали и по вертикали: между группами, между рядами групп, между заголовком группы и тайлами, между тайлами. Экран для этого ничего не пишет — 16px даёт <code class="tok">.grid12</code>.</p>
+    <p class="desc"><b>Перестроение — три шага, и два из них штатные.</b> Группа объявляет обе ширины сразу — широкую и узкую (<code class="tok">.col-3 colw-6</code>), а экран включает узкую порогом от ширины рабочей области (см. <a class="link link--accent" href="Spacing.html">Сетка и отступы</a>). Шаги главной: 4 группы в ряд при рабочей области шире 1700px, ≤1700px — 2 группы, ≤900px — одна. Третий шаг парой <code class="tok">colw-</code> не выражается, его экран дописывает своим правилом — ограничение механизма, а не выбор экрана (пункт в «Бэклоге»).</p>
+    <p class="desc"><b>Страница обычная, не app-shell.</b> Рабочая область без <code class="tok">.screen--app</code>: контент растёт под число групп, страница скроллится, крошки залипают у верхней кромки. Это противоположность реестру — и единственное, чем два типа экрана отличаются по правилам скролла. Зона крошек при этом есть и на главной, но трейла в ней нет: одна крошка, она же текущая страница.</p>
+
+    <h3>Экран-реестр: состав и отступы</h3>
+    <p class="desc">Реестр — самый частый тип экрана продукта, и состав блоков у него фиксирован: заголовок страницы, зона тулбара, таблица. Таблица здесь не «очередной блок в потоке» — это последний блок, забирающий весь остаток высоты, поэтому реестр всегда собирается в режиме app-shell (<code class="tok">.screen--app</code> + <code class="tok">.dtable--fill</code>). Эталон — «Текущий портфель ДИД».</p>
+    <div class="panel" style="padding:0;overflow:hidden;margin-bottom:32px"><div id="registryTable"></div></div>
+    <p class="desc"><b>Вертикальный ритм реестра — 12px, а не 24px.</b> Заголовок страницы → зона тулбара → таблица стоят плотнее общего ритма: блоки здесь не самостоятельные разделы, а одна связка «что показываем — как отобрано — сами данные». Значение задаёт экран одной строкой <code class="tok">.screen__content { gap: var(--space-12) }</code> — это единственная раскладочная строка, которую экран-реестр пишет сам, и единственное разрешённое отклонение от ритма 24px. Всё остальное — поля, высоты, залипание — даёт каркас.</p>
+    <p class="desc"><b>Снизу — 24px, как у любого экрана.</b> Нижнее поле контентной области одинаково для всех типов контента; собственного отступа под таблицей нет. Добавочный <code class="tok">margin-bottom</code> у <code class="tok">.dtable</code> — ошибка, а не приём: он даёт «почти 32px», которых нет ни в шкале экрана, ни на соседних страницах, и таблица перестаёт совпадать по низу с тайлами и карточками.</p>
+    <p class="desc"><b>Сколько высоты остаётся таблице.</b> Всё, что не заняли зоны каркаса. При вьюпорте 900px и заголовке без подзаголовка: 900 − 44 (крошки) − 8 (верхнее поле) − 40 (шапка страницы) − 12 − 32 (зона тулбара) − 12 − 24 (нижнее поле) = <b>728px</b>. Внутри этой высоты таблица сама раскладывает липкую шапку колонок, скроллящееся тело и закреплённый футер пагинации — экран их высоты не считает.</p>
+
     <h3>Высота вьюпорта</h3>
     <p class="desc">По умолчанию рабочая область растёт под контент — страница скроллится. Вариант <code class="tok">.screen--app</code> (app-shell) фиксирует рабочую область на высоту вьюпорта (<code class="tok">height:100vh; overflow:hidden</code>), контентная область получает <code class="tok">min-height:0</code>: страница не скроллится, скролл живёт внутри контентного блока.</p>
     <p class="desc"><b>Правило высоты главной таблицы.</b> Если на странице одна таблица — или она основной контентный блок — она занимает <b>всю свободную высоту экрана</b> за вычетом полей контента, крошек, шапки страницы и тулбара/фильтра таблицы: на рабочую область ставится <code class="tok">.screen--app</code>, на таблицу — <code class="tok">.dtable--fill</code> (см. <a class="link link--accent" href="../organisms/Table.html">Table</a>, вариант «На всю высоту»); тело таблицы скроллится внутри, шапка/тулбар/пагинация закреплены. Если над/под таблицей есть тайлы — кейс рассматривается индивидуально, но, как правило, таблица всё равно занимает всю оставшуюся высоту (с учётом тайлов).</p>
@@ -180,6 +235,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
     <h2>Контент</h2>
     <h3>Порядок блоков</h3>
     <p class="desc">Первый блок контентной области — заголовок страницы (PageHeader). Дальше блоки идут в один поток с зазором 24px; вложенная структура — сетка колонок. Последний блок заканчивается полем 24px — закреплённого снизу подвала действий в продукте нет, кнопки форм живут в своём блоке потока.</p>
+    <p class="desc">У экрана-реестра порядок блоков не выбирается: шапка страницы → зона тулбара (<code class="tok">.dtable-toolbar</code>) → таблица. Фильтр и настройка колонок живут в зоне тулбара, а не в шапке страницы: в шапке — действия над сущностями реестра («Новая сделка»), в зоне тулбара — управление самой выборкой. Счётчик записей не дублируется в заголовке — он остаётся в футере пагинации.</p>
     <h3>Колоночная сетка</h3>
     <p class="desc">Горизонтальную структуру задаёт сетка из основ — <a class="link link--accent" href="Spacing.html">Сетка и отступы</a>: 12 резиновых колонок, зазор 16px, поля внутри контентной области 0 (боковые 24px уже дал каркас). Каркас сетку не переопределяет и своих колонок не вводит.</p>
     <div class="dev-code" style="margin-bottom:20px"><button class="dev-copy" data-copy="#gridSample">Копировать</button><pre id="gridSample">&lt;main class="screen__content"&gt;
@@ -259,6 +315,34 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
     &lt;/main&gt;
   &lt;/div&gt;
 &lt;/div&gt;</pre></div>
+    <h3>Разметка экрана-реестра</h3>
+    <div class="dev-code" style="margin-bottom:34px"><button class="dev-copy" data-copy="#devRegistry">Копировать</button><pre id="devRegistry">&lt;div class="screen screen--app"&gt;            &lt;!-- app-shell: страница не скроллится --&gt;
+  &lt;nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs&gt;…&lt;/nav&gt;
+  &lt;main class="screen__content"&gt;             &lt;!-- ритм 12px, см. CSS ниже --&gt;
+
+    &lt;div class="phead"&gt;…заголовок страницы + действие «Новая сделка»…&lt;/div&gt;
+
+    &lt;div class="dtable-toolbar"&gt;             &lt;!-- 32px, без подложки --&gt;
+      &lt;div class="tfilter" role="group" aria-label="Фильтр таблицы"&gt;…&lt;/div&gt;
+      &lt;button class="ibtn ibtn--neutral ibtn--m" data-table-settings
+              aria-label="Настроить колонки"&gt;…&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;div class="dtable dtable--fill"&gt;        &lt;!-- забирает остаток высоты --&gt;
+      &lt;div class="dtable__body"&gt;
+        &lt;div class="tbl tbl--scroll" data-table&gt;
+          &lt;div class="tbl__row tbl__row--head"&gt;…&lt;/div&gt;  &lt;!-- липкая шапка --&gt;
+          &lt;div class="tbl__row"&gt;…&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="dtable__footer"&gt;&lt;div class="pgn-row"&gt;…&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+  &lt;/main&gt;
+&lt;/div&gt;
+
+/* единственная раскладочная строка, которую пишет экран-реестр */
+.screen__content { gap: var(--space-12); }</pre></div>
     <h3>Поведение · псевдокод (framework-agnostic)</h3>
     <div class="dev-code"><button class="dev-copy" data-copy="#devPseudo">Копировать</button><pre id="devPseudo">// 1. Каркас: обёртка (панель + рабочая область). Отступ рабочей области слева
 //    равен ширине панели в текущем режиме: rail и drawer — 56, fixed — 272.
@@ -287,7 +371,13 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 //    относительно него.
 
 // 5. Горизонтальная структура блоков — 12 колонок с зазором 16, поля внутри
-//    контентной области 0 (боковые поля уже дал каркас).</pre></div>
+//    контентной области 0 (боковые поля уже дал каркас).
+
+// 6. Экран-реестр: контентная область = шапка страницы, зона тулбара, таблица.
+//    Ритм между ними 12, не 24. Таблица забирает остаток высоты: рабочая
+//    область фиксирована на вьюпорт, таблица растёт, тело скроллится внутри.
+//    Свободная высота = вьюпорт − 44 (крошки) − 8 − H(шапка) − 12 − 32 (тулбар)
+//    − 12 − 24. Снизу 24 — нижнее поле контента, своего отступа у таблицы нет.</pre></div>
   </section>
 
   <!-- БЭКЛОГ -->
@@ -297,8 +387,9 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
     <ul class="bullets">
       <li><b>Брейкпоинты.</b> Общие для ДС значения точек перестроения. Сейчас шаги задаёт каждый экран сам от ширины рабочей области (карточка сделки — 1560 / 1240 / 900&nbsp;px); нужен единый набор и правила, сколько колонок берут блоки на каждом шаге, что уходит под кат, что схлопывается.</li>
       <li><b>Два уровня порога.</b> Базово порог задаётся на уровне экрана, но для экранов, где ширина контентной области меняется отдельно (растягиваемая правая панель), может понадобиться свой порог от ширины именно контентной области. Точная формулировка правила пока не зафиксирована. Закреплено уже сейчас: сужение от левой панели навигации учитывается всегда и на всех страницах — панель можно закрепить на любом экране, и рабочая область становится меньше на 216&nbsp;px.</li>
+      <li><b>Три шага перестроения против пары <code class="tok">colw-</code>.</b> Механизм сетки объявляет одну узкую ширину рядом с основной, а экранам нужно больше: стартовая страница перекладывается трижды (3 → 6 → 12 колонок), и третий шаг она дописывает своим правилом с оглядкой на специфичность правила пары. Решить, расширять ли механизм до списка ширин или оставить последний шаг за экраном.</li>
       <li><b>Правый сайдбар.</b> Панель связанных сущностей или истории справа от контента: своя ширина, свои поля, поведение на узких брейкпоинтах.</li>
-      <li><b>Липкие элементы внутри контента.</b> Заголовок страницы и шапка таблицы при скролле: липнут ли они под зоной крошек и в каком порядке перекрываются.</li>
+      <li><b>Липкие элементы внутри контента.</b> У экрана-реестра вопрос закрыт: страница не скроллится вовсе (app-shell), шапка таблицы липнет внутри её тела, а не под зоной крошек. Открытым остаётся случай длинной карточки сущности со скроллом страницы: липнет ли там заголовок страницы под зоной крошек и в каком порядке перекрываются слои.</li>
     </ul>
   </section>
 
@@ -311,7 +402,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
           <div class="docs-layout">
             <div class="docs-main">
               <h2>Конструктор</h2>
-              <p class="desc">Схема каркаса в натуральную величину: переключите режим панели и тип контента, включите подсветку зон. Зона крошек — реальный компонент Breadcrumbs, поля контентной области — реальные правила <code class="tok">.screen__content</code>; панель навигации в превью показана заглушкой нужной ширины, но повторяет её поведение: остаётся на месте при скролле контента, а список пунктов внутри скроллится сам.</p>
+              <p class="desc">Схема каркаса в натуральную величину: переключите режим панели и тип контента, включите подсветку зон. Зона крошек — реальный компонент Breadcrumbs, поля контентной области — реальные правила <code class="tok">.screen__content</code>; панель навигации в превью показана заглушкой нужной ширины, но повторяет её поведение: остаётся на месте при скролле контента, а список пунктов внутри скроллится сам. Вариант контента «Таблица» показывает экран-реестр целиком: app-shell (страница не скроллится), зона тулбара над таблицей, липкая шапка колонок, закреплённый футер пагинации и ритм 12px — сводка справа пересчитывается под режим.</p>
               <div class="pg__controls">
         <div class="ctl-col">
         <div class="ctl">
@@ -320,7 +411,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
         </div>
         <div class="ctl">
           <span class="lbl">Контент</span>
-          <div class="pg-select"><select id="pgKind"><option value="tiles" selected>Тайлы</option><option value="table">Таблица</option><option value="entity">Карточка</option></select></div>
+          <div class="pg-select"><select id="pgKind"><option value="home" selected>Стартовая страница</option><option value="table">Таблица</option><option value="entity">Карточка</option></select></div>
         </div>
         </div><!-- /ctl-col -->
         <div class="toggles">
@@ -388,7 +479,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 <script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/layout.page.js)
 // Зоны каркаса: панель навигации (rail 56 / fixed 272) + рабочая область
 // → .screen: крошки (.crumbs) + контентная область (.screen__content)
-// Конструктор: pgNav (rail/fixed), pgKind (tiles/table/entity), pgZones, pgCrumbs
+// Конструктор: pgNav (rail/fixed), pgKind (home/table/entity), pgZones, pgCrumbs
 // → превью .lay-frame(.is-zones); сводка readout (roNav/roCrumbs/roPad/roGap).
 // Поля 8px 24px 24px; ритм блоков 24px; панель фиксируется при скролле.</script>
 <script type="text/plain" id="src-code-css">/* =========================================================================

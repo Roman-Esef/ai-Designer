@@ -1,0 +1,504 @@
+<!-- @dsCard group="RND" name="Табы второго уровня" viewport="1440x900" subtitle="Три концепта вложенной навигации" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Табы второго уровня — Дизайн-система</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/spacing.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-toc.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Раскладка страницы. Токены — из ДС, своих значений нет.
+   ───────────────────────────────────────────────────────────── */
+.page{max-width:1560px;margin:0 auto;padding:clamp(40px,7vw,96px) clamp(24px,4vw,56px) 140px;}
+a{color:var(--link);} a:hover{color:var(--link-dark);}
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:88ch;text-wrap:pretty;}
+.section>h3{font:var(--type-h5-strong);color:var(--text-primary);margin:40px 0 12px;}
+.crit{margin:0 0 28px;padding-left:22px;font:var(--type-body-m);color:var(--text-secondary);max-width:88ch;}
+.crit li{margin-bottom:8px;text-wrap:pretty;}
+.tk{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text-secondary);background:var(--bgtable-row-focus);padding:var(--space-2) var(--space-6);border-radius:var(--radius-s);display:inline-block;}
+
+/* ── рамка демо: имитирует контентную область экрана ────────── */
+.demo{border:1px solid var(--border-light);border-radius:var(--radius-2xl);background:var(--bg-tile);overflow:hidden;max-width:940px;}
+.demo__l1{padding:var(--space-16) var(--space-24) 0;}
+.demo__l2{padding:var(--space-16) var(--space-24);}
+.demo__body{padding:var(--space-32) var(--space-24);border-top:1px solid var(--border-light);background:var(--bg-page);font:var(--type-body-m);color:var(--text-inactive);}
+.demo__cap{padding:var(--space-12) var(--space-24);border-top:1px solid var(--border-light);font:var(--type-body-xs);color:var(--text-secondary);}
+.states{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-8);padding:var(--space-16) var(--space-24);border-top:1px solid var(--border-light);}
+.states__cap{font:var(--type-body-xs);color:var(--text-inactive);width:100%;margin-bottom:var(--space-4);}
+
+/* ── плюсы / минусы ─────────────────────────────────────────── */
+.pm{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:var(--space-24);margin-top:var(--space-24);max-width:940px;}
+.pm h4{font:var(--type-body-m-strong);color:var(--text-primary);margin:0 0 var(--space-8);}
+.pm ul{margin:0;padding-left:20px;font:var(--type-body-m);color:var(--text-secondary);}
+.pm li{margin-bottom:var(--space-8);text-wrap:pretty;}
+.pm li:last-child{margin-bottom:0;}
+
+/* ─────────────────────────────────────────────────────────────
+   ПРОТОТИП «таб второго уровня» — локальные классы .t2*.
+   Компонента в ДС нет, поэтому концепты 1 и 3 собраны здесь на
+   токенах; классы ДС (.tab, .segctrl) не переопределяются.
+   Живость — без своего JS: скрытый radio + label.
+   ───────────────────────────────────────────────────────────── */
+.t2{position:relative;display:inline-flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;}
+.t2__radio{position:absolute;top:0;left:0;width:1px;height:1px;margin:0;opacity:0;pointer-events:none;}
+.t2__item{
+  position:relative;
+  box-sizing:border-box;display:inline-flex;align-items:center;gap:var(--space-8);
+  height:32px;padding:0 var(--space-12);
+  border:0;border-radius:var(--radius-control);
+  background:transparent;color:var(--text-secondary);
+  font:var(--type-body-s);letter-spacing:0;white-space:nowrap;
+  cursor:pointer;user-select:none;
+  transition:background-color .15s ease,color .15s ease;
+}
+/* hover = focus, как у Tab: тот же слой Active · PrimaryBG */
+.t2__item:hover,.t2__item--hover{background:var(--primary-bg);color:var(--text-primary);}
+.t2__radio:focus-visible+.t2__item{outline:2px solid var(--primary);outline-offset:2px;}
+.t2__radio:disabled+.t2__item,.t2__item--disabled{color:var(--text-inactive);background:transparent;cursor:not-allowed;pointer-events:none;}
+
+/* ── Концепт 1 · Заливка ───────────────────────────────────────
+   Трек как у SegmentControl, но его высота равна высоте сегмента:
+   паддинга трека нет (у ДС M: 34 + 2×3 = 40, здесь 32 = 32).
+   Выбранный сегмент закрашен от края до края — обводки трека
+   вокруг него не остаётся. Скругление даёт сам трек через
+   overflow:hidden, поэтому у крайних сегментов заливка
+   подрезается по радиусу, а у средних — прямые края.           */
+.t2--fill,.t2--fill-dark{
+  gap:0;flex-wrap:nowrap;
+  background:var(--st-system-light);         /* тот же тон трека, что у .segctrl */
+  border-radius:var(--radius-control);
+  overflow:hidden;
+}
+.t2--fill .t2__item,.t2--fill-dark .t2__item{border-radius:0;}
+/* обводка обрезала бы фокус — уводим внутрь, как у .tab:focus-visible */
+.t2--fill .t2__radio:focus-visible+.t2__item,
+.t2--fill-dark .t2__radio:focus-visible+.t2__item{outline-offset:-2px;}
+
+/* разделитель между соседними невыбранными сегментами — механика ДС:
+   гаснет у выбранного, у его правого соседа и вокруг наведённого */
+.t2--fill .t2__item::before,.t2--fill-dark .t2__item::before{
+  content:"";position:absolute;left:0;top:22%;bottom:22%;width:1px;
+  background:var(--border-primary);
+}
+.t2--fill .t2__item:first-of-type::before,
+.t2--fill-dark .t2__item:first-of-type::before{display:none;}
+.t2--fill .t2__radio:checked+.t2__item::before,
+.t2--fill .t2__radio:checked+.t2__item+.t2__radio+.t2__item::before,
+.t2--fill .t2__item:hover::before,
+.t2--fill .t2__item:hover+.t2__radio+.t2__item::before,
+.t2--fill .t2__item--selected::before,
+.t2--fill .t2__item--hover::before,
+.t2--fill-dark .t2__radio:checked+.t2__item::before,
+.t2--fill-dark .t2__radio:checked+.t2__item+.t2__radio+.t2__item::before,
+.t2--fill-dark .t2__item:hover::before,
+.t2--fill-dark .t2__item:hover+.t2__radio+.t2__item::before,
+.t2--fill-dark .t2__item--selected::before,
+.t2--fill-dark .t2__item--hover::before{opacity:0;}
+
+.t2--fill .t2__radio:checked+.t2__item,
+.t2--fill .t2__item--selected{background:var(--primary);color:var(--text-on-dark);}
+.t2--fill .t2__radio:checked+.t2__item:hover,
+.t2--fill .t2__item--selected.t2__item--hover{background:var(--primary-dark);color:var(--text-on-dark);}
+/* тот же концепт на тоне --primary-dark: контраст подписи 5.24:1 вместо 2.91:1 */
+.t2--fill-dark .t2__radio:checked+.t2__item,
+.t2--fill-dark .t2__item--selected{background:var(--primary-dark);color:var(--text-on-dark);}
+.t2--fill-dark .t2__radio:checked+.t2__item:hover,
+.t2--fill-dark .t2__item--selected.t2__item--hover{background:var(--st-primary-dark);color:var(--text-on-dark);}
+
+/* сравнение геометрии: подписи под образцами */
+.cmp{display:flex;flex-wrap:wrap;gap:var(--space-40);padding:var(--space-24);}
+.cmp__cap{font:var(--type-body-xs);color:var(--text-secondary);margin:var(--space-8) 0 0;max-width:36ch;}
+
+/* Концепт 3 · Мягкая подложка: тональная заливка + полужирная подпись */
+.t2--soft .t2__radio:checked+.t2__item,
+.t2--soft .t2__item--selected{background:var(--st-primary-light);color:var(--text-primary);}
+.t2--soft .t2__radio:checked+.t2__item:hover,
+.t2--soft .t2__item--selected.t2__item--hover{background:var(--st-primary-midlight);color:var(--text-primary);}
+.t2--soft .t2__radio:checked+.t2__item .t2__text,
+.t2--soft .t2__item--selected .t2__text{font:var(--type-body-s-strong);}
+/* резерв ширины под полужирное начертание: ряд не «прыгает» при выборе */
+.t2--soft .t2__text{display:grid;}
+.t2--soft .t2__text>span{grid-area:1/1;}
+.t2--soft .t2__text::after{
+  grid-area:1/1;content:attr(data-text);
+  font:var(--type-body-s-strong);
+  visibility:hidden;pointer-events:none;
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <a class="crumb" href="../../index.html">← Дизайн-система</a>
+  <header class="masthead">
+    <p class="eyebrow">RND</p>
+    <h1>Табы второго уровня</h1>
+    <p class="meta"><span>Версия: <b>1.000</b></span><span>Обновлено: <b>10.09.2026</b></span></p>
+    <p class="lead">Три концепта вложенной навигации внутри раздела первого уровня. Компонента второго уровня в ДС нет — страница нужна, чтобы выбрать механику до того, как она разъедется по экранам. Концепты живые: по ряду можно кликать и ходить стрелками.</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <section class="section" data-screen-label="Задача">
+    <h2>Задача</h2>
+    <p class="desc">Второй уровень появляется, когда раздел первого уровня сам делится на подразделы. Первый уровень в ДС — компонент <a href="../molecules/Tab.html">Tab</a>: высота 40, подпись body-m, подчёркивание 2px и общий рейл под рядом. Повторить его один в один на втором уровне нельзя: два одинаковых ряда подчёркиваний читаются как один уровень — пользователь перестаёт понимать, где находится (эвристика Нильсена №1 «видимость состояния системы», и закон подобия в гештальт-группировке: одинаковая форма = один уровень).</p>
+    <p class="desc">Разница между уровнями должна держаться минимум на двух признаках сразу — размер и механика выделения, — а не на одном размере. Ниже три механики; каждая оценена по одним и тем же критериям.</p>
+    <ol class="crit">
+      <li><b>Различимость уровней</b> — виден ли второй уровень как подчинённый без наведения и без клика.</li>
+      <li><b>Конкуренция с действиями</b> — правило ДС: на область экрана одна акцентная кнопка. Навигация, закрашенная акцентом, спорит с ней за внимание.</li>
+      <li><b>Ёмкость</b> — сколько подразделов ряд держит без переполнения (закон Хика: время выбора растёт с числом равнозначных вариантов).</li>
+      <li><b>Доступность</b> — WCAG 2.2: 1.4.3 (текст 4.5:1), 1.4.11 (нетекстовый индикатор 3:1), 1.4.1 (выбор передан не только цветом).</li>
+      <li><b>Стоимость</b> — что нужно добавить в ДС, чтобы концепт стал компонентом.</li>
+    </ol>
+    <p class="desc">Подписи в демо условные, первый уровень взят из мокапа «Карточка сделки». Второй уровень везде 32px / body-s — на 8px ниже первого.</p>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <section class="section" data-screen-label="Концепт 1">
+    <h2>Концепт 1 · Заливка</h2>
+    <p class="desc">Сегмент-контрол с треком, но <b>высота трека равна высоте сегмента</b>. У компонента ДС трек выше сегмента на величину своего паддинга (M: 34 + 2×3 = 40, S: 28 + 2×2 = 32) — эта рамка и читается как внешняя обводка вокруг выбранного. Здесь паддинга нет: 32 = 32, выбранный сегмент закрашен акцентом от края до края, обводки трека вокруг него не остаётся. Скругление задаёт сам трек (<span class="tk">--radius-control</span>, 8px) и подрезает заливку по краям — у крайних сегментов углы скруглены, у средних края прямые.</p>
+    <p class="desc">Всё остальное — механика ДС: тон трека <span class="tk">--st-system-light</span> (тот же, что у <span class="tk">.segctrl</span>), тонкие разделители между соседними невыбранными сегментами, гаснущие у выбранного и вокруг наведённого. Заливка акцентом с белой подписью в системе тоже уже есть — <span class="tk">.btn--accent</span>, <span class="tk">.chip--primary-solid</span>.</p>
+
+    <div class="demo">
+      <div class="demo__l1">
+        <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы сделки">
+          <button type="button" class="tab tab--m tab--selected" role="tab" aria-selected="true" tabindex="0"><span class="tab__label">Сделка</span></button>
+          <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">ЦУП</span></button>
+          <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">Operations</span></button>
+          <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">Monitoring</span></button>
+        </div>
+      </div>
+      <div class="demo__l2">
+        <div class="t2 t2--fill" role="radiogroup" aria-label="Подразделы раздела «Сделка»">
+          <input type="radio" class="t2__radio" name="l2-fill" id="l2f-1" checked>
+          <label class="t2__item" for="l2f-1"><span class="t2__text">Общая информация</span></label>
+          <input type="radio" class="t2__radio" name="l2-fill" id="l2f-2">
+          <label class="t2__item" for="l2f-2"><span class="t2__text">Условия</span></label>
+          <input type="radio" class="t2__radio" name="l2-fill" id="l2f-3">
+          <label class="t2__item" for="l2f-3"><span class="t2__text">Документы</span><span class="badge badge--text badge--s">12</span></label>
+          <input type="radio" class="t2__radio" name="l2-fill" id="l2f-4">
+          <label class="t2__item" for="l2f-4"><span class="t2__text">История</span></label>
+        </div>
+      </div>
+      <div class="demo__body">Область содержимого подраздела</div>
+      <div class="states">
+        <p class="states__cap">Состояния: обычное · наведение · выбрано · выбрано + наведение · отключено</p>
+        <span class="t2 t2--fill"><span class="t2__item"><span class="t2__text">Условия</span></span></span>
+        <span class="t2 t2--fill"><span class="t2__item t2__item--hover"><span class="t2__text">Условия</span></span></span>
+        <span class="t2 t2--fill"><span class="t2__item t2__item--selected"><span class="t2__text">Условия</span></span></span>
+        <span class="t2 t2--fill"><span class="t2__item t2__item--selected t2__item--hover"><span class="t2__text">Условия</span></span></span>
+        <span class="t2 t2--fill"><span class="t2__item t2__item--disabled"><span class="t2__text">Условия</span></span></span>
+      </div>
+      <div class="demo__cap">Трек: <span class="tk">--st-system-light</span>, радиус <span class="tk">--radius-control</span>, паддинг 0. Выбранный сегмент: фон <span class="tk">--primary</span>, подпись <span class="tk">--text-on-dark</span>, высота = высоте трека. Наведение на невыбранный: <span class="tk">--primary-bg</span>. Выбранный + наведение: <span class="tk">--primary-dark</span>. Разделитель: <span class="tk">--border-primary</span>. Счётчик — <span class="tk">.badge--text.badge--s</span>: на заливке он не читается, см. открытые вопросы.</div>
+    </div>
+
+    <h3>В чём разница с сегмент-контролом ДС</h3>
+    <p class="desc">Слева — компонент ДС <span class="tk">.segctrl--s</span> как есть: полная высота 32, внутренний сегмент 28, между ними паддинг трека 2px сверху и снизу — выбранное значение сидит на подложке белой «таблеткой» с тенью, и трек виден вокруг него рамкой. Справа — тот же ряд в геометрии концепта: трек 32, сегмент 32, паддинга нет.</p>
+    <div class="demo">
+      <div class="cmp">
+        <div>
+          <div class="segctrl segctrl--s" role="radiogroup" aria-label="Сегмент-контрол ДС" data-segctrl>
+            <div class="segctrl__thumb"></div>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0"><span class="segctrl__label">Условия</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1"><span class="segctrl__label">Документы</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1"><span class="segctrl__label">История</span></button>
+          </div>
+          <p class="cmp__cap">ДС · <span class="tk">.segctrl--s</span>: трек 32, сегмент 28, паддинг трека 2px. Индикатор — белая таблетка с тенью, трек обводит её рамкой.</p>
+        </div>
+        <div>
+          <div class="t2 t2--fill" role="radiogroup" aria-label="Концепт: трек равен сегменту">
+            <input type="radio" class="t2__radio" name="l2-cmp" id="l2c-1" checked>
+            <label class="t2__item" for="l2c-1"><span class="t2__text">Условия</span></label>
+            <input type="radio" class="t2__radio" name="l2-cmp" id="l2c-2">
+            <label class="t2__item" for="l2c-2"><span class="t2__text">Документы</span></label>
+            <input type="radio" class="t2__radio" name="l2-cmp" id="l2c-3">
+            <label class="t2__item" for="l2c-3"><span class="t2__text">История</span></label>
+          </div>
+          <p class="cmp__cap">Концепт: трек 32, сегмент 32, паддинга нет. Заливка акцентом доходит до края трека — рамки вокруг выбранного не остаётся.</p>
+        </div>
+      </div>
+      <div class="demo__cap">Обе высоты одинаковые — 32. Отличие только в том, отдаёт трек часть высоты под свою рамку или нет.</div>
+    </div>
+
+    <h3>Тот же концепт на тоне <span class="tk">--primary-dark</span></h3>
+    <p class="desc">Белая подпись на <span class="tk">--primary</span> (#00AA9B) даёт контраст <b>2.91:1</b> при норме 4.5:1 — WCAG 1.4.3 не выполняется. На <span class="tk">--primary-dark</span> (#007A6D) — <b>5.24:1</b>. Занижение не про этот концепт, а системное: ровно так же собран <span class="tk">.btn--accent</span>. Если концепт 1 берут в работу — брать с тёмным тоном.</p>
+    <div class="demo">
+      <div class="demo__l2">
+        <div class="t2 t2--fill-dark" role="radiogroup" aria-label="Подразделы, тёмный тон">
+          <input type="radio" class="t2__radio" name="l2-filld" id="l2fd-1" checked>
+          <label class="t2__item" for="l2fd-1"><span class="t2__text">Общая информация</span></label>
+          <input type="radio" class="t2__radio" name="l2-filld" id="l2fd-2">
+          <label class="t2__item" for="l2fd-2"><span class="t2__text">Условия</span></label>
+          <input type="radio" class="t2__radio" name="l2-filld" id="l2fd-3">
+          <label class="t2__item" for="l2fd-3"><span class="t2__text">Документы</span></label>
+          <input type="radio" class="t2__radio" name="l2-filld" id="l2fd-4">
+          <label class="t2__item" for="l2fd-4"><span class="t2__text">История</span></label>
+        </div>
+      </div>
+      <div class="demo__cap">Единственное отличие — тон заливки. Подпись 5.24:1, индикатор к белому фону 5.24:1 (1.4.11 выполняется с запасом).</div>
+    </div>
+
+    <div class="pm">
+      <div>
+        <h4>Что работает</h4>
+        <ul>
+          <li>Максимальная различимость уровней: подчёркивание сверху, заливка снизу — механики разные, спутать нельзя.</li>
+          <li>Текущий подраздел виден периферийным зрением, без сканирования ряда.</li>
+          <li>Трек очерчивает границы группы: видно, что это один переключатель с фиксированным набором, а не набор отдельных кнопок (закон общей области в гештальт-группировке).</li>
+          <li>Выбор передан заливкой, а не только цветом подписи — 1.4.1 выполняется.</li>
+          <li>Механика в системе уже есть (btn--accent, chip--primary-solid, трек и разделители — от SegmentControl) — новых визуальных сущностей не заводим.</li>
+          <li>Реализуется как модификатор SegmentControl, а не с нуля: паддинг трека в 0, индикатор красится акцентом. Анимация индикатора и клавиатура достаются от <span class="tk">ds-tabs.js</span> бесплатно.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Что мешает</h4>
+        <ul>
+          <li>Контраст на <span class="tk">--primary</span> — 2.91:1. Обязателен тёмный тон.</li>
+          <li>Навигация весит как акцентная кнопка: на экране с кнопкой «Сохранить» два акцента спорят за внимание.</li>
+          <li>Семантика спорит с ролью: трек и сегменты в ДС закреплены за SegmentControl — «выбор значения параметра», а не «переключение вьюх». Внешне это сегмент-контрол, по назначению — навигация; расхождение придётся разрешать на уровне ДС, а не экрана.</li>
+          <li>Счётчик на заливке: тона бейджа «на акценте» в ДС нет.</li>
+          <li>Трек — фиксированная рамка: ряд не растягивается по контенту и не переносится, поэтому 6+ пунктов или длинные подписи в него не влезают.</li>
+          <li>Тон трека <span class="tk">--st-system-light</span> полупрозрачный: на сером фоне (<span class="tk">--bg-page</span>) он почти сливается с поверхностью.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="desc" style="margin-top:24px">Когда брать: 2–5 подразделов, второй уровень — главный переключатель экрана, рядом нет акцентной кнопки.</p>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <section class="section" data-screen-label="Концепт 2">
+    <h2>Концепт 2 · Подчёркивание S</h2>
+    <p class="desc">Существующий компонент Tab в размере S (32px, body-s) без общего рейла — <span class="tk">.tabs--horiz.tabs--bare</span> + <span class="tk">.tab--s</span>. Рейл остаётся признаком только первого уровня; второй отличается размером подписи, отсутствием рейла и отсутствием иконок. Это вариант «ничего не добавлять»: ряд ниже собран из реальных классов ДС и оживлён рантаймом <span class="tk">ds-tabs.js</span>, а не прототипом страницы. Ровно так устроены secondary tabs в Material 3.</p>
+
+    <div class="demo">
+      <div class="demo__l1">
+        <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы сделки">
+          <button type="button" class="tab tab--m tab--selected" role="tab" aria-selected="true" tabindex="0"><span class="tab__label">Сделка</span></button>
+          <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">ЦУП</span></button>
+          <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">Operations</span></button>
+          <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">Monitoring</span></button>
+        </div>
+      </div>
+      <div class="demo__l2">
+        <div class="tabs tabs--horiz tabs--bare" role="tablist" data-tabs data-tabs-overflow="none" aria-label="Подразделы раздела «Сделка»">
+          <button type="button" class="tab tab--s tab--selected" role="tab" aria-selected="true" tabindex="0"><span class="tab__label">Общая информация</span></button>
+          <button type="button" class="tab tab--s" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">Условия</span></button>
+          <button type="button" class="tab tab--s" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">Документы</span><span class="tab__badge">12</span></button>
+          <button type="button" class="tab tab--s" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">История</span></button>
+        </div>
+      </div>
+      <div class="demo__body">Область содержимого подраздела</div>
+      <div class="states">
+        <p class="states__cap">Состояния: обычное · наведение · выбрано · выбрано + наведение · отключено</p>
+        <span class="tab tab--s"><span class="tab__label">Условия</span></span>
+        <span class="tab tab--s is-hover"><span class="tab__label">Условия</span></span>
+        <span class="tab tab--s tab--selected tab--standalone"><span class="tab__label">Условия</span></span>
+        <span class="tab tab--s tab--selected tab--standalone is-hover"><span class="tab__label">Условия</span></span>
+        <span class="tab tab--s" aria-disabled="true"><span class="tab__label">Условия</span></span>
+      </div>
+      <div class="demo__cap">Классы ДС без изменений. Счётчик — штатный <span class="tk">.tab__badge</span>. Переполнение в реальном экране решает рантайм: скролл со стрелками или меню «Ещё» (<span class="tk">data-tabs-overflow</span>).</div>
+    </div>
+
+    <div class="pm">
+      <div>
+        <h4>Что работает</h4>
+        <ul>
+          <li>Стоимость нулевая: компонент, рантайм, клавиатура, счётчики, переполнение — всё уже есть.</li>
+          <li>Механика та же, что на первом уровне: пользователю нечему учиться.</li>
+          <li>Держит 8+ подразделов и длинные подписи — переполнение уже решено.</li>
+          <li>Контраст: подпись <span class="tk">--text-primary</span> 9.79:1, индикатор <span class="tk">--primary</span> к белому 2.91:1 — ниже 3:1 по 1.4.11, но выбор дублируется цветом подписи, а не держится на полоске одной.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Что мешает</h4>
+        <ul>
+          <li>Различимость уровней держится на размере и рейле — самый слабый из трёх вариантов. На плотном экране два ряда сливаются в один.</li>
+          <li>Индикатор во всю ширину таба усиливает сходство с первым уровнем; в узкой колонке разница почти пропадает.</li>
+          <li>Если у первого уровня размер S (как в шапке «Карточки сделки»), уровни становятся неразличимы совсем — концепт применим только при первом уровне M.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="desc" style="margin-top:24px">Когда брать: 5+ подразделов, длинные подписи, счётчики, первый уровень — размер M.</p>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <section class="section" data-screen-label="Концепт 3">
+    <h2>Концепт 3 · Мягкая подложка</h2>
+    <p class="desc">Та же геометрия, что у концепта 1, но выбранный пункт получает тональную подложку <span class="tk">--st-primary-light</span> (эмеральд 16%) и <b>полужирную</b> подпись вместо сплошного акцента. Вес выделения средний: уровень читается, но с акцентной кнопкой экрана не спорит. Похоже устроена подсветка активного раздела в Salesforce Setup и Fluent 2.</p>
+
+    <div class="demo">
+      <div class="demo__l1">
+        <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы сделки">
+          <button type="button" class="tab tab--m tab--selected" role="tab" aria-selected="true" tabindex="0"><span class="tab__label">Сделка</span></button>
+          <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">ЦУП</span></button>
+          <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">Operations</span></button>
+          <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"><span class="tab__label">Monitoring</span></button>
+        </div>
+      </div>
+      <div class="demo__l2">
+        <div class="t2 t2--soft" role="radiogroup" aria-label="Подразделы раздела «Сделка»">
+          <input type="radio" class="t2__radio" name="l2-soft" id="l2s-1" checked>
+          <label class="t2__item" for="l2s-1"><span class="t2__text" data-text="Общая информация"><span>Общая информация</span></span></label>
+          <input type="radio" class="t2__radio" name="l2-soft" id="l2s-2">
+          <label class="t2__item" for="l2s-2"><span class="t2__text" data-text="Условия"><span>Условия</span></span></label>
+          <input type="radio" class="t2__radio" name="l2-soft" id="l2s-3">
+          <label class="t2__item" for="l2s-3"><span class="t2__text" data-text="Документы"><span>Документы</span></span><span class="badge badge--text badge--s">12</span></label>
+          <input type="radio" class="t2__radio" name="l2-soft" id="l2s-4">
+          <label class="t2__item" for="l2s-4"><span class="t2__text" data-text="История"><span>История</span></span></label>
+        </div>
+      </div>
+      <div class="demo__body">Область содержимого подраздела</div>
+      <div class="states">
+        <p class="states__cap">Состояния: обычное · наведение · выбрано · выбрано + наведение · отключено</p>
+        <span class="t2 t2--soft"><span class="t2__item"><span class="t2__text" data-text="Условия"><span>Условия</span></span></span></span>
+        <span class="t2 t2--soft"><span class="t2__item t2__item--hover"><span class="t2__text" data-text="Условия"><span>Условия</span></span></span></span>
+        <span class="t2 t2--soft"><span class="t2__item t2__item--selected"><span class="t2__text" data-text="Условия"><span>Условия</span></span></span></span>
+        <span class="t2 t2--soft"><span class="t2__item t2__item--selected t2__item--hover"><span class="t2__text" data-text="Условия"><span>Условия</span></span></span></span>
+        <span class="t2 t2--soft"><span class="t2__item t2__item--disabled"><span class="t2__text" data-text="Условия"><span>Условия</span></span></span></span>
+      </div>
+      <div class="demo__cap">Выбранный: фон <span class="tk">--st-primary-light</span>, подпись <span class="tk">--text-primary</span> в начертании <span class="tk">--type-body-s-strong</span> (8.24:1). Выбранный + наведение: <span class="tk">--st-primary-midlight</span>. Ширина пункта зарезервирована под полужирное начертание — при переключении ряд не сдвигается.</div>
+    </div>
+
+    <div class="pm">
+      <div>
+        <h4>Что работает</h4>
+        <ul>
+          <li>Вес выделения средний: уровень подчинён первому и не конкурирует с акцентной кнопкой действия.</li>
+          <li>Контраст подписи 8.24:1 — с запасом.</li>
+          <li>Выбор передан двумя признаками сразу — подложка и начертание, — 1.4.1 выполняется даже при потере цвета.</li>
+          <li>Держит 6–8 пунктов: ряд остаётся спокойным.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Что мешает</h4>
+        <ul>
+          <li>Подложка к белому фону — 1.19:1: как самостоятельный индикатор 1.4.11 не проходит. Полужирная подпись здесь обязательна, а не украшение.</li>
+          <li>На сером фоне (<span class="tk">--bg-page</span>) или внутри тайла подложка почти исчезает — вариант «на цветной поверхности» надо решать отдельно.</li>
+          <li>Смена начертания меняет ширину пункта: без резерва ширины ряд «прыгает» при каждом переключении. В прототипе резерв сделан двойником-<span class="tk">::after</span> — в компоненте это придётся зафиксировать в спеке.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="desc" style="margin-top:24px">Когда брать: 3–8 подразделов, на экране есть акцентная кнопка, второй уровень — способ уточнить раздел, а не главный переключатель.</p>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <section class="section" data-screen-label="Сравнение">
+    <h2>Сравнение</h2>
+    <p class="desc">Оценки — по критериям из раздела «Задача». Контрасты посчитаны по формуле WCAG 2.2 для белого фона поверхности (<span class="tk">--bg-tile</span>).</p>
+    <div class="tbl">
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1fr 1fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Критерий</span></div>
+        <div class="th"><span class="th__label">1 · Заливка</span></div>
+        <div class="th"><span class="th__label">2 · Подчёркивание S</span></div>
+        <div class="th"><span class="th__label">3 · Мягкая подложка</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1fr 1fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Различимость уровней</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Высокая — другая механика выделения</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Низкая — та же механика, меньше размер</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Средняя — подложка вместо полоски</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1fr 1fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Конкуренция с действиями</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Высокая — второй акцент на экране</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Нет</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Низкая</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1fr 1fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Ёмкость ряда</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">2–5 пунктов; трек не переносится и не тянется</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">8+ пунктов, переполнение решено</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">3–8 пунктов</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1fr 1fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Контраст подписи выбранного</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">2.91:1 на <span class="tk">--primary</span>, 5.24:1 на <span class="tk">--primary-dark</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">9.79:1</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">8.24:1</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1fr 1fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Выбор не только цветом (1.4.1)</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Да — заливка</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Да — полоска-индикатор</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Да — подложка + начертание</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1fr 1fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Счётчик</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Нет тона для заливки — нужен новый</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Штатный <span class="tk">.tab__badge</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Штатный <span class="tk">.badge--text</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1fr 1fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Стоимость</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Модификатор SegmentControl (паддинг трека 0 + акцентный индикатор) + тон бейджа + решение по семантике</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Ноль — правило применения в спеке Tab</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Новый компонент + резерв ширины + переполнение</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <section class="section" data-screen-label="Рекомендация">
+    <h2>Рекомендация</h2>
+    <p class="desc"><b>Основной — концепт 3 «Мягкая подложка».</b> Он единственный решает обе задачи сразу: уровень читается как подчинённый и при этом не превращает навигацию во второй акцент экрана. Контраст с запасом, выбор передан двумя признаками. Цена — новый компонент и правило резерва ширины в спеке.</p>
+    <p class="desc"><b>Концепт 1 «Заливка» — для узких случаев:</b> 2–4 подраздела с короткими подписями, второй уровень главный на экране, акцентной кнопки рядом нет. Брать только на тоне <span class="tk">--primary-dark</span>: на <span class="tk">--primary</span> подпись не проходит по контрасту. В плюс ему то, что реализация дешевле, чем казалось: это модификатор SegmentControl (паддинг трека 0, индикатор акцентом), а не новый компонент — но платой идёт вопрос о семантике, см. открытые вопросы.</p>
+    <p class="desc"><b>Концепт 2 — запасной вариант «сегодня».</b> Пока компонента нет, второй уровень собирается из <span class="tk">.tab--s</span> + <span class="tk">.tabs--bare</span>: это лучше, чем каждый экран решает по-своему. Как постоянное решение слабоват — уровни путаются.</p>
+    <p class="desc">Проверять концепты глазами на макете мало: нужен короткий коридорный тест на 5–6 менеджерах сделок — «покажите, в каком разделе вы сейчас находитесь» на статичном скриншоте, без наведения. Различимость уровней — это ровно то, что нельзя оценить, собрав экран самому.</p>
+
+    <h3>Открытые вопросы</h3>
+    <ol class="crit">
+      <li><b>Тон бейджа на акцентной заливке.</b> Ни <span class="tk">.tab__badge</span> (свомп 32% + тёмный текст), ни <span class="tk">.badge--text</span> (<span class="tk">--text-primary</span>, 4.21:1 на эмеральде) на заливке не читаются. Нужен тон «на акценте» — или счётчики во втором уровне запрещаются правилом.</li>
+      <li><b>Контраст белого на <span class="tk">--primary</span> — 2.91:1.</b> Это не дефект концепта, а свойство <span class="tk">.btn--accent</span> и всех solid-чипов. Предлагаю завести отдельной строкой в <a href="Backlog.html">общий бэклог</a> — рядом с записью про контраст тона neutral у IconButton.</li>
+      <li><b>Чем считать концепт 1 — вариантом Tab или вариантом SegmentControl.</b> Внешне это сегмент-контрол (трек, сегменты, разделители), по роли — навигация между вьюхами, то есть Tab. Инвариант ДС сейчас разводит их жёстко: «роль — переключение вьюх страницы, не значения параметра (это SegmentControl)». Варианта два: завести у Tab вид «сегментированный» или разрешить SegmentControl роль навигации с <span class="tk">role="tablist"</span>. Первое чище: семантика остаётся у роли, а не у внешнего вида.</li>
+      <li><b>Переполнение.</b> Рантайм <span class="tk">ds-tabs.js</span> умеет скролл и меню «Ещё» только для <span class="tk">.tabs--horiz</span>. Концепт 1 переполнение не переживает в принципе — трек не переносится; ему нужно правило «не более N пунктов». Концепту 3 переполнение придётся либо переиспользовать, либо тоже ограничить правилом.</li>
+      <li><b>Третий уровень.</b> Есть ли в продукте разделы с тремя уровнями вложенности? Если да — второй уровень нельзя занимать самой заметной механикой, иначе третьему не останется веса.</li>
+      <li><b>Первый уровень размера S.</b> В «Карточке сделки» ряд первого уровня собран на <span class="tk">.tab--s</span>. Если так остаётся — концепт 2 отпадает совсем, а второму уровню нужен размер XS, которого у Tab нет.</li>
+    </ol>
+
+    <h3>Что не вошло в тройку</h3>
+    <ol class="crit">
+      <li><b>Вертикальный рейл слева от содержимого</b> (Azure Portal, Salesforce Setup, Bloomberg). Честный ответ для 8+ подразделов с длинными названиями: подписи не режутся, порядок сканируется сверху вниз. Стоит рассмотреть отдельно — это уже не «табы», а разбиение экрана, и у ДС есть <span class="tk">.tabs--vert</span> и Splitter.</li>
+      <li><b>Выпадающий список рядом с заголовком раздела.</b> Когда подразделов много, а переключаются между ними редко: экономит вертикаль, но прячет состав раздела — нарушает «recognition rather than recall».</li>
+    </ol>
+
+    <h3>Источники</h3>
+    <ol class="crit">
+      <li><a href="https://m3.material.io/components/tabs/guidelines" target="_blank" rel="noopener">Material 3 · Tabs</a> — primary и secondary tabs, механика вложенности.</li>
+      <li><a href="https://www.nngroup.com/articles/tabs-used-right/" target="_blank" rel="noopener">NN/g · Tabs, Used Right</a> — правила применения табов и когда уровень второй лишний.</li>
+      <li><a href="https://www.w3.org/WAI/WCAG22/Understanding/use-of-color" target="_blank" rel="noopener">WCAG 2.2 · 1.4.1 Use of Color</a>, <a href="https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast" target="_blank" rel="noopener">1.4.11 Non-text Contrast</a>.</li>
+      <li><a href="https://lawsofux.com/hicks-law/" target="_blank" rel="noopener">Laws of UX · Hick's Law</a> — ёмкость ряда.</li>
+    </ol>
+  </section>
+</main>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-toc.js"></script>
+</body>
+</html>

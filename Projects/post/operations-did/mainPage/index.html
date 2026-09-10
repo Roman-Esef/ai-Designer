@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FIDELITY-GATE: N/A · нет исходного макета · 02.09.2026 -->
+<!-- FIDELITY-GATE: N/A · нет исходного макета · 10.09.2026 -->
 <html lang="ru">
 <head>
 <script>window.__DS_ROOT = '../../../../DS-IBP/';</script>
@@ -23,17 +23,13 @@
     pointer-events: none;
   }
 
-  /* 12-колоночная сетка: группа = колонка 3, 4 в ряд, перенос на следующий ряд.
-     Тайлы внутри колонки тянутся на её ширину (не фикс. 442px компонента) */
-  .home-groups {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 16px;
-    align-items: start;
-  }
+  /* Сетка групп — штатная .grid12 из ДС (12 колонок, зазор 16px). Экран своей
+     сетки не строит: ширину группы дают .col-3 (широкая) и .colw-6 (узкая),
+     см. Каркас экрана, раздел «Стартовая страница: состав и отступы».
+     Здесь остаётся только то, что сетке не принадлежит: подъём над фоновой
+     иллюстрацией (она абсолютная в .home-wrap) и внутренняя раскладка группы. */
+  .home-groups { position: relative; }
   .home-group {
-    grid-column: span 3;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -45,10 +41,15 @@
     color: var(--text-primary);
     margin: 0;
   }
-  /* перестроение: 4 колонки только при широкой рабочей области (rail-1920);
-     при закреплении панели (рабочая область уже) — 2 колонки, дальше 1 */
-  @container screen (max-width: 1700px) { .home-group { grid-column: span 6; } }
-  @container screen (max-width: 900px)  { .home-group { grid-column: span 12; } }
+  /* Перестроение: 4 колонки только при широкой рабочей области (rail-1920);
+     при закреплении панели (область уже) — 2 колонки, дальше 1.
+     Первый шаг — штатный механизм пары .col-N/.colw-N (Сетка и отступы).
+     Второй шаг парой не выражается и пишется экраном, но ОБЯЗАН иметь ту же
+     специфичность (0,2,0) и стоять ниже: правило пары — .grid12 > [class*="colw-"],
+     и «.home-group { span 12 }» (0,1,0) ему проиграло бы — на 900px группы
+     остались бы в 6 колонках. */
+  @container screen (max-width: 1700px) { .grid12 > [class*="colw-"] { grid-column: span var(--colw); } }
+  @container screen (max-width: 900px)  { .grid12 > .home-group { grid-column: span 12; } }
 </style>
 </head>
 <body>
@@ -65,7 +66,7 @@
     <main class="screen__content">
       <div class="home-wrap">
         <!-- тайлы строятся экранным скриптом из ibp-home.js по роли -->
-        <div class="home-groups" id="home-groups"></div>
+        <div class="grid12 home-groups" id="home-groups"></div>
       </div>
     </main>
   </div>
@@ -158,7 +159,7 @@
     IBPHome.itemsFor(role).forEach(function (g) {
       var tiles = g.items.filter(function (it) { return it.tile; });
       if (!tiles.length) return;
-      html += '<section class="home-group">';
+      html += '<section class="home-group col-3 colw-6">';
       html += '<h2 class="home-group__head">' + g.label + '</h2>';
       /* тайл целиком — ссылка на раздел; для собранных экранов подменяем первый
          href="#" (ссылка-обёртка тайла) на реальный путь (разметка — IBPHome.tileHTML) */

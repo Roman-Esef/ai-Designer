@@ -3,9 +3,9 @@ screen: mainPage
 title: Главная страница
 file: Projects/post/operations-did/mainPage/index.html
 source: DS-IBP/uploads/1920_Dashboard_Финансист ДИД.png (референс), решение пользователя 01.09.2026 (роли, состав)
-version: "1.003"
+version: "1.004"
 created: "01.09.2026"
-updated: "03.09.2026"
+updated: "10.09.2026"
 design_system: IBP DS
 components: [Layout, NavPanel, Breadcrumbs, NavTile, Illustrations, Modal, Badge, Avatar, IconButton]
 ---
@@ -62,14 +62,24 @@ components: [Layout, NavPanel, Breadcrumbs, NavTile, Illustrations, Modal, Badge
 - Каркас Layout: `nav-layout` → панель `.nav.nav--rail` + `.screen` →
   `.crumbs` (44px, крошка «Главная» — текущая страница) → `main.screen__content`
   (поля 24px).
-- 12-колоночная сетка `.home-groups` (гэп 16px): **группа = колонка `span 3`**,
-  4 группы в ряд; пятая и далее переносятся под первую/вторую.
+- Сетка — штатная `.grid12` из ДС (12 колонок, зазор 16px). Своей сетки экран
+  не строит (с 10.09.2026; до этого была собственная `repeat(12, 1fr)`, за что
+  линтер держал `WARN L3`). Ширину группы дают классы разметки:
+  **`.home-group col-3 colw-6`** — 3 колонки широко, 6 на узком шаге; 4 группы
+  в ряд, пятая и далее переносятся под первую/вторую.
+- Класс `.home-groups` остался на том же узле рядом с `.grid12`, но держит
+  только `position: relative` — подъём сетки над фоновой иллюстрацией
+  (она абсолютная в `.home-wrap`). Раскладку он больше не задаёт.
 - Внутри колонки `.home-group` — заголовок группы (h5 Strong) + тайлы
   (NavTile, тянутся на ширину колонки) с вертикальным гэпом 16px.
-- Перестроение: `@container screen (max-width: 1700px)` → колонки `span 6`,
-  `900px` → `span 12`. 4 колонки — только при рабочей области >1700px
-  (rail-1920 и drawer-1920: область 1864px); при закреплении панели
-  (fixed-1920: область 1648px) — 2 колонки.
+- Перестроение — три шага. Первые два даёт штатный механизм пары:
+  `@container screen (max-width: 1700px) { .grid12 > [class*="colw-"] { grid-column: span var(--colw) } }`.
+  Третий (`900px` → `span 12`) парой не выражается и написан экраном —
+  **обязательно с той же специфичностью (0,2,0) и ниже по файлу**:
+  `.grid12 > .home-group`. Написанный как `.home-group` (0,1,0), он проиграл бы
+  правилу пары, и на 900px группы остались бы в 6 колонках.
+  4 колонки — только при рабочей области >1700px (rail-1920 и drawer-1920:
+  область 1864px); при закреплении панели (fixed-1920: область 1648px) — 2.
 - Фоновая иллюстрация `background-illustration.svg` (1066×777) — только на
   главной, `background-size: cover` за контентом (`opacity .6`).
 
