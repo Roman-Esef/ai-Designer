@@ -2551,7 +2551,7 @@ Column                                   fields{}      значения поль
         pendingCol = null;
         sync();
       }
-      if (window.DSModal) DSModal.close(document.getElementById('kb-confirm'));
+      if (window.DSModal) DSModal.closeTop();
       return;
     }
     var col = e.target.closest('[data-kb-collapse]');

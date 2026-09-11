@@ -2,7 +2,7 @@
 type: rules
 title: Правила работы с дизайн-системой IBP
 scope: подключается через instructions в opencode.json — в контексте всех агентов
-updated: "29.08.2026"
+updated: "11.09.2026"
 ---
 
 # Дизайн-система IBP — правила работы (opencode)
@@ -126,12 +126,13 @@ JavaScript вместо рантайма ДС не пишется.**
 
 **Атомы:** Avatar · Badge · Buttons · Checkbox · Chip · Divider · IconButton · LabelHelper · Link · ProgressBar · Radiobutton · Skeleton · Spinner · Switch
 
-**Молекулы:** Alert · Breadcrumbs · ButtonGroup · ContextMenu · DatePicker · DropdownList · EmptyState · InputAmountRange · InputAutocomplete · InputDate · InputDateRange · InputText · NavTile · Pagination · ReadOnlyField · SegmentControl · Splitter · Tab · Toast · Tooltip
+**Молекулы:** Alert · Breadcrumbs · ButtonGroup · ContextMenu · DatePicker · DropdownList · EmptyState · InputAmountRange · InputAutocomplete · InputDate · InputDateRange · InputText · NavTile · Pagination · ReadOnlyField · SegmentControl · Splitter · SubTab · Tab · Toast · Tooltip
 
 **Организмы:** AllocationBar · Chart · Entity · Modal · NavPanel · PageHeader · Popover · RiskMetric · SnackBar · Table · TableCell · TableFilter · Tile
 
 **Созависимые части (собираются вместе, как чип+поповер у RiskMetric):**
 - **TableFilter** — кнопка «Фильтр» и модалка фильтра `.tfm` неотъемлемы: собираешь фильтр — собираешь и модалку (`.tfm__nav` + `.tfm__panel` + `.tfm__sec` + `.tfm__grid`). Структура — ДС, данные (какие секции/поля/пресеты) — потребитель. Вторичная кнопка подвала — «Очистить фильтр», не «Очистить». Собственный CSS на форму фильтра не пишется.
+- **SubTab — только под Tab, и только внутри него.** Табы второго уровня (`.subtabs` / `.subtab`) применяются **исключительно на экране, где есть ряд табов первого уровня** (`.tabs--horiz` с `.tab`), и размещаются **как содержимое одного из табов первого уровня** — под его рядом, а не отдельной панелью экрана. Одиночный `.subtabs` без первого уровня — дефект: механика заливки сама по себе не сообщает, что уровень подчинённый, и экран читается как один уровень навигации с необычным видом. Нужен одиночный ряд переключения вьюх — это **Tab**; нужен выбор значения параметра (период, единицы, режим показа) — **SegmentControl**. **Размер — в пару к первому уровню и не крупнее его.** Шкала общая с Tab: `.subtabs--m` 40 · `.subtabs--s` 32 · `.subtabs--xs` 24 (без класса — S). Рекомендованный выбор — шаг вниз: `.tab--m` → `.subtabs--s`, `.tab--s` → `.subtabs--xs`. Равный размер допустим, когда второй уровень — главный переключатель экрана. Второй уровень **крупнее** первого — инверсия иерархии, запрещено. Эту половину правила линтер НЕ стережёт — сверять на приёмке. Ёмкость ряда — **2–5 пунктов**: переполнения у компонента нет by design (трек не переносится и не скроллится), 6+ подразделов собираются на `.tab--s` + `.tabs--bare`. Ловится линтером, правило `B14` (BLOCKER).
 
 ## 7. Обращение с неизвестным
 

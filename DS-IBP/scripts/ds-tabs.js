@@ -1,10 +1,12 @@
 /* =========================================================================
-   DS Tabs — рантайм табов и сегмент-контрола (out-of-box).
-   Зависимости: styles/tab.css, styles/segment-control.css.
+   DS Tabs — рантайм табов, сегмент-контрола и табов второго уровня (out-of-box).
+   Зависимости: styles/tab.css, styles/segment-control.css, styles/sub-tab.css.
 
-   Общее у Tab и SegmentControl — roving tabindex и навигация стрелками;
+   Общее у Tab, SegmentControl и SubTab — roving tabindex и навигация стрелками;
    различаются разметкой (role/атрибут выбора) и тем, что у сегмент-контрола
-   есть измеряемый индикатор (thumb), а у табов — переполнение.
+   есть измеряемый индикатор (thumb), а у табов — переполнение. У SubTab нет
+   ни того, ни другого: выбранный сегмент красится сам, а трек не переносится
+   и не скроллится — ёмкость ряда держит правило применения, а не рантайм.
 
    Переполнение горизонтальных табов — из коробки, включено в tabs():
    ряд шире контейнера сам получает паттерн переполнения — по умолчанию скролл со
@@ -17,8 +19,9 @@
    Экспорт: window.DSTabs = {
      tabs(el, opts) → api          — группа .tabs[role="tablist"]
      segment(el, opts) → api       — контрол .segctrl[role="radiogroup"]
+     subtabs(el, opts) → api       — ряд второго уровня .subtabs[role="tablist"]
      positionThumb(el)             — пересчитать индикатор сегмент-контрола
-     wireAll(root)                 — обойти [data-tabs] и [data-segctrl]
+     wireAll(root)                 — обойти [data-tabs], [data-segctrl], [data-subtabs]
    }
    api: { el, items() → [], select(elOrIndex), value() → index, refresh(),
           overflow — { mode, refresh() } у горизонтальных групп (или null) }
@@ -27,26 +30,29 @@
      <div class="tabs tabs--horiz" role="tablist" data-tabs>…</div>
      <div class="tabs tabs--horiz" role="tablist" data-tabs data-tabs-overflow="menu">…</div>
      <div class="segctrl" role="radiogroup" aria-label="Период" data-segctrl>…</div>
+     <div class="subtabs" role="tablist" aria-label="Подразделы" data-subtabs>…</div>
    opts.onChange(index, el) — коллбэк при смене выбора.
    ========================================================================= */
 (function () {
   'use strict';
 
-  function disabled(el) {
+  /* cls — класс форс-состояния витрины своего компонента (у каждого свой);
+     рабочее состояние на экране передаётся атрибутом aria-disabled */
+  function disabled(el, cls) {
     return el.disabled
       || el.getAttribute('aria-disabled') === 'true'
-      || el.classList.contains('tab--disabled');
+      || el.classList.contains(cls || 'tab--disabled');
   }
 
   /* общий движок: roving tabindex + стрелки/Home/End с активацией на месте */
   function roving(host, cfg) {
     function items() { return Array.prototype.slice.call(host.querySelectorAll(cfg.itemSel)); }
-    function live() { return items().filter(function (b) { return !disabled(b); }); }
+    function live() { return items().filter(function (b) { return !disabled(b, cfg.disClass); }); }
 
     function select(target, silent) {
       var list = items();
       var el = typeof target === 'number' ? list[target] : target;
-      if (!el || disabled(el)) return null;
+      if (!el || disabled(el, cfg.disClass)) return null;
       list.forEach(function (b) {
         var on = b === el;
         b.setAttribute(cfg.selAttr, String(on));
@@ -71,7 +77,7 @@
 
     host.addEventListener('click', function (e) {
       var btn = e.target.closest ? e.target.closest(cfg.itemSel) : null;
-      if (btn && host.contains(btn) && !disabled(btn)) select(btn);
+      if (btn && host.contains(btn) && !disabled(btn, cfg.disClass)) select(btn);
     });
 
     host.addEventListener('keydown', function (e) {
@@ -148,6 +154,27 @@
       if (mode !== 'none') api.overflow = wireOverflow(host, mode === 'menu' ? 'menu' : 'scroll', opts);
     }
     host.__dsTabs = api;
+    return api;
+  }
+
+  /* --------------------------------------------------------------------- */
+  /* SubTab — ряд второго уровня.                                            */
+  /* От tabs() отличается только тем, чего здесь НЕТ: переполнения и         */
+  /* подскролла выбранного. Трек не переносится и не скроллится by design —  */
+  /* ёмкость ряда (2–5 пунктов) держит правило применения, а не рантайм.     */
+  /* Выбранный сегмент красит CSS по [aria-selected], индикатор не измеряется.*/
+  /* --------------------------------------------------------------------- */
+  function subtabs(host, opts) {
+    if (!host || host.__dsSubtabs) return host && host.__dsSubtabs;
+    opts = opts || {};
+    var api = roving(host, {
+      itemSel: '.subtab',
+      selAttr: 'aria-selected',
+      selClass: 'subtab--selected',
+      disClass: 'subtab--disabled',
+      onChange: opts.onChange,
+    });
+    host.__dsSubtabs = api;
     return api;
   }
 
@@ -299,6 +326,7 @@
     root = root || document;
     root.querySelectorAll('[data-tabs]').forEach(function (el) { tabs(el); });
     root.querySelectorAll('[data-segctrl]').forEach(function (el) { segment(el); });
+    root.querySelectorAll('[data-subtabs]').forEach(function (el) { subtabs(el); });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { wireAll(document); });
@@ -327,5 +355,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { registerTrunc(); if (truncatedHandle) truncatedHandle.refresh(document); });
   else { registerTrunc(); if (truncatedHandle) truncatedHandle.refresh(document); }
 
-  window.DSTabs = { tabs: tabs, segment: segment, positionThumb: positionThumb, wireAll: wireAll };
+  window.DSTabs = { tabs: tabs, segment: segment, subtabs: subtabs, positionThumb: positionThumb, wireAll: wireAll };
 })();

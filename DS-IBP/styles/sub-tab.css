@@ -1,0 +1,175 @@
+/* =========================================================================
+   Design System — SubTab (табы второго уровня)
+
+   Навигация по подразделам ВНУТРИ раздела первого уровня. Не самостоятельный
+   компонент: применяется только на экране, где есть ряд табов первого уровня
+   (Tab, .tabs--horiz), и стоит под ним — как содержимое выбранного раздела.
+   Одиночный ряд .subtabs без первого уровня — дефект (правило B14 линтера).
+
+   Чем отличается от соседей:
+   - Tab            — навигация по вьюхам страницы; рейл + подчёркивание,
+                      переполнение (скролл / меню «Ещё»), размеры M и S.
+   - SegmentControl — выбор ЗНАЧЕНИЯ параметра, role="radiogroup";
+                      трек ВЫШЕ сегмента на свой паддинг (M: 34+2×3=40),
+                      выбор — плавающая белая таблетка (thumb) с тенью.
+   - SubTab         — навигация (role="tablist"), но сегментированный вид:
+                      высота трека РАВНА высоте сегмента, паддинга трека нет,
+                      поэтому выбранный сегмент закрашен акцентом от края до
+                      края и обводки трека вокруг него не остаётся.
+                      Скругление задаёт трек через overflow:hidden.
+
+   Sizes:   m (40) · s (32) · xs (24). Размер второго уровня НЕ КРУПНЕЕ
+            первого: шаг вниз — рекомендованный выбор (Tab M → SubTab S,
+            Tab S → SubTab XS), равный размер допустим, крупнее — инверсия
+            иерархии и запрещено. Правило держится текстом, не линтером.
+   States:  default · hover = focus · selected · selected+hover · disabled
+   Slots:   label · счётчик (атом Badge, .badge--neutral; размер плашки идёт
+            за размером ряда: M → .badge--xs, S и XS → .badge--xxs)
+   Ёмкость: 2–5 пунктов. Переполнения нет by design: трек не переносится
+            и не скроллится.
+   Requires: typography.css, colors.css, radius.css, spacing.css, badge.css
+   Runtime:  scripts/ds-tabs.js — хук data-subtabs (DSTabs.subtabs)
+   ========================================================================= */
+
+/* Парные `[hidden]` — правило B11 линтера. Браузерное `[hidden] {display:none}`
+   приходит из UA-стиля со специфичностью (0,0,0), а правила ниже — (0,1,0):
+   класс побеждает, и атрибут `hidden` молча перестаёт работать. */
+.subtabs[hidden],
+.subtab[hidden] { display: none; }
+
+/* ---------- трек ----------------------------------------------------------- */
+.subtabs {
+  /* размерные токены — переопределяются модификатором размера ниже.
+     Значения по умолчанию = S, а не M: базовый размер компонента — тот,
+     что стоит в паре с базовым первым уровнем. Базовый Tab — M (40), шаг
+     вниз от него — S (32). У Tab и SegmentControl корень по умолчанию M по
+     этой же логике: там M и есть их базовый случай. */
+  --sub-h: 32px;
+  --sub-px: var(--space-12);
+  --sub-gap: var(--space-6);
+  --sub-font: var(--type-body-s);
+  --sub-radius: var(--radius-control);
+
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;                       /* сегменты вплотную: границу рисует разделитель */
+  flex-wrap: nowrap;            /* ряд не переносится — ёмкость держит правило, не вёрстка */
+  background: var(--st-system-light);
+  border-radius: var(--sub-radius);
+  overflow: hidden;             /* скругление заливки крайних сегментов */
+}
+
+/* ---------- размеры --------------------------------------------------------
+   Высота трека РАВНА высоте сегмента во всех трёх размерах — паддинга у трека
+   нет ни в одном, это определяющая черта компонента.
+
+   M и S совпадают с размерным рядом Tab (40 / 32 и те же кегли) не случайно:
+   компоненты стоят в паре на одном экране, и шаг «второй уровень на размер
+   ниже первого» возможен только при общей шкале. XS берёт паддинг и кегль у
+   .segctrl--xs — единственного XS-контрола с треком в системе.
+
+   Радиус: M и S — --radius-control (8), XS — --radius-control-s (6): токен
+   заведён ровно для мелких контролов (кнопка XS, чип XS, icon-button S),
+   а 8px на высоте 24 читается переслащённым.
+
+   Размер объявляется на ТРЕКЕ, а не на сегменте (как у SegmentControl, не как
+   у Tab): сегмент SubTab вне трека не существует, и разметке хватает одного
+   класса.                                                                    */
+.subtabs--m {
+  --sub-h: 40px; --sub-px: var(--space-16); --sub-gap: var(--space-8);
+  --sub-font: var(--type-body-m); --sub-radius: var(--radius-control);
+}
+.subtabs--s {
+  --sub-h: 32px; --sub-px: var(--space-12); --sub-gap: var(--space-6);
+  --sub-font: var(--type-body-s); --sub-radius: var(--radius-control);
+}
+.subtabs--xs {
+  --sub-h: 24px; --sub-px: var(--space-8); --sub-gap: var(--space-4);
+  --sub-font: var(--type-body-xs); --sub-radius: var(--radius-control-s);
+}
+
+/* ---------- сегмент -------------------------------------------------------- */
+.subtab {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sub-gap);
+  height: var(--sub-h);
+  padding: 0 var(--sub-px);
+  border: 0;
+  border-radius: 0;             /* форму крайним задаёт трек, а не сегмент */
+  background: transparent;
+  color: var(--text-secondary);
+  font: var(--sub-font);
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+/* Подпись НЕ усекается: ни overflow:hidden, ни text-overflow здесь нет.
+   Второй уровень несёт короткие метки подразделов; ряд из длинных подписей
+   просто становится шире — и это сигнал сократить подписи, а не повод
+   включать многоточие. Раз усечения нет, не нужен и тултип на нём. */
+.subtab__label { white-space: nowrap; }
+.subtab .badge { flex: none; }
+
+/* ---------- разделитель между соседними невыбранными ----------------------- */
+.subtab::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 1px;
+  background: var(--border-primary);
+}
+/* гаснет: у первого, у выбранного и его правого соседа, вокруг наведённого */
+.subtab:first-child::before,
+.subtab:is(.subtab--selected, [aria-selected="true"])::before,
+.subtab:is(.subtab--selected, [aria-selected="true"]) + .subtab::before,
+.subtab:hover::before,
+.subtab:hover + .subtab::before { opacity: 0; }
+
+/* ---------- состояния ------------------------------------------------------
+   Красим напрямую по [aria-selected] / [aria-disabled] — классы --selected и
+   --disabled нужны только для форс-состояний витрины (как у Tab, RulesAudit W1).
+   Hover = focus: единая заливка, держится после клика, пока курсор не ушёл. */
+.subtab:hover,
+.subtab.is-hover {
+  background: var(--primary-bg);
+  color: var(--text-primary);
+}
+
+.subtab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;         /* внутрь: трек с overflow:hidden срезал бы внешнее кольцо */
+}
+
+.subtab--selected,
+.subtab[aria-selected="true"] {
+  background: var(--primary);
+  color: var(--text-on-dark);
+}
+.subtab--selected:hover,
+.subtab--selected.is-hover,
+.subtab[aria-selected="true"]:hover,
+.subtab[aria-selected="true"].is-hover {
+  background: var(--primary-dark);
+  color: var(--text-on-dark);
+}
+/* кольцо --primary на заливке --primary невидимо — на выбранном оно светлое */
+.subtab--selected:focus-visible,
+.subtab[aria-selected="true"]:focus-visible { outline-color: var(--text-on-dark); }
+
+.subtab--disabled,
+.subtab[aria-disabled="true"] {
+  background: transparent;
+  color: var(--text-inactive);
+  cursor: not-allowed;
+  pointer-events: none;
+}

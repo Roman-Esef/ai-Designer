@@ -61,6 +61,7 @@
             { label: 'ReadOnlyField',    href: 'pages/molecules/ReadOnlyField.html' },
             { label: 'SegmentControl',   href: 'pages/molecules/SegmentControl.html' },
             { label: 'Splitter',         href: 'pages/molecules/Splitter.html' },
+            { label: 'SubTab',           href: 'pages/molecules/SubTab.html' },
             { label: 'Tab',              href: 'pages/molecules/Tab.html' },
             { label: 'Toast',            href: 'pages/molecules/Toast.html' },
             { label: 'Tooltip',          href: 'pages/molecules/Tooltip.html' }
@@ -71,7 +72,9 @@
           items: [
             { label: 'AllocationBar', href: 'pages/organisms/AllocationBar.html' },
             { label: 'Chart',    href: 'pages/organisms/Chart.html' },
+            { label: 'Drawer',   href: 'pages/organisms/Drawer.html' },
             { label: 'Entity',     href: 'pages/organisms/Entity.html' },
+            { label: 'Kanban',   href: 'pages/organisms/Kanban.html' },
             { label: 'Modal',    href: 'pages/organisms/Modal.html' },
             { label: 'NavPanel', href: 'pages/organisms/NavPanel.html' },
             { label: 'PageHeader', href: 'pages/organisms/PageHeader.html' },

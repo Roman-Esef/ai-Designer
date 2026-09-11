@@ -271,3 +271,73 @@
 @media (prefers-reduced-motion: reduce) {
   .tile__chevron { transition: none; }
 }
+
+/* ------------------------------------------------------------
+   Card — родственник Tile с хэдером типа Card.
+   Тип TileHeader и определяет, чем становится тайл: TileHeader M —
+   плашка рабочей области, без хэдера — TileHeadless, TileHeader Card —
+   карточка. Отличия от Tile: Title на ступень ниже (H6 Strong вместо
+   H5 Strong), отступы контента 8/16/20/16 вместо 10/20/24/20 и —
+   главное — СВОИ интерактивные состояния, которых у Tile нет.
+
+   Применение: карточка в модальном окне, в списке и на канбан-доске.
+   Alert-слот у Card не предполагается.
+
+   Состояния (набор объявлен в документации Tile с самого начала):
+   Default · Hover · Active · Move · Disabled. Move — состояние
+   перетаскивания: карточка схвачена и следует за указателем.
+   Имена служебных классов — как у IconButton (.is-hover / .is-pressed):
+   они нужны, чтобы показать состояние статично в документации.
+   ------------------------------------------------------------ */
+.tile--card {
+  --tile-pad-x: 16px;
+  --tile-pad-bottom: 20px;
+
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.tile--card > .tile__header {
+  padding: 16px var(--tile-pad-x) 8px;
+}
+.tile--card > .tile__body {
+  padding: 8px var(--tile-pad-x) var(--tile-pad-bottom);
+}
+/* Title Card — H6 Strong (16/20). Клэмп 2 строки и усечение уже заданы
+   у .tile__title, здесь меняется только ступень шрифта. */
+.tile--card .tile__title {
+  font: var(--type-h6-strong);
+}
+
+/* Hover */
+.tile--card:hover,
+.tile--card.is-hover {
+  background: var(--bgtable-row-hover);
+  border-color: var(--border-primary);
+}
+/* Active — нажатие */
+.tile--card:active,
+.tile--card.is-pressed {
+  background: var(--bgtable-row-focus);
+  border-color: var(--border-dark);
+}
+.tile--card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+/* Move — карточка схвачена и едет за указателем */
+.tile--card.is-move {
+  background: var(--bg-tile);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-modal-form);
+  cursor: grabbing;
+}
+/* Disabled — карточка недоступна: роль не вправе её трогать */
+.tile--card[aria-disabled="true"],
+.tile--card.is-disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile--card { transition: none; }
+}

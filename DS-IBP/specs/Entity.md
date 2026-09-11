@@ -2,7 +2,7 @@
 component: Entity
 title: "Entity"
 version: "1.007"
-updated: "05.09.2026"
+updated: "11.09.2026"
 page: pages/organisms/Entity.html
 css: styles/entity.css
 deps: [avatar, chip, icon-button, button, badge]

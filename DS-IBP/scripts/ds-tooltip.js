@@ -415,6 +415,14 @@
     doc.addEventListener('pointerover', function (e) {
       var el = findHover(e.target);
       if (!el || el.__dsTrunc) return;
+      /* Усечение проверяется ДО attachTrunc, а не только внутри show().
+         attachTrunc строит разметку: оборачивает подпись в .tip-anchor и
+         кладёт рядом .tip. Для неусечённой подписи тултип потом не покажется
+         (allowed() = truncatedOnly && isTruncated), но узлы уже вставлены и
+         остаются в DOM навсегда. Страница без styles/tooltip.css рисует такой
+         .tip обычным текстом — подпись таба/чипа дублируется по наведению.
+         Ветки focusin и refresh() проверяли усечение изначально, эта — нет. */
+      if (!isTruncated(el)) return;
       var api = attachTrunc(el, o);
       if (api) api.show(false);
     }, true);
