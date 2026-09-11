@@ -2,7 +2,7 @@
 component: Tab
 title: "Tab"
 version: "1.012"
-updated: "05.09.2026"
+updated: "11.09.2026"
 page: pages/molecules/Tab.html
 page_js: scripts/tab.page.js
 runtime: scripts/ds-tabs.js (+ scripts/ds-tooltip.js — тултип усечённой подписи)

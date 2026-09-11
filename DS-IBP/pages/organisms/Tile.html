@@ -140,8 +140,8 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     Обзор компонентов
   </a>
   <div class="meta">
-    <span>Версия <b>1.011</b></span>
-    <span>Обновлено <b>05.09.2026</b></span>
+    <span>Версия <b>1.012</b></span>
+    <span>Обновлено <b>10.09.2026</b></span>
     <span>CSS <b>styles/tile.css</b></span>
     <span>Зависимости <b>icon-button, button, link, chip, badge, alert, divider, read-only-field, table-cell</b></span>
   </div>
@@ -383,6 +383,111 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
   </div>
 
   <div class="subsec">
+    <h3>Card</h3>
+    <p class="desc tight">Родственник с хэдером типа Card: Title на ступень ниже (<code class="tok">--type-h6-strong</code>, 16/20 вместо 18/24), отступы контента 8/16/20/16 вместо 10/20/24/20 и — главное — <b>собственные интерактивные состояния</b>, которых у Tile нет. Применяется в модальных окнах, списках и на канбан-доске. Alert-слот у Card не предполагается.</p>
+    <p class="desc tight">Класс — модификатор <code class="tok">.tile--card</code>: вся анатомия TileHeader (<code class="tok">.tile__header-main</code>, <code class="tok">.tile__title-row</code>, <code class="tok">.tile__chiplist</code>, <code class="tok">.tile__actions</code>) остаётся той же, меняются геометрия, ступень заголовка и набор состояний. Пример сборки на нём — организм <a class="inl" href="Kanban.html">Kanban</a>.</p>
+    <div class="stagebg">
+      <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;">
+        <div>
+          <div class="tile tile--card" style="width:264px;">
+            <div class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h4 class="tile__title">ООО «ЮгСтрой» — мезонин</h4></div>
+                <div class="tile__chiplist"><span class="chip chip--xs chip--rounded"><span class="chip__label">Повышенный риск</span></span></div>
+              </div>
+              <div class="tile__actions">
+                <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="В избранное" aria-pressed="false"><i data-icon="star"></i></button>
+              </div>
+            </div>
+            <div class="tile__body">
+              <div class="tl-fieldgrid">
+                <div class="rof"><span class="ds-label"><span class="ds-label__text">Сумма</span></span><div class="rof__row"><span class="rof__value">1 250 000 000 ₽</span></div></div>
+              </div>
+            </div>
+          </div>
+          <p class="ws-cap" style="margin-top:8px">Default</p>
+        </div>
+        <div>
+          <div class="tile tile--card is-hover" style="width:264px;">
+            <div class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h4 class="tile__title">ООО «ЮгСтрой» — мезонин</h4></div>
+                <div class="tile__chiplist"><span class="chip chip--xs chip--rounded"><span class="chip__label">Повышенный риск</span></span></div>
+              </div>
+              <div class="tile__actions">
+                <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="В избранное" aria-pressed="false"><i data-icon="star"></i></button>
+              </div>
+            </div>
+            <div class="tile__body">
+              <div class="tl-fieldgrid">
+                <div class="rof"><span class="ds-label"><span class="ds-label__text">Сумма</span></span><div class="rof__row"><span class="rof__value">1 250 000 000 ₽</span></div></div>
+              </div>
+            </div>
+          </div>
+          <p class="ws-cap" style="margin-top:8px">Hover</p>
+        </div>
+        <div>
+          <div class="tile tile--card is-pressed" style="width:264px;">
+            <div class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h4 class="tile__title">ООО «ЮгСтрой» — мезонин</h4></div>
+                <div class="tile__chiplist"><span class="chip chip--xs chip--rounded"><span class="chip__label">Повышенный риск</span></span></div>
+              </div>
+              <div class="tile__actions">
+                <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="В избранное" aria-pressed="false"><i data-icon="star"></i></button>
+              </div>
+            </div>
+            <div class="tile__body">
+              <div class="tl-fieldgrid">
+                <div class="rof"><span class="ds-label"><span class="ds-label__text">Сумма</span></span><div class="rof__row"><span class="rof__value">1 250 000 000 ₽</span></div></div>
+              </div>
+            </div>
+          </div>
+          <p class="ws-cap" style="margin-top:8px">Active</p>
+        </div>
+        <div>
+          <div class="tile tile--card is-move" style="width:264px;">
+            <div class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h4 class="tile__title">ООО «ЮгСтрой» — мезонин</h4></div>
+                <div class="tile__chiplist"><span class="chip chip--xs chip--rounded"><span class="chip__label">Повышенный риск</span></span></div>
+              </div>
+              <div class="tile__actions">
+                <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="В избранное" aria-pressed="false"><i data-icon="star"></i></button>
+              </div>
+            </div>
+            <div class="tile__body">
+              <div class="tl-fieldgrid">
+                <div class="rof"><span class="ds-label"><span class="ds-label__text">Сумма</span></span><div class="rof__row"><span class="rof__value">1 250 000 000 ₽</span></div></div>
+              </div>
+            </div>
+          </div>
+          <p class="ws-cap" style="margin-top:8px">Move — схвачена</p>
+        </div>
+        <div>
+          <div class="tile tile--card is-disabled" style="width:264px;">
+            <div class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h4 class="tile__title">ООО «ЮгСтрой» — мезонин</h4></div>
+                <div class="tile__chiplist"><span class="chip chip--xs chip--rounded"><span class="chip__label">Повышенный риск</span></span></div>
+              </div>
+              <div class="tile__actions">
+                <button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="В избранное" aria-pressed="false"><i data-icon="star"></i></button>
+              </div>
+            </div>
+            <div class="tile__body">
+              <div class="tl-fieldgrid">
+                <div class="rof"><span class="ds-label"><span class="ds-label__text">Сумма</span></span><div class="rof__row"><span class="rof__value">1 250 000 000 ₽</span></div></div>
+              </div>
+            </div>
+          </div>
+          <p class="ws-cap" style="margin-top:8px">Disabled</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec">
     <h3>С Alert-слотом</h3>
     <p class="desc tight">Полноширинный Alert между хэдером и контентом — статус, требующий внимания. Тона: Warning, Info, Error. В Card Alert-слот не предполагается.</p>
     <div class="stagebg" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px;">
@@ -502,11 +607,12 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
 <!-- 8. СОСТОЯНИЯ -->
 <section class="section" id="states" data-screen-label="Состояния">
   <h2>Состояния</h2>
-  <p class="desc">Tile собственных состояний <b>не имеет</b> — нет hover / active / selected у самого тайла. Интерактивны только вложенные элементы: IconButton в хэдере, а также Button и Link в алертах и контентной области. Состояния перетаскивания/выбора есть только у родственного компонента Card.</p>
+  <p class="desc">Tile собственных состояний <b>не имеет</b> — нет hover / active / selected у самого тайла. Интерактивны только вложенные элементы: IconButton в хэдере, а также Button и Link в алертах и контентной области. Состояния есть только у родственника <b>Card</b>: <code class="tok">.tile--card</code> — Default · Hover · Active · Move · Disabled, где Move — состояние перетаскивания.</p>
   <div class="panel">
     <ul class="bullets">
       <li><b>IconButton в хэдере</b> — собственные состояния Default / Hover / Focus / Disabled (см. IconButton).</li>
       <li><b>Button / Link в контенте и алертах</b> — состояния своих компонентов.</li>
+      <li><b>Card</b> (<code class="tok">.tile--card</code>) — единственный родственник со своими состояниями: <code class="tok">:hover</code> / <code class="tok">.is-hover</code>, <code class="tok">:active</code> / <code class="tok">.is-pressed</code>, <code class="tok">.is-move</code> (перетаскивание), <code class="tok">[aria-disabled="true"]</code> / <code class="tok">.is-disabled</code>. Служебные классы <code class="tok">.is-*</code> нужны, чтобы показать состояние статично в документации — как у IconButton.</li>
       <li><b>AccordionTile</b> — не состояние, а переключаемая конфигурация (collapsed / expanded) через <code class="tok">.tile--collapsed</code>.</li>
     </ul>
   </div>

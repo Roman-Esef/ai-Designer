@@ -1,0 +1,816 @@
+<!-- @dsCard group="Организмы" name="Drawer" viewport="1440x900" subtitle="Панель деталей у правого края экрана" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drawer — Дизайн-система</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/spacing.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/modal.css">
+<link rel="stylesheet" href="../../styles/drawer.css">
+<link rel="stylesheet" href="../../styles/tile.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/read-only-field.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/input.css">
+<link rel="stylesheet" href="../../styles/checkbox.css">
+<link rel="stylesheet" href="../../styles/context-menu.css">
+<link rel="stylesheet" href="../../styles/alert.css">
+<link rel="stylesheet" href="../../styles/chip.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/tooltip.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<style>
+/* Раскладка страницы документации. Токены ДС, своих значений нет. */
+a{color:var(--link);} a:hover{color:var(--link-dark);}
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:82ch;text-wrap:pretty;}
+.subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:32px 0 14px;}
+.tk{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text-secondary);background:var(--bgtable-row-focus);padding:var(--space-2) var(--space-6);border-radius:var(--radius-s);display:inline-block;}
+.crit{margin:0 0 28px;padding-left:22px;font:var(--type-body-m);color:var(--text-secondary);max-width:82ch;}
+.crit li{margin-bottom:8px;text-wrap:pretty;}
+
+/* демо в верхней панели сплиттера: слева список, справа встроенная панель */
+.dw-stage{flex:1;display:flex;min-height:0;background:var(--bg-page);border:1px solid var(--border-light);border-radius:var(--radius-2xl);padding:var(--space-16);width:100%;}
+.dw-scene{flex:1;display:flex;gap:var(--space-16);min-height:0;min-width:0;}
+.dw-scene__list{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--space-12);overflow:auto;}
+.dw-row--active{border-color:var(--primary);background:var(--primary-bg);}
+.ws-cap{font:var(--type-body-xs);color:var(--text-inactive);margin:12px 0 0;text-wrap:pretty;}
+
+/* анатомия: нумерованные маркеры на живом образце + легенда */
+.anat{display:flex;flex-direction:column;gap:28px;}
+.anat__stage{background:var(--bg-page);border:1px solid var(--border-light);border-radius:var(--radius-2xl);padding:32px 40px;display:flex;justify-content:center;overflow-x:auto;}
+.anat-dia{position:relative;display:inline-block;}
+.anat-dia .drawer{pointer-events:none;}
+.mk{position:absolute;width:22px;height:22px;border-radius:var(--radius-circle);background:var(--text-primary);color:var(--text-on-dark);font:600 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5;}
+.anat__legend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 28px;}
+@media(max-width:860px){.anat__legend{grid-template-columns:minmax(0,1fr);}}
+.anat__legend li{display:flex;gap:12px;align-items:flex-start;}
+.anat__legend .n{width:22px;height:22px;border-radius:var(--radius-circle);background:var(--primary);color:var(--text-on-dark);font:600 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;flex:none;margin-top:2px;}
+.anat__legend .d{font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty;min-width:0;}
+.anat__legend .d b{color:var(--text-primary);}
+
+/* сравнительные карточки «когда что» */
+.guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+.guide-card{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-2xl);padding:20px 24px;display:flex;flex-direction:column;gap:8px;}
+.guide-card__tag{font:var(--type-body-xs);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+.guide-card__body{font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty;}
+.guide-card__body b{color:var(--text-primary);}
+.pm{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;}
+.pm h4{font:var(--type-body-m-strong);color:var(--text-primary);margin:0 0 8px;}
+.pm ul{margin:0;padding-left:20px;font:var(--type-body-m);color:var(--text-secondary);}
+.pm li{margin-bottom:8px;text-wrap:pretty;}
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Drawer">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="46">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="dw-stage" id="pg-stage"></div>
+        <p class="ws-cap">Слева — список, справа — встроенная панель (<span class="tk">.drawer--inline</span>): живой слой во весь вьюпорт закрыл бы саму документацию. Открыть настоящим слоем — кнопка в разделе «Поведение». Настройки — во вкладке «Конструктор».</p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+  <a class="crumb" href="../../index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Обзор компонентов
+  </a>
+  <div class="meta">
+    <span>Версия: <b>1.000</b></span>
+    <span>Обновлено: <b>10.09.2026</b></span>
+    <span>CSS <b>styles/drawer.css</b></span>
+    <span>Рантайм <b>scripts/ds-drawer.js</b></span>
+  </div>
+  <div class="eyebrow">Дизайн-система · Организмы</div>
+  <h1>Drawer</h1>
+  <p class="lead">Панель деталей у правого края экрана поверх страницы. Отвечает на вопрос «что внутри вот этого объекта из списка», не уводя со списка: доска, реестр или дерево остаются на месте, и у объекта есть «следующий». Слой — общий с Modal: скрим, focus trap, Esc и возврат фокуса даёт <span class="tk">ds-modal.js</span>, своей копии этой логики Drawer не заводит.</p>
+</header>
+
+<!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#pg-stage),
+     контролы — во вкладку «Конструктор» нижней панели (см. в конце) -->
+
+<!-- 2. ИСПОЛЬЗОВАНИЕ -->
+<section class="section" id="usage" data-screen-label="Использование">
+  <h2>Использование</h2>
+  <p class="desc">Drawer, Modal и отдельная страница отвечают на разные вопросы, и подменять их друг другом — самая частая ошибка при проектировании детального просмотра. Признак, по которому они делятся, один: что пользователь будет делать сразу после того, как закончит с этим объектом.</p>
+
+  <div class="guide">
+    <div class="guide-card">
+      <div class="guide-card__tag">Drawer</div>
+      <div class="guide-card__body">Пользователь <b>остаётся в списке</b> и будет открывать соседние объекты подряд: карточка на доске, строка реестра, узел дерева. Список виден краем глаза, контекст «где я» не теряется, закрытие ничего не отменяет и не сохраняет.</div>
+    </div>
+    <div class="guide-card">
+      <div class="guide-card__tag">Modal</div>
+      <div class="guide-card__body">Задачу надо <b>закончить или бросить</b>: форма создания, подтверждение удаления, мастер из шагов. Список в этот момент не нужен, а иногда и вреден — он провоцирует уйти, не закончив.</div>
+    </div>
+    <div class="guide-card">
+      <div class="guide-card__tag">Отдельная страница</div>
+      <div class="guide-card__body">У объекта <b>своя навигация и свой адрес</b>: вкладки, история, документы, ссылка, которую отправляют коллеге. Панель на 595px такого объёма не выдержит, а ссылку на неё не пришлёшь.</div>
+    </div>
+  </div>
+
+  <div class="subhead">Когда панель — неверный выбор</div>
+  <ul class="crit">
+    <li><b>Внутри панели начинается длинная форма.</b> Панель шириной 595px даёт одну колонку полей; форма на 20 полей в ней превращается в вертикальный тоннель. Такую форму открывают модалкой в 6–8 колонок или отдельной страницей.</li>
+    <li><b>Пользователю нужно сравнить два объекта.</b> Панель модальна: пока она открыта, список под скримом недоступен. Сравнение — это задача таблицы с колонками, а не двух панелей подряд.</li>
+    <li><b>На объект нужно сослаться.</b> У панели нет своего адреса. Если коллеге отправляют ссылку «посмотри вот это» — нужна страница.</li>
+    <li><b>Панель открывается из панели.</b> Второй уровень деталей внутри первого — признак того, что иерархия объектов не разобрана. Вложенным слоем поверх панели открывают форму (например, «Новое поле»), но не второй просмотр.</li>
+  </ul>
+</section>
+
+<!-- 3. АНАТОМИЯ -->
+<section class="section" id="anatomy" data-screen-label="Анатомия">
+  <h2>Анатомия</h2>
+  <p class="desc">Панель — три зоны по вертикали: закреплённая шапка, прокручиваемое тело из секций и необязательный закреплённый подвал. Прокручивается только тело: шапка обязана оставаться на месте, иначе на длинном списке полей теряется ответ на вопрос «чью карточку я читаю».</p>
+
+  <div class="anat">
+    <div class="anat__stage"><div class="anat-dia" id="anat-drawer"></div></div>
+    <ul class="anat__legend">
+      <li><span class="n">1</span><span class="d"><b>Путь</b> — крошка «раздел → идентификатор». Обязателен, когда панель открыта из списка: без него через минуту работы непонятно, чей объект открыт.</span></li>
+      <li><span class="n">2</span><span class="d"><b>Заголовок</b> — имя объекта. Переносится на вторую строку, не обрезается: имя сделки длиннее строки — норма, а не край.</span></li>
+      <li><span class="n">3</span><span class="d"><b>Действия и закрытие</b> — 1–2 действия над объектом целиком и крестик. Крестик всегда крайний справа: это самая частая цель в панели.</span></li>
+      <li><span class="n">4</span><span class="d"><b>Заголовок секции</b> — тело делится на смысловые блоки, а не на один список из тридцати полей.</span></li>
+      <li><span class="n">5</span><span class="d"><b>Действие секции</b> — относится к секции, а не ко всей панели: «Добавить поле», «Изменить».</span></li>
+      <li><span class="n">6</span><span class="d"><b>Сетка значений</b> — пары «подпись — значение» на ReadOnlyField, две колонки; одна колонка, когда значения длинные.</span></li>
+      <li><span class="n">7</span><span class="d"><b>Подвал</b> — необязателен. Заводится там, где есть что подтверждать; панель просмотра закрывается крестиком.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 4. ВАРИАНТЫ -->
+<section class="section" id="variants" data-screen-label="Варианты">
+  <h2>Варианты</h2>
+  <p class="desc">Осей четыре, и все они — про то, сколько места и обязательств берёт на себя панель. Стороны среди осей нет: панель всегда справа.</p>
+
+  <h3>По ширине</h3>
+  <p class="desc">Шкала общая с Modal — шаг равен числу колонок сетки экрана. Панель и окно стоят в одном интерфейсе, и разные шкалы читались бы как две разные системы.</p>
+  <ul class="crit">
+    <li><span class="tk">.drawer--w3</span> · 442 — короткий просмотр: 4–6 значений, без подвала.</li>
+    <li><span class="tk">.drawer--w4</span> · 595 — <b>дефолт</b>: две колонки значений, 2–4 секции. Карточка сделки на доске.</li>
+    <li><span class="tk">.drawer--w5</span> · 747 — просмотр с таблицей или списком связанных объектов внутри.</li>
+    <li><span class="tk">.drawer--w6</span> · 900 — предел. Шире панели не бывает: от списка остаётся полоса, ради которой панель и затевалась.</li>
+  </ul>
+
+  <h3>По подвалу</h3>
+  <p class="desc">Без подвала — панель просмотра: закрывается крестиком, Esc или кликом мимо, ничего не подтверждается. С подвалом — панель, в которой есть необратимое или сохраняемое действие. Промежуточного состояния «подвал есть, но кнопок в нём нет» не бывает: пустая полоса внизу читается как сломанная вёрстка.</p>
+
+  <h3>По шапке</h3>
+  <p class="desc">С путём — панель открыта из списка, и путь отвечает «откуда». Без пути — панель открыта из единственного места, где она возможна, и крошка была бы шумом.</p>
+
+  <h3>По монтированию</h3>
+  <p class="desc"><span class="tk">.drawer-scrim</span> — рабочий вариант: слой поверх страницы. <span class="tk">.drawer--inline</span> — только витрины и превью документации: панель встраивается в статичный контейнер, без скрима и тени. На экранах продукта <span class="tk">--inline</span> не применяется.</p>
+</section>
+
+<!-- 5. РАЗМЕРЫ -->
+<section class="section" id="sizes" data-screen-label="Размеры">
+  <h2>Размеры</h2>
+  <p class="desc">Значения снимаются с живой панели через <span class="tk">getComputedStyle</span>, а не переписываются руками: расхождение таблицы с CSS невозможно по построению.</p>
+  <div class="tbl" id="redline-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
+  <p class="ws-cap">Высота панели — всегда 100% вьюпорта. <span class="tk">max-height</span> у Drawer нет, в отличие от Modal с его 80vh: панель прижата к краю и растёт во весь экран.</p>
+</section>
+
+<!-- 6. КОНТЕНТ -->
+<section class="section" id="content" data-screen-label="Контент">
+  <h2>Контент</h2>
+  <p class="desc">Панель читают глазами по вертикали, сверху вниз, и почти всегда — в поиске одного конкретного значения. Отсюда все правила ниже.</p>
+  <ul class="crit">
+    <li><b>Заголовок переносится, а не обрезается.</b> <span class="tk">text-wrap: pretty</span>. Усечённое имя сделки в панели, открытой ради этой сделки, — потеря главного.</li>
+    <li><b>Путь — две ступени, не больше.</b> «Колонка → идентификатор» или «Раздел → номер». Полная навигационная крошка здесь избыточна: пользователь пришёл из списка, который у него на глазах.</li>
+    <li><b>Секций 2–5.</b> Одна секция — значит секции не нужны вовсе. Больше пяти — панель превращается в страницу, и её надо ею сделать.</li>
+    <li><b>Пары «подпись — значение» — ReadOnlyField.</b> Своей вёрстки для значений панель не заводит: подпись, выравнивание, пустое значение и копирование уже решены в компоненте.</li>
+    <li><b>Две колонки — по умолчанию, одна — для длинных значений.</b> Перенос значения в узкой колонке ломает ритм сильнее, чем лишняя высота.</li>
+    <li><b>Пустое значение — прочерк, а не пустота.</b> Правило ReadOnlyField (<span class="tk">.rof--empty</span>): пустая строка неотличима от несработавшей загрузки.</li>
+    <li><b>Действия секции — глаголом и по месту.</b> «Добавить поле» стоит в заголовке той секции, куда поле добавится, а не в подвале панели.</li>
+  </ul>
+</section>
+
+<!-- 7. ПОВЕДЕНИЕ -->
+<section class="section" id="behavior" data-screen-label="Поведение">
+  <h2>Поведение</h2>
+  <p class="desc">Своего поведения у Drawer почти нет, и это осознанно. Слой — скрим, портал в <span class="tk">body</span>, блокировка прокрутки страницы, <span class="tk">inert</span> фона, focus trap, стек слоёв, Esc и возврат фокуса — целиком принадлежит <span class="tk">ds-modal.js</span>. Drawer добавляет к нему геометрию края и выезд.</p>
+
+  <p class="desc"><button type="button" class="btn btn--accent btn--m" data-drawer="dw-layer"><i data-icon="open-wide"></i><span class="btn__label">Открыть настоящим слоем</span></button> — та же панель, что собрана в конструкторе, но как слой поверх страницы: со скримом, ловушкой фокуса и закрытием по Esc.</p>
+
+  <div class="pm">
+    <div>
+      <h4>Открытие</h4>
+      <ul>
+        <li>Клик по <span class="tk">[data-drawer="id"]</span> — рантайм сам находит скрим, дописывает ему <span class="tk">.drawer-scrim</span> и открывает слой.</li>
+        <li>Программно — <span class="tk">DSDrawer.open(scrim, {returnFocus})</span>. Так панель открывает канбан по клику на карточке.</li>
+        <li>Выезд справа 200мс. <span class="tk">prefers-reduced-motion</span> его снимает: направление уже объяснено положением панели.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Закрытие</h4>
+      <ul>
+        <li>Крестик, любой <span class="tk">[data-modal-close]</span>, Esc, клик мимо панели.</li>
+        <li><span class="tk">data-drawer-guarded</span> на триггере — клик мимо не закрывает. Ставится там, где внутри есть несохранённый ввод: случайный клик по списку не должен стирать десять минут работы.</li>
+        <li>Фокус возвращается на элемент, из которого панель открыли. Не на начало страницы — иначе после закрытия пользователь теряет место в списке.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Слой поверх панели</h4>
+      <ul>
+        <li>Форма открывается вложенным слоем: <span class="tk">data-modal-nested</span>. Панель под ней остаётся открытой, скрим уплотняется.</li>
+        <li>Esc закрывает верхний слой, а не всё сразу: стек ведёт <span class="tk">ds-modal.js</span>.</li>
+        <li>Второй <b>просмотр</b> поверх первого — запрещён. Вложенным слоем открывают действие, а не ещё одну панель.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Прокрутка и адаптив</h4>
+      <ul>
+        <li>Прокручивается только <span class="tk">.drawer__body</span>. Шапка и подвал закреплены, при прокрутке у них появляется тень (<span class="tk">.is-scrolled</span>).</li>
+        <li>Ниже 640px панель занимает всю ширину и теряет скругление: 595px на узком экране оставляют от списка бесполезную полосу.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8. СОСТОЯНИЯ -->
+<section class="section" id="states" data-screen-label="Состояния">
+  <h2>Состояния</h2>
+  <p class="desc">Состояний у панели немного: она либо есть, либо её нет. Всё остальное — состояния её частей.</p>
+  <ul class="crit">
+    <li><b>Скрыта</b> — атрибут <span class="tk">hidden</span> на скриме. Парное правило <span class="tk">.drawer-scrim[hidden]</span> в CSS обязательно: без него класс (0,1,0) перебивает браузерное <span class="tk">[hidden]</span> (0,0,0), и «скрытая» панель рендерится открытой.</li>
+    <li><b>Открыта</b> — <span class="tk">hidden</span> снят, фон получил <span class="tk">inert</span>, фокус внутри панели.</li>
+    <li><b>Шапка · прокручено</b> — <span class="tk">.drawer__head.is-scrolled</span>: тень под шапкой усиливает разделительную линию, которая есть всегда. Класс ставит <span class="tk">DSModal.wireScroll</span>.</li>
+    <li><b>Подвал · есть, что ниже</b> — <span class="tk">.drawer__foot.is-scrolled</span>: тень сверху говорит, что тело прокручено не до конца.</li>
+    <li><b>Guarded</b> — клик мимо не закрывает. Визуального отличия нет намеренно: панель не должна выглядеть иначе от того, что в ней начали печатать.</li>
+  </ul>
+</section>
+
+<!-- 9. ДОСТУПНОСТЬ -->
+<section class="section" id="a11y" data-screen-label="Доступность">
+  <h2>Доступность</h2>
+  <ul class="crit">
+    <li><b>4.1.2 Имя, роль, значение.</b> На <span class="tk">.drawer</span> — <span class="tk">role="dialog"</span> и <span class="tk">aria-modal="true"</span>, имя — через <span class="tk">aria-labelledby</span> на заголовок. Триггеру рантайм сам ставит <span class="tk">aria-haspopup="dialog"</span> и <span class="tk">aria-controls</span>.</li>
+    <li><b>2.1.2 Фокус не в ловушке.</b> Фокус заперт внутри панели, пока она открыта, и обязан выходить по Esc. Ловушку и Esc даёт <span class="tk">ds-modal.js</span> — вторая реализация здесь была бы прямым риском.</li>
+    <li><b>2.4.3 Порядок фокуса.</b> При открытии фокус уходит на первый интерактивный элемент тела, при закрытии возвращается на триггер. Возврат «в начало страницы» — дефект: пользователь теряет строку списка.</li>
+    <li><b>1.3.1 Информация и связи.</b> Секции — <span class="tk">&lt;section&gt;</span> с заголовком <span class="tk">&lt;h3&gt;</span>, а не визуально жирная строка: скринридер обязан видеть структуру, а не только текст.</li>
+    <li><b>Крестику нужен <span class="tk">aria-label</span>.</b> «Закрыть панель», а не «Закрыть»: на экране может быть открыт вложенный слой, и две кнопки «Закрыть» неразличимы на слух.</li>
+    <li><b>Фон недоступен.</b> <span class="tk">inert</span> + <span class="tk">aria-hidden</span> на соседях панели — иначе скринридер продолжает читать список под скримом.</li>
+  </ul>
+</section>
+
+<!-- 10. ТИПОГРАФИКА -->
+<section class="section" id="type" data-screen-label="Типографика">
+  <h2>Типографика</h2>
+  <ul class="crit">
+    <li><b>Заголовок панели</b> — <span class="tk">--type-h5-strong</span>. У Modal на этом месте <span class="tk">--type-h4-strong</span>, и разница не случайна: панель уже окна, а её заголовок соседствует с путём — вместе они образуют блок, в котором h4 перевесил бы.</li>
+    <li><b>Путь</b> — <span class="tk">--type-body-xs</span>, тон <span class="tk">--text-inactive</span>. Служебная строка: нужна, когда её ищут, и не мешает, когда читают заголовок.</li>
+    <li><b>Заголовок секции</b> — <span class="tk">--type-body-s-strong</span>. Не заголовочная шкала: секция — это группировка внутри одного объекта, а не отдельная сущность.</li>
+    <li><b>Тело</b> — <span class="tk">--type-body-m</span>. Подписи и значения задаёт ReadOnlyField, панель их не переопределяет.</li>
+  </ul>
+</section>
+
+<!-- 11. ЦВЕТА -->
+<section class="section" id="colors" data-screen-label="Цвета">
+  <h2>Цвета</h2>
+  <p class="desc">Hex считается на странице из токена, а не выписан в разметке: пересчёт палитры не оставит здесь устаревших значений.</p>
+  <div class="tbl" id="color-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
+</section>
+
+<!-- 12. ДЛЯ РАЗРАБОТЧИКОВ -->
+<section class="section" id="dev" data-screen-label="Для разработчиков">
+  <h2>Для разработчиков</h2>
+  <p class="desc">Полная эталонная разметка, CSS и API — во вкладке «Код». Здесь — договор между панелью и экраном.</p>
+
+  <div class="pm">
+    <div>
+      <h4>Что даёт коробка</h4>
+      <ul>
+        <li>Подключить <span class="tk">scripts/ds.js</span> — <span class="tk">ds-drawer.js</span> и <span class="tk">ds-modal.js</span> загрузятся сами.</li>
+        <li>Триггер — <span class="tk">data-drawer="id"</span>. Больше на экране писать нечего.</li>
+        <li>Разметку, добавленную после загрузки страницы, надо связать заново: <span class="tk">DSDrawer.bindAll(scope)</span>.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Чего коробка не делает</h4>
+      <ul>
+        <li>Не наполняет панель данными. Содержимое кладёт экран — рантайм не знает, что за объект открыт.</li>
+        <li>Не запоминает, какая панель была открыта, при переходе между страницами.</li>
+        <li>Не сохраняет ввод: <span class="tk">guarded</span> лишь мешает закрыть панель случайным кликом, но не защищает от Esc.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Частые ошибки</h4>
+      <ul>
+        <li>Скрим без <span class="tk">.drawer-scrim</span> — панель встаёт по центру экрана с полями по краям.</li>
+        <li>Подключён <span class="tk">drawer.css</span>, но не подключён <span class="tk">ds-modal.js</span> — панель видно, фокус гуляет по фону.</li>
+        <li><span class="tk">overflow</span> на корне <span class="tk">.drawer</span> вместо тела — прокручивается вся панель вместе с шапкой.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 13. БЭКЛОГ -->
+<section class="section" id="backlog" data-screen-label="Бэклог">
+  <h2>Бэклог</h2>
+  <ul class="crit">
+    <li><b>Немодальный режим.</b> Панель без скрима, рядом с которой доска остаётся живой: можно открыть карточку и тут же перетащить соседнюю. Требует хост-контракта (список ужимается под панель) и отдельного решения по фокусу. Решено начать с модального: он честнее по ожиданиям и не требует переверстки экранов-потребителей.</li>
+    <li><b>Навигация «предыдущий / следующий» в шапке.</b> Стрелки, переключающие панель на соседний объект списка, не закрывая её. Главный сценарий панели — просмотр объектов подряд, и сейчас на каждый нужно закрыть и открыть.</li>
+    <li><b>Изменение ширины перетаскиванием.</b> Граница панели как Splitter, ширина в <span class="tk">localStorage</span>. Спрашивают те же, кто просил менять ширину колонок таблицы.</li>
+    <li><b>Режим редактирования внутри панели.</b> Сейчас панель — просмотр, правка уезжает в модалку. Инлайн-правка полей прямо в панели снимает лишний слой, но требует ответа на вопрос про несохранённый ввод.</li>
+    <li><b>Стек панелей.</b> Явно запрещён в «Использовании», но запрос будет: «открыть контрагента из сделки». Правильный ответ — страница контрагента, и это надо проверить на людях, а не решить за них.</li>
+  </ul>
+</section>
+
+<footer class="page-foot">
+  <span>Дизайн-система · Drawer</span>
+  <span>v1.000 · 10.09.2026</span>
+</footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите панель: ширина, подвал, путь, Alert и состав тела. Демо и кнопка «Открыть настоящим слоем» показывают одну и ту же конфигурацию.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API рантайма.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<!-- живой слой: наполняет drawer.page.js той же конфигурацией, что в демо -->
+<div class="modal-scrim drawer-scrim" id="dw-layer" hidden></div>
+
+<div class="menu" id="dw-menu" role="menu" hidden>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="link"></i></span><span class="menu__item-label">Копировать ссылку</span></button>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Выгрузить в Excel</span></button>
+  <div class="menu__divider" role="separator"></div>
+  <button type="button" class="menu__item menu__item--danger" role="menuitem"><span class="menu__item-icon"><i data-icon="trash"></i></span><span class="menu__item-label">Удалить</span></button>
+</div>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-float.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/ds-tile.js"></script>
+<script src="../../scripts/ds-menu.js"></script>
+<script src="../../scripts/ds-tooltip.js"></script>
+<script src="../../scripts/ds-modal.js"></script>
+<script src="../../scripts/ds-drawer.js"></script>
+<script src="../../scripts/ds-readonlyfield.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/drawer.page.js"></script>
+<!-- самодостаточные подписи свитчей конструктора (общий слой docs-split.js) -->
+<script>
+window.DS_SPLIT_SWITCH_LABELS = {
+  'Подвал': 'Показывать подвал',
+  'Путь в шапке': 'Показывать путь в шапке',
+  'Alert под шапкой': 'Показывать Alert под шапкой'
+};
+</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html">&lt;!-- Триггер: рантайм сам найдёт скрим по id, допишет ему .drawer-scrim
+     и откроет слой. Больше на экране писать нечего. --&gt;
+&lt;button type="button" class="btn btn--outline btn--m" data-drawer="d1"&gt;
+  &lt;span class="btn__label"&gt;Открыть карточку&lt;/span&gt;
+&lt;/button&gt;
+
+&lt;!-- Слой. Скрим несёт ОБА класса: .modal-scrim — тон, z-index и клик мимо,
+     .drawer-scrim — прижимает панель к правому краю. --&gt;
+&lt;div class="modal-scrim drawer-scrim" id="d1" hidden&gt;
+  &lt;aside class="drawer drawer--w4" role="dialog" aria-modal="true" aria-labelledby="d1-t"&gt;
+
+    &lt;header class="drawer__head"&gt;
+      &lt;div class="drawer__headmain"&gt;
+        &lt;p class="drawer__path"&gt;&lt;span&gt;Заведение&lt;/span&gt;&lt;i data-icon="chevron-right"&gt;&lt;/i&gt;&lt;span&gt;D-1042&lt;/span&gt;&lt;/p&gt;
+        &lt;h2 class="drawer__title" id="d1-t"&gt;ООО «ЮгСтрой» — кредитный мезонин&lt;/h2&gt;
+      &lt;/div&gt;
+      &lt;div class="drawer__acts"&gt;
+        &lt;button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="В избранное" aria-pressed="false"&gt;&lt;i data-icon="star"&gt;&lt;/i&gt;&lt;/button&gt;
+        &lt;span class="drawer__close"&gt;
+          &lt;button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Закрыть панель" data-modal-close&gt;&lt;i data-icon="close"&gt;&lt;/i&gt;&lt;/button&gt;
+        &lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/header&gt;
+
+    &lt;!-- необязательный Alert во всю ширину, между шапкой и телом --&gt;
+    &lt;div class="drawer__alert"&gt;
+      &lt;div class="alert alert--warning alert--flush"&gt;…&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- единственная прокручиваемая зона панели --&gt;
+    &lt;div class="drawer__body"&gt;
+      &lt;section class="drawer__sec"&gt;
+        &lt;div class="drawer__sechead"&gt;
+          &lt;h3 class="drawer__sectitle"&gt;Поля карточки&lt;/h3&gt;
+          &lt;span class="drawer__secact"&gt;
+            &lt;!-- форма поверх панели — вложенным слоем, панель остаётся открытой --&gt;
+            &lt;button type="button" class="btn btn--transparent btn--s" data-modal="d1-field" data-modal-nested&gt;
+              &lt;i data-icon="add"&gt;&lt;/i&gt;&lt;span class="btn__label"&gt;Добавить поле&lt;/span&gt;
+            &lt;/button&gt;
+          &lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="drawer__grid"&gt;
+          &lt;div class="rof"&gt;
+            &lt;span class="ds-label"&gt;&lt;span class="ds-label__text"&gt;Уровень риска&lt;/span&gt;&lt;/span&gt;
+            &lt;div class="rof__row"&gt;&lt;span class="rof__value"&gt;Повышенный&lt;/span&gt;&lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+    &lt;/div&gt;
+
+    &lt;!-- подвал необязателен: панель просмотра закрывается крестиком --&gt;
+    &lt;div class="drawer__foot"&gt;
+      &lt;div class="drawer__foot-left"&gt;…&lt;/div&gt;
+      &lt;div class="drawer__foot-right"&gt;
+        &lt;button type="button" class="btn btn--outline btn--m" data-modal-close&gt;&lt;span class="btn__label"&gt;Закрыть&lt;/span&gt;&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+  &lt;/aside&gt;
+&lt;/div&gt;</script>
+
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — Drawer
+   Drawer — панель деталей у правого края экрана поверх страницы. Отвечает
+   на вопрос «что внутри вот этого объекта из списка», не уводя со списка:
+   доска, реестр, дерево остаются на месте, у объекта есть «следующий».
+
+   Слой у Drawer и Modal ОБЩИЙ — scripts/ds-modal.js: скрим, портал в body,
+   блокировка прокрутки страницы, inert фона, focus trap, стек слоёв, Esc,
+   возврат фокуса. Drawer не заводит второго экземпляра этой логики: две
+   реализации одного механизма расходятся на первой же правке. Своё у
+   Drawer — только геометрия (край вместо центра, высота во весь экран,
+   выезд сбоку) и анатомия шапки (путь + заголовок).
+
+   Sides:   right (единственная сторона — см. ниже)
+   Sizes:   w3 442 · w4 595 (дефолт) · w5 747 · w6 900
+   Slots:   путь · заголовок · действия · alert · тело из секций · подвал
+
+   Сторона одна, и это решение, а не упущение: левый край экрана занят
+   NavPanel, и панель, выезжающая из-под навигации, конкурирует с ней за
+   один и тот же жест и одну и ту же зону внимания.
+
+   Requires: typography.css, colors.css, radius.css, shadow.css, modal.css
+             (скрим и шкала ширины), button.css, icon-button.css
+   ========================================================================= */
+
+/* Парные `[hidden]` — правило B11 линтера: без пары класс (0,1,0)
+   перебивает браузерное `[hidden]` (0,0,0), и скрытая разметкой панель
+   всё равно рендерится открытой. */
+.drawer[hidden],
+.drawer-scrim[hidden] { display: none; }
+
+:root {
+  /* Геометрия повторяет шкалу Modal — панель и окно стоят в одном
+     интерфейсе, и разные отступы читались бы как разные системы. */
+  --drawer-pad-x:           24px;
+  --drawer-head-pad-y:      20px;
+  --drawer-head-pad-right:  20px;
+  --drawer-head-gap:        16px;
+  --drawer-body-pad-y:      20px;
+  --drawer-body-gap:        24px;  /* зазор между секциями */
+  --drawer-sec-gap:         12px;  /* зазор внутри секции */
+  --drawer-foot-pad-y:      16px;
+
+  --drawer-radius: var(--radius-modal);
+  --drawer-shadow: var(--shadow-modal-form);
+  --drawer-bg:     var(--bg-popup);
+}
+
+/* =========================================================================
+   СКРИМ. Берётся у Modal (.modal-scrim — тон, z-index, вход, клик мимо),
+   здесь снимается только охранное поле: оно рассчитано на окно по центру,
+   а панель обязана стоять вплотную к краю.
+   ========================================================================= */
+.drawer-scrim {
+  padding: 0;
+  justify-content: flex-end;
+}
+
+/* =========================================================================
+   ПАНЕЛЬ
+   ========================================================================= */
+.drawer {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  margin: 0;
+  width: var(--modal-w-4);
+  max-width: 100vw;
+  height: 100%;
+  background: var(--drawer-bg);
+  /* скругление только с внутренней стороны: внешняя прижата к краю экрана */
+  border-radius: var(--drawer-radius) 0 0 var(--drawer-radius);
+  box-shadow: var(--drawer-shadow);
+  box-sizing: border-box;
+  overflow: hidden;   /* иначе содержимое режет скругление */
+}
+
+/* Шкала ширины — та же, что у Modal: шаг = число колонок сетки экрана. */
+.drawer--w3 { width: var(--modal-w-3); }
+.drawer--w4 { width: var(--modal-w-4); }
+.drawer--w5 { width: var(--modal-w-5); }
+.drawer--w6 { width: var(--modal-w-6); }
+
+/* Встраивание в статичный контейнер документации — вместо слоя на вьюпорт */
+.drawer--inline { height: 100%; box-shadow: none; border-radius: var(--drawer-radius); }
+
+/* Выезд сбоку, а не появление на месте: направление движения — единственное,
+   что отличает панель от окна на уровне восприятия, и оно же объясняет,
+   откуда панель взялась и куда уйдёт. */
+.drawer-scrim .drawer { animation: drawer-slide-in .2s cubic-bezier(.2, .8, .3, 1); }
+@keyframes drawer-slide-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer-scrim .drawer { animation: none; }
+}
+
+/* =========================================================================
+   ШАПКА — путь + заголовок слева, действия справа.
+   Путь обязателен, когда панель открыта из списка: без него через минуту
+   работы непонятно, чью карточку читаешь (эвристика Нильсена №1).
+   ========================================================================= */
+.drawer__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--drawer-head-gap);
+  min-width: 0;
+  padding: var(--drawer-head-pad-y) var(--drawer-head-pad-right)
+           var(--drawer-head-pad-y) var(--drawer-pad-x);
+  border-bottom: 1px solid var(--border-light);
+  transition: box-shadow .15s ease;
+}
+.drawer__head.is-scrolled { box-shadow: 0 6px 12px -8px rgba(40, 50, 55, .18); }
+
+.drawer__headmain {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+.drawer__path {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  min-width: 0;
+  margin: 0;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+}
+.drawer__path :is(svg, [data-icon]) { width: 14px; height: 14px; flex: none; }
+.drawer__title {
+  margin: 0;
+  font: var(--type-h5-strong);
+  color: var(--text-primary);
+  text-wrap: pretty;   /* заголовок переносится, а не обрезается */
+}
+.drawer__acts {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.drawer__close { flex: none; display: flex; }
+
+/* Алерт между шапкой и телом — во всю ширину, без скруглений */
+.drawer__alert { flex: none; }
+.drawer &gt; .alert,
+.drawer__alert &gt; .alert { flex: none; border-radius: 0; }
+
+/* =========================================================================
+   ТЕЛО — единственная прокручиваемая зона панели. Содержимое приходит
+   снаружи; здесь только паддинг, скролл и ритм секций.
+   ========================================================================= */
+.drawer__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--drawer-body-pad-y) var(--drawer-pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--drawer-body-gap);
+  font: var(--type-body-m);
+  color: var(--text-primary);
+}
+.drawer__body::-webkit-scrollbar { width: 8px; }
+.drawer__body::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 8px; }
+.drawer__body--flush { padding: 0; gap: 0; }
+
+/* ---- секция тела ---- */
+.drawer__sec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--drawer-sec-gap);
+  min-width: 0;
+}
+.drawer__sechead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+}
+.drawer__sectitle {
+  margin: 0;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+}
+/* действие секции уезжает вправо — «Добавить поле», «Изменить» */
+.drawer__secact { margin-left: auto; flex: none; }
+
+/* Пары «подпись — значение» в две колонки. Одна колонка (--1col) — когда
+   значения длинные: перенос в узкой колонке ломает ритм сильнее, чем
+   лишняя высота. */
+.drawer__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-16);
+  min-width: 0;
+}
+.drawer__grid--1col { grid-template-columns: minmax(0, 1fr); }
+.drawer__grid-full { grid-column: 1 / -1; }
+
+/* =========================================================================
+   ПОДВАЛ — необязателен: панель просмотра закрывается крестиком, подвал
+   нужен только там, где есть что подтверждать.
+   ========================================================================= */
+.drawer__foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  flex-wrap: nowrap;
+  padding: var(--drawer-foot-pad-y) var(--drawer-pad-x);
+  border-top: 1px solid var(--border-light);
+  transition: box-shadow .15s ease;
+}
+.drawer__foot.is-scrolled { box-shadow: 0 -6px 12px -8px rgba(40, 50, 55, .18); }
+.drawer__foot-left,
+.drawer__foot-right {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: var(--space-8);
+}
+.drawer__foot-right { margin-left: auto; }
+
+/* =========================================================================
+   АДАПТИВ. Ниже 640px панель занимает всю ширину: 595px на узком экране
+   оставляют от списка полосу, по которой всё равно нельзя работать.
+   ========================================================================= */
+@media (max-width: 640px) {
+  .drawer { width: 100vw; border-radius: 0; }
+}</script>
+
+<script type="text/plain" id="src-code-js">/* =========================================================================
+   DS Drawer — рантайм панели деталей (out-of-box).
+   Зависимости: styles/drawer.css, styles/modal.css, scripts/ds-modal.js.
+
+   Слой Drawer НЕ пишет: скрим, портал в body, блокировку прокрутки, inert
+   фона, focus trap, стек, Esc и возврат фокуса даёт ds-modal.js — один
+   механизм на всю ДС. Здесь только то, что принадлежит именно панели:
+   разрешение триггера, класс скрима и договор о закрытии.
+
+   Экспорт: window.DSDrawer = {
+     open(scrim, opts) → api        — открыть панель
+     bind(trigger, opts) → api|null — открытие по клику на триггер
+     bindAll(root)                  — обойти [data-drawer] внутри root
+     close() · current() → api|null
+   }
+
+   Автоподключение (без единой строки кода на экране):
+     &lt;button data-drawer="d1"&gt;Открыть&lt;/button&gt;
+     &lt;div class="modal-scrim drawer-scrim" id="d1" hidden&gt;
+       &lt;aside class="drawer drawer--w4" role="dialog" aria-modal="true"&gt;…&lt;/aside&gt;
+     &lt;/div&gt;
+   Настройки на триггере: data-drawer-guarded (клик мимо не закрывает —
+   панель с несохранённой формой). Закрытие: крестик .drawer__close button,
+   любой [data-modal-close], Esc, клик мимо панели.
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  function need() { return !!window.DSModal; }
+
+  /* Скрим панели обязан нести .drawer-scrim: без него панель встанет по
+     центру с охранным полем Modal, то есть перестанет быть панелью. */
+  function prep(scrim) {
+    if (!scrim) return null;
+    if (!scrim.classList.contains('modal-scrim')) scrim.classList.add('modal-scrim');
+    if (!scrim.classList.contains('drawer-scrim')) scrim.classList.add('drawer-scrim');
+    return scrim;
+  }
+
+  function open(scrim, opts) {
+    if (!prep(scrim) || !need()) return null;
+    return DSModal.open(scrim, opts || {});
+  }
+
+  function resolve(trigger, opts) {
+    if (opts &amp;&amp; opts.scrim) return opts.scrim;
+    var id = trigger.getAttribute('data-drawer');
+    if (id) return document.getElementById(id);
+    var next = trigger.nextElementSibling;
+    return next &amp;&amp; next.classList.contains('modal-scrim') ? next : null;
+  }
+
+  function bind(trigger, opts) {
+    opts = opts || {};
+    if (trigger.__dsDrawerBound) return trigger.__dsDrawerBound;
+    var scrim = prep(resolve(trigger, opts));
+    if (!scrim) return null;
+    var d = trigger.dataset || {};
+    trigger.setAttribute('aria-haspopup', 'dialog');
+    if (scrim.id) trigger.setAttribute('aria-controls', scrim.id);
+    var api = {
+      trigger: trigger, scrim: scrim,
+      open: function () {
+        return open(scrim, {
+          guarded: opts.guarded != null ? opts.guarded : d.drawerGuarded != null,
+          returnFocus: trigger,
+          onOpen: opts.onOpen, onClose: opts.onClose
+        });
+      }
+    };
+    trigger.addEventListener('click', function (e) { e.preventDefault(); api.open(); });
+    trigger.__dsDrawerBound = api;
+    return api;
+  }
+
+  function bindAll(root) {
+    (root || document).querySelectorAll('[data-drawer]').forEach(function (t) { bind(t); });
+  }
+
+  function close() { return need() ? DSModal.closeTop() : null; }
+  function current() { return need() ? DSModal.current() : null; }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { bindAll(document); });
+  } else { bindAll(document); }
+
+  window.DSDrawer = {
+    open: open, bind: bind, bindAll: bindAll, close: close, current: current
+  };
+})();</script>
+
+</body>
+</html>

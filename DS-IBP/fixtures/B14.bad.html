@@ -1,0 +1,53 @@
+<!-- @dsCard group="Fixtures" name="R-base" viewport="1440x900" -->
+<!DOCTYPE html>
+<!-- ФИКСТУРА линтера: B14. Получена из `_base.ok.html` добавлением ряда
+     второго уровня (`.subtabs`) — вместе с парным `sub-tab.css`, иначе
+     сработало бы постороннее правило ряда F («класс без своего CSS»), и пара
+     проверяла бы не то правило.
+     ДЕФЕКТ: ряд второго уровня стоит один, ряда первого уровня
+     (`.tabs--horiz` с `.tab`) на странице нет. Разметка при этом валидна и
+     выглядит нормально — врёт только иерархия: экран читается как один
+     уровень навигации с необычным видом.
+     Правило обязано ПАДАТЬ здесь и МОЛЧАТЬ на эталоне — `lessons-cli verify`. -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фикстура R — Дизайн-система</title>
+<link rel="stylesheet" href="../styles/typography.css">
+<link rel="stylesheet" href="../styles/colors.css">
+<link rel="stylesheet" href="../styles/docs-split.css">
+<link rel="stylesheet" href="../styles/splitter.css">
+<link rel="stylesheet" href="../styles/segment-control.css">
+<link rel="stylesheet" href="../styles/sub-tab.css">
+<link rel="stylesheet" href="../styles/input.css">
+<link rel="stylesheet" href="../styles/ds-toc.css">
+<style>
+  .fx-note { font: var(--type-body-m); color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<main class="page ds-split">
+  <p class="meta">Версия: <b>1.000</b> · Обновлено: <b>06.09.2026</b></p>
+  <div class="splitpane">
+    <div class="splitpane__a">
+      <div id="pg-controls">
+        <div class="ctl"><span class="lbl">Вариант</span></div>
+        <div class="inp inp--m"><div class="inp__field"><input class="inp__control"></div></div>
+      </div>
+    </div>
+    <div class="splitpane__b">
+      <div class="subtabs subtabs--s" role="tablist" data-subtabs aria-label="Подразделы раздела «Сделка»">
+        <button type="button" class="subtab" role="tab" aria-selected="true" tabindex="0"><span class="subtab__label">Общая информация</span></button>
+        <button type="button" class="subtab" role="tab" aria-selected="false" tabindex="-1"><span class="subtab__label">Условия</span></button>
+        <button type="button" class="subtab" role="tab" aria-selected="false" tabindex="-1"><span class="subtab__label">Документы</span></button>
+      </div>
+      <p class="fx-note">Область предпросмотра.</p>
+    </div>
+  </div>
+</main>
+<script src="../scripts/ds-toc.js"></script>
+<script src="../scripts/ds-splitter.js"></script>
+<script src="../scripts/docs-split.js"></script>
+</body>
+</html>

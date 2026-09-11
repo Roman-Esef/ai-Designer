@@ -1,0 +1,691 @@
+<!-- @dsCard group="Components" name="SubTab" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SubTab — Дизайн-система</title>
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/spacing.css">
+<link rel="stylesheet" href="../../styles/sub-tab.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<style>
+
+  /* section */
+  .section > p.desc { font: var(--type-body-m); color: var(--text-secondary); margin:0 0 28px; max-width:80ch; text-wrap:pretty; }
+
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:20px; }
+  .row + .row { margin-top: 24px; }
+
+  .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
+  .subhead.mt { margin-top: 30px; }
+  .demo-rowlabel { font: var(--type-body-xs); color: var(--text-inactive); margin-bottom:10px; }
+
+  /* ---------- демо-стадия (docs-split) ---------- */
+  .pg__stage { flex:1; min-height:0; width:100%; padding:48px 40px; display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
+      repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
+  .pg__stagebox { width:100%; max-width:640px; display:flex; align-items:center; justify-content:center; }
+
+  .ctl { display:flex; flex-direction:column; gap:10px; }
+  .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+
+  .toggles { display:flex; flex-direction:column; gap:8px; }
+
+  .pg__code { margin-top:14px; font: var(--type-body-s); color: var(--text-inactive); }
+
+  /* ---------- рамка «два уровня» ----------
+     Раскладка страницы, не компонент: показывает обязательный контекст —
+     ряд первого уровня сверху, ряд второго под ним, содержимое подраздела ниже. */
+  .lvl-frame { border:1px solid var(--border-light); border-radius:var(--radius-2xl); background:var(--bg-tile); overflow:hidden; width:100%; }
+  .lvl-frame__l1 { padding: var(--space-16) var(--space-24) 0; }
+  .lvl-frame__l2 { padding: var(--space-16) var(--space-24); }
+  .lvl-frame__body { padding: var(--space-32) var(--space-24); border-top:1px solid var(--border-light); background:var(--bg-page); font: var(--type-body-m); color: var(--text-inactive); }
+  .use-l2 { margin-top: var(--space-16); }
+
+  /* ---------- сравнение / карточки развязки ---------- */
+  .cols2 { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:20px; }
+  @media (max-width:680px){ .cols2{ grid-template-columns:1fr; } }
+
+  .diff { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
+  @media (max-width:900px){ .diff { grid-template-columns:1fr; } }
+  .diff__card { border:1px solid var(--border-light); border-radius:14px; padding:24px; background: var(--bg-tile); display:flex; flex-direction:column; gap:12px; }
+  .diff__card.is-current { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary) inset; }
+  .diff__card h4 { font: var(--type-h6-strong); color: var(--text-primary); margin:0; display:flex; align-items:center; gap:8px; }
+  .diff__card h4 .star { font: var(--type-button-xs); text-transform:uppercase; letter-spacing:.06em; color: var(--primary); background: var(--primary-bg); padding:4px 8px; border-radius:999px; }
+  .diff__card .stage { min-height:52px; display:flex; align-items:center; }
+
+  /* ---------- do / don't ---------- */
+  .guide { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .guide { grid-template-columns:1fr; } }
+  .guide-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background: var(--bg-tile); display:flex; flex-direction:column; }
+  .guide-card__tag { display:inline-flex; align-items:center; gap:8px; font: var(--type-body-s-strong); padding:14px 20px 0; }
+  .guide-card.good .guide-card__tag { color: var(--success-dark); }
+  .guide-card.bad .guide-card__tag { color: var(--error); }
+  .guide-card__body { padding:28px 20px; flex:1; display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; min-height:96px; }
+  .guide-card__cap { padding:0 20px 16px; font: var(--type-body-xs); color: var(--text-inactive); text-wrap:pretty; }
+
+  /* ---------- анатомия ---------- */
+  .anat { display:grid; grid-template-columns: minmax(260px,1fr) minmax(240px,360px); gap:40px; align-items:center; }
+  @media (max-width:760px){ .anat { grid-template-columns:1fr; } }
+  .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:72px 44px; display:flex; justify-content:center; }
+  .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
+  .anat__legend li { display:flex; gap:14px; align-items:flex-start; }
+  .anat__legend li .n { counter-increment:a; flex:none; width:24px; height:24px; border-radius:50%; background: var(--primary); color:#fff; font: var(--type-body-s-strong); display:flex; align-items:center; justify-content:center; }
+  .anat__legend li .n::before { content: counter(a); }
+  .anat__legend li .t .k { font: var(--type-body-m-strong); color: var(--text-primary); display:block; }
+  .anat__legend li .t .d { font: var(--type-body-s); color: var(--text-secondary); }
+
+  /* ---------- ряд состояний ---------- */
+  .states-grid { display:grid; grid-template-columns: 220px 1fr; gap:14px 24px; align-items:center; }
+  @media (max-width:640px){ .states-grid { grid-template-columns:1fr; gap:6px 0; } }
+  .states-grid .k { font: var(--type-body-s-strong); color: var(--text-primary); }
+  .states-grid .v { display:flex; align-items:center; }
+
+  /* ---------- developer code panels ---------- */
+  .code-panel__name { font: var(--type-body-s-strong); color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; }
+</style>
+  <link rel="stylesheet" href="../../styles/ds-nav.css">
+  <link rel="stylesheet" href="../../styles/splitter.css">
+  <link rel="stylesheet" href="../../styles/docs-split.css">
+</head>
+<body>
+<main class="page ds-split" data-screen-label="SubTab">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="pg__stage"><div class="pg__stagebox" id="pg-preview"></div></div>
+        <p class="pg__code" id="pg-code"></p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+  <header class="masthead">
+    <a class="crumb" href="../../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Дизайн-система</a>
+    <div class="meta"><span>Версия: <b>1.001</b></span><span>Обновлено: <b>11.09.2026</b></span></div>
+    <p class="eyebrow">Дизайн-система · Компоненты</p>
+    <h1>SubTab</h1>
+    <p class="lead">Ряд табов <b>второго уровня</b> — навигация по подразделам внутри раздела, выбранного на первом уровне. Сегменты лежат в общем треке, но, в отличие от SegmentControl, трек и сегмент одной высоты: выбранный подраздел закрашен акцентом от края до края. Три размера — M 40, S 32, XS 24 — в пару к размеру первого уровня, но не крупнее его. <b>Не самостоятельный компонент</b>: применяется только там, где есть ряд табов первого уровня.</p>
+  </header>
+
+  <!-- USAGE -->
+  <section class="section" data-screen-label="Usage">
+    <h2>Использование</h2>
+    <p class="desc tight">SubTab переключает <b>подразделы одного раздела</b>. Он появляется тогда, когда раздел первого уровня сам делится на части: «Сделка» → «Общая информация» / «Условия» / «Документы» / «История». Ряд второго уровня всегда стоит под рядом первого и относится к выбранному в нём разделу.</p>
+
+    <div class="panel">
+      <ul class="bullets" style="margin-bottom:26px;">
+        <li><b>Обязательный контекст.</b> На экране должен быть ряд табов первого уровня (<code class="tok">Tab</code>, <code class="tok">.tabs--horiz</code>). Одиночный ряд SubTab — дефект: пользователь не понимает, на каком уровне находится.</li>
+        <li><b>Размещение.</b> Ряд второго уровня — содержимое выбранного таба первого уровня, а не отдельная панель экрана.</li>
+        <li><b>Размер — в пару к первому уровню и не крупнее его.</b> Рекомендованный выбор — шаг вниз: Tab M&nbsp;→&nbsp;SubTab S, Tab S&nbsp;→&nbsp;SubTab XS. Подробнее — в разделе «Размеры».</li>
+        <li><b>Ёмкость — 2–5 подразделов.</b> Переполнения у компонента нет: трек не переносится и не скроллится. Больше пяти — признак того, что раздел разбит неверно.</li>
+        <li>Нужен одиночный ряд переключения вьюх — это <code class="tok">Tab</code>. Нужен выбор значения параметра (период, единицы) — <code class="tok">SegmentControl</code>.</li>
+      </ul>
+
+      <p class="demo-rowlabel">Так: два уровня на одном экране — первый уровень задаёт раздел, второй переключает его подразделы</p>
+      <div id="use-correct"></div>
+    </div>
+
+  <div class="subsec" data-screen-label="Differentiation">
+    <h3>SubTab, Tab и SegmentControl — в чём разница</h3>
+    <p class="desc">Три компонента выглядят как «ряд опций», и SubTab внешне ближе всего к SegmentControl. Выбирайте по роли, а не по виду: у SubTab роль навигационная (<code class="tok">role="tablist"</code>), несмотря на сегментированную форму.</p>
+    <div class="diff">
+      <div class="diff__card is-current">
+        <h4>SubTab <span class="star">Этот компонент</span></h4>
+        <p>Переключает <b>подраздел внутри раздела</b>. Трек равен по высоте сегменту, выбранный закрашен акцентом. Только вместе с первым уровнем, 2–5 пунктов, переполнения нет. <code class="tok">role="tablist"</code>.</p>
+        <div class="stage" id="diff-sub"></div>
+      </div>
+      <div class="diff__card">
+        <h4>Tab</h4>
+        <p>Переключает <b>раздел / вьюху</b> страницы или модалки. Индикатор — полоса на общем рейле, без трека. Держит 8+ пунктов, переполнение решено рантаймом. <code class="tok">role="tablist"</code>.</p>
+        <div class="stage" id="diff-tab"></div>
+      </div>
+      <div class="diff__card">
+        <h4>SegmentControl</h4>
+        <p>Выбирает <b>значение параметра</b> — период, единицы, режим показа. Трек выше сегмента на свой паддинг, выбор — белая таблетка с тенью. <code class="tok">role="radiogroup"</code>.</p>
+        <div class="stage" id="diff-seg"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec" data-screen-label="Guidelines">
+    <h3>Правила</h3>
+    <p class="desc">Каждая пара «так / не так» раскрывает одну конкретную ситуацию — не смешивайте разные правила в одном сравнении.</p>
+    <div class="guide">
+      <div class="guide-card bad">
+        <div class="guide-card__tag">Не так</div>
+        <div class="guide-card__body" id="use-wrong"></div>
+        <p class="guide-card__cap">Ряд второго уровня без первого. Механика заливки сама по себе не сообщает, что уровень подчинённый, — экран читается как один уровень навигации с необычным видом. Нужен одиночный ряд — берите Tab.</p>
+      </div>
+      <div class="guide-card bad">
+        <div class="guide-card__tag">Не так</div>
+        <div class="guide-card__body" id="use-toomany"></div>
+        <p class="guide-card__cap">Восемь подразделов. Трек не переносится и не скроллится, поэтому ряд выдавливает раскладку. Столько подразделов — задача Tab (<code class="tok">.tab--s</code> + <code class="tok">.tabs--bare</code>) с решённым переполнением.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="section" data-screen-label="Anatomy">
+    <h2>Анатомия</h2>
+    <p class="desc">Ряд — это общий трек, внутри которого сегменты лежат вплотную. Форму крайним сегментам задаёт трек: он скруглён и подрезает заливку по <code class="tok">overflow:hidden</code>, поэтому у первого и последнего сегмента углы скруглены, а у средних края прямые. Отдельного элемента-индикатора нет — выбранный сегмент красится сам.</p>
+    <div class="panel">
+      <div class="anat">
+        <div class="anat__stage"><div id="anat-demo"></div></div>
+        <ul class="anat__legend">
+          <li><span class="n"></span><span class="t"><span class="k">Трек</span><span class="d">полупрозрачная нейтральная заливка <code class="tok">--st-system-light</code>; его высота равна высоте сегмента — паддинга у трека нет</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Сегмент</span><span class="d">интерактивная зона с подписью; невыбранный прозрачен, выбранный закрашен акцентом от края до края</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Разделитель</span><span class="d">линия 1&nbsp;px между соседними невыбранными сегментами; гаснет у выбранного, у его правого соседа и вокруг наведённого</span></span></li>
+          <li><span class="n"></span><span class="t"><span class="k">Счётчик (опционально)</span><span class="d">атом Badge, вариант <code class="tok">--neutral</code> размера <code class="tok">--xxs</code> — светлая плашка читается и на треке, и на заливке</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section class="section" data-screen-label="Variants">
+    <h2>Варианты</h2>
+    <p class="desc">Ось конфигурации одна — счётчик. Размер осью «Вариантов» не считается: он живёт в разделе «Размеры», потому что выбирается не свободно, а в пару к первому уровню. Ориентации, иконок и тонов нет намеренно: второй уровень обязан оставаться однообразным, иначе он начинает конкурировать с первым.</p>
+
+  <div class="subsec" data-screen-label="Badge">
+    <h3>Со счётчиком</h3>
+    <p class="desc">Счётчик показывает количество элементов в подразделе — документов, замечаний, задач. Это реальный атом <a href="../atoms/Badge.html">Badge</a> в варианте <code class="tok">.badge--neutral</code>: светлая плашка с тёмным текстом одинаково читается на светлом треке и на акцентной заливке выбранного сегмента, поэтому цвет счётчика не меняется ни в одном состоянии. Размер плашки идёт за размером ряда — <code class="tok">.badge--xs</code> в M, <code class="tok">.badge--xxs</code> в S и XS, — и задаётся классом самого Badge в разметке: перекрывать габариты чужого компонента из <code class="tok">sub-tab.css</code> нельзя.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Без счётчиков</p>
+      <div id="var-plain" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Со счётчиками</p>
+      <div id="var-badge"></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- SIZES -->
+  <section class="section" data-screen-label="Sizes">
+    <h2>Размеры</h2>
+    <p class="desc">Три размера. <b>M</b> и <b>S</b> совпадают с размерным рядом <a href="Tab.html">Tab</a> не случайно: компоненты стоят в паре на одном экране, и шаг «второй уровень на размер ниже первого» возможен только при общей шкале. <b>XS</b> продолжает её вниз для плотных мест — узких модалок, тайлов, боковых панелей. Базовый размер без модификатора — <b>S</b>: это партнёр базового первого уровня <code class="tok">.tab--m</code>.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">M 40 · S 32 · XS 24 — переключайте, ряды рабочие</p>
+      <div id="size-demo"></div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden; margin-top:20px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.7fr 1.2fr 0.8fr 0.7fr 1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Размер</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Высота</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Подпись</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Паддинг</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">Зазор</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Счётчик (Badge)</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.7fr 1.2fr 0.8fr 0.7fr 1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><b>M</b></span></span></div><div class="tc tc--right"><span class="tc__row"><span class="tc__text">40 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc tc--right"><span class="tc__row"><span class="tc__text">16 px</span></span></div><div class="tc tc--right"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">.badge--xs</code> (20)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.7fr 1.2fr 0.8fr 0.7fr 1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><b>S</b> — базовый</span></span></div><div class="tc tc--right"><span class="tc__row"><span class="tc__text">32 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc tc--right"><span class="tc__row"><span class="tc__text">12 px</span></span></div><div class="tc tc--right"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">.badge--xxs</code> (16)</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.7fr 1.2fr 0.8fr 0.7fr 1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><b>XS</b></span></span></div><div class="tc tc--right"><span class="tc__row"><span class="tc__text">24 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc tc--right"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc tc--right"><span class="tc__row"><span class="tc__text">4 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">.badge--xxs</code> (16)</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+
+  <div class="subsec" data-screen-label="Pairing">
+    <h3>Правило пары: второй уровень не крупнее первого</h3>
+    <p class="desc">Размер выбирается не сам по себе, а <b>в пару к первому уровню</b>. Рекомендованный выбор — <b>шаг вниз</b>: тогда различимость уровней держится на двух признаках сразу, размере и механике выделения, а не на одной механике. <b>Равный размер допустим</b>, когда второй уровень — главный переключатель экрана, а первый переключается редко. <b>Крупнее первого — запрещено</b>: это инверсия иерархии, ряд подразделов начинает весить больше, чем раздел, которому он принадлежит.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Шаг вниз — рекомендованная пара</p>
+      <div id="pair-step" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Равный размер — допустимо</p>
+      <div id="pair-equal" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Плотный экран: первый уровень S, второй XS</p>
+      <div id="pair-dense"></div>
+    </div>
+    <div class="guide" style="margin-top:26px;">
+      <div class="guide-card bad">
+        <div class="guide-card__tag">Не так</div>
+        <div class="guide-card__body" id="pair-wrong"></div>
+        <p class="guide-card__cap">Второй уровень крупнее первого. Подразделы перевешивают раздел, которому принадлежат, — иерархия читается наоборот. Правило держится текстом, а не линтером: сверить размеры — задача приёмки.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec" data-screen-label="Radius">
+    <h3>Радиус скругления</h3>
+    <p class="desc">Скругление принадлежит треку; сегменты не скруглены вовсе — их форму подрезает трек. В M и S радиус одинаковый, у XS он уходит на ступень ниже: токен <code class="tok">--radius-control-s</code> заведён ровно для мелких контролов (кнопка XS, чип XS), а 8&nbsp;px на высоте 24 читается переслащённым.</p>
+    <div class="panel" style="padding:0;overflow:hidden;"><div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Элемент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Радиус</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек — M и S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">8 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек — XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-control-s</code></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Сегмент</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">0</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">форму задаёт трек</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.7fr 0.8fr 1.1fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Счётчик (Badge)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">999 px</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--radius-pill</code></span></span></div><div class="tc tc--separator"></div></div></div></div>
+  </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" data-screen-label="Content">
+    <h2>Контент</h2>
+    <p class="desc">Содержимое сегмента — короткая подпись подраздела и опциональный числовой счётчик. Иконок у второго уровня нет: иконка добавляет вес, которого уровню не положено, и съедает ширину, которой у трека и так мало.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Короткие подписи — норма для второго уровня</p>
+      <div id="content-short" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Длинные подписи — ряд растёт по ширине, подписи не усекаются</p>
+      <div id="content-long"></div>
+    </div>
+    <p class="desc" style="margin-top:20px;">Подпись не усекается и не переносится: <code class="tok">white-space: nowrap</code>. Ряд из длинных подписей просто становится шире — и это сигнал, что подписи надо сократить, а не расширять трек. Тултипа усечения у компонента нет, потому что нет усечения.</p>
+  </section>
+
+  <!-- ПОВЕДЕНИЕ -->
+  <section class="section" data-screen-label="Behavior">
+    <h2>Поведение</h2>
+    <p class="desc">Клик и клавиатура приходят из рантайма ДС. Ничего измеряемого в компоненте нет: индикатор не двигается, ширина не пересчитывается, шрифтовые метрики на раскладку не влияют.</p>
+
+  <div class="subsec" data-screen-label="Capacity">
+    <h3>Ёмкость ряда и отсутствие переполнения</h3>
+    <p class="desc">2–5 подразделов. Переполнения у компонента нет <b>намеренно</b>: трек с <code class="tok">flex-wrap: nowrap</code> не переносится, скролла и меню «Ещё» здесь не будет. Ряд, который не помещается, — это не задача для рантайма, а сигнал, что раздел разбит неверно (закон Хика: время выбора растёт с числом равнозначных вариантов). Нужно больше пунктов — второй уровень собирается на Tab: <code class="tok">.tab--s</code> + <code class="tok">.tabs--bare</code>, там переполнение решено.</p>
+    <div class="panel">
+      <p class="demo-rowlabel">Минимум — 2 подраздела</p>
+      <div id="beh-min" style="margin-bottom:26px;"></div>
+      <p class="demo-rowlabel">Максимум — 5 подразделов</p>
+      <div id="beh-max"></div>
+    </div>
+  </div>
+
+  <div class="subsec" data-screen-label="Keyboard">
+    <h3>Клавиатура и выбор</h3>
+    <p class="desc">Поведение — общий рантайм <code class="tok">scripts/ds-tabs.js</code>, хук <code class="tok">data-subtabs</code>. Клик или стрелка сразу меняет выбор (активация на месте, без отдельного Enter). Стрелки ← → и ↑ ↓ ходят по ряду с зацикливанием, <code class="tok">Home</code> / <code class="tok">End</code> уводят на края, отключённые сегменты пропускаются. В таб-последовательности участвует только выбранный сегмент — roving tabindex.</p>
+  </div>
+
+  <div class="subsec" data-screen-label="Surface">
+    <h3>Поверхность под рядом</h3>
+    <p class="desc">Трек залит полупрозрачным <code class="tok">--st-system-light</code> (Swamp_400, 16&nbsp;%), поэтому он «темнит» любую подложку, а не заливается собственным цветом. Компонент рассчитан на белую поверхность <code class="tok">--bg-tile</code>. На сером фоне страницы <code class="tok">--bg-page</code> тональный шаг между треком и фоном становится меньше и границы ряда читаются слабее — на таких поверхностях ряд лучше класть на белую плашку. Вариант «на цветной поверхности» — в бэклоге.</p>
+  </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="section" data-screen-label="States">
+    <h2>Состояния</h2>
+    <p class="desc">Невыбранный и выбранный сегменты проходят через Default и Hover&nbsp;=&nbsp;Focus, плюс Disabled — отдельного состояния нажатия (Active) нет, как и у Tab. Наведение и фокус визуально совпадают: единая заливка <code class="tok">--primary-bg</code> у невыбранного и тон <code class="tok">--primary-dark</code> у выбранного. Клик переводит сегмент в Selected, а заливка остаётся как при наведении, пока курсор не покинет сегмент. Счётчик цвет не меняет ни в одном состоянии.</p>
+    <div class="panel">
+      <div class="states-grid">
+        <span class="k">Default</span><span class="v" id="st-default"></span>
+        <span class="k">Hover = Focus</span><span class="v" id="st-hover"></span>
+        <span class="k">Selected</span><span class="v" id="st-selected"></span>
+        <span class="k">Selected + Hover</span><span class="v" id="st-selected-hover"></span>
+        <span class="k">Disabled</span><span class="v" id="st-disabled"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" data-screen-label="A11y">
+    <h2>Доступность</h2>
+    <p class="desc">Контейнер — <code class="tok">role="tablist"</code> с обязательным <code class="tok">aria-label</code>, который называет раздел первого уровня («Подразделы раздела «Сделка»»), каждый сегмент — <code class="tok">role="tab"</code> с <code class="tok">aria-selected</code>. Роль навигационная, несмотря на сегментированный вид: семантика идёт от задачи, а не от формы. Отключённый сегмент помечается <code class="tok">aria-disabled="true"</code>, а не нативным <code class="tok">disabled</code>, — иначе он выпадает из roving-порядка. Выбор передан заливкой, а не только цветом подписи, поэтому 1.4.1 (Use of Color) выполняется.</p>
+
+    <div class="panel">
+      <p class="subhead">Принятое отступление · контраст подписи выбранного</p>
+      <p class="desc tight" style="margin-bottom:14px;">Белая подпись <code class="tok">--text-on-dark</code> на заливке <code class="tok">--primary</code> (#00AA9B) даёт контраст <b>2.91:1</b> при норме 4.5:1 по <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum" target="_blank" rel="noopener">WCAG 2.2 · 1.4.3</a>. Отступление принято сознательно, ради консистентности с <code class="tok">.btn--accent</code> и <code class="tok">.chip--primary-solid</code>, у которых ровно та же величина: это свойство акцентного тона ДС, а не дефект компонента. Заливка к белому фону — те же 2.91:1, то есть ниже 3:1 по 1.4.11 (Non-text Contrast).</p>
+      <p class="desc tight" style="margin-bottom:14px;">Вопрос ведётся общим: контраст белого на <code class="tok">--primary</code> заведён отдельной записью в <a href="../rnd/Backlog.html">общий бэклог ДС</a> — решать его нужно на уровне токена, одним ходом для всех акцентных заливок. Тон <code class="tok">--primary-dark</code> (#007A6D) даёт 5.24:1 и остаётся готовым решением, если по бэклогу примут смену тона.</p>
+      <p class="desc tight" style="margin:0;">Замеренные пары, чтобы утверждения выше не расходились с реальностью: текст счётчика на его плашке — <b>8.28:1</b>, сама плашка <code class="tok">--c-cgrey-100</code> к акцентной заливке — <b>2.46:1</b>. Плашка ниже 3:1, но носитель смысла здесь — число внутри неё, а не граница плашки, поэтому 1.4.11 держится на первой паре. Подпись невыбранного подраздела <code class="tok">--text-secondary</code> на белом — <b>4.17:1</b>: это свойство токена, общее для Tab и SegmentControl, не частность второго уровня.</p>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section" data-screen-label="Typography">
+    <h2>Типографика</h2>
+    <p class="desc">Подпись набирается гарнитурой <b>SB Sans Text</b>, начертание Regular во всех состояниях, включая выбранное: вес выделения несёт заливка, а не начертание — иначе ряд «прыгал» бы по ширине при каждом переключении. Кегль зависит от размера, <code class="tok">letter-spacing</code> 0 во всех.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.2fr 1.1fr 0.9fr 1.3fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Часть</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Гарнитура</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Начертание</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Размер / интерлиньяж</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.2fr 1.1fr 0.9fr 1.3fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Подпись · M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-m</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-m)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.2fr 1.1fr 0.9fr 1.3fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Подпись · S</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.2fr 1.1fr 0.9fr 1.3fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Подпись · XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.2fr 1.1fr 0.9fr 1.3fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Счётчик · M</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 0.8fr 1.2fr 1.1fr 0.9fr 1.3fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Счётчик · S и XS</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">SB Sans Text</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Regular</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </section>
+
+  <!-- COLORS -->
+  <section class="section" data-screen-label="Colors">
+    <h2>Цвета</h2>
+    <p class="desc">Трек — полупрозрачная нейтральная заливка (Swamp_400, 16&nbsp;%), тот же тон, что у SegmentControl: ряд остаётся отчётливым на разных подложках. Невыбранный сегмент — Text_Secondary, при наведении Text_Primary с заливкой Active·PrimaryBG. Выбранный — заливка Primary (Emerald) с белой подписью, при наведении тон уходит в Primary_Dark. Разделитель — Border_Primary. Disabled — Text_Inactive. Счётчик — Badge, вариант neutral, цвет не зависит от состояния сегмента.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Раздел</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Роль</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Токен</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Образец</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th"><span class="th__label">Hex</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливка трека</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--st-system-light</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--st-system-light)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">16% #7A9994</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Трек</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Разделитель</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--border-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--border-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#B8CCCC</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Подпись</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Невыбранный</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-secondary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-secondary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#6C8080</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Подпись</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Наведение</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#324844</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Подпись</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Выбранный</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-on-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-on-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#FFFFFF</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Наведение (невыбранный)</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-bg</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-bg)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">6% #00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Выбранный</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#00AA9B</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Заливки</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Выбранный + наведение</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--primary-dark</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--primary-dark)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#007A6D</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Disabled</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Подпись</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--text-inactive</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--text-inactive)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#AAB2B1</span></span></div><div class="tc tc--separator"></div></div><div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.3fr 1.3fr 0.7fr 0.9fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text">Счётчик</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">Плашка Badge neutral</span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--c-cgrey-100</code></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-100)"></span></span></span></div><div class="tc"><span class="tc__row"><span class="tc__text">#E8EDED</span></span></div><div class="tc tc--separator"></div></div></div>
+    </div>
+  </section>
+
+  <!-- DEVELOPER HANDOFF -->
+  <section class="section" data-screen-label="Dev">
+    <h2>Для разработчиков</h2>
+    <p class="desc">Эта страница ДС собрана на чистых CSS-классах и vanilla JS, но всё ниже не привязано к стеку: команда, которая верстает компонент на другом фреймворке, берёт отсюда размеры, состояния и алгоритм поведения, не заглядывая в этот код построчно.</p>
+
+    <p class="subhead">Точные размеры (redline)</p>
+    <p class="desc tight">Значения сняты с реально отрендеренного экземпляра через <code class="tok">getComputedStyle</code>, не выписаны руками — поэтому таблица не может разъехаться с <code class="tok">styles/sub-tab.css</code>.</p>
+    <div class="panel" style="padding:0;overflow:hidden; margin-bottom:36px;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;"><div class="tbl__row" style="grid-template-columns:8px 1.5fr 0.8fr 0.8fr 0.8fr 8px;"><div class="th th--separator"></div><div class="th"><span class="th__label">Параметр</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">M</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">S</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--right"><span class="th__label">XS</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div><div class="th th--separator"></div></div><div id="dev-spec-table"></div></div>
+    </div>
+
+    <div class="dev-intro">
+      <span class="req">Подключить (если переиспользуете этот CSS напрямую):</span>
+      <code class="tok">styles/typography.css</code>
+      <code class="tok">styles/colors.css</code>
+      <code class="tok">styles/radius.css</code>
+      <code class="tok">styles/spacing.css</code>
+      <code class="tok">styles/sub-tab.css</code>
+      <span class="req">— и <code class="tok">styles/badge.css</code>, если используется счётчик.</span>
+    </div>
+
+    <p class="subhead2">Поведение · псевдокод (framework-agnostic)</p>
+<div class="code-panel">
+      <div class="code-panel__head">
+        <span class="code-panel__name">Поведение · псевдокод (framework-agnostic)</span>
+        <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="copy-label">Копировать</span></button>
+      </div>
+      <pre><code id="code-js"><span class="tk-cm">// 0. ПРЕДУСЛОВИЕ, а не деталь реализации: ряд второго уровня рендерится</span>
+<span class="tk-cm">//    только внутри выбранного таба первого уровня. Компонент без первого</span>
+<span class="tk-cm">//    уровня не собирается — это ограничение применения, см. «Использование».</span>
+
+<span class="tk-cm">// 1. Клик / Enter / Space по сегменту → снять aria-selected со всех,</span>
+<span class="tk-cm">//    поставить на текущий; tabIndex текущего = 0, у остальных = -1 (roving tabindex)</span>
+
+<span class="tk-cm">// 2. Клавиатура на [role="tablist"] — активация НА МЕСТЕ (выбор меняется</span>
+<span class="tk-cm">//    сразу при переходе, без подтверждения Enter):</span>
+<span class="tk-cm">//    ArrowRight / ArrowDown → следующий доступный сегмент (зациклено)</span>
+<span class="tk-cm">//    ArrowLeft  / ArrowUp   → предыдущий доступный сегмент (зациклено)</span>
+<span class="tk-cm">//    Home / End             → первый / последний доступный сегмент</span>
+
+<span class="tk-cm">// 3. Hover = Focus — единый визуальный слой; отдельного pressed нет.</span>
+<span class="tk-cm">//    Заливка держится как hover, пока курсор не покинет сегмент.</span>
+
+<span class="tk-cm">// 4. Разделители — производная от состояния соседей, не самостоятельные узлы:</span>
+<span class="tk-cm">//    линия скрыта у первого сегмента, у выбранного, у соседа справа от</span>
+<span class="tk-cm">//    выбранного и вокруг наведённого. В CSS это ::before + соседние</span>
+<span class="tk-cm">//    селекторы; в шаблонизаторе — тот же расчёт по индексу.</span>
+
+<span class="tk-cm">// 5. Disabled: aria-disabled="true" (НЕ нативный disabled), pointer-events: none,</span>
+<span class="tk-cm">//    tabIndex = -1; клавиатурный перебор такой сегмент пропускает.</span>
+
+<span class="tk-cm">// 6. Переполнения НЕТ: ни скролла, ни меню «Ещё». Ряд шире контейнера —</span>
+<span class="tk-cm">//    это ошибка данных (больше 5 подразделов), а не случай для рантайма.</span></code></pre>
+    </div>
+    <p class="dev-note">Это не готовый сниппет для вставки, а алгоритм. Рабочий референс на vanilla JS — <code class="tok">scripts/ds-tabs.js</code>, функция <code class="tok">subtabs()</code>: она переиспользует общий движок <code class="tok">roving()</code> вместе с Tab и SegmentControl, отличаясь только селектором элемента и отсутствием переполнения.</p>
+    </section>
+
+    <!-- BACKLOG -->
+  <section class="section" data-screen-label="Backlog">
+    <h2>Бэклог</h2>
+    <p class="desc">Кейсы, которых недостаёт компоненту, — на существующих токенах.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>XS на реальном экране</b> — размер собран, но на живых данных не проверен: 24&nbsp;px с подписью 12&nbsp;px — предел читаемости для интерфейса, в котором работают по многу часов. Нужен прогон на «Карточке сделки», где первый уровень собран на <code class="tok">.tab--s</code>.</li>
+        <li><b>Сверка пары линтером</b> — правило «второй уровень не крупнее первого» механизируемо: обе высоты заданы классами (<code class="tok">.tab--m</code>/<code class="tok">--s</code> и <code class="tok">.subtabs--m</code>/<code class="tok">--s</code>/<code class="tok">--xs</code>), и ветка к правилу <code class="tok">B14</code> ловила бы инверсию иерархии автоматически. Пока держится текстом и приёмкой — решение осознанное, не забытое.</li>
+        <li><b>Поведение на цветной поверхности</b> — на <code class="tok">--bg-page</code> и внутри тайлов полупрозрачный трек даёт слабый тональный шаг. Нужен либо вариант с более плотным треком, либо правило «только на белой плашке».</li>
+        <li><b>Контраст подписи на акцентной заливке</b> — 2.91:1, общий вопрос для всех акцентных заливок ДС. Ведётся в <a href="../rnd/Backlog.html">общем бэклоге</a>, решается на уровне токена, не компонента.</li>
+      </ul>
+    </div>
+  </section>
+
+<footer class="page-foot">
+    <span>Дизайн-система · SubTab</span>
+    <span>M 40 · S 32 · XS 24 — Default / Hover = Focus / Selected / Selected + Hover / Disabled — со счётчиком</span>
+  </footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите ряд: количество подразделов, длина подписей, счётчик и отключённый пункт — превью обновляется мгновенно. Кликните по подразделу в превью или походите стрелками с клавиатуры. Ряд первого уровня в превью не выключается: без него компонент не применяется.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента (styles/sub-tab.css) и выжимка API для интеграции.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/tbl-resize.js"></script>
+<script src="../../scripts/tbl-reorder.js"></script>
+<script src="../../scripts/sub-tab.page.js"></script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Счётчик (badge)': 'Показывать счётчик', 'Отключённый подраздел': 'Показывать отключённый подраздел' };</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично) ===== -->
+<script type="text/plain" id="src-code-html">&lt;!-- ряд первого уровня обязателен: без него второй уровень не применяется --&gt;
+&lt;div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы сделки"&gt;
+  &lt;button type="button" class="tab tab--m tab--selected" role="tab" aria-selected="true" tabindex="0"&gt;
+    &lt;span class="tab__label"&gt;Сделка&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1"&gt;
+    &lt;span class="tab__label"&gt;ЦУП&lt;/span&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- второй уровень — подразделы выбранного раздела.
+     Размер — шаг вниз от первого уровня: .tab--m → .subtabs--s --&gt;
+&lt;div class="subtabs subtabs--s" role="tablist" data-subtabs aria-label="Подразделы раздела «Сделка»"&gt;
+
+  &lt;button type="button" class="subtab" role="tab" aria-selected="true" tabindex="0"&gt;
+    &lt;span class="subtab__label"&gt;Общая информация&lt;/span&gt;
+  &lt;/button&gt;
+
+  &lt;button type="button" class="subtab" role="tab" aria-selected="false" tabindex="-1"&gt;
+    &lt;span class="subtab__label"&gt;Документы&lt;/span&gt;
+    &lt;!-- опциональный счётчик — реальный Badge, вариант neutral --&gt;
+    &lt;span class="badge badge--neutral badge--xxs"&gt;12&lt;/span&gt;
+  &lt;/button&gt;
+
+  &lt;!-- отключённый — aria-disabled, не нативный disabled --&gt;
+  &lt;button type="button" class="subtab" role="tab" aria-selected="false" tabindex="-1" aria-disabled="true"&gt;
+    &lt;span class="subtab__label"&gt;История&lt;/span&gt;
+  &lt;/button&gt;
+&lt;/div&gt;</script>
+<script type="text/plain" id="src-code-js">// Выжимка API (полный код — scripts/sub-tab.page.js)
+function makeSubTabs(o) {
+  // o: { items:[{ label, badge, disabled }], selected, label, size, static }
+  // size: 'm' | 's' | 'xs' — по умолчанию 's'; класс .subtabs--<size> на трек
+  // .subtabs → role="tablist" + aria-label; .subtab (role="tab") → .subtab__label
+  // счётчик — атом Badge: .badge--neutral + .badge--xs (M) / .badge--xxs (S, XS)
+}
+// Поведение — рантайм ДС: window.DSTabs.subtabs(host, { onChange }) — клик и
+// клавиатура (roving tabindex). Автоподключение — атрибут data-subtabs на .subtabs.
+// Переполнения нет: у subtabs() нет ни обёрток скролла, ни меню «Ещё».</script>
+<script type="text/plain" id="src-code-css">/* =========================================================================
+   Design System — SubTab (табы второго уровня)
+
+   Навигация по подразделам ВНУТРИ раздела первого уровня. Не самостоятельный
+   компонент: применяется только на экране, где есть ряд табов первого уровня
+   (Tab, .tabs--horiz), и стоит под ним — как содержимое выбранного раздела.
+   Одиночный ряд .subtabs без первого уровня — дефект (правило B14 линтера).
+
+   Чем отличается от соседей:
+   - Tab            — навигация по вьюхам страницы; рейл + подчёркивание,
+                      переполнение (скролл / меню «Ещё»), размеры M и S.
+   - SegmentControl — выбор ЗНАЧЕНИЯ параметра, role="radiogroup";
+                      трек ВЫШЕ сегмента на свой паддинг (M: 34+2×3=40),
+                      выбор — плавающая белая таблетка (thumb) с тенью.
+   - SubTab         — навигация (role="tablist"), но сегментированный вид:
+                      высота трека РАВНА высоте сегмента, паддинга трека нет,
+                      поэтому выбранный сегмент закрашен акцентом от края до
+                      края и обводки трека вокруг него не остаётся.
+                      Скругление задаёт трек через overflow:hidden.
+
+   Sizes:   m (40) · s (32) · xs (24). Размер второго уровня НЕ КРУПНЕЕ
+            первого: шаг вниз — рекомендованный выбор (Tab M → SubTab S,
+            Tab S → SubTab XS), равный размер допустим, крупнее — инверсия
+            иерархии и запрещено. Правило держится текстом, не линтером.
+   States:  default · hover = focus · selected · selected+hover · disabled
+   Slots:   label · счётчик (атом Badge, .badge--neutral; размер плашки идёт
+            за размером ряда: M → .badge--xs, S и XS → .badge--xxs)
+   Ёмкость: 2–5 пунктов. Переполнения нет by design: трек не переносится
+            и не скроллится.
+   Requires: typography.css, colors.css, radius.css, spacing.css, badge.css
+   Runtime:  scripts/ds-tabs.js — хук data-subtabs (DSTabs.subtabs)
+   ========================================================================= */
+
+/* Парные `[hidden]` — правило B11 линтера. Браузерное `[hidden] {display:none}`
+   приходит из UA-стиля со специфичностью (0,0,0), а правила ниже — (0,1,0):
+   класс побеждает, и атрибут `hidden` молча перестаёт работать. */
+.subtabs[hidden],
+.subtab[hidden] { display: none; }
+
+/* ---------- трек ----------------------------------------------------------- */
+.subtabs {
+  /* размерные токены — переопределяются модификатором размера ниже.
+     Значения по умолчанию = S, а не M: базовый размер компонента — тот,
+     что стоит в паре с базовым первым уровнем. Базовый Tab — M (40), шаг
+     вниз от него — S (32). У Tab и SegmentControl корень по умолчанию M по
+     этой же логике: там M и есть их базовый случай. */
+  --sub-h: 32px;
+  --sub-px: var(--space-12);
+  --sub-gap: var(--space-6);
+  --sub-font: var(--type-body-s);
+  --sub-radius: var(--radius-control);
+
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;                       /* сегменты вплотную: границу рисует разделитель */
+  flex-wrap: nowrap;            /* ряд не переносится — ёмкость держит правило, не вёрстка */
+  background: var(--st-system-light);
+  border-radius: var(--sub-radius);
+  overflow: hidden;             /* скругление заливки крайних сегментов */
+}
+
+/* ---------- размеры --------------------------------------------------------
+   Высота трека РАВНА высоте сегмента во всех трёх размерах — паддинга у трека
+   нет ни в одном, это определяющая черта компонента.
+
+   M и S совпадают с размерным рядом Tab (40 / 32 и те же кегли) не случайно:
+   компоненты стоят в паре на одном экране, и шаг «второй уровень на размер
+   ниже первого» возможен только при общей шкале. XS берёт паддинг и кегль у
+   .segctrl--xs — единственного XS-контрола с треком в системе.
+
+   Радиус: M и S — --radius-control (8), XS — --radius-control-s (6): токен
+   заведён ровно для мелких контролов (кнопка XS, чип XS, icon-button S),
+   а 8px на высоте 24 читается переслащённым.
+
+   Размер объявляется на ТРЕКЕ, а не на сегменте (как у SegmentControl, не как
+   у Tab): сегмент SubTab вне трека не существует, и разметке хватает одного
+   класса.                                                                    */
+.subtabs--m {
+  --sub-h: 40px; --sub-px: var(--space-16); --sub-gap: var(--space-8);
+  --sub-font: var(--type-body-m); --sub-radius: var(--radius-control);
+}
+.subtabs--s {
+  --sub-h: 32px; --sub-px: var(--space-12); --sub-gap: var(--space-6);
+  --sub-font: var(--type-body-s); --sub-radius: var(--radius-control);
+}
+.subtabs--xs {
+  --sub-h: 24px; --sub-px: var(--space-8); --sub-gap: var(--space-4);
+  --sub-font: var(--type-body-xs); --sub-radius: var(--radius-control-s);
+}
+
+/* ---------- сегмент -------------------------------------------------------- */
+.subtab {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sub-gap);
+  height: var(--sub-h);
+  padding: 0 var(--sub-px);
+  border: 0;
+  border-radius: 0;             /* форму крайним задаёт трек, а не сегмент */
+  background: transparent;
+  color: var(--text-secondary);
+  font: var(--sub-font);
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+/* Подпись НЕ усекается: ни overflow:hidden, ни text-overflow здесь нет.
+   Второй уровень несёт короткие метки подразделов; ряд из длинных подписей
+   просто становится шире — и это сигнал сократить подписи, а не повод
+   включать многоточие. Раз усечения нет, не нужен и тултип на нём. */
+.subtab__label { white-space: nowrap; }
+.subtab .badge { flex: none; }
+
+/* ---------- разделитель между соседними невыбранными ----------------------- */
+.subtab::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 1px;
+  background: var(--border-primary);
+}
+/* гаснет: у первого, у выбранного и его правого соседа, вокруг наведённого */
+.subtab:first-child::before,
+.subtab:is(.subtab--selected, [aria-selected="true"])::before,
+.subtab:is(.subtab--selected, [aria-selected="true"]) + .subtab::before,
+.subtab:hover::before,
+.subtab:hover + .subtab::before { opacity: 0; }
+
+/* ---------- состояния ------------------------------------------------------
+   Красим напрямую по [aria-selected] / [aria-disabled] — классы --selected и
+   --disabled нужны только для форс-состояний витрины (как у Tab, RulesAudit W1).
+   Hover = focus: единая заливка, держится после клика, пока курсор не ушёл. */
+.subtab:hover,
+.subtab.is-hover {
+  background: var(--primary-bg);
+  color: var(--text-primary);
+}
+
+.subtab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;         /* внутрь: трек с overflow:hidden срезал бы внешнее кольцо */
+}
+
+.subtab--selected,
+.subtab[aria-selected="true"] {
+  background: var(--primary);
+  color: var(--text-on-dark);
+}
+.subtab--selected:hover,
+.subtab--selected.is-hover,
+.subtab[aria-selected="true"]:hover,
+.subtab[aria-selected="true"].is-hover {
+  background: var(--primary-dark);
+  color: var(--text-on-dark);
+}
+/* кольцо --primary на заливке --primary невидимо — на выбранном оно светлое */
+.subtab--selected:focus-visible,
+.subtab[aria-selected="true"]:focus-visible { outline-color: var(--text-on-dark); }
+
+.subtab--disabled,
+.subtab[aria-disabled="true"] {
+  background: transparent;
+  color: var(--text-inactive);
+  cursor: not-allowed;
+  pointer-events: none;
+}</script>
+</body>
+</html>

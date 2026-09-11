@@ -34,6 +34,7 @@
 /* Молекулы */
 @import url("styles/segment-control.css");
 @import url("styles/tab.css");
+@import url("styles/sub-tab.css");
 @import url("styles/breadcrumbs.css");
 @import url("styles/tooltip.css");
 @import url("styles/toast.css");
@@ -51,6 +52,7 @@
 
 /* Организмы */
 @import url("styles/modal.css");
+@import url("styles/drawer.css");
 @import url("styles/nav-panel.css");
 @import url("styles/page-header.css");
 @import url("styles/popover.css");
@@ -63,6 +65,7 @@
 @import url("styles/allocation-bar.css");
 @import url("styles/chart.css");
 @import url("styles/tile.css");
+@import url("styles/kanban.css");
 
 /* Компоненты подкачки */
 @import url("styles/alert.css");

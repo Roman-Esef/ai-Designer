@@ -1,0 +1,437 @@
+/* ============================================================
+   Kanban — доска: тулбар + горизонтальный трек колонок.
+   Колонка (.kbcol) — организм доски: шапка, тело, линия вставки.
+   Карточка — Card (.tile.tile--card) + раскладка контента (.kbcard).
+   Геометрию и интерактивные состояния карточки задаёт Card в
+   styles/tile.css; здесь — только то, что принадлежит доске.
+
+   Скролл один и он у .kanban__viewport — обе оси сразу. У колонок
+   своего скролла нет: доска прокручивается целиком, а шапки колонок
+   залипают сверху (position: sticky). Ряд колонок .kanban__track —
+   отдельный элемент внутри вьюпорта, см. разбор ниже.
+
+   Хост-контракт: доска обязана получить ОПРЕДЕЛЁННУЮ высоту — быть
+   flex-элементом (flex: 1; min-height: 0) в колоночном родителе,
+   у которого высота задана. Без этого вьюпорту нечего ограничивать,
+   скролл уезжает на страницу и залипания шапок не будет.
+
+   Только токены ДС (var(--*)).
+   ============================================================ */
+
+/* Парные `[hidden]` — правило B11 линтера. */
+.kanban[hidden],
+.kbcol[hidden],
+.kbcard[hidden] { display: none; }
+
+.kanban {
+  --kb-col-w: 288px;        /* ширина колонки вместе с паддингом 8+8 */
+  --kb-col-pad: var(--space-8);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+}
+
+/* ------------------------------------------------------------
+   Тулбар доски
+   ------------------------------------------------------------ */
+.kanban__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+  min-width: 0;
+  flex: none;
+}
+.kanban__title {
+  margin: 0;
+  font: var(--type-h5-strong);
+  color: var(--text-primary);
+}
+.kanban__toolbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* ------------------------------------------------------------
+   ДВЕ РОЛИ — ДВА ЭЛЕМЕНТА, и это главное правило раскладки доски.
+
+   .kanban__viewport — скроллпорт: единственный скролл доски, обе оси.
+   .kanban__track    — ряд колонок: высота по самой длинной колонке.
+
+   Совмещать их в одном элементе нельзя, хотя очень хочется. Скроллпорт
+   имеет ОПРЕДЕЛЁННУЮ высоту (flex: 1 в колоночном родителе), а
+   align-items: stretch растягивает элементы по высоте КОНТЕЙНЕРА, а не
+   по высоте самого длинного из них. Пока скроллпорт и ряд — один
+   элемент, колонка ровно высотой с видимую область, и отсюда сразу два
+   дефекта: карточки, которые в неё не влезли, торчат за её коробкой
+   (заливка hover и цель дропа кончаются раньше карточек), а sticky-шапка
+   отлипает на первом же экране прокрутки — держать её внутри колонки
+   больше негде. Проверено дважды: сперва здесь стоял flex-start (шапка
+   отлипала у коротких колонок), потом stretch (отлипала у всех).
+
+   Инвариант Layout: у экрана горизонтального скролла нет, он принадлежит
+   контейнеру в его собственной раскладке.
+
+   Колонки прижаты друг к другу (gap: 0): расстояние между карточками
+   соседних колонок даёт паддинг самих колонок, 8+8=16. По вертикали
+   карточки стоят плотнее — зазор 8: на доске важнее, сколько карточек
+   видно разом, а границы между ними задаёт рамка Card, не воздух.
+   ------------------------------------------------------------ */
+.kanban__viewport {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.kanban__track {
+  position: relative;        /* система координат .kanban__colguide */
+  display: flex;
+  gap: 0;
+  /* Высота ряда — auto, то есть по самой длинной колонке; отсюда
+     stretch растягивает до неё ВСЕ колонки, и коробка каждой доходит
+     до конца прокрутки. min-height не даёт ряду быть ниже скроллпорта:
+     на доске из двух карточек колонка всё равно цель дропа во всю
+     высоту, а не полоска сверху. */
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+/* Заглушка «Добавить колонку» — в конце трека, там же, где появится
+   результат (закон Фиттса + принцип близости) */
+.kanban__addcol {
+  flex: 0 0 var(--kb-col-w);
+  width: var(--kb-col-w);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--kb-col-pad);
+}
+
+/* Карточка (или шапка колонки) на плавающем слое, пока её тащат */
+.kanban__flying {
+  position: fixed;
+  z-index: 1200;
+  margin: 0;
+  pointer-events: none;
+  user-select: none;
+}
+/* Летит клон ШАПКИ, а не колонки целиком: колонка высотой в экран под
+   курсором нечитаема и перекрывает как раз ту часть доски, куда целятся. */
+.kanban__flying.kbcol__head {
+  box-shadow: var(--shadow-modal-form);
+  border-radius: var(--radius-m);
+}
+
+/* Вертикальная линия места вставки колонки. Тон тот же, что у линии
+   вставки карточки: указатель позиции — единственный, WCAG 1.4.11 просит
+   для него 3:1. Высота и вертикаль — из CSS, не из JS: линия абсолютна
+   внутри .kanban__track, а трек сам не скроллится (скролл у вьюпорта),
+   поэтому поправки на прокрутку не нужны — рантайм считает только left. */
+.kanban__colguide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 2px;
+  border-radius: var(--radius-2xs);
+  background: var(--primary-dark);
+  pointer-events: none;
+}
+
+/* Пока идёт перенос, выделение текста выключено НА ВСЁМ экране, а не
+   только на доске: жест уводит указатель за пределы трека, и браузер
+   начинает тянуть выделение по соседним карточкам и по документу.
+   Класс живёт на <body> — так же, как ds-nav.js держит .ds-nav-open. */
+.kb-dragging,
+.kb-dragging * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ------------------------------------------------------------
+   Колонка. Своей заливки в покое НЕТ — она появляется только под
+   указателем и при перетаскивании, чтобы цель дропа читалась.
+   ------------------------------------------------------------ */
+.kbcol {
+  flex: 0 0 var(--kb-col-w);
+  width: var(--kb-col-w);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--kb-col-pad);
+  border-radius: var(--radius-m);
+  background-color: transparent;
+  transition: background-color .15s ease, opacity .15s ease;
+}
+
+/* Шапка колонки залипает при вертикальном скролле вьюпорта.
+   Заливка обязана быть НЕПРОЗРАЧНОЙ: под шапкой едут карточки.
+   Тон состояния (--primary-bg — color-mix c transparent) полупрозрачный,
+   поэтому кладётся слоем ПОВЕРХ непрозрачной базы, а не вместо неё. */
+.kbcol__head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+  /* тянется на всю ширину колонки, но содержимое стоит по кромке карточек */
+  margin: calc(-1 * var(--kb-col-pad)) calc(-1 * var(--kb-col-pad)) 0;
+  padding: var(--kb-col-pad);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
+  background-color: var(--bg-page);
+  background-image: none;
+  cursor: grab;                 /* шапка — ручка переноса колонки */
+}
+.kbcol__head:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+.kbcol--moving > .kbcol__head { cursor: grabbing; }
+/* Кнопки внутри шапки — обычные кнопки, ручкой не работают */
+.kbcol__acts .ibtn { cursor: pointer; }
+.kbcol__marker {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-circle);
+  background: var(--st-grey);
+}
+.kbcol--green   .kbcol__marker { background: var(--st-green); }
+.kbcol--lblue   .kbcol__marker { background: var(--st-lblue); }
+.kbcol--orange  .kbcol__marker { background: var(--st-orange); }
+.kbcol--dpurple .kbcol__marker { background: var(--st-dpurple); }
+.kbcol--primary .kbcol__marker { background: var(--st-primary); }
+
+.kbcol__name {
+  min-width: 0;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Три действия: добавить · перейти на страницу колонки · меню */
+.kbcol__acts {
+  margin-left: auto;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.kbcol__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+  padding-top: var(--space-8);
+}
+
+/* Линия места вставки. Тон --primary-dark, а не --primary: линия —
+   единственный указатель позиции, и по WCAG 1.4.11 ей нужен контраст
+   3:1 (у --primary к белому 2.91:1, у --primary-dark 5.24:1). */
+.kbcol__guide {
+  flex: none;
+  height: 2px;
+  /* Линия — такой же flex-элемент, как карточка: вставка добавляет к списку
+     её высоту и ЕЩЁ ОДИН зазор. Отрицательные поля гасят прибавку, чтобы
+     соседи не разъезжались в момент показа линии; компенсация равна
+     половине зазора (8/2 = 4), при зазоре 16 здесь стояло 8. */
+  margin: calc(-1 * var(--space-4)) 0;
+  border-radius: var(--radius-2xs);
+  background: var(--primary-dark);
+}
+
+/* ---- состояния колонки ----
+   Специфичность здесь значащая, а не косметика. Селектор с псевдоклассом
+   .kbcol:hover — это (0,2,0), голый модификатор .kbcol--drop — (0,1,0), и
+   порядок в файле не спасает: специфичность решает раньше. Клон летит с
+   pointer-events: none, поэтому колонка под курсором ВСЕГДА в :hover —
+   состояние, ради которого правило написано, и состояние, которое его
+   гасит, наступают одновременно. Отсюда .kbcol.kbcol--drop и
+   .kbcol.kbcol--selected: модификатор уравнен по весу с псевдоклассом. */
+.kbcol:hover { background-color: var(--primary-bg); }
+.kbcol:hover > .kbcol__head {
+  background-image: linear-gradient(var(--primary-bg), var(--primary-bg));
+}
+/* Во время переноса подсвечена ровно одна колонка — та, куда ляжет
+   карточка. Наведение гасится, НО не на самой цели: без :not() правило
+   (0,4,0) перебивало бы .kbcol.kbcol--drop (0,2,0) и гасило именно ту
+   подсветку, ради которой всё затевалось. Колонка под курсором всегда
+   в :hover (клон летит с pointer-events: none), и она же чаще всего цель;
+   гасить надо остальные случаи — свёрнутую колонку, которую дроп не
+   принимает, и колонку под курсором в момент, когда линия вставки ещё
+   не встала. */
+.kanban.is-dragging .kbcol:hover:not(.kbcol--drop) { background-color: transparent; }
+.kanban.is-dragging .kbcol:hover:not(.kbcol--drop) > .kbcol__head { background-image: none; }
+
+/* Цель дропа. Заливка та же, что под указателем (--primary-bg), поэтому
+   цель отличает КОЛЬЦО, а не тон: во время переноса hover-заливка гасится
+   правилом выше, и подсвеченной остаётся ровно одна колонка — та, куда
+   ляжет карточка. Подсветка обязана читаться однозначно: это единственный
+   ответ системы на вопрос «куда именно» (эвристика Нильсена №1). */
+.kbcol.kbcol--drop {
+  background-color: var(--primary-bg);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+.kbcol.kbcol--drop > .kbcol__head {
+  background-image: linear-gradient(var(--primary-bg), var(--primary-bg));
+}
+
+/* Колонка на месте, откуда её взяли: геометрия сохранена, соседи
+   не прыгают — тот же приём, что у .kbcard--ghost. */
+.kbcol--ghost { opacity: .4; }
+/* тот же случай, что и у --drop: голый модификатор (0,1,0) слабее .kbcol:hover (0,2,0) */
+.kbcol.kbcol--selected { background-color: var(--primary-bg); }
+
+/* ---- свёрнутая колонка ---- */
+.kbcol--collapsed {
+  flex: 0 0 48px;
+  width: 48px;
+}
+.kbcol--collapsed .kbcol__body,
+.kbcol--collapsed .kbcol__name { display: none; }
+.kbcol--collapsed .kbcol__head {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  border-radius: var(--radius-m);
+}
+.kbcol--collapsed .kbcol__acts { margin-left: 0; flex-direction: column; }
+/* Имя читается СНИЗУ ВВЕРХ: vertical-rl даёт сверху вниз,
+   поворот на 180° разворачивает и направление письма, и порядок строк. */
+.kbcol__vname {
+  display: none;
+  max-height: 320px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+}
+.kbcol--collapsed .kbcol__vname { display: block; }
+@media (prefers-reduced-motion: reduce) {
+  .kbcol { transition: none; }
+}
+
+/* ------------------------------------------------------------
+   Карточка доски = Card (.tile.tile--card) + раскладка контента.
+   Геометрия, Hover / Active / Move / Disabled — у Card в tile.css.
+   Здесь только то, что принадлежит доске: поля, метрики, подвал,
+   плотность и служебные состояния перетаскивания и выбора.
+   ------------------------------------------------------------ */
+.kbcard {
+  cursor: grab;            /* вся карточка — ручка перетаскивания */
+}
+.kbcard.is-move { cursor: grabbing; }
+
+/* Пользовательские поля — две колонки, значение в одну строку:
+   перенос ломает сетку и делает карточки разной высоты без причины */
+.kbcard__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-8) var(--space-12);
+}
+.kbcard__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.kbcard__flabel {
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kbcard__fvalue {
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Метрики: вложения, комментарии, срок */
+.kbcard__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+.kbcard__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+}
+.kbcard__stat :is(svg, [data-icon]) { width: 16px; height: 16px; }
+
+.kbcard__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.kbcard__id {
+  margin-left: auto;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+}
+
+/* Контент карточки — колонка с зазором 12 */
+.kbcard > .tile__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+/* ---- плотность ----
+   Компактная — ответ на зафиксированную потребность: «Operations хотят
+   видеть больше карточек на экране одновременно». Заголовок в одну
+   строку, поля с лица уходят в Drawer. */
+.kbcard--compact > .tile__header {
+  padding: var(--space-12) var(--space-12) var(--space-4);
+}
+.kbcard--compact > .tile__body {
+  padding: var(--space-4) var(--space-12) var(--space-12);
+  gap: var(--space-8);
+}
+.kbcard--compact .tile__title {
+  font: var(--type-body-s-strong);
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+.kbcard--compact .kbcard__fields,
+.kbcard--compact .kbcard__meta { display: none; }
+
+/* ---- служебные состояния доски (у Card их нет) ----
+   Ghost — место схваченной карточки: геометрия сохранена, поэтому
+   список не схлопывается и соседи не прыгают. */
+.kbcard--ghost {
+  background: var(--bgtable-row-focus);
+  border-style: dashed;
+  border-color: var(--border-primary);
+  box-shadow: none;
+}
+.kbcard--ghost > * { opacity: 0; }
+.kbcard--selected {
+  background: var(--primary-bg);
+  border-color: var(--primary);
+}
+.kbcard--error { border-color: var(--error); }

@@ -2,7 +2,7 @@
 component: Chip
 title: "Chip"
 version: "1.018"
-updated: "05.09.2026"
+updated: "11.09.2026"
 page: pages/atoms/Chip.html
 page_js: scripts/chip.page.js
 runtime: scripts/ds-chip.js (+ scripts/ds-tooltip.js — тултип усечённой подписи)

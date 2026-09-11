@@ -32,7 +32,12 @@ const HEX_OK = /(chess|checker|shadow-demo|elevation-demo)/i;
 // #f2f5f5/#fbfcfc/#d9e0e0 — подложка и рамка превью конструктора; rgba(40,50,55,*) — демо-тени
 const HEX_ALLOW = [/^#(fff|ffffff|000|000000)$/i, /^rgba?\(\s*255\s*,\s*255\s*,\s*255/i, /^#(f2f5f5|fbfcfc|d9e0e0)$/i, /^rgba?\(\s*40\s*,\s*50\s*,\s*55/i];
 // пары «скрипт ↔ его CSS» (сами скрипты умеют подтягивать стиль, потому WARN)
-const JS_CSS_PAIRS = [['ds-nav.js', 'ds-nav.css'], ['ds-toc.js', 'ds-toc.css'], ['pg-kit.js', 'pg-kit.css']];
+const JS_CSS_PAIRS = [['ds-nav.js', 'ds-nav.css'], ['ds-toc.js', 'ds-toc.css'], ['pg-kit.js', 'pg-kit.css'],
+  // ds-tooltip.js свой CSS НЕ догружает, а разметку строит: оборачивает подпись в
+  // .tip-anchor и кладёт рядом .tip. Без tooltip.css этот .tip рисуется обычным
+  // текстом — подпись дублируется прямо в компоненте (инцидент 11.09.2026: Tab,
+  // Chip, Entity, Table). Потому BLOCKER, а не WARN, как у самодогружающих пар.
+  ['ds-tooltip.js', 'tooltip.css', 'BLOCKER']];
 // рантаймы, которые ds.js (RulesAudit W0/K0) догружает сам — экран не должен подключать их напрямую
 const DS_JS_BUNDLES = ['icons-data.js', 'ds-icons.js', 'ds-float.js', 'screens-chrome.js', 'ds-tabs.js', 'ds-tile.js', 'ds-menu.js', 'ds-popover.js', 'ds-tooltip.js', 'ds-modal.js', 'ds-table.js', 'tbl-resize.js', 'tbl-reorder.js', 'tbl-pin.js', 'ds-pagination.js', 'ds-riskmetric.js', 'ds-alert.js', 'ds-chip.js', 'ds-allocationbar.js', 'ds-notify.js', 'ds-datepicker.js', 'input-kit.js', 'ds-nav-panel.js', 'ds-splitter.js', 'ds-illustrations.js'];
 // утилитарные классы разметки документации — владельца в styles/* не имеют
@@ -56,6 +61,18 @@ const SHRINK_OK = {
   tab: 'ряд табов не сжимает таб, а скроллится (.tabs-scroll) или прячет хвост в меню «Ещё» (.tabs-overflow); внутри меню .tab__label сжимается своим правилом',
   segctrl: 'ширина трека — по контенту; в --fullwidth растягивается трек, а сегменты делят его через flex:1 1 0 — сжимается item, не контрол'
 };
+// B15 — законный паддинг на элементе с рейлом. Ключ — «<css-файл> <ось> <блок>»,
+// где ось: h — линия идёт по горизонтали (запрещён горизонтальный паддинг), v — по
+// вертикали. Каждое подавление — с причиной. Подавляется ровно одна ось: вторая
+// продолжает стеречь.
+const RAIL_PAD_OK = {
+  // .tabs объявляет обе ориентации, и по селектору `.tabs` статически не понять, какая
+  // стоит на странице. Панель документации (Конструктор/Документация/Код) держит только
+  // горизонтальный ряд: рейл у него снизу, верхний отступ его не удлиняет. Горизонтальная
+  // ось того же файла НЕ подавлена — она и ловила инцидент 11.09.2026.
+  'docs-split.css v tabs': 'панель документации держит только .tabs--horiz; рейл снизу, вертикальный паддинг его не трогает',
+};
+
 // B9 — обёртки, которые рантайм вставляет ВОКРУГ уже свёрстанного элемента.
 // Такая обёртка обязана быть раскладочно прозрачной, иначе она меняет поведение
 // чужой разметки, которая сама по себе написана правильно.
@@ -328,6 +345,88 @@ async function globalChecks(P, out) {
     }
   }
 
+  /* B15 — паддинг на элементе, который несёт рейл, режет рейл наружу.
+     Рейл ряда (общая линия под табами, слева от вертикальных табов, линия-разделитель
+     внутри группы) рисуется inset-тенью: `box-shadow: inset 0 -1px 0 0 var(--tab-track)`.
+     Inset-тень рисуется ПО PADDING-BOX, а не по content-box — значит паддинг на том же
+     элементе не отодвигает линию вместе с содержимым, а удлиняет её: линия выходит до
+     первого элемента ряда и тянется после последнего. Выглядит как «полоска 24px, потом
+     табы, потом снова полоска» (инцидент docs-split.css, ряд «Конструктор/Документация/
+     Код», 11.09.2026: `padding: 10px 24px 0` на `.tabs`).
+     Признак машинный: ось рейла берётся из смещений тени — `inset 0 ±N` = линия идёт по
+     горизонтали (низ/верх), запрещён горизонтальный паддинг; `inset ±N 0` = линия идёт по
+     вертикали (лево/право), запрещён вертикальный. Тень-кольцо (`inset 0 0 0 N`) — не рейл,
+     пропускается. Горизонтальный отступ ряда задаётся ОБЁРТКОЙ без рейла.
+     Заведено 11.09.2026, первый цикл — WARN (skills/ds-integrity-check.md, «Как расширять», п.4). */
+  {
+    const railRules = [];
+    const allRules = [];
+    for (const f of P.styleFiles) {
+      const css = (P.src && P.src.get(f)) || (await readFile(f).catch(() => ''));
+      const clean = css.replace(/\/\*[\s\S]*?\*\//g, '');
+      for (const m of clean.matchAll(/([^{}]+)\{([^{}]*)\}/g)) allRules.push({ f, sel: m[1].trim(), decl: m[2] });
+    }
+    /* классы ключевого компаунда каждой ветки селектора: то, на что правило и наводится */
+    const keyClasses = (sel) => splitTopLevel(sel).map((br) => {
+      const last = br.trim().split(/[\s>+~]+/).filter(Boolean).pop() || '';
+      return (last.match(/\.[-\w]+/g) || []).map((c) => c.slice(1));
+    });
+    const nonZero = (v) => !!v && !/^0[a-z%]*$/i.test(v.trim());
+    const padOnAxis = (decl) => {
+      const hit = { h: null, v: null };
+      for (const d of decl.split(';')) {
+        const m = d.match(/^\s*(padding(?:-[a-z-]+)?)\s*:\s*(.+)$/i);
+        if (!m) continue;
+        const prop = m[1].toLowerCase();
+        const val = m[2].replace(/!important/i, '').trim();
+        const parts = val.split(/\s+/);
+        if (prop === 'padding') {
+          const t = parts[0], r = parts[1] != null ? parts[1] : t;
+          const b = parts[2] != null ? parts[2] : t, l = parts[3] != null ? parts[3] : r;
+          if (nonZero(r) || nonZero(l)) hit.h = prop + ': ' + val;
+          if (nonZero(t) || nonZero(b)) hit.v = prop + ': ' + val;
+        } else if (/^padding-(left|right|inline)/.test(prop)) {
+          if (parts.some(nonZero)) hit.h = prop + ': ' + val;
+        } else if (/^padding-(top|bottom|block)/.test(prop)) {
+          if (parts.some(nonZero)) hit.v = prop + ': ' + val;
+        }
+      }
+      return hit;
+    };
+    for (const r of allRules) {
+      const sh = r.decl.match(/box-shadow\s*:\s*([^;]+)/i);
+      if (!sh || !/inset/i.test(sh[1])) continue;
+      const off = sh[1].replace(/inset/ig, '').trim().match(/^(-?[\d.]+)[a-z%]*\s+(-?[\d.]+)[a-z%]*/i);
+      if (!off) continue;
+      const x = parseFloat(off[1]), y = parseFloat(off[2]);
+      const axis = (x === 0 && y !== 0) ? 'h' : (y === 0 && x !== 0) ? 'v' : null;   // кольцо (0 0) — не рейл
+      if (!axis) continue;
+      for (const br of splitTopLevel(r.sel)) {
+        /* рейл РЯДА объявляется на самом контейнере — одиночным компаундом
+           (`.tabs--horiz`). Ветка с комбинатором (`.btn-group--accent > .btn + .btn`)
+           — это разделитель НА ЭЛЕМЕНТЕ группы, он обязан идти во всю его сторону,
+           и паддинг элемента его законно удлиняет. Такие ветки не регистрируются. */
+        const t = br.trim();
+        if (/[>+~]/.test(t) || /\s/.test(t)) continue;
+        for (const c of (t.match(/\.[-\w]+/g) || []).map((x) => x.slice(1))) {
+          const block = c.split('--')[0];
+          if (!railRules.some((q) => q.block === block && q.axis === axis)) railRules.push({ block, axis, sel: r.sel, f: r.f });
+        }
+      }
+    }
+    for (const rail of railRules) {
+      for (const r of allRules) {
+        if (!keyClasses(r.sel).some((cs) => cs.some((c) => c === rail.block || c.startsWith(rail.block + '--')))) continue;
+        const hit = padOnAxis(r.decl)[rail.axis];
+        if (!hit) continue;
+        if (RAIL_PAD_OK[base(r.f) + ' ' + rail.axis + ' ' + rail.block]) continue;
+        const side = rail.axis === 'h' ? 'горизонтальный' : 'вертикальный';
+        out.push(['WARN', 'B15', r.f + ': "' + r.sel.replace(/\s+/g, ' ').slice(0, 70) + '" — ' + side + ' паддинг (' + hit
+          + ') на элементе с рейлом (' + rail.f + ': "' + rail.sel.replace(/\s+/g, ' ').slice(0, 40) + '"); inset-тень рисуется по padding-box, паддинг удлиняет линию до первого и после последнего элемента ряда — отступ задавать обёрткой без рейла']);
+      }
+    }
+  }
+
   /* B9 — обёртка рантайма меняет раскладку чужой разметки. Рантаймы ДС вставляют свои
      обёртки ВОКРУГ уже свёрстанного элемента (`X.parentNode.insertBefore(W, X)`), поэтому
      обёртка обязана быть раскладочно прозрачной: `max-width: 100%`, а для flex/inline-flex
@@ -459,6 +558,112 @@ async function globalChecks(P, out) {
     if (real.length < 2) continue;
     const sorted = [...real].sort((a, b) => a.localeCompare(b, 'ru'));
     if (real.join('|') !== sorted.join('|')) out.push(['WARN', 'D4', 'ds-nav.js: «' + gname + '» — порядок не алфавитный']);
+  }
+  await runtimeApiCheck(P, out);
+  await stickyInHorizontalScrollCheck(P, out);
+}
+
+/* ---------- A9: вызов метода, которого нет в экспорте рантайма ----------
+   Идиома «window.DSX && DSX.method» при опечатке в ИМЕНИ МЕТОДА не падает и
+   ничего не пишет в консоль: guard просто ложный, и функциональность тихо
+   отсутствует. Так на странице Kanban не появлялся индикатор сегмент-контрола
+   (`DSTabs.bindAll` вместо `wireAll` — у DSTabs нет метода bindAll), не
+   закрывалась модалка подтверждения (`DSModal.close` вместо `closeTop`) и не
+   рисовались иллюстрации пустого состояния (`DSIllustrations.apply` вместо
+   `render`). Ни один гейт этого не видел: классы на месте, разметка валидна,
+   рантайм подключён — не совпадает только имя, а проверить его некому.
+
+   Проверка чисто текстовая и потому дешёвая: ключи из `window.DSX = {…}`
+   каждого рантайма сверяются с обращениями `DSX.method(` во всех скриптах и
+   страницах. Комментарии вырезаются — шапка рантайма законно упоминает чужие
+   приватные функции (`DSModal.lockPage()` в ds-float.js: объяснение, не вызов).
+   Неизвестный namespace пропускается: правило стережёт только то, чей экспорт
+   действительно виден. Уровень BLOCKER — дефект этого класса не проявляется
+   ни в консоли, ни на гейтах, только глазами на живой странице. */
+/* ---------- B13: горизонтальный flex-скроллпорт растягивает содержимое по
+   своей высоте, а не по высоте контента — sticky внутри него не держит ----------
+   Пока элемент одновременно `display: flex` (строкой, не колонкой) И
+   скроллпорт (`overflow: auto|scroll`), align-items: stretch (дефолт flex)
+   тянет его детей по высоте САМОГО КОНТЕЙНЕРА, а не по высоте самого
+   длинного из них. Если внутри такого ребёнка есть `position: sticky` —
+   он держится только до конца коробки родителя, то есть до конца видимой
+   области, и отваливается на первом же экране прокрутки. Тот же механизм
+   отнимает и цель попадания указателем: контент, который не влез в коробку
+   ребёнка, торчит за её пределами, и hover/дроп там уже не работают.
+
+   Ровно так был устроен .kanban__track: одновременно скроллпорт и flex-ряд,
+   внутри — sticky-шапка колонки. Правка развела роли на два элемента —
+   .kanban__viewport (скролл) и .kanban__track (ряд, высота auto) — и это
+   тот образец, которым правило и написано (10.09.2026).
+
+   Срабатывает, только если В ТОМ ЖЕ ФАЙЛЕ объявлен хотя бы один
+   `position: sticky` — иначе проверять нечего: без sticky внутри лишняя
+   растяжка по высоте почти всегда безвредна (см. семь колоночных
+   flex+overflow контейнеров в ДС — там stretch действует на ширину). */
+async function stickyInHorizontalScrollCheck(P, out) {
+  const cssFiles = P.styleFiles;
+  const srcs = await Promise.all(cssFiles.map((f) => readFile(f).catch(() => '')));
+  for (let i = 0; i < cssFiles.length; i++) {
+    const f = cssFiles[i];
+    const css = srcs[i].replace(/\/\*[\s\S]*?\*\//g, '');
+    if (!/position:\s*sticky/.test(css)) continue;
+    for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      const sel = m[1].trim(), body = m[2];
+      if (!/display:\s*flex\b/.test(body)) continue;
+      if (/flex-direction:\s*column/.test(body)) continue;
+      if (!/overflow(-x|-y)?:\s*(auto|scroll)\b/.test(body)) continue;
+      out.push(['WARN', 'B13', f + ': "' + sel + '" — горизонтальный flex-контейнер сам является скроллпортом; stretch растянет детей по высоте видимой области, а не по высоте самого длинного — sticky внутри отвалится на первом экране прокрутки. Развести на скроллпорт (overflow) и ряд (высота auto) двумя элементами']);
+    }
+  }
+}
+
+async function runtimeApiCheck(P, out) {
+  const KEY = /(?:^|[,{])\s*([A-Za-z_$][\w$]*)\s*(?=[:,}])/g;
+  const decomment = (t) => t
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+
+  const jsFiles = P.list.filter((f) => /^scripts\/.+\.js$/.test(f) && !/ds-lint/.test(base(f)));
+  const jsSrc = await Promise.all(jsFiles.map((f) => readFile(f).catch(() => '')));
+
+  const exp = new Map();                       // DSX -> { file, keys: Set }
+  for (let i = 0; i < jsFiles.length; i++) {
+    const src = decomment(jsSrc[i]);
+    for (const m of src.matchAll(/window\.(DS[A-Za-z]\w*)\s*=\s*\{/g)) {
+      const at = m.index + m[0].length - 1;
+      let d = 0, end = -1;
+      for (let k = at; k < src.length; k++) {
+        if (src[k] === '{') d++;
+        else if (src[k] === '}') { d--; if (!d) { end = k; break; } }
+      }
+      if (end < 0) continue;
+      const keys = new Set();
+      // закрывающая скобка нужна: без неё последний ключ объекта не находится
+      for (const k of (src.slice(at + 1, end) + '}').matchAll(KEY)) keys.add(k[1]);
+      exp.set(m[1], { file: base(jsFiles[i]), keys });
+    }
+    for (const m of src.matchAll(/window\.(DS[A-Za-z]\w*)\.(\w+)\s*=/g)) {
+      if (exp.has(m[1])) exp.get(m[1]).keys.add(m[2]);
+    }
+  }
+  if (!exp.size) return;
+
+  const targets = P.list.filter((f) => /\.(js|html)$/.test(f) && !/ds-lint/.test(base(f)));
+  const srcs = await Promise.all(targets.map((f) => readFile(f).catch(() => '')));
+  for (let i = 0; i < targets.length; i++) {
+    const f = targets[i];
+    const src = decomment(srcs[i].replace(/<!--[\s\S]*?-->/g, ' '));
+    const seen = new Set();
+    for (const m of src.matchAll(/\b(DS[A-Za-z]\w*)\.(\w+)\s*(?=\()/g)) {
+      const ns = m[1], fn = m[2], e = exp.get(ns);
+      if (!e || base(f) === e.file || e.keys.has(fn)) continue;
+      const k = ns + '.' + fn;
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push(['BLOCKER', 'A9', f + ': ' + k + '() — нет в экспорте ' + e.file +
+        ' (есть: ' + [...e.keys].join(', ') + '). Guard «window.' + ns + ' && ' + k +
+        '» делает промах бесшумным: ни ошибки, ни функциональности']);
+    }
   }
 }
 
@@ -654,8 +859,13 @@ async function pageChecks(p, P, opts, out) {
   };
 
   /* A1 — скрипт без парного CSS */
-  for (const [js, css] of JS_CSS_PAIRS) {
-    if (scripts.some((s) => base(s) === js) && !linkNames.includes(css) && !hasBundle) say('WARN', 'A1', js + ' подключён без ' + css);
+  for (const [js, css, hard] of JS_CSS_PAIRS) {
+    if (!scripts.some((s) => base(s) === js) || linkNames.includes(css) || hasBundle) continue;
+    /* уровень — отдельной переменной: реестр якорей (lessons-cli anchors) читает
+       точку отчёта по форме `say('УРОВЕНЬ'|lvl, 'ID'`, и выражение прямо в
+       аргументе делает правило невидимым для реестра */
+    const lvl = hard || 'WARN';
+    say(lvl, 'A1', js + ' подключён без ' + css);
   }
   /* A2 — компонентный CSS не подключён.
      Классы берутся и из разметки, и из парного *.page.js: `markup` вырезает
@@ -685,6 +895,20 @@ async function pageChecks(p, P, opts, out) {
       const [f, lvl] = key.split('|');
       say(lvl, 'A2', 'классы ' + cls.join(', ') + ' есть, а <link> на ' + f + ' нет');
     }
+  }
+  /* B14 — SubTab без первого уровня. Компонент второго уровня не самостоятелен:
+     его механика (заливка выбранного сегмента в общем треке) сообщает «я
+     подчинён» только рядом с рядом табов первого уровня. Одиночный `.subtabs`
+     читается как один уровень навигации с необычным видом — дефект не виден
+     ни глазами на самой раскладке, ни сенсором: разметка валидна, компонент
+     выглядит нормально, врёт только иерархия. Поэтому правило структурное:
+     есть `.subtabs` — на той же странице обязан быть `.tabs--horiz` с `.tab`.
+     Комментарии и <script> из markup уже вырезаны выше, поэтому страница,
+     ОБЪЯСНЯЮЩАЯ правило текстом, сама его не глушит. */
+  {
+    const hasSub = /class="[^"]*\bsubtabs\b[^"]*"/.test(markup);
+    const hasL1 = /class="[^"]*\btabs--horiz\b[^"]*"/.test(markup) && /class="[^"]*\btab\b[^"]*"/.test(markup);
+    if (hasSub && !hasL1) say('BLOCKER', 'B14', 'есть .subtabs (табы второго уровня), но нет ряда первого уровня (.tabs--horiz с .tab) — второй уровень не применяется в одиночку: он размещается как содержимое выбранного таба первого уровня. Одиночный ряд переключения вьюх — это Tab');
   }
   /* A6 — контейнер страницы: ds-nav/ds-toc монтируются только в <main class="page"> */
   if (!isScreen && !/<main class="page(?:\s|")/.test(markup) && scripts.some((s) => /ds-(nav|toc)\.js$/.test(s))) say('BLOCKER', 'A6', 'нет <main class="page"> — ds-nav/ds-toc молча не смонтируются');
@@ -1111,10 +1335,15 @@ async function pageChecks(p, P, opts, out) {
       if (upd && su && su.trim() !== upd.trim()) say('WARN', 'D7', 'дата в спеке ' + su + ' ≠ ' + upd + ' на странице');
     }
   }
-  /* D7 вне реестров (pages/rnd/* и прочие): спека есть — версия и дата обязаны совпадать */
+  /* D7 вне реестров (pages/rnd/* и прочие): версия и дата обязаны совпадать со
+     спекой — но только если спека и правда объявляет ЭТУ страницу. Совпадения
+     одного имени файла мало: `pages/rnd/Kanban.html` — концепт, из которого
+     вырос организм, отдельный документ со своей историей, и требовать от него
+     версию компонента бессмысленно. Сверяем с полем `page:` спеки. */
   if (!inRegistry) {
     const s = P.src.get('specs/' + name + '.md');
-    if (s) {
+    const declared = s ? ((s.match(/^page:\s*(\S+)/m) || [])[1] || '').trim() : '';
+    if (s && declared === p) {
       const sv = (s.match(/^version:\s*"?([^"\n]+)/m) || [])[1];
       const su = (s.match(/^updated:\s*"?([^"\n]+)/m) || [])[1];
       if (ver && sv && sv.trim() !== ver.trim()) say('WARN', 'D7', 'версия в спеке ' + sv + ' ≠ ' + ver + ' на странице');

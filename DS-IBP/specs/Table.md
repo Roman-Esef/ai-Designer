@@ -2,7 +2,7 @@
 component: Table
 title: "Table"
 version: "1.015"
-updated: "05.09.2026"
+updated: "11.09.2026"
 page: pages/organisms/Table.html
 runtime: scripts/ds-table.js, scripts/tbl-resize.js, scripts/tbl-reorder.js, scripts/tbl-pin.js, scripts/ds-table-settings.js (+ scripts/ds-tooltip.js — тултип усечённой ячейки/шапки)
 css: styles/table.css

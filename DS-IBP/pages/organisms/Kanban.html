@@ -1,0 +1,1641 @@
+<!-- @dsCard group="Организмы" name="Kanban" viewport="1440x900" subtitle="Доска, колонка и карточка Card" -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanban — Дизайн-система</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../styles/typography.css">
+<link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/radius.css">
+<link rel="stylesheet" href="../../styles/spacing.css">
+<link rel="stylesheet" href="../../styles/shadow.css">
+<link rel="stylesheet" href="../../styles/tile.css">
+<link rel="stylesheet" href="../../styles/kanban.css">
+<link rel="stylesheet" href="../../styles/chip.css">
+<link rel="stylesheet" href="../../styles/badge.css">
+<link rel="stylesheet" href="../../styles/avatar.css">
+<link rel="stylesheet" href="../../styles/icon-button.css">
+<link rel="stylesheet" href="../../styles/button.css">
+<link rel="stylesheet" href="../../styles/context-menu.css">
+<link rel="stylesheet" href="../../styles/modal.css">
+<link rel="stylesheet" href="../../styles/drawer.css">
+<link rel="stylesheet" href="../../styles/dropdown-list.css">
+<link rel="stylesheet" href="../../styles/input.css">
+<link rel="stylesheet" href="../../styles/checkbox.css">
+<link rel="stylesheet" href="../../styles/empty-state.css">
+<link rel="stylesheet" href="../../styles/skeleton.css">
+<link rel="stylesheet" href="../../styles/tooltip.css">
+<link rel="stylesheet" href="../../styles/alert.css">
+<link rel="stylesheet" href="../../styles/progress-bar.css">
+<link rel="stylesheet" href="../../styles/snackbar.css">
+<link rel="stylesheet" href="../../styles/divider.css">
+<link rel="stylesheet" href="../../styles/illustration.css">
+<link rel="stylesheet" href="../../styles/label-helper.css">
+<link rel="stylesheet" href="../../styles/read-only-field.css">
+<link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/splitter.css">
+<link rel="stylesheet" href="../../styles/segment-control.css">
+<link rel="stylesheet" href="../../styles/tab.css">
+<link rel="stylesheet" href="../../styles/docs-split.css">
+<link rel="stylesheet" href="../../styles/ds-nav.css">
+<link rel="stylesheet" href="../../styles/ds-docs.css">
+<style>
+/* Раскладка страницы документации. Токены ДС, своих значений нет. */
+a{color:var(--link);} a:hover{color:var(--link-dark);}
+.section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:82ch;text-wrap:pretty;}
+.subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:32px 0 14px;}
+.tk{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text-secondary);background:var(--bgtable-row-focus);padding:var(--space-2) var(--space-6);border-radius:var(--radius-s);display:inline-block;}
+.crit{margin:0 0 28px;padding-left:22px;font:var(--type-body-m);color:var(--text-secondary);max-width:82ch;}
+.crit li{margin-bottom:8px;text-wrap:pretty;}
+
+/* демо в верхней панели сплиттера */
+.kb-stage{flex:1;display:flex;min-height:0;background:var(--bg-page);border:1px solid var(--border-light);border-radius:var(--radius-2xl);padding:var(--space-16);width:100%;}
+.ws-cap{font:var(--type-body-xs);color:var(--text-inactive);margin:12px 0 0;text-wrap:pretty;}
+
+/* анатомия: нумерованные маркеры на живом образце + легенда */
+.anat{display:flex;flex-direction:column;gap:28px;}
+.anat__stage{background:var(--bg-page);border:1px solid var(--border-light);border-radius:var(--radius-2xl);padding:32px 40px;display:flex;justify-content:center;overflow-x:auto;}
+.anat-dia{position:relative;display:inline-block;}
+.anat-dia .kbcard,.anat-dia .kbcol{pointer-events:none;}
+.mk{position:absolute;width:22px;height:22px;border-radius:var(--radius-circle);background:var(--text-primary);color:var(--text-on-dark);font:600 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5;}
+.anat__legend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 28px;}
+@media(max-width:860px){.anat__legend{grid-template-columns:minmax(0,1fr);}}
+.anat__legend li{display:flex;gap:12px;align-items:flex-start;}
+.anat__legend .n{width:22px;height:22px;border-radius:var(--radius-circle);background:var(--primary);color:var(--text-on-dark);font:600 12px/22px var(--font-text),sans-serif;display:flex;align-items:center;justify-content:center;flex:none;margin-top:2px;}
+.anat__legend .d{font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty;min-width:0;}
+.anat__legend .d b{color:var(--text-primary);}
+.anat__legend .d em{font-style:normal;color:var(--text-inactive);}
+
+/* образцы состояний и вариантов */
+.samples{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;}
+.sample{display:flex;flex-direction:column;gap:8px;width:264px;}
+.sample__name{font:var(--type-body-xs);color:var(--text-inactive);}
+.sample__box{background:var(--bg-page);border:1px solid var(--border-light);border-radius:var(--radius-m);padding:12px;}
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:760px){.guide{grid-template-columns:1fr;}}
+.guide-card{background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-2xl);padding:20px 24px;display:flex;flex-direction:column;gap:8px;}
+.guide-card__tag{font:var(--type-body-xs);color:var(--text-inactive);text-transform:uppercase;letter-spacing:.06em;}
+.guide-card__body{font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty;}
+.guide-card__body b{color:var(--text-primary);}
+.pm{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;}
+.pm h4{font:var(--type-body-m-strong);color:var(--text-primary);margin:0 0 8px;}
+.pm ul{margin:0;padding-left:20px;font:var(--type-body-m);color:var(--text-secondary);}
+.pm li{margin-bottom:8px;text-wrap:pretty;}
+</style>
+</head>
+<body>
+<main class="page ds-split" data-screen-label="Kanban">
+
+  <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="46">
+    <div class="splitpane__panel splitpane__a app-pane-demo">
+      <div class="demo-stage">
+        <div class="kb-stage" id="pg-stage"></div>
+        <p class="ws-cap">Доска живая: карточки перетаскиваются мышью и с клавиатуры (Tab до карточки, Space — взять, ← → — перенести, Space — положить, Esc — отменить). Настройки — во вкладке «Конструктор».</p>
+      </div>
+    </div>
+
+    <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+    <div class="splitpane__panel splitpane__b app-pane-docs">
+      <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+        <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+        <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+        <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+      </div>
+
+      <div class="tabs-body">
+        <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+          <div class="docs-layout">
+            <div class="docs-main">
+
+<header class="masthead">
+  <a class="crumb" href="../../index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Обзор компонентов
+  </a>
+  <div class="meta">
+    <span>Версия: <b>1.003</b></span>
+    <span>Обновлено: <b>10.09.2026</b></span>
+    <span>CSS <b>styles/kanban.css</b></span>
+    <span>Рантайм <b>scripts/ds-kanban.js</b></span>
+  </div>
+  <div class="eyebrow">Дизайн-система · Организмы</div>
+  <h1>Kanban</h1>
+  <p class="lead">Доска: горизонтальный трек колонок-этапов с карточками, которые переносятся между этапами перетаскиванием. Колонка — организм доски, карточка — вложенный в неё компонент Card. Отвечает на вопрос «как распределена работа и что застряло», в отличие от реестра, который отвечает «какие объекты есть».</p>
+</header>
+
+<!-- 1. КОНСТРУКТОР: демо — в верхнюю панель сплиттера (#pg-stage),
+     контролы — во вкладку «Конструктор» нижней панели (см. в конце) -->
+
+<!-- 2. ИСПОЛЬЗОВАНИЕ -->
+<section class="section" id="usage" data-screen-label="Использование">
+  <h2>Использование</h2>
+  <p class="desc">Доска и реестр отвечают на разные вопросы, и подменять один другим — самая частая ошибка при внедрении канбана в enterprise. Реестр отвечает «какие объекты есть и что в них», доска — «как распределена работа и что застряло». Если у объекта нет 3–7 осмысленных этапов, доска не нужна: получится таблица, которую неудобно читать.</p>
+
+  <div class="guide">
+    <div class="guide-card">
+      <div class="guide-card__tag">Когда использовать</div>
+      <div class="guide-card__body">У объекта есть <b>3–7 этапов</b>, и переход между ними — осмысленное действие пользователя. Важно распределение, а не значения. Объектов десятки, не тысячи. Статус меняют вручную и часто.</div>
+    </div>
+    <div class="guide-card">
+      <div class="guide-card__tag">Когда не использовать</div>
+      <div class="guide-card__body">Нужно сравнивать значения между объектами — суммы, ставки, даты: это <a class="inl" href="Table.html">Table</a>, колонки выравнивают числа, доска нет. Больше 7 этапов — горизонтальный скролл съедает обзор. Массовый ввод данных — доска про перемещение, а не про заполнение.</div>
+    </div>
+    <div class="guide-card">
+      <div class="guide-card__tag">Kanban vs Table</div>
+      <div class="guide-card__body">Две вьюхи одних данных, а не два экрана. Переключатель <span class="tk">.segctrl</span> в тулбаре обязателен, и фильтр обязан переживать переключение — иначе пользователь настраивает его дважды.</div>
+    </div>
+    <div class="guide-card">
+      <div class="guide-card__tag">Kanban vs Entity</div>
+      <div class="guide-card__body">Отдельный объект в списке без этапов — это <a class="inl" href="Entity.html">Entity</a> в строке, а не карточка на доске. Карточка нужна там, где у объекта есть позиция в процессе и её меняют перетаскиванием.</div>
+    </div>
+  </div>
+
+  <div class="subsec" data-screen-label="Состав">
+    <h3>Из чего собрана</h3>
+    <p class="desc">Своего в доске — трек, колонка и раскладка контента карточки. Всё остальное готовое: <a class="inl" href="Tile.html">Card</a> (карточка и её состояния), <a class="inl" href="../atoms/Chip.html">Chip</a>, <a class="inl" href="../atoms/Badge.html">Badge</a> (счётчик колонки), <a class="inl" href="../atoms/Avatar.html">Avatar</a> (исполнители), <a class="inl" href="../atoms/IconButton.html">IconButton</a>, <a class="inl" href="../molecules/ContextMenu.html">ContextMenu</a> (кебабы), <a class="inl" href="Modal.html">Modal</a> (подтверждения и форма поля), <a class="inl" href="../molecules/Tooltip.html">Tooltip</a> (усечения и причина запрета), <a class="inl" href="SnackBar.html">SnackBar</a>, <a class="inl" href="../molecules/EmptyState.html">EmptyState</a> и <a class="inl" href="../atoms/Skeleton.html">Skeleton</a>.</p>
+  </div>
+</section>
+
+<!-- 3. АНАТОМИЯ -->
+<section class="section" id="anatomy" data-screen-label="Анатомия">
+  <h2>Анатомия</h2>
+  <p class="desc">Три вложенных уровня: доска держит трек колонок, колонка держит список карточек, карточка держит содержимое. Скроллы принадлежат строго одному уровню — это главный инвариант раскладки, и его нарушение ломает экран целиком.</p>
+
+  <div class="subsec" data-screen-label="Доска">
+    <h3>Доска</h3>
+    <p class="desc tight">Тулбар и трек. Трек — <b>единственный скролл доски</b>, и он скроллит по обеим осям: колонки своего вертикального скролла не имеют, доска прокручивается целиком, а шапки колонок залипают сверху.</p>
+    <div class="anat">
+      <div class="anat__stage"><div class="anat-dia" id="anat-board"></div></div>
+      <ul class="anat__legend">
+        <li><span class="n">1</span><span class="d"><b>Тулбар</b> — название доски, счётчик карточек, переключатель вьюх, фильтр и кебаб настроек. <em>Не скроллится.</em></span></li>
+        <li><span class="n">2</span><span class="d"><b>Скроллпорт и ряд колонок</b> — два вложенных элемента, и это не формальность. <span class="tk">.kanban__viewport</span> держит скролл (обе оси), <span class="tk">.kanban__track</span> — <em>flex-ряд высотой по самой длинной колонке</em>. Совместить их в одном элементе нельзя: у скроллпорта высота определённая, и колонки растянулись бы по нему, а не по контенту. Инвариант Layout: у экрана скролла нет, он принадлежит контейнеру в его собственной раскладке.</span></li>
+        <li><span class="n">3</span><span class="d"><b>Колонка</b> — фиксированная ширина 288px вместе с паддингом. Колонки прижаты друг к другу без зазора: расстояние между карточками соседних колонок даёт паддинг самих колонок, 8+8=16.</span></li>
+        <li><span class="n">4</span><span class="d"><b>Заглушка «Добавить колонку»</b> — в конце трека, там же, где появится результат.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsec" data-screen-label="Колонка">
+    <h3>Колонка</h3>
+    <p class="desc tight">Организм доски. Своей заливки в покое <b>нет</b> — она появляется только под указателем и при перетаскивании, чтобы цель дропа читалась однозначно.</p>
+    <div class="anat">
+      <div class="anat__stage"><div class="anat-dia" id="anat-col"></div></div>
+      <ul class="anat__legend">
+        <li><span class="n">1</span><span class="d"><b>Шапка</b> — <em>position: sticky</em>, видна при вертикальном скролле доски. Тянется на всю ширину колонки, содержимое стоит по кромке карточек.</span></li>
+        <li><span class="n">2</span><span class="d"><b>Маркер тона</b> — круг 8×8 на статусной рампе <span class="tk">--st-*</span>. Признак вторичный: колонка опознаётся по имени и позиции.</span></li>
+        <li><span class="n">3</span><span class="d"><b>Имя и счётчик</b> — имя усекается многоточием и получает <em>Tooltip</em>; счётчик — <span class="tk">.badge--text.badge--s</span>.</span></li>
+        <li><span class="n">4</span><span class="d"><b>Три действия</b> — добавить карточку · перейти на страницу колонки · меню. Порядок фиксирован.</span></li>
+        <li><span class="n">5</span><span class="d"><b>Тело</b> — карточки с зазором 16. <em>Своего скролла нет</em>: доска прокручивается целиком.</span></li>
+        <li><span class="n">6</span><span class="d"><b>Линия вставки</b> — 2px <span class="tk">--primary-dark</span>, показывает, куда именно ляжет карточка.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsec" data-screen-label="Карточка">
+    <h3>Карточка</h3>
+    <p class="desc tight">Карточка доски — это <a class="inl" href="Tile.html">Card</a>: <span class="tk">.tile.tile--card</span> плюс класс раскладки <span class="tk">.kbcard</span>. Геометрию, типографику и интерактивные состояния задаёт Card; доска добавляет только содержимое и служебные состояния переноса. Заголовок стоит первым, чипы — под ним: это штатная анатомия TileHeader, а не переопределение.</p>
+    <div class="anat">
+      <div class="anat__stage"><div class="anat-dia" id="anat-card"></div></div>
+      <ul class="anat__legend">
+        <li><span class="n">1</span><span class="d"><b>Заголовок</b> — <em>Title Card</em>, <span class="tk">--type-h6-strong</span>, клэмп 2 строки, при усечении — Tooltip.</span></li>
+        <li><span class="n">2</span><span class="d"><b>Чипы</b> — <span class="tk">.tile__chiplist</span> под заголовком, переносятся по строкам. Без иконок; исключение — «Ключевая сделка» с молнией.</span></li>
+        <li><span class="n">3</span><span class="d"><b>Действия</b> — звезда избранного (<span class="tk">aria-pressed</span>) и кебаб. Удаление карточки живёт в кебабе.</span></li>
+        <li><span class="n">4</span><span class="d"><b>Пользовательские поля</b> — две колонки, значение в одну строку. Максимум четыре.</span></li>
+        <li><span class="n">5</span><span class="d"><b>Метрики</b> — вложения, комментарии, срок. Вторичный вес, <span class="tk">--text-inactive</span>.</span></li>
+        <li><span class="n">6</span><span class="d"><b>Подвал</b> — исполнители <span class="tk">.av-group--s</span> и код объекта справа.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="panel">
+    <ul class="rules">
+      <li><b>Оба скролла — у вьюпорта, и только у него.</b> Горизонтальный и вертикальный принадлежат <span class="tk">.kanban__viewport</span>. Третьего быть не должно: страница под доской не скроллится, колонка сама не скроллится тоже.</li>
+      <li><b>Ряд колонок — отдельный элемент внутри вьюпорта.</b> <span class="tk">.kanban__track</span> имеет высоту <span class="tk">auto</span>, поэтому <span class="tk">stretch</span> тянет все колонки по самой длинной, а не по видимой области. Если свести обе роли в один элемент, колонка окажется ровно высотой с экран: карточки, которые не влезли, будут торчать за её коробкой, а липкая шапка отвалится на первом же экране прокрутки — держать её внутри колонки станет негде.</li>
+      <li><b>Доске нужна определённая высота — это хост-контракт.</b> Она должна быть flex-элементом (<span class="tk">flex: 1; min-height: 0</span>) в колоночном родителе с заданной высотой. Иначе вьюпорту нечего ограничивать: скролл уезжает на страницу, и залипания шапок не будет.</li>
+      <li><b>Липкая шапка обязана быть непрозрачной.</b> Под ней едут карточки. Тона состояний в ДС полупрозрачные (<span class="tk">--primary-bg</span> — color-mix с transparent, <span class="tk">--bgtable-row-hover</span> — swamp a400), поэтому кладутся слоем поверх непрозрачной базы, а не вместо неё.</li>
+      <li><b>Ширина колонки — переменная <span class="tk">--kb-col-w</span>, а не класс экрана.</b> Свои классы ширины экран не заводит — то же правило, что у Tile.</li>
+      <li><b>Высота колонок не выравнивается</b> (<span class="tk">align-items:flex-start</span>): колонка с двумя карточками не растягивается до высоты самой длинной.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 4. ВАРИАНТЫ -->
+<section class="section" id="variants" data-screen-label="Варианты">
+  <h2>Варианты</h2>
+  <p class="desc">Оси конфигурации разнесены по уровням: у доски свои, у колонки свои, у карточки свои. Каждая ось — отдельный вариант мастер-компонента.</p>
+
+  <div class="subsec" data-screen-label="Варианты доски">
+    <h3>Варианты доски</h3>
+    <p class="desc tight">Доска настраивается целиком и одинаково для всех своих колонок и карточек — разнородные карточки нельзя сканировать взглядом, а в этом весь смысл доски.</p>
+    <ul class="bullets">
+      <li><b>Группировка</b> — по этапу (дефолт), по исполнителю, по категории риска. Колонка означает разное, и <b>смысл перетаскивания меняется вместе с ней</b>: в разрезе «по риску» переносить нельзя вовсе, категорию присваивает модель, а не пользователь. Там перетаскивание выключается целиком, а не оставляется с запретами.</li>
+      <li><b>Плотность карточек</b> — базовая или компактная, на всю доску сразу.</li>
+      <li><b>Состав полей на лице карточки</b> — 0 / 2 / 4 поля, выбираются на уровне доски.</li>
+      <li><b>Число колонок</b> — 3–7. Больше семи горизонтальный скролл съедает обзор, ради которого доску и брали.</li>
+    </ul>
+  </div>
+
+  <div class="subsec" data-screen-label="Варианты колонки">
+    <h3>Варианты колонки</h3>
+    <p class="desc tight">Три оси: тон маркера, свёрнутость и права на перенос.</p>
+    <p class="subhead">Тон маркера</p>
+    <p class="desc tight">Тон задаётся маркером 8×8 в шапке, а не заливкой колонки: заливка съедает контраст карточек и на шести колонках превращает доску в радугу. Тон закреплён за этапом, свободный выбор цвета пользователю не даётся — иначе доски разных команд перестают читаться одинаково.</p>
+    <div class="samples" id="var-col-tone"></div>
+    <p class="subhead">Свёрнутая колонка</p>
+    <p class="desc tight">При шести и более этапах часть колонок сворачивается в 48px с вертикальной подписью и счётчиком. Имя читается <b>снизу вверх</b> — так его удобнее читать при наклоне головы влево, и так же устроены свёрнутые панели в Jira и Azure DevOps. Свёрнутость — свойство пользователя, а не доски: у ЦУП и Operations свёрнуты разные колонки.</p>
+    <div class="samples" id="var-col-collapsed"></div>
+    <p class="subhead">Порядок колонок</p>
+    <p class="desc tight">Колонка переносится за шапку: этапы у команд идут в разном порядке, и переставлять их через настройки — лишний слой. Ручка — вся шапка, кроме трёх кнопок в ней; летит клон шапки, а не колонка целиком (колонка высотой в экран под курсором перекрывает как раз то место, куда целятся). С клавиатуры — <b>Tab</b> до шапки, <b>Space</b>, <b>←</b> / <b>→</b>, <b>Space</b>; <b>Esc</b> возвращает колонку на исходный индекс. Каждый перенос — событие <span class="tk">kanban:colmove</span>.</p>
+  </div>
+
+  <div class="subsec" data-screen-label="Варианты карточки">
+    <h3>Варианты карточки</h3>
+    <p class="desc tight">Карточка — Card, поэтому её геометрия и состояния описаны на странице <a class="inl" href="Tile.html">Tile</a>. Доска добавляет две оси: плотность и состав контента.</p>
+    <p class="subhead">Плотность</p>
+    <p class="desc tight">Базовая следует объявленной геометрии Card (8/16/20/16). Компактная сжимает до 12/12/12/12, ставит заголовок в одну строку и убирает поля с лица. Основание для компактной — зафиксированная потребность: «Operations хотят видеть больше карточек на экране одновременно, сейчас карточки крупные». В той же вертикали, где помещается одна базовая, помещаются две компактных.</p>
+    <div class="samples" id="var-card-density"></div>
+    <p class="subhead">Чипы</p>
+    <p class="desc tight">Чипов на карточке может быть несколько — они переносятся по строкам под заголовком. <b>Иконок у чипов нет</b>: на карточке шириной 272px иконка съедает место, ничего не добавляя к слову. Единственное исключение — <b>«Ключевая сделка»</b> с молнией в тоне <span class="tk">--orange</span>: это не статус, а флаг приоритета, и его задача — выцепляться из ряда одинаковых карточек периферийным зрением.</p>
+    <div class="samples" id="var-card-chips"></div>
+  </div>
+
+  <div class="subsec" data-screen-label="Модальные окна">
+    <h3>Модальные окна</h3>
+    <p class="desc tight">Доска использует четыре модалки, и все — штатный <a class="inl" href="Modal.html">Modal</a>. Своих окон компонент не заводит; рантайм только наполняет разметку страницы и помнит отложенное действие.</p>
+    <p class="desc tight">Правило, по которому окно вообще появляется: <b>подтверждается необратимое, отменяется обратимое</b>. Перенос карточки диалогом не подтверждается — на частом действии подтверждение перестаёт читаться через день работы; вместо него снекбар. Удаление подтверждается: оно необратимо, а «минимизация ошибок» стоит у продукта в критичных требованиях.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+      <div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.2fr 1.4fr 2.2fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Окно</span></div>
+        <div class="th"><span class="th__label">Ширина и роль</span></div>
+        <div class="th"><span class="th__label">Откуда открывается</span></div>
+        <div class="th"><span class="th__label">Что показывает</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.2fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Удаление карточки</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--w3</span> · <span class="tk">role="alertdialog"</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Кебаб карточки → «Удалить»</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Называет объект и говорит, что восстановления не будет. Кнопка <span class="tk">.btn--error</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.2fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Удаление колонки</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--w3</span> · <span class="tk">role="alertdialog"</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Кебаб колонки → «Удалить»</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Называет число карточек и <b>куда они переедут</b>. Не «Вы уверены?», а последствие</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.2fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Поле карточки</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--w3</span> · форма</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Drawer → «Добавить поле», кебаб доски → «Настроить поля»</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Имя, тип из 8 (текст · число · сумма · дата · список · флаг · сотрудник · ссылка), показывать ли на лице карточки</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.2fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Настройки доски</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--w4</span> · форма</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Кебаб доски → «Настройки»</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Группировка, состав полей на лице карточки, плотность. Тот же паттерн формы, что у поля</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. РАЗМЕРЫ -->
+<section class="section" id="sizes" data-screen-label="Размеры">
+  <h2>Размеры</h2>
+  <p class="desc">Все значения — токены ДС. Два исключения названы явно: ширина колонки 288px и ширина свёрнутой 48px — это параметры раскладки, а не токены, и живут в CSS-переменной компонента, чтобы экран не заводил свой класс ширины.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Свойство</span></div>
+        <div class="th"><span class="th__label">Значение</span></div>
+        <div class="th"><span class="th__label">Токен</span></div>
+        <div class="th"><span class="th__label">Комментарий</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Ширина колонки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">288px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--kb-col-w</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Вместе с паддингом. Фиксирована: плавающая ширина ломает узнавание позиции</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Паддинг колонки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">8px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--space-8</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Колонки прижаты вплотную, поэтому между карточками соседних колонок 8+8=16</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Зазор между колонками</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">0</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Заливка колонки при наведении должна доходить до соседа</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Зазор между карточками</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">8px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--space-8</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Вдвое плотнее горизонтального: по вертикали важнее, сколько карточек видно разом, а границу между ними держит рамка Card</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Ширина карточки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">272px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">288 − 8 − 8</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Свёрнутая колонка</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">48px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Помещает маркер, счётчик и вертикальное имя</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Радиус колонки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">8px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--radius-m</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Тот же, что у Card и Tile</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Шапка колонки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">8px по кругу</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--space-8</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отрицательные margin тянут её на всю ширину колонки, паддинг возвращает содержимое на кромку карточек</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Хэдер Card (база)</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">16 / 16 / 8</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--space-16</span> · <span class="tk">--space-8</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Нижние 8 дают зазор до контента — механика TileHeader</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Контент Card (база)</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">8 / 16 / 20</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--space-16</span> · <span class="tk">--space-20</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Объявленная геометрия Card</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Хэдер Card (компакт)</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">12 / 12 / 4</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--space-12</span> · <span class="tk">--space-4</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отклонение от объявления, обосновано потребностью Operations</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Контент Card (компакт)</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">4 / 12 / 12</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--space-12</span> · <span class="tk">--space-4</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Линия вставки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">2px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--primary-dark</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Тон тёмный: линия — единственный указатель позиции, ей нужен контраст 3:1</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Маркер тона колонки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">8 × 8px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--st-*</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Круг, <span class="tk">--radius-circle</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Действия колонки и карточки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">16 × 16px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">.ibtn--s</span></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Зона нажатия 24×24 через <span class="tk">::before</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Зона автоскролла трека</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">64px</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Ближе к краю трек начинает ехать под курсором</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      </div>
+    </div>
+</section>
+
+<!-- 6. КОНТЕНТ -->
+<section class="section" id="content" data-screen-label="Контент">
+  <h2>Контент</h2>
+  <p class="desc">Карточка живёт в колонке 272px — это жёсткое ограничение, и почти все правила контента из него следуют.</p>
+
+  <div class="subsec" data-screen-label="Заголовок">
+    <h3>Заголовок и чипы</h3>
+    <ul class="bullets">
+      <li><b>Клэмп 2 строки</b> в базовой плотности, 1 строка в компактной. Обрезанный заголовок получает Tooltip через <span class="tk">DSTooltip.truncated</span> — тот же механизм, что у Chip, Tab и ReadOnlyField, своей реализации компонент не заводит.</li>
+      <li><b>Смысловая часть — в начало.</b> «ООО «ЮгСтрой» — кредитный мезонин», а не «Сделка № 1042 по продукту…». При клэмпе в 2 строки хвост не виден никогда.</li>
+      <li><b>Чипов — не больше трёх.</b> Дальше они занимают больше места, чем заголовок, и карточка перестаёт читаться как объект.</li>
+      <li><b>Код объекта — не в заголовке</b>, а в подвале справа: по нему ищут, но не читают.</li>
+    </ul>
+  </div>
+
+  <div class="subsec" data-screen-label="Поля">
+    <h3>Пользовательские поля</h3>
+    <ul class="bullets">
+      <li><b>Две колонки, максимум четыре поля.</b> Подпись <span class="tk">--type-body-xs</span> цветом <span class="tk">--text-inactive</span>, значение <span class="tk">--type-body-s</span> цветом <span class="tk">--text-primary</span>.</li>
+      <li><b>Значение усекается в одну строку.</b> Перенос ломает сетку из двух колонок и делает карточки разной высоты без причины.</li>
+      <li><b>Пустое значение — прочерк «—», а не пустота.</b> Пустое место читается как ошибка загрузки; прочерк говорит «данных нет, и это нормально».</li>
+      <li><b>Набор полей задаётся на уровне доски.</b> Карточки с разным набором нельзя сканировать взглядом — теряется главное преимущество доски.</li>
+      <li><b>На лице только то, по чему принимают решение о переносе.</b> Остальное живёт в панели деталей.</li>
+    </ul>
+  </div>
+
+  <div class="subsec" data-screen-label="Переполнение">
+    <h3>Числа, переполнение, пустые состояния</h3>
+    <ul class="bullets">
+      <li><b>Суммы</b> — с разделителями разрядов и валютой: <b>1 250 000 000 ₽</b>. Выравнивать по правому краю бессмысленно: значения не стоят в колонку, сравнивать их всё равно нельзя. Если сравнение сумм — рабочая задача, нужен реестр, а не доска.</li>
+      <li><b>Исполнители</b> — <span class="tk">.av-group--s</span> со штатным <span class="tk">+N</span>: помещается 3 аватара, дальше счётчик.</li>
+      <li><b>Карточек в колонке</b> — после 50 показывается «Показать ещё». Виртуализация нужна на 200+, таких колонок в продукте не бывает.</li>
+      <li><b>Пустая колонка</b> — короткий текст без иллюстрации: <span class="tk">.es</span> в колонке 272px выглядит громоздко. Текст говорит, что сюда класть.</li>
+      <li><b>Пустая доска и фильтр без результатов</b> — <span class="tk">.es--m</span> с иллюстрацией. Колонки при фильтре <b>остаются видимыми</b>: скрывать их значит терять структуру доски.</li>
+    </ul>
+  </div>
+
+  <div class="subsec" data-screen-label="Тексты">
+    <h3>Тексты интерфейса</h3>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Действие в кнопке — глаголом:</b> «Добавить карточку», «Добавить колонку», «Отменить». Не «Новая карточка».</li>
+        <li><b>Подтверждение называет последствие:</b> «Удалить колонку «Голосование»? В ней 3 карточки — они переедут в «Заведение (ЦУП)»». Не «Вы уверены?».</li>
+        <li><b>Запрет дропа объясняет правило, а не факт:</b> «Из «Заведение (ЦУП)» можно только в «Голосование»». Не «Действие недоступно».</li>
+        <li><b>Снекбар подтверждает результат и даёт откат:</b> «Карточка перенесена. Этап: «Голосование»» + «Отменить».</li>
+        <li><b>Пустая колонка говорит, что делать:</b> «Пока пусто. Перетащите сюда карточку». Не «Нет данных».</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ПОВЕДЕНИЕ -->
+<section class="section" id="behavior" data-screen-label="Поведение">
+  <h2>Поведение</h2>
+  <p class="desc">Перетаскивание — центральная механика доски и единственная, которой в ДС не было. Всё остальное поведение (меню, подсказки, модалки, снекбар) рантайм берёт у штатных <span class="tk">DSMenu</span>, <span class="tk">DSTooltip</span>, <span class="tk">DSModal</span>, <span class="tk">DSSnack</span> и своих реализаций не заводит.</p>
+
+  <div class="subsec" data-screen-label="Перетаскивание">
+    <h3>Перетаскивание указателем</h3>
+    <p class="desc tight">Собрано по образцу <span class="tk">scripts/tbl-reorder.js</span> — единственной реализации drag-and-drop в ДС, доведённой до продакшена. Копируются не строки, а решения: они уже проверены на переупорядочивании колонок таблицы.</p>
+    <ol class="crit">
+      <li><b>Порог 4px.</b> Перенос начинается только после смещения на 4px от точки нажатия. Без порога любой клик по карточке превращается в микроперенос, и открыть карточку становится нельзя.</li>
+      <li><b>Pointer events, не HTML5 DnD.</b> Атрибут <span class="tk">draggable</span> не даёт контроля над видом перетаскиваемого элемента и по-разному работает в браузерах.</li>
+      <li><b>Схваченная карточка уходит на плавающий слой</b> и следует за курсором со смещением, зафиксированным в момент захвата, — карточка не «прыгает» под курсор.</li>
+      <li><b>На её месте остаётся призрак</b> той же геометрии: список не схлопывается, соседние карточки не прыгают.</li>
+      <li><b>Индекс вставки — по центрам карточек.</b> Курсор выше центра — вставка перед карточкой, ниже — после.</li>
+      <li><b>Линия вставки</b> показывает конечную позицию. Без неё пользователь узнаёт результат только после того, как отпустил.</li>
+      <li><b>Автоскролл трека</b> по обеим осям при подведении к краю: иначе нельзя донести карточку до колонки, которой не видно.</li>
+      <li><b>Esc отменяет в любой момент</b> — карточка возвращается на исходное место, состояние не меняется.</li>
+    </ol>
+  </div>
+
+  <div class="subsec" data-screen-label="Ограничения переходов">
+    <h3>Ограничения переходов — задача решения, а не доски</h3>
+    <p class="desc tight">Доска <b>не знает ничего о статусах</b> и знать не должна. Kanban — компонент общий: на нём живут сделки, задачи, заметки, заявки. Зашить в рантайм модель переходов сделки значит навязать её всем остальным. Поэтому по умолчанию карточка переносится в любую колонку, а решению, которому ограничения нужны, дана одна точка входа.</p>
+    <div class="panel">
+      <ul class="rules">
+        <li><b>Отменяемое событие <span class="tk">kanban:beforemove</span></b> летит перед укладкой и несёт <span class="tk">{card, from, to, index}</span>. <span class="tk">preventDefault()</span> отменяет перенос — карточка возвращается на место, как по Esc. Ни на что другое доска не смотрит.</li>
+        <li><b>Правило переходов живёт у решения.</b> Матрица «из какого этапа в какой можно», роль пользователя, блокировки по обеспечению — это предметная логика продукта, у неё свой источник истины и свой срок жизни, не совпадающий с версией ДС.</li>
+        <li><b>Показать запрет — тоже задача решения.</b> Если переходы ограничены, лучше гасить недоступные колонки <b>в момент захвата</b>, а не отказывать при попытке бросить: пользователь видит поле возможностей до того, как потратил движение. Слушайте <span class="tk">kanban:beforemove</span> и ставьте свой класс на колонки по <span class="tk">pointerdown</span>.</li>
+        <li><b>Каждый состоявшийся перенос — событие <span class="tk">kanban:move</span></b> с картой «откуда, куда, на какую позицию». Аудит-трейл строится на нём: «прозрачность статусов» и «история изменений» — критичные требования продукта, а не пожелание.</li>
+      </ul>
+    </div>
+    <p class="desc tight">В демо на этой странице ограничений нет намеренно: страница показывает компонент ДС, а не конкретное решение на нём.</p>
+  </div>
+
+  <div class="subsec" data-screen-label="Панель деталей">
+    <h3>Панель деталей</h3>
+    <p class="desc tight">Клик по карточке мимо кнопок открывает <a class="inl" href="Drawer.html">Drawer</a> — панель деталей у правого края. Карточка на доске показывает 4 поля из сорока; всё остальное, включая создание собственных полей, живёт в панели. Доска отличает клик от жеста сама: перенос, закончившийся на той же карточке, панель не открывает.</p>
+    <p class="desc tight">Разметка панели принадлежит экрану, доска только называет её: <span class="tk">data-kb-drawer="id-скрима"</span>. Рантайм подставляет путь, идентификатор и заголовок из карточки и шлёт <span class="tk">kanban:open</span>.</p>
+  </div>
+
+  <div class="subsec" data-screen-label="Клавиатура">
+    <h3>Клавиатура</h3>
+    <p class="desc tight">Клавиатурный перенос <b>не дублирует мышиный, а заменяет его</b>: карточка шагает по колонкам, промахнуться мимо цели нельзя в принципе — в отличие от мыши. Тот же договор действует и для колонки: <b>Tab</b> до её шапки, <b>Space</b> — взять, стрелки — переставить. Каждый шаг объявляется в <span class="tk">aria-live</span>. Мышиный жест без клавиатурного эквивалента — отказ по WCAG 2.1.1, а не «удобство для продвинутых».</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+      <div class="tbl__row" style="grid-template-columns:8px 1fr 3.4fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Клавиша</span></div>
+        <div class="th"><span class="th__label">Действие</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1fr 3.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Tab</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Переход между карточками и действиями колонки</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1fr 3.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Space</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Взять карточку · положить её на выбранное место</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1fr 3.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>← →</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Перенести взятую карточку в соседнюю <b>разрешённую</b> колонку; запрещённые пропускаются</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1fr 3.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>↑ ↓</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Сдвинуть взятую карточку внутри колонки</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1fr 3.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Esc</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отменить перенос — карточка возвращается на исходное место, а не остаётся где была</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1fr 3.4fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Enter</b></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Открыть карточку</span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec" data-screen-label="Отмена">
+    <h3>Отмена вместо подтверждения</h3>
+    <p class="desc tight">Перенос карточки <b>не подтверждается диалогом</b>. Подтверждение на частом действии перестаёт читаться через день работы и превращается в лишний клик. Вместо него — снекбар с «Отменить». Это стандартный размен: подтверждение защищает от редких необратимых действий, отмена — от частых обратимых.</p>
+    <p class="desc tight">Диалог остаётся там, где действие необратимо: удаление карточки и удаление колонки с карточками. Там <span class="tk">role="alertdialog"</span> и явное указание последствий.</p>
+  </div>
+
+  <div class="subsec" data-screen-label="Границы">
+    <h3>Чего доска не делает</h3>
+    <ul class="bullets">
+      <li><b>Не сортирует карточки внутри колонки автоматически.</b> Порядок задаёт пользователь и он значим: сверху то, чем занимаются в первую очередь. Автосортировка по дате обнуляет эту работу.</li>
+      <li><b>Не скрывает колонки по фильтру.</b> Фильтр прячет карточки, структура доски остаётся.</li>
+      <li><b>Не редактирует поля на лице карточки.</b> Инлайн-редактирование конфликтует с перетаскиванием: клик по полю неотличим от начала захвата.</li>
+      <li><b>Не придумывает разметку карточки.</b> Новая карточка клонируется из образца на самой доске (<span class="tk">data-kb-card-tpl</span>): рантайм не знает, из чего состоит карточка конкретного продукта.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 8. СОСТОЯНИЯ -->
+<section class="section" id="states" data-screen-label="Состояния">
+  <h2>Состояния</h2>
+  <p class="desc">Состояния разнесены по уровням так же, как варианты. У карточки они принадлежат <b>Card</b> и описаны на его странице; доска добавляет только служебные состояния переноса и выбора.</p>
+
+  <div class="subsec" data-screen-label="Состояния карточки">
+    <h3>Состояния карточки</h3>
+    <p class="desc tight">Пять состояний — <b>Default · Hover · Active · Move · Disabled</b> — принадлежат Card и объявлены в ДС с самого начала, ещё до того, как доска понадобилась: состояние <b>Move</b> — это ровно перетаскивание. Доска добавляет три своих: Ghost (место схваченной карточки), Selected (выбрана для массового действия или взята с клавиатуры) и Error (изменение не сохранилось).</p>
+    <div class="samples" id="states-card"></div>
+  </div>
+
+  <div class="subsec" data-screen-label="Состояния колонки">
+    <h3>Состояния колонки</h3>
+    <p class="desc tight">Пять состояний. Заливки в покое нет — это и есть Default.</p>
+    <div class="samples" id="states-col"></div>
+  </div>
+
+  <div class="subsec" data-screen-label="Состояния доски">
+    <h3>Состояния доски</h3>
+    <ul class="bullets">
+      <li><b>Загрузка</b> — колонки отрисованы, карточки в Skeleton. Структура доски известна раньше содержимого, и показывать её сразу правильнее, чем крутить спиннер на всю область.</li>
+      <li><b>Нет колонок</b> — <span class="tk">.es--m</span>, иллюстрация <span class="tk">empty-folder</span>, кнопка «Создать первую колонку».</li>
+      <li><b>Фильтр без результатов</b> — <span class="tk">.es--m</span>, иллюстрация <span class="tk">empty-check</span>, кнопка «Сбросить фильтр». Колонки остаются видимыми.</li>
+    </ul>
+  </div>
+
+  <p class="desc" style="margin-top:24px"><b>Инвариант:</b> состояния задаёт сам компонент. Экран не переопределяет <span class="tk">:hover</span>, <span class="tk">--selected</span> и прочие извне — в ДС это отдельно зафиксированный запрет после разбора инцидента с NavPanel.</p>
+</section>
+
+<!-- 9. ДОСТУПНОСТЬ -->
+<section class="section" id="a11y" data-screen-label="Доступность">
+  <h2>Доступность</h2>
+  <p class="desc">Канбан — один из самых проблемных паттернов по доступности: его центральная механика по умолчанию недоступна ни с клавиатуры, ни для скринридера. Ниже то, что рантайм делает сам, и то, что остаётся на экране.</p>
+  <div class="panel">
+    <ul class="rules">
+      <li><b>2.1.1 Keyboard (A).</b> Перетаскивание обязано иметь клавиатурный эквивалент. Реализовано рантаймом: Space — взять, стрелки — перенести, Space — положить, Esc — отменить. Без этого доска недоступна принципиально, а не «частично».</li>
+      <li><b>2.5.7 Dragging Movements (AA, новое в 2.2).</b> Любое действие, выполняемое перетаскиванием, должно выполняться и одиночным указателем без перетаскивания. Закрывается кебабом карточки: пункт «Переместить в…» со списком разрешённых колонок. Это требование стандарта, а не запасной путь.</li>
+      <li><b>4.1.2 Name, Role, Value.</b> Рантайм сам ставит колонке <span class="tk">role="group"</span> и <span class="tk">aria-label</span> вида «Голосование, карточек: 3» — счётчик в имени обязателен, иначе скринридер не сообщит объём. Карточка получает <span class="tk">aria-roledescription</span> и <span class="tk">tabindex="0"</span>.</li>
+      <li><b>4.1.3 Status Messages (AA).</b> Каждый шаг переноса объявляется в <span class="tk">aria-live="polite"</span>: «Взята карточка», «Голосование, позиция 2 из 3», «Перенос отменён, карточка возвращена в…». Без объявлений клавиатурный перенос работает вслепую.</li>
+      <li><b>1.4.11 Non-text Contrast (AA).</b> Линия вставки — <span class="tk">--primary-dark</span> (5.24:1), а не <span class="tk">--primary</span> (2.91:1, ниже нормы 3:1). Линия — единственный указатель позиции, поэтому занижение здесь недопустимо.</li>
+      <li><b>2.4.7 Focus Visible.</b> Фокус на карточке — <span class="tk">outline 2px --primary</span> с отступом 2px. Внутри карточки фокусируемы только звезда и кебаб; остальное из таб-порядка исключено, иначе обход доски занимает сотни нажатий.</li>
+      <li><b>2.4.3 Focus Order.</b> После переноса и после отмены фокус остаётся на перенесённой карточке, а не сбрасывается в начало доски.</li>
+    </ul>
+  </div>
+  <div class="subsec" data-screen-label="Границы">
+    <h3>Честная оценка</h3>
+    <p class="desc tight"><b>1.4.10 Reflow</b> — горизонтальный скролл трека осознанное исключение: доска не сворачивается в одну колонку без потери смысла. На узких экранах доска заменяется списком, а не сжимается. <b>Prefers-reduced-motion</b> — переходы заливки отключены; движение карточки за курсором остаётся, отключить его значит сломать саму механику.</p>
+    <p class="desc tight">Клавиатурный перенос реализован и покрыт тестами, но <b>не проверен на пользователях скринридера</b>. Формулировки объявлений в <span class="tk">aria-live</span> — предположение: слишком подробные объявления так же вредны, как их отсутствие. До проверки считать раздел спроектированным, но не подтверждённым.</p>
+  </div>
+</section>
+
+<!-- 10. ТИПОГРАФИКА -->
+<section class="section" id="typography" data-screen-label="Типографика">
+  <h2>Типографика</h2>
+  <p class="desc">Ключевое значение — заголовок карточки: <span class="tk">--type-h6-strong</span>. Оно взято не по вкусу, а из объявления Card: у Tile заголовок <span class="tk">--type-h5-strong</span> (18/24), у Card — на ступень ниже. Три размера на карточке — предел: всё мельче <span class="tk">--type-body-xs</span> на плотной доске нечитаемо, всё крупнее заголовка спорит с ним за роль точки входа.</p>
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <div class="tbl" style="grid-template-columns:none;border:none;border-radius:0;">
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 1.3fr 0.8fr 0.9fr 8px;">
+        <div class="th th--separator"></div>
+        <div class="th"><span class="th__label">Элемент</span></div>
+        <div class="th"><span class="th__label">Токен</span></div>
+        <div class="th"><span class="th__label">Размер</span></div>
+        <div class="th"><span class="th__label">Образец</span></div>
+        <div class="th th--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 1.3fr 0.8fr 0.9fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Заголовок карточки (Title Card)</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--type-h6-strong</code></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">16 / 20</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-h6-strong)">Образец</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 1.3fr 0.8fr 0.9fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Заголовок в компактной плотности</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s-strong</code></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s-strong)">Образец</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 1.3fr 0.8fr 0.9fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Имя колонки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s-strong</code></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s-strong)">Образец</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 1.3fr 0.8fr 0.9fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Значение поля карточки</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-s</code></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">14 / 16</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-s)">Образец</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 1.3fr 0.8fr 0.9fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Подпись поля, метрики, код объекта</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--type-body-xs</code></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">12 / 16</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-body-xs)">Образец</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      <div class="tbl__row" style="grid-template-columns:8px 1.7fr 1.3fr 0.8fr 0.9fr 8px;">
+        <div class="tc tc--separator"></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Название доски в тулбаре</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><code class="tok">--type-h5-strong</code></span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">18 / 24</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span style="font:var(--type-h5-strong)">Образец</span></span></span></div>
+        <div class="tc tc--separator"></div>
+      </div>
+      </div>
+    </div>
+</section>
+
+<!-- 11. ЦВЕТА -->
+<section class="section" id="colors" data-screen-label="Цвета">
+  <h2>Цвета</h2>
+  <p class="desc">Своих цветов нет — только токены ДС. Hex вычисляется на странице из реальных значений, а не выписан руками: расхождение с ДС невозможно по построению.</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" id="color-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
+  </div>
+  <p class="desc" style="margin-top:20px"><b>Почему тона состояний нельзя класть на липкую шапку напрямую.</b> <span class="tk">--primary-bg</span> — это <span class="tk">color-mix</span> с <span class="tk">transparent</span>, <span class="tk">--bgtable-row-hover</span> — альфа-тон свомпа. Под шапкой колонки при скролле едут карточки, и полупрозрачная заливка пропустит их насквозь. Поэтому шапка получает непрозрачную базу <span class="tk">--bg-page</span>, а тон состояния кладётся слоем поверх через <span class="tk">background-image</span> — тот же цвет, но без просвета.</p>
+</section>
+
+<!-- 12. ДЛЯ РАЗРАБОТЧИКОВ -->
+<section class="section" id="dev" data-screen-label="Для разработчиков">
+  <h2>Для разработчиков</h2>
+  <p class="desc">Хендофф-пакет: точные размеры считаются на странице, поведение описано псевдокодом без привязки к стеку.</p>
+
+  <p class="subhead">Точные размеры (redline)</p>
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div class="tbl" id="redline-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
+  </div>
+
+  <p class="subhead">Поведение · псевдокод (framework-agnostic)</p>
+  <div class="code-wrap">
+    <button class="copy-btn" data-copy="dnd">Скопировать</button>
+    <code id="code-dnd">// ── 1. Захват: порог 4px, иначе это клик, а не перенос
+onPointerDown(card, e):
+    armed = {card, x: e.clientX, y: e.clientY}
+
+onPointerMove(e):
+    if armed and |dx| + |dy| &lt; 4: return
+    if armed: beginDrag(armed.card, e); armed = null
+    moveFly(e.clientX - offset.x, e.clientY - offset.y)
+    autoScroll(track, e)                  // по ОБЕИМ осям: трек скроллит и вниз
+    placeGuide(columnUnder(e), e.clientY)
+
+// ── 2. Начало: призрак на месте, клон на плавающем слое
+beginDrag(card, e):
+    fly = card.clone(); fly.addClass('is-move'); fly.width = card.rect.width
+    card.addClass('kbcard--ghost')        // остаётся в потоке, список не схлопывается
+    board.addClass('is-dragging')         // гасит hover-тон, чтобы цель дропа читалась
+    body.addClass('kb-dragging')          // выделение текста выключено на всём экране
+    selection.removeAllRanges()           // и уже начатое — тоже
+
+// ── 3. Ограничений переходов у доски НЕТ. Решение получает
+//     отменяемое событие и реализует свою модель у себя
+allow(board, detail):
+    ev = CustomEvent('kanban:beforemove', {detail, cancelable: true})
+    board.dispatch(ev)
+    return not ev.defaultPrevented        // preventDefault() → карточка вернётся
+
+// ── 4. Место вставки — по центрам карточек
+insertIndex(col, y):
+    for i, c in col.cards:
+        if y &lt; c.rect.top + c.rect.height / 2: return i
+    return col.cards.length
+
+// ── 5. Сброс
+onPointerUp(e):
+    col = columnUnder(e)
+    if col and guide.isPlaced:
+        move(card, col, indexOfGuide())
+        emit('kanban:move', {card, from, to: col, index})  // на этом строится аудит
+        snack('Карточка перенесена', {action: 'Отменить'})
+    cleanup()
+
+// ── 6. Esc отменяет и ВОЗВРАЩАЕТ карточку, а не просто снимает захват
+onKeyDown(Esc): if dragging: restoreTo(from, savedNextSibling); cleanup()
+
+// ── 7. Клавиатурный путь — не дубль мышиного:
+//     перебираются только разрешённые колонки, промах невозможен
+onKeyDown(Space) on card:
+    if not grabbed: grabbed = card; home = {col, nextSibling}
+                    announce('Взята карточка…')
+    else:           drop(); announce('Карточка положена в «' + col.name + '»')
+onKeyDown(Left/Right) when grabbed:
+    j = index(current) + dir
+    while columns[j] and not allowed(current, columns[j]): j += dir   // пропуск
+    if not columns[j]: announce('Дальше переносить некуда'); return
+    move(grabbed, columns[j]); announce(columns[j].name + ', позиция N из N')</code>
+  </div>
+
+  <p class="subhead">Контракт разметки и данных</p>
+  <div class="code-wrap">
+    <button class="copy-btn" data-copy="model">Скопировать</button>
+    <code id="code-model">Доска      &lt;div class="kanban" data-kanban data-kb-confirm="id-модалки"&gt;
+  тулбар   .kanban__toolbar   [data-kb-total] — счётчик всех карточек
+  вьюпорт  .kanban__viewport  единственный скролл, обе оси
+  ряд      .kanban__track     высота по самой длинной колонке
+  заглушка .kanban__addcol    [data-kb-addcol]
+
+Колонка    &lt;section class="kbcol" data-kb-col="ключ" data-kb-name="Имя"&gt;
+  шапка    .kbcol__head       ручка переноса колонки, tabindex ставит рантайм
+                              [data-kb-count] · [data-kb-add] · [data-kb-collapse]
+  тело     .kbcol__body       [data-kb-body]
+  пусто    [data-kb-empty-text] — свой текст пустого состояния
+
+Карточка   &lt;article class="kbcard tile tile--card" tabindex="0"&gt;
+  хэдер    .tile__header  →  .tile__title + .tile__chiplist + .tile__actions
+  звезда   [data-kb-star]     aria-pressed
+  удалить  [data-kb-delcard]  в кебабе карточки
+  образец  [data-kb-card-tpl] — скрытая карточка-шаблон для «Добавить»
+
+Панель     data-kb-drawer="id-скрима" на доске → Drawer по клику на карточке
+           [data-kb-d-col] · [data-kb-d-id] · [data-kb-d-title] — куда подставить
+
+События доски: kanban:beforemove (ОТМЕНЯЕМОЕ — точка для модели переходов) ·
+               kanban:move {card, from, to, index} · kanban:add · kanban:remove ·
+               kanban:star · kanban:colmove {column, from, to} ·
+               kanban:colremove · kanban:open {card}
+API:           DSKanban.bind(board) · bindAll(root) · move(card, col, i) · sync(board)
+
+Инварианты:
+  · порядок карточек в колонке значим — задаётся пользователем, не сортировкой
+  · избранное и свёрнутость колонки — свойства пользователя, не объекта
+  · набор полей на лице карточки — свойство доски, не карточки
+  · любое перемещение уходит событием: кто, когда, откуда, куда</code>
+  </div>
+</section>
+
+<!-- 13. БЭКЛОГ -->
+<section class="section" data-screen-label="Бэклог">
+  <h2>Бэклог</h2>
+  <p class="desc">Отложенное осознанно.</p>
+  <div class="panel">
+    <ul class="rules">
+      <li><b>Универсальный рантайм DnD</b> (<span class="tk">ds-dnd.js</span>) — перетаскивание реализовано в ДС трижды: колонки таблицы, список настроек таблицы, эта доска. Четвёртая реализация будет поводом остановиться и вынести общий слой.</li>
+      <li><b>Вынести грип и линию вставки в атомы.</b> <span class="tk">.entity__drag</span> и <span class="tk">.tbl__guide</span> уже написаны и работают, но заперты внутри Entity и Table; доска завела линию у себя третьей копией.</li>
+      <li><b>Drawer</b> — боковая панель деталей карточки. В ДС её нет; сейчас детали открываются модалкой. Нужна не только доске.</li>
+      <li><b>Массовый выбор карточек</b> — состояние Selected у карточки есть, механики выбора нескольких и переноса пачкой пока нет.</li>
+      <li><b>Виртуализация колонки</b> при 200+ карточках. Сегодня закрыто кнопкой «Показать ещё» после 50.</li>
+      <li><b>Swimlanes</b> — горизонтальные дорожки (по клиенту, по десксу). Второе измерение доски; заметно усложняет и перетаскивание, и клавиатуру.</li>
+      <li><b>Чек-лист внутри карточки</b> с прогрессом — есть ProgressBar, нет компонента списка задач.</li>
+      <li><b>Тон Badge «на акценте»</b> — счётчик на акцентной заливке не читается. Проблема общая с другими компонентами, решается один раз.</li>
+      <li><b>Коридорный тест на 5–6 пользователях.</b> Проверить не доску, а гипотезу: решает ли она задачу «что ждёт действия от меня» лучше реестра с фильтром. Если нет — остальной бэклог неактуален.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="page-foot">
+  <span>Дизайн-система · Kanban</span>
+  <span>v1.003 · 10.09.2026</span>
+</footer>
+
+            </div><!-- /docs-main -->
+            <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+          </div><!-- /docs-layout -->
+        </div><!-- /pane-docs -->
+
+        <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Конструктор</h2>
+              <p class="desc">Соберите доску: число колонок, состояние, плотность и состав карточки. Демо обновляется наверху.</p>
+              <div class="pg__controls" id="pg-controls"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+          <div class="docs-layout">
+            <div class="docs-main">
+              <h2>Код компонента</h2>
+              <p class="desc">Эталонная разметка, полный CSS компонента и выжимка API рантайма.</p>
+              <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                <div class="segctrl__thumb"></div>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+              </div>
+              <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+              <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+              <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabs-body -->
+    </div><!-- /app-pane-docs -->
+  </div><!-- /splitpane -->
+</main>
+
+<!-- меню и модалка подтверждения: разметка для штатных рантаймов ДС -->
+<div class="menu" id="kb-board-menu" role="menu" hidden>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="settings"></i></span><span class="menu__item-label">Настройки доски</span></button>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="layout-rows-01"></i></span><span class="menu__item-label">Группировка</span></button>
+  <div class="menu__divider" role="separator"></div>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Выгрузить в Excel</span></button>
+</div>
+
+<div class="menu" id="kb-col-menu" role="menu" hidden>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="edit"></i></span><span class="menu__item-label">Переименовать</span></button>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="circle-filled"></i></span><span class="menu__item-label">Тон колонки</span></button>
+  <button type="button" class="menu__item" role="menuitem" data-kb-collapse><span class="menu__item-icon"><i data-icon="chevron-left-double"></i></span><span class="menu__item-label">Свернуть колонку</span></button>
+  <div class="menu__divider" role="separator"></div>
+  <button type="button" class="menu__item menu__item--danger" role="menuitem" data-kb-delcol><span class="menu__item-icon"><i data-icon="trash"></i></span><span class="menu__item-label">Удалить колонку</span></button>
+</div>
+
+<div class="menu" id="kb-card-menu" role="menu" hidden>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="arrow-narrow-right"></i></span><span class="menu__item-label">Переместить в…</span><span class="menu__item-hint">без перетаскивания</span></button>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="copy"></i></span><span class="menu__item-label">Дублировать</span></button>
+  <button type="button" class="menu__item" role="menuitem"><span class="menu__item-icon"><i data-icon="link"></i></span><span class="menu__item-label">Копировать ссылку</span></button>
+  <div class="menu__divider" role="separator"></div>
+  <button type="button" class="menu__item menu__item--danger" role="menuitem" data-kb-delcard><span class="menu__item-icon"><i data-icon="trash"></i></span><span class="menu__item-label">Удалить карточку</span></button>
+</div>
+
+<div class="modal-scrim" id="kb-confirm" hidden>
+  <div class="modal modal--w3" role="alertdialog" aria-labelledby="kb-confirm-t" aria-describedby="kb-confirm-d">
+    <div class="modal__head">
+      <h2 class="modal__title" id="kb-confirm-t" data-kb-confirm-title>Удалить?</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m modal__close" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </div>
+    <div class="modal__body"><p id="kb-confirm-d" class="kbcard__flabel" style="margin:0;font:var(--type-body-m);color:var(--text-secondary);white-space:normal;" data-kb-confirm-text>Действие необратимо.</p></div>
+    <div class="modal__foot">
+      <div class="modal__foot-left"></div>
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button type="button" class="btn btn--accent btn--error btn--m" data-kb-confirm-ok><span class="btn__label">Удалить</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Панель деталей карточки — организм Drawer. Слой, focus trap и Esc
+     даёт ds-modal.js; наполнение шапки — ds-kanban.js по data-kb-d-*. -->
+<div class="modal-scrim drawer-scrim" id="kb-drawer" hidden>
+  <aside class="drawer drawer--w4" role="dialog" aria-modal="true" aria-labelledby="kb-d-title">
+    <header class="drawer__head">
+      <div class="drawer__headmain">
+        <p class="drawer__path"><span data-kb-d-col>Заведение</span><i data-icon="chevron-right"></i><span data-kb-d-id>D-1042</span></p>
+        <h2 class="drawer__title" id="kb-d-title" data-kb-d-title>ООО «ЮгСтрой» — кредитный мезонин</h2>
+      </div>
+      <div class="drawer__acts">
+        <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="В избранное" aria-pressed="false"><i data-icon="star"></i></button>
+        <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Действия" data-menu="kb-card-menu"><i data-icon="more-dots"></i></button>
+        <span class="drawer__close"><button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Закрыть панель" data-modal-close><i data-icon="close"></i></button></span>
+      </div>
+    </header>
+
+    <div class="drawer__body">
+      <section class="drawer__sec">
+        <div class="drawer__sechead"><h3 class="drawer__sectitle">Реквизиты сделки</h3></div>
+        <div class="drawer__grid">
+          <div class="rof"><span class="ds-label"><span class="ds-label__text">Сумма</span></span><div class="rof__row"><span class="rof__value">1 250 000 000 ₽</span></div></div>
+          <div class="rof"><span class="ds-label"><span class="ds-label__text">Погашение</span></span><div class="rof__row"><span class="rof__value">31.12.2029</span></div></div>
+          <div class="rof"><span class="ds-label"><span class="ds-label__text">Клиент</span></span><div class="rof__row"><span class="rof__value">ООО «ЮгСтрой»</span></div></div>
+          <div class="rof"><span class="ds-label"><span class="ds-label__text">Менеджер</span></span><div class="rof__row"><span class="rof__value">Волкова П. А.</span></div></div>
+        </div>
+      </section>
+
+      <section class="drawer__sec">
+        <div class="drawer__sechead">
+          <h3 class="drawer__sectitle">Поля карточки</h3>
+          <span class="drawer__secact"><button type="button" class="btn btn--transparent btn--s" data-modal="kb-field" data-modal-nested><i data-icon="add"></i><span class="btn__label">Добавить поле</span></button></span>
+        </div>
+        <div class="drawer__grid">
+          <div class="rof"><span class="ds-label"><span class="ds-label__text">Уровень риска</span></span><div class="rof__row"><span class="rof__value">Повышенный</span></div></div>
+          <div class="rof"><span class="ds-label"><span class="ds-label__text">Обеспечение</span></span><div class="rof__row"><span class="rof__value">Залог недвижимости</span></div></div>
+        </div>
+      </section>
+
+      <section class="drawer__sec">
+        <div class="drawer__sechead"><h3 class="drawer__sectitle">Активность</h3></div>
+        <p class="drawer__path">Вчера · Захарова К. перенесла карточку в «Голосование»</p>
+        <p class="drawer__path">3 сентября · Волкова П. создала карточку</p>
+      </section>
+    </div>
+
+    <div class="drawer__foot">
+      <div class="drawer__foot-left"><button type="button" class="btn btn--transparent btn--m"><span class="btn__label">Открыть сделку</span></button></div>
+      <div class="drawer__foot-right"><button type="button" class="btn btn--outline btn--m" data-modal-close><span class="btn__label">Закрыть</span></button></div>
+    </div>
+  </aside>
+</div>
+
+<!-- Новое поле карточки — форма поверх открытой панели (вложенный слой) -->
+<div class="modal-scrim" id="kb-field" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="kb-field-t">
+    <div class="modal__head">
+      <h2 class="modal__title" id="kb-field-t">Новое поле карточки</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l modal__close" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </div>
+    <div class="modal__body">
+      <div class="inp inp--m">
+        <label class="ds-label" for="kb-field-name"><span class="ds-label__text">Название поля</span></label>
+        <div class="inp__field"><input class="inp__control" id="kb-field-name" placeholder="Например, «Уровень риска»"></div>
+      </div>
+      <div class="inp inp--m">
+        <label class="ds-label" for="kb-field-type"><span class="ds-label__text">Тип значения</span></label>
+        <div class="inp__field" role="combobox" aria-expanded="false" aria-controls="kb-field-types">
+          <input class="inp__control" id="kb-field-type" value="Текст" readonly>
+          <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+        </div>
+        <span class="ds-helper ds-helper--left">Текст · Число · Сумма · Дата · Список · Флаг · Пользователь · Ссылка</span>
+      </div>
+      <label class="cb cb--selected">
+        <input type="checkbox" class="cb__input" checked>
+        <span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span>
+        <span class="cb__content"><span class="cb__label">Показывать на лице карточки</span>
+        <span class="ds-helper ds-helper--left">На карточке помещаются 4 поля, остальные видны только здесь</span></span>
+      </label>
+    </div>
+    <div class="modal__foot">
+      <div class="modal__foot-left"></div>
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button type="button" class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Добавить</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../scripts/icons-data.js"></script>
+<script src="../../scripts/ds-icons.js"></script>
+<script src="../../scripts/ds-float.js"></script>
+<script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/ds-tile.js"></script>
+<script src="../../scripts/ds-menu.js"></script>
+<script src="../../scripts/ds-tooltip.js"></script>
+<script src="../../scripts/ds-modal.js"></script>
+<script src="../../scripts/ds-drawer.js"></script>
+<script src="../../scripts/ds-notify.js"></script>
+<script src="../../scripts/ds-illustrations.js"></script>
+<script src="../../scripts/ds-kanban.js"></script>
+<script src="../../scripts/ds-splitter.js"></script>
+<script src="../../scripts/ds-nav.js"></script>
+<script src="../../scripts/kanban.page.js"></script>
+<!-- самодостаточные подписи свитчей конструктора (общий слой docs-split.js) -->
+<script>
+window.DS_SPLIT_SWITCH_LABELS = {
+  'Компактные карточки': 'Компактные карточки',
+  'Чип «Ключевая сделка»': 'Показывать чип «Ключевая сделка»',
+  'Исполнители': 'Показывать исполнителей',
+  'Свернуть первую колонку': 'Свернуть первую колонку'
+};
+</script>
+<script src="../../scripts/docs-split.js"></script>
+
+<!-- ===== исходники для вкладки «Код» (статично, синхронизировать с ДС) ===== -->
+<script type="text/plain" id="src-code-html">&lt;!-- Доска. Ограничений переходов у неё нет: их задаёт решение,
+     слушая отменяемое kanban:beforemove. data-kb-drawer — панель деталей. --&gt;
+&lt;div class="kanban" data-kanban data-kb-confirm="kb-confirm" data-kb-drawer="kb-drawer"&gt;
+
+  &lt;div class="kanban__toolbar"&gt;
+    &lt;h2 class="kanban__title"&gt;Сделки&lt;/h2&gt;
+    &lt;span class="badge badge--text badge--s" data-kb-total&gt;0&lt;/span&gt;
+    &lt;div class="kanban__toolbar-right"&gt;
+      &lt;button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Настройки доски" data-menu="kb-board-menu"&gt;&lt;i data-icon="more-dots"&gt;&lt;/i&gt;&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Скроллпорт и ряд — РАЗНЫЕ элементы. У вьюпорта высота определённая
+       (flex: 1), и растяни колонки по нему — они окажутся высотой с экран:
+       лишние карточки торчат за коробкой, липкая шапка отваливается.
+       У ряда высота auto, поэтому колонки тянутся по самой длинной. --&gt;
+  &lt;div class="kanban__viewport"&gt;
+   &lt;div class="kanban__track"&gt;
+
+    &lt;section class="kbcol kbcol--lblue" data-kb-col="draft" data-kb-name="Заведение"&gt;
+      &lt;!-- шапка — ручка переноса колонки; tabindex ставит рантайм --&gt;
+      &lt;header class="kbcol__head"&gt;
+        &lt;span class="kbcol__marker" aria-hidden="true"&gt;&lt;/span&gt;
+        &lt;span class="kbcol__name"&gt;Заведение&lt;/span&gt;
+        &lt;span class="kbcol__vname" aria-hidden="true"&gt;Заведение&lt;/span&gt;
+        &lt;span class="badge badge--text badge--s" data-kb-count&gt;0&lt;/span&gt;
+        &lt;span class="kbcol__acts"&gt;
+          &lt;button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Добавить карточку" data-kb-add&gt;&lt;i data-icon="add"&gt;&lt;/i&gt;&lt;/button&gt;
+          &lt;button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть страницу «Заведение»"&gt;&lt;i data-icon="arrow-right"&gt;&lt;/i&gt;&lt;/button&gt;
+          &lt;button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия с колонкой" data-menu="kb-col-menu"&gt;&lt;i data-icon="more-dots"&gt;&lt;/i&gt;&lt;/button&gt;
+        &lt;/span&gt;
+      &lt;/header&gt;
+      &lt;div class="kbcol__body" data-kb-body&gt;
+
+        &lt;!-- Карточка = Card (.tile.tile--card) + раскладка .kbcard --&gt;
+        &lt;article class="kbcard tile tile--card" tabindex="0"&gt;
+          &lt;header class="tile__header"&gt;
+            &lt;div class="tile__header-main"&gt;
+              &lt;div class="tile__title-row"&gt;
+                &lt;h3 class="tile__title"&gt;ООО «ЮгСтрой» — кредитный мезонин&lt;/h3&gt;
+              &lt;/div&gt;
+              &lt;div class="tile__chiplist"&gt;
+                &lt;span class="chip chip--xs chip--rounded chip--orange"&gt;&lt;span class="chip__icon"&gt;&lt;i data-icon="zap"&gt;&lt;/i&gt;&lt;/span&gt;&lt;span class="chip__label"&gt;Ключевая сделка&lt;/span&gt;&lt;/span&gt;
+                &lt;span class="chip chip--xs chip--rounded"&gt;&lt;span class="chip__label"&gt;Повышенный риск&lt;/span&gt;&lt;/span&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="tile__actions"&gt;
+              &lt;button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="В избранное" aria-pressed="false" data-kb-star&gt;&lt;i data-icon="star"&gt;&lt;/i&gt;&lt;/button&gt;
+              &lt;button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия" data-menu="kb-card-menu"&gt;&lt;i data-icon="more-dots"&gt;&lt;/i&gt;&lt;/button&gt;
+            &lt;/div&gt;
+          &lt;/header&gt;
+          &lt;div class="tile__body"&gt;
+            &lt;div class="kbcard__fields"&gt;
+              &lt;div class="kbcard__field"&gt;&lt;span class="kbcard__flabel"&gt;Сумма&lt;/span&gt;&lt;span class="kbcard__fvalue"&gt;1 250 000 000 ₽&lt;/span&gt;&lt;/div&gt;
+              &lt;div class="kbcard__field"&gt;&lt;span class="kbcard__flabel"&gt;Погашение&lt;/span&gt;&lt;span class="kbcard__fvalue"&gt;31.12.2029&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="kbcard__meta"&gt;
+              &lt;span class="kbcard__stat"&gt;&lt;i data-icon="attach"&gt;&lt;/i&gt;3&lt;/span&gt;
+              &lt;span class="kbcard__stat"&gt;&lt;i data-icon="message-text"&gt;&lt;/i&gt;7&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class="kbcard__foot"&gt;
+              &lt;span class="av-group av-group--s"&gt;
+                &lt;span class="av av--s av--circular"&gt;&lt;span class="av__text"&gt;ВП&lt;/span&gt;&lt;/span&gt;
+              &lt;/span&gt;
+              &lt;span class="kbcard__id"&gt;D-1042&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/article&gt;
+
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;div class="kanban__addcol"&gt;
+      &lt;button type="button" class="btn btn--transparent btn--s" data-kb-addcol&gt;&lt;i data-icon="add"&gt;&lt;/i&gt;&lt;span class="btn__label"&gt;Добавить колонку&lt;/span&gt;&lt;/button&gt;
+    &lt;/div&gt;
+   &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</script>
+<script type="text/plain" id="src-code-css">/* ============================================================
+   Kanban — доска: тулбар + горизонтальный трек колонок.
+   Колонка (.kbcol) — организм доски: шапка, тело, линия вставки.
+   Карточка — Card (.tile.tile--card) + раскладка контента (.kbcard).
+   Геометрию и интерактивные состояния карточки задаёт Card в
+   styles/tile.css; здесь — только то, что принадлежит доске.
+
+   Скролл один и он у .kanban__viewport — обе оси сразу. У колонок
+   своего скролла нет: доска прокручивается целиком, а шапки колонок
+   залипают сверху (position: sticky). Ряд колонок .kanban__track —
+   отдельный элемент внутри вьюпорта, см. разбор ниже.
+
+   Хост-контракт: доска обязана получить ОПРЕДЕЛЁННУЮ высоту — быть
+   flex-элементом (flex: 1; min-height: 0) в колоночном родителе,
+   у которого высота задана. Без этого вьюпорту нечего ограничивать,
+   скролл уезжает на страницу и залипания шапок не будет.
+
+   Только токены ДС (var(--*)).
+   ============================================================ */
+
+/* Парные `[hidden]` — правило B11 линтера. */
+.kanban[hidden],
+.kbcol[hidden],
+.kbcard[hidden] { display: none; }
+
+.kanban {
+  --kb-col-w: 288px;        /* ширина колонки вместе с паддингом 8+8 */
+  --kb-col-pad: var(--space-8);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+}
+
+/* ------------------------------------------------------------
+   Тулбар доски
+   ------------------------------------------------------------ */
+.kanban__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+  min-width: 0;
+  flex: none;
+}
+.kanban__title {
+  margin: 0;
+  font: var(--type-h5-strong);
+  color: var(--text-primary);
+}
+.kanban__toolbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* ------------------------------------------------------------
+   ДВЕ РОЛИ — ДВА ЭЛЕМЕНТА, и это главное правило раскладки доски.
+
+   .kanban__viewport — скроллпорт: единственный скролл доски, обе оси.
+   .kanban__track    — ряд колонок: высота по самой длинной колонке.
+
+   Совмещать их в одном элементе нельзя, хотя очень хочется. Скроллпорт
+   имеет ОПРЕДЕЛЁННУЮ высоту (flex: 1 в колоночном родителе), а
+   align-items: stretch растягивает элементы по высоте КОНТЕЙНЕРА, а не
+   по высоте самого длинного из них. Пока скроллпорт и ряд — один
+   элемент, колонка ровно высотой с видимую область, и отсюда сразу два
+   дефекта: карточки, которые в неё не влезли, торчат за её коробкой
+   (заливка hover и цель дропа кончаются раньше карточек), а sticky-шапка
+   отлипает на первом же экране прокрутки — держать её внутри колонки
+   больше негде. Проверено дважды: сперва здесь стоял flex-start (шапка
+   отлипала у коротких колонок), потом stretch (отлипала у всех).
+
+   Инвариант Layout: у экрана горизонтального скролла нет, он принадлежит
+   контейнеру в его собственной раскладке.
+
+   Колонки прижаты друг к другу (gap: 0): расстояние между карточками
+   соседних колонок даёт паддинг самих колонок, 8+8=16. По вертикали
+   карточки стоят плотнее — зазор 8: на доске важнее, сколько карточек
+   видно разом, а границы между ними задаёт рамка Card, не воздух.
+   ------------------------------------------------------------ */
+.kanban__viewport {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.kanban__track {
+  position: relative;        /* система координат .kanban__colguide */
+  display: flex;
+  gap: 0;
+  /* Высота ряда — auto, то есть по самой длинной колонке; отсюда
+     stretch растягивает до неё ВСЕ колонки, и коробка каждой доходит
+     до конца прокрутки. min-height не даёт ряду быть ниже скроллпорта:
+     на доске из двух карточек колонка всё равно цель дропа во всю
+     высоту, а не полоска сверху. */
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+/* Заглушка «Добавить колонку» — в конце трека, там же, где появится
+   результат (закон Фиттса + принцип близости) */
+.kanban__addcol {
+  flex: 0 0 var(--kb-col-w);
+  width: var(--kb-col-w);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--kb-col-pad);
+}
+
+/* Карточка (или шапка колонки) на плавающем слое, пока её тащат */
+.kanban__flying {
+  position: fixed;
+  z-index: 1200;
+  margin: 0;
+  pointer-events: none;
+  user-select: none;
+}
+/* Летит клон ШАПКИ, а не колонки целиком: колонка высотой в экран под
+   курсором нечитаема и перекрывает как раз ту часть доски, куда целятся. */
+.kanban__flying.kbcol__head {
+  box-shadow: var(--shadow-modal-form);
+  border-radius: var(--radius-m);
+}
+
+/* Вертикальная линия места вставки колонки. Тон тот же, что у линии
+   вставки карточки: указатель позиции — единственный, WCAG 1.4.11 просит
+   для него 3:1. Высота и вертикаль — из CSS, не из JS: линия абсолютна
+   внутри .kanban__track, а трек сам не скроллится (скролл у вьюпорта),
+   поэтому поправки на прокрутку не нужны — рантайм считает только left. */
+.kanban__colguide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 2px;
+  border-radius: var(--radius-2xs);
+  background: var(--primary-dark);
+  pointer-events: none;
+}
+
+/* Пока идёт перенос, выделение текста выключено НА ВСЁМ экране, а не
+   только на доске: жест уводит указатель за пределы трека, и браузер
+   начинает тянуть выделение по соседним карточкам и по документу.
+   Класс живёт на &lt;body&gt; — так же, как ds-nav.js держит .ds-nav-open. */
+.kb-dragging,
+.kb-dragging * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ------------------------------------------------------------
+   Колонка. Своей заливки в покое НЕТ — она появляется только под
+   указателем и при перетаскивании, чтобы цель дропа читалась.
+   ------------------------------------------------------------ */
+.kbcol {
+  flex: 0 0 var(--kb-col-w);
+  width: var(--kb-col-w);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--kb-col-pad);
+  border-radius: var(--radius-m);
+  background-color: transparent;
+  transition: background-color .15s ease, opacity .15s ease;
+}
+
+/* Шапка колонки залипает при вертикальном скролле вьюпорта.
+   Заливка обязана быть НЕПРОЗРАЧНОЙ: под шапкой едут карточки.
+   Тон состояния (--primary-bg — color-mix c transparent) полупрозрачный,
+   поэтому кладётся слоем ПОВЕРХ непрозрачной базы, а не вместо неё. */
+.kbcol__head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+  /* тянется на всю ширину колонки, но содержимое стоит по кромке карточек */
+  margin: calc(-1 * var(--kb-col-pad)) calc(-1 * var(--kb-col-pad)) 0;
+  padding: var(--kb-col-pad);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
+  background-color: var(--bg-page);
+  background-image: none;
+  cursor: grab;                 /* шапка — ручка переноса колонки */
+}
+.kbcol__head:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+.kbcol--moving &gt; .kbcol__head { cursor: grabbing; }
+/* Кнопки внутри шапки — обычные кнопки, ручкой не работают */
+.kbcol__acts .ibtn { cursor: pointer; }
+.kbcol__marker {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-circle);
+  background: var(--st-grey);
+}
+.kbcol--green   .kbcol__marker { background: var(--st-green); }
+.kbcol--lblue   .kbcol__marker { background: var(--st-lblue); }
+.kbcol--orange  .kbcol__marker { background: var(--st-orange); }
+.kbcol--dpurple .kbcol__marker { background: var(--st-dpurple); }
+.kbcol--primary .kbcol__marker { background: var(--st-primary); }
+
+.kbcol__name {
+  min-width: 0;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Три действия: добавить · перейти на страницу колонки · меню */
+.kbcol__acts {
+  margin-left: auto;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.kbcol__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+  padding-top: var(--space-8);
+}
+
+/* Линия места вставки. Тон --primary-dark, а не --primary: линия —
+   единственный указатель позиции, и по WCAG 1.4.11 ей нужен контраст
+   3:1 (у --primary к белому 2.91:1, у --primary-dark 5.24:1). */
+.kbcol__guide {
+  flex: none;
+  height: 2px;
+  /* Линия — такой же flex-элемент, как карточка: вставка добавляет к списку
+     её высоту и ЕЩЁ ОДИН зазор. Отрицательные поля гасят прибавку, чтобы
+     соседи не разъезжались в момент показа линии; компенсация равна
+     половине зазора (8/2 = 4), при зазоре 16 здесь стояло 8. */
+  margin: calc(-1 * var(--space-4)) 0;
+  border-radius: var(--radius-2xs);
+  background: var(--primary-dark);
+}
+
+/* ---- состояния колонки ----
+   Специфичность здесь значащая, а не косметика. Селектор с псевдоклассом
+   .kbcol:hover — это (0,2,0), голый модификатор .kbcol--drop — (0,1,0), и
+   порядок в файле не спасает: специфичность решает раньше. Клон летит с
+   pointer-events: none, поэтому колонка под курсором ВСЕГДА в :hover —
+   состояние, ради которого правило написано, и состояние, которое его
+   гасит, наступают одновременно. Отсюда .kbcol.kbcol--drop и
+   .kbcol.kbcol--selected: модификатор уравнен по весу с псевдоклассом. */
+.kbcol:hover { background-color: var(--primary-bg); }
+.kbcol:hover &gt; .kbcol__head {
+  background-image: linear-gradient(var(--primary-bg), var(--primary-bg));
+}
+/* Во время переноса подсвечена ровно одна колонка — та, куда ляжет
+   карточка. Наведение гасится, НО не на самой цели: без :not() правило
+   (0,4,0) перебивало бы .kbcol.kbcol--drop (0,2,0) и гасило именно ту
+   подсветку, ради которой всё затевалось. Колонка под курсором всегда
+   в :hover (клон летит с pointer-events: none), и она же чаще всего цель;
+   гасить надо остальные случаи — свёрнутую колонку, которую дроп не
+   принимает, и колонку под курсором в момент, когда линия вставки ещё
+   не встала. */
+.kanban.is-dragging .kbcol:hover:not(.kbcol--drop) { background-color: transparent; }
+.kanban.is-dragging .kbcol:hover:not(.kbcol--drop) &gt; .kbcol__head { background-image: none; }
+
+/* Цель дропа. Заливка та же, что под указателем (--primary-bg), поэтому
+   цель отличает КОЛЬЦО, а не тон: во время переноса hover-заливка гасится
+   правилом выше, и подсвеченной остаётся ровно одна колонка — та, куда
+   ляжет карточка. Подсветка обязана читаться однозначно: это единственный
+   ответ системы на вопрос «куда именно» (эвристика Нильсена №1). */
+.kbcol.kbcol--drop {
+  background-color: var(--primary-bg);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+.kbcol.kbcol--drop &gt; .kbcol__head {
+  background-image: linear-gradient(var(--primary-bg), var(--primary-bg));
+}
+
+/* Колонка на месте, откуда её взяли: геометрия сохранена, соседи
+   не прыгают — тот же приём, что у .kbcard--ghost. */
+.kbcol--ghost { opacity: .4; }
+/* тот же случай, что и у --drop: голый модификатор (0,1,0) слабее .kbcol:hover (0,2,0) */
+.kbcol.kbcol--selected { background-color: var(--primary-bg); }
+
+/* ---- свёрнутая колонка ---- */
+.kbcol--collapsed {
+  flex: 0 0 48px;
+  width: 48px;
+}
+.kbcol--collapsed .kbcol__body,
+.kbcol--collapsed .kbcol__name { display: none; }
+.kbcol--collapsed .kbcol__head {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  border-radius: var(--radius-m);
+}
+.kbcol--collapsed .kbcol__acts { margin-left: 0; flex-direction: column; }
+/* Имя читается СНИЗУ ВВЕРХ: vertical-rl даёт сверху вниз,
+   поворот на 180° разворачивает и направление письма, и порядок строк. */
+.kbcol__vname {
+  display: none;
+  max-height: 320px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+}
+.kbcol--collapsed .kbcol__vname { display: block; }
+@media (prefers-reduced-motion: reduce) {
+  .kbcol { transition: none; }
+}
+
+/* ------------------------------------------------------------
+   Карточка доски = Card (.tile.tile--card) + раскладка контента.
+   Геометрия, Hover / Active / Move / Disabled — у Card в tile.css.
+   Здесь только то, что принадлежит доске: поля, метрики, подвал,
+   плотность и служебные состояния перетаскивания и выбора.
+   ------------------------------------------------------------ */
+.kbcard {
+  cursor: grab;            /* вся карточка — ручка перетаскивания */
+}
+.kbcard.is-move { cursor: grabbing; }
+
+/* Пользовательские поля — две колонки, значение в одну строку:
+   перенос ломает сетку и делает карточки разной высоты без причины */
+.kbcard__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-8) var(--space-12);
+}
+.kbcard__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.kbcard__flabel {
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kbcard__fvalue {
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Метрики: вложения, комментарии, срок */
+.kbcard__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+.kbcard__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+}
+.kbcard__stat :is(svg, [data-icon]) { width: 16px; height: 16px; }
+
+.kbcard__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.kbcard__id {
+  margin-left: auto;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+}
+
+/* Контент карточки — колонка с зазором 12 */
+.kbcard &gt; .tile__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+/* ---- плотность ----
+   Компактная — ответ на зафиксированную потребность: «Operations хотят
+   видеть больше карточек на экране одновременно». Заголовок в одну
+   строку, поля с лица уходят в Drawer. */
+.kbcard--compact &gt; .tile__header {
+  padding: var(--space-12) var(--space-12) var(--space-4);
+}
+.kbcard--compact &gt; .tile__body {
+  padding: var(--space-4) var(--space-12) var(--space-12);
+  gap: var(--space-8);
+}
+.kbcard--compact .tile__title {
+  font: var(--type-body-s-strong);
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+.kbcard--compact .kbcard__fields,
+.kbcard--compact .kbcard__meta { display: none; }
+
+/* ---- служебные состояния доски (у Card их нет) ----
+   Ghost — место схваченной карточки: геометрия сохранена, поэтому
+   список не схлопывается и соседи не прыгают. */
+.kbcard--ghost {
+  background: var(--bgtable-row-focus);
+  border-style: dashed;
+  border-color: var(--border-primary);
+  box-shadow: none;
+}
+.kbcard--ghost &gt; * { opacity: 0; }
+.kbcard--selected {
+  background: var(--primary-bg);
+  border-color: var(--primary);
+}
+.kbcard--error { border-color: var(--error); }</script>
+<script type="text/plain" id="src-code-js">/* Рантайм ds-kanban.js подключается через scripts/ds.js и оживляет
+   любую разметку с data-kanban сам. Экрану писать нечего. */
+
+/* Ограничений переходов у доски НЕТ: компонент общий, на нём живут
+   сделки, задачи и заметки. Решение реализует свою модель само —
+   через отменяемое kanban:beforemove. */
+board.addEventListener('kanban:beforemove', function (e) {
+  var d = e.detail;                          // {card, from, to, index}
+  if (!STATUS_MODEL[d.from.dataset.kbCol].includes(d.to.dataset.kbCol)) {
+    e.preventDefault();                      // карточка вернётся на место
+    DSSnack.show({ tone: 'error', title: 'Такой переход недоступен' });
+  }
+});
+
+/* API — когда доску меняет сам экран */
+DSKanban.bind(board)              // связать одну доску
+DSKanban.bindAll(root)            // связать все внутри root
+DSKanban.move(card, col, index)   // перенести программно
+DSKanban.sync(board)              // пересчитать счётчики и пустые состояния
+
+/* События — на элементе доски, всплывают */
+board.addEventListener('kanban:move', function (e) {
+  var d = e.detail;               // {card, from, to, index}
+  audit.push({
+    card: d.card.dataset.kbCard,
+    from: d.from.dataset.kbCol,
+    to:   d.to.dataset.kbCol,
+    at:   Date.now()
+  });
+});
+board.addEventListener('kanban:colmove', function (e) {
+  savePreset(e.detail.column.dataset.kbCol, e.detail.to);   // порядок этапов
+});
+// ещё: kanban:add · kanban:remove · kanban:star · kanban:colremove · kanban:open
+
+/* Панель деталей — штатный Drawer. Доска называет её атрибутом
+   data-kb-drawer и подставляет путь, id и заголовок из карточки;
+   содержимое панели принадлежит экрану. */
+
+/* Подтверждения — штатный Modal. Рантайм только наполняет разметку
+   страницы, найденную по data-kb-confirm, и помнит отложенное действие.
+   Своей разметки не создаёт: диалог принадлежит экрану. */
+
+/* ВАЖНО про перерисовку. Рантаймы ДС связывают разметку один раз, на
+   DOMContentLoaded. Экран, который пересобирает доску через innerHTML,
+   обязан позвать их заново — иначе кебабы и триггеры панели останутся
+   мёртвыми, причём молча:
+     DSKanban.bind(board); DSMenu.bindAll(scope);
+     DSModal.bindAll(scope); DSDrawer.bindAll(scope); */</script>
+
+</body>
+</html>

@@ -1,6 +1,14 @@
 /* =========================================================================
-   DS Modal — рантайм модального окна (out-of-box).
+   DS Modal — рантайм модального СЛОЯ (out-of-box).
    Зависимости: styles/modal.css. Иконки в разметке — <i data-icon> как обычно.
+
+   Слой и геометрия здесь разведены. Слой — это скрим, портал в body,
+   блокировка прокрутки, inert фона, focus trap, стек, Esc и возврат
+   фокуса; он один на всю ДС. Геометрия — что именно лежит в скриме:
+   .modal (окно по центру) или .drawer (панель у края экрана, организм
+   Drawer). Корень слоя ищется по [data-layer-root], .modal, .drawer —
+   второй экземпляр логики слоя в ДС не заводится, иначе реализации
+   разъедутся на первой же правке.
 
    Экспорт: window.DSModal = {
      open(scrim, opts) → api        — смонтировать и открыть слой
@@ -66,12 +74,19 @@
     });
   }
 
+  /* Корень слоя внутри скрима. Геометрий две — окно и панель, слой один. */
+  var ROOT_SEL = '[data-layer-root], .modal, .drawer';
+  var BODY_SEL = '.modal__body, .drawer__body';
+  var HEAD_SEL = '.modal__head, .drawer__head';
+  var FOOT_SEL = '.modal__foot, .drawer__foot';
+  var CLOSE_SEL = '[data-modal-close], .modal__close button, .drawer__close button';
+
   /* wireScroll — тень у шапки и подвала по прокрутке тела (спека, п.4) */
   function wireScroll(modal) {
     if (!modal || modal.__dsModalScroll) return modal;
-    var body = modal.querySelector('.modal__body');
-    var head = modal.querySelector('.modal__head');
-    var foot = modal.querySelector('.modal__foot');
+    var body = modal.querySelector(BODY_SEL);
+    var head = modal.querySelector(HEAD_SEL);
+    var foot = modal.querySelector(FOOT_SEL);
     if (!body) return modal;
     modal.__dsModalScroll = true;
     function sync() {
@@ -86,10 +101,10 @@
   }
 
   function firstTarget(modal) {
-    var body = modal.querySelector('.modal__body');
+    var body = modal.querySelector(BODY_SEL);
     var inBody = body ? focusables(body) : [];
     if (inBody.length) return inBody[0];
-    var close = modal.querySelector('.modal__close button, [data-modal-close]');
+    var close = modal.querySelector(CLOSE_SEL);
     if (close) return close;
     return focusables(modal)[0] || null;
   }
@@ -113,7 +128,7 @@
     /* верхний слой закрывается, если новый — не вложенный */
     if (!conf.nested) while (layers.length) closeTop();
 
-    var modal = scrim.querySelector('.modal') || scrim;
+    var modal = scrim.querySelector(ROOT_SEL) || scrim;
     if (conf.nested) scrim.classList.add('modal-scrim--nested');
     if (scrim.parentElement !== document.body) document.body.appendChild(scrim);
     scrim.removeAttribute('hidden');
@@ -198,7 +213,7 @@
   document.addEventListener('click', function (e) {
     var t = top();
     if (!t || !e.target.closest) return;
-    var closer = e.target.closest('[data-modal-close], .modal__close button');
+    var closer = e.target.closest(CLOSE_SEL);
     if (closer && t.scrim.contains(closer)) { e.preventDefault(); closeTop(); return; }
     /* клик мимо модалки: guarded-форма закрывается только крестиком и Esc */
     if (e.target === t.scrim && !t.config.guarded) closeTop();

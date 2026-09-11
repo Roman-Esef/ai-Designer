@@ -35,7 +35,11 @@ main.ds-split .splitpane{flex:1;min-height:0;height:100%;border-radius:var(--rad
 main.ds-split .app-pane-demo{display:flex!important;background:var(--bg-page)!important}
 main.ds-split .demo-stage{flex:1;min-height:0;padding:32px;display:flex;flex-direction:column;gap:12px;align-items:safe center;justify-content:safe center;overflow:auto;box-sizing:border-box}
 main.ds-split .app-pane-docs{display:flex!important;flex-direction:column!important;min-height:0}
-main.ds-split .app-pane-docs .tabs{flex:none;padding:10px 24px 0;background:var(--bg-tile)}
+/* Боковой паддинг на самом .tabs недопустим: рейл ряда — inset box-shadow,
+   он рисуется по padding-box и превращает паддинг в голую полоску
+   подчёркивания до первого и после последнего таба. Вертикальный отступ —
+   можно, горизонтальный задаётся только на обёртке без рейла. */
+main.ds-split .app-pane-docs .tabs{flex:none;padding:10px 0 0;background:var(--bg-tile)}
 main.ds-split .tabs-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
 main.ds-split .tabpane{min-width:0}
 

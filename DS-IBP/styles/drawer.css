@@ -1,0 +1,239 @@
+/* =========================================================================
+   Design System — Drawer
+   Drawer — панель деталей у правого края экрана поверх страницы. Отвечает
+   на вопрос «что внутри вот этого объекта из списка», не уводя со списка:
+   доска, реестр, дерево остаются на месте, у объекта есть «следующий».
+
+   Слой у Drawer и Modal ОБЩИЙ — scripts/ds-modal.js: скрим, портал в body,
+   блокировка прокрутки страницы, inert фона, focus trap, стек слоёв, Esc,
+   возврат фокуса. Drawer не заводит второго экземпляра этой логики: две
+   реализации одного механизма расходятся на первой же правке. Своё у
+   Drawer — только геометрия (край вместо центра, высота во весь экран,
+   выезд сбоку) и анатомия шапки (путь + заголовок).
+
+   Sides:   right (единственная сторона — см. ниже)
+   Sizes:   w3 442 · w4 595 (дефолт) · w5 747 · w6 900
+   Slots:   путь · заголовок · действия · alert · тело из секций · подвал
+
+   Сторона одна, и это решение, а не упущение: левый край экрана занят
+   NavPanel, и панель, выезжающая из-под навигации, конкурирует с ней за
+   один и тот же жест и одну и ту же зону внимания.
+
+   Requires: typography.css, colors.css, radius.css, shadow.css, modal.css
+             (скрим и шкала ширины), button.css, icon-button.css
+   ========================================================================= */
+
+/* Парные `[hidden]` — правило B11 линтера: без пары класс (0,1,0)
+   перебивает браузерное `[hidden]` (0,0,0), и скрытая разметкой панель
+   всё равно рендерится открытой. */
+.drawer[hidden],
+.drawer-scrim[hidden] { display: none; }
+
+:root {
+  /* Геометрия повторяет шкалу Modal — панель и окно стоят в одном
+     интерфейсе, и разные отступы читались бы как разные системы. */
+  --drawer-pad-x:           24px;
+  --drawer-head-pad-y:      20px;
+  --drawer-head-pad-right:  20px;
+  --drawer-head-gap:        16px;
+  --drawer-body-pad-y:      20px;
+  --drawer-body-gap:        24px;  /* зазор между секциями */
+  --drawer-sec-gap:         12px;  /* зазор внутри секции */
+  --drawer-foot-pad-y:      16px;
+
+  --drawer-radius: var(--radius-modal);
+  --drawer-shadow: var(--shadow-modal-form);
+  --drawer-bg:     var(--bg-popup);
+}
+
+/* =========================================================================
+   СКРИМ. Берётся у Modal (.modal-scrim — тон, z-index, вход, клик мимо),
+   здесь снимается только охранное поле: оно рассчитано на окно по центру,
+   а панель обязана стоять вплотную к краю.
+   ========================================================================= */
+.drawer-scrim {
+  padding: 0;
+  justify-content: flex-end;
+}
+
+/* =========================================================================
+   ПАНЕЛЬ
+   ========================================================================= */
+.drawer {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  margin: 0;
+  width: var(--modal-w-4);
+  max-width: 100vw;
+  height: 100%;
+  background: var(--drawer-bg);
+  /* скругление только с внутренней стороны: внешняя прижата к краю экрана */
+  border-radius: var(--drawer-radius) 0 0 var(--drawer-radius);
+  box-shadow: var(--drawer-shadow);
+  box-sizing: border-box;
+  overflow: hidden;   /* иначе содержимое режет скругление */
+}
+
+/* Шкала ширины — та же, что у Modal: шаг = число колонок сетки экрана. */
+.drawer--w3 { width: var(--modal-w-3); }
+.drawer--w4 { width: var(--modal-w-4); }
+.drawer--w5 { width: var(--modal-w-5); }
+.drawer--w6 { width: var(--modal-w-6); }
+
+/* Встраивание в статичный контейнер документации — вместо слоя на вьюпорт */
+.drawer--inline { height: 100%; box-shadow: none; border-radius: var(--drawer-radius); }
+
+/* Выезд сбоку, а не появление на месте: направление движения — единственное,
+   что отличает панель от окна на уровне восприятия, и оно же объясняет,
+   откуда панель взялась и куда уйдёт. */
+.drawer-scrim .drawer { animation: drawer-slide-in .2s cubic-bezier(.2, .8, .3, 1); }
+@keyframes drawer-slide-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer-scrim .drawer { animation: none; }
+}
+
+/* =========================================================================
+   ШАПКА — путь + заголовок слева, действия справа.
+   Путь обязателен, когда панель открыта из списка: без него через минуту
+   работы непонятно, чью карточку читаешь (эвристика Нильсена №1).
+   ========================================================================= */
+.drawer__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--drawer-head-gap);
+  min-width: 0;
+  padding: var(--drawer-head-pad-y) var(--drawer-head-pad-right)
+           var(--drawer-head-pad-y) var(--drawer-pad-x);
+  border-bottom: 1px solid var(--border-light);
+  transition: box-shadow .15s ease;
+}
+.drawer__head.is-scrolled { box-shadow: 0 6px 12px -8px rgba(40, 50, 55, .18); }
+
+.drawer__headmain {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+.drawer__path {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  min-width: 0;
+  margin: 0;
+  font: var(--type-body-xs);
+  color: var(--text-inactive);
+}
+.drawer__path :is(svg, [data-icon]) { width: 14px; height: 14px; flex: none; }
+.drawer__title {
+  margin: 0;
+  font: var(--type-h5-strong);
+  color: var(--text-primary);
+  text-wrap: pretty;   /* заголовок переносится, а не обрезается */
+}
+.drawer__acts {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.drawer__close { flex: none; display: flex; }
+
+/* Алерт между шапкой и телом — во всю ширину, без скруглений */
+.drawer__alert { flex: none; }
+.drawer > .alert,
+.drawer__alert > .alert { flex: none; border-radius: 0; }
+
+/* =========================================================================
+   ТЕЛО — единственная прокручиваемая зона панели. Содержимое приходит
+   снаружи; здесь только паддинг, скролл и ритм секций.
+   ========================================================================= */
+.drawer__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--drawer-body-pad-y) var(--drawer-pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--drawer-body-gap);
+  font: var(--type-body-m);
+  color: var(--text-primary);
+}
+.drawer__body::-webkit-scrollbar { width: 8px; }
+.drawer__body::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 8px; }
+.drawer__body--flush { padding: 0; gap: 0; }
+
+/* ---- секция тела ---- */
+.drawer__sec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--drawer-sec-gap);
+  min-width: 0;
+}
+.drawer__sechead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+}
+.drawer__sectitle {
+  margin: 0;
+  font: var(--type-body-s-strong);
+  color: var(--text-primary);
+}
+/* действие секции уезжает вправо — «Добавить поле», «Изменить» */
+.drawer__secact { margin-left: auto; flex: none; }
+
+/* Пары «подпись — значение» в две колонки. Одна колонка (--1col) — когда
+   значения длинные: перенос в узкой колонке ломает ритм сильнее, чем
+   лишняя высота. */
+.drawer__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-16);
+  min-width: 0;
+}
+.drawer__grid--1col { grid-template-columns: minmax(0, 1fr); }
+.drawer__grid-full { grid-column: 1 / -1; }
+
+/* =========================================================================
+   ПОДВАЛ — необязателен: панель просмотра закрывается крестиком, подвал
+   нужен только там, где есть что подтверждать.
+   ========================================================================= */
+.drawer__foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  flex-wrap: nowrap;
+  padding: var(--drawer-foot-pad-y) var(--drawer-pad-x);
+  border-top: 1px solid var(--border-light);
+  transition: box-shadow .15s ease;
+}
+.drawer__foot.is-scrolled { box-shadow: 0 -6px 12px -8px rgba(40, 50, 55, .18); }
+.drawer__foot-left,
+.drawer__foot-right {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: var(--space-8);
+}
+.drawer__foot-right { margin-left: auto; }
+
+/* =========================================================================
+   АДАПТИВ. Ниже 640px панель занимает всю ширину: 595px на узком экране
+   оставляют от списка полосу, по которой всё равно нельзя работать.
+   ========================================================================= */
+@media (max-width: 640px) {
+  .drawer { width: 100vw; border-radius: 0; }
+}

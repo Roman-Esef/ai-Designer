@@ -721,6 +721,7 @@ css: `styles/link.css` · deps: [breadcrumbs]
 
 ## Modal
 css: `styles/modal.css` · js: `scripts/ds-modal.js` · deps: [button, icon-button, label-helper, checkbox, alert]
+**Слой ≠ геометрия:** `ds-modal.js` — единственный владелец модального слоя в ДС (скрим, портал в body, inert фона, focus trap, стек, Esc, возврат фокуса). Геометрий на нём две: `.modal` (окно по центру) и `.drawer` (панель у края — см. блок Drawer). Корень слоя ищется по `[data-layer-root], .modal, .drawer`, тело — по `.modal__body, .drawer__body`. Новая геометрия добавляется расширением этих селекторов, а не вторым рантаймом слоя.
 **Оси:** ширина (`--modal-w-2…12`, шаг колонок, 3–9 типичны) · подвал (слева опц./справа Primary обязателен) · `--body--roomy`.
 **Инварианты:** варианта в одну колонку нет и не может быть; левые+правые кнопки одновременно не используются.
 **Классы:** `.modal-scrim` · `.modal-scrim--nested` · `.modal-scrim--inline` · `.modal` · `.modal--w2 … --w12` · `.modal__alert` · `.modal--saving` · `.modal__head` / `.modal__foot` · `.modal__title` · `.modal__close` · `.modal__body` · `.modal__body--flush` · `.modal__body--roomy` · `.sk-line` / `.sk-group` · `.modal__foot-left` / `-right` · `.btn--danger` · `role="dialog"` / `alertdialog` · `aria-modal`, `aria-labelledby`
@@ -1356,6 +1357,44 @@ css: `styles/splitter.css` · js: `scripts/ds-splitter.js` · deps: [button]
 
 Полная анатомия: specs/Splitter.md.
 
+## SubTab
+css: `styles/sub-tab.css` · js: `scripts/ds-tabs.js` · deps: [badge]
+**Оси:** размер (m 40 · s 32 · xs 24, класс на ТРЕКЕ: `.subtabs--m|--s|--xs`; без класса — S) · счётчик (есть / нет). Ориентации, тона и иконок нет намеренно.
+**Инварианты:** размер НЕ КРУПНЕЕ первого уровня — рекомендуется шаг вниз (`.tab--m` → `.subtabs--s`, `.tab--s` → `.subtabs--xs`), равный допустим, крупнее запрещено (линтер не стережёт, сверять на приёмке) · только вместе с рядом первого уровня (`.tabs--horiz` с `.tab`) и как содержимое выбранного таба первого уровня — одиночный `.subtabs` дефект, ловит правило B14 линтера · ёмкость 2–5 пунктов, переполнения нет by design (трек не переносится и не скроллится; 6+ подразделов — это Tab `.tab--s` + `.tabs--bare`) · роль навигационная (`role="tablist"`), несмотря на сегментированный вид · начертание подписи при выборе не меняется — вес несёт заливка, иначе ряд «прыгает» по ширине · disabled — `aria-disabled`, не нативный `disabled`.
+**Диагностика:** «Ряд вылезает за контейнер» → больше пяти пунктов, переполнения нет by design · «Два ряда читаются как один уровень» → размеры совпали; допустимо, но различимость держится тогда на одной механике — взять шаг вниз · «Подразделы весят больше, чем раздел» → второй уровень крупнее первого, инверсия иерархии · «Фокусное кольцо не видно на выбранном» → ожидаемо: на заливке `--primary` кольцо перекрашено в `--text-on-dark` · «Границы ряда почти не видны» → трек полупрозрачный, класть на белую плашку `--bg-tile`, не на `--bg-page`
+
+Табы второго уровня: навигация по подразделам внутри раздела, выбранного на первом уровне. Сегменты в общем треке; высота трека равна высоте сегмента (32 = 32, паддинга трека нет), поэтому выбранный закрашен акцентом от края до края — этим отличается от SegmentControl, где трек выше сегмента и выбор показывает плавающая белая таблетка.
+
+```html
+<!-- ряд первого уровня обязателен -->
+<div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы сделки">
+  <button type="button" class="tab tab--m tab--selected" role="tab" aria-selected="true" tabindex="0">
+    <span class="tab__label">Сделка</span>
+  </button>
+  <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1">
+    <span class="tab__label">ЦУП</span>
+  </button>
+</div>
+
+<!-- второй уровень — подразделы выбранного раздела -->
+<div class="subtabs subtabs--s" role="tablist" data-subtabs aria-label="Подразделы раздела «Сделка»">
+  <button type="button" class="subtab" role="tab" aria-selected="true" tabindex="0">
+    <span class="subtab__label">Общая информация</span>
+  </button>
+  <button type="button" class="subtab" role="tab" aria-selected="false" tabindex="-1">
+    <span class="subtab__label">Документы</span>
+    <span class="badge badge--neutral badge--xxs">12</span>
+  </button>
+  <button type="button" class="subtab" role="tab" aria-selected="false" tabindex="-1" aria-disabled="true">
+    <span class="subtab__label">История</span>
+  </button>
+</div>
+```
+
+**Из коробки:** `data-subtabs` на `.subtabs` — рантайм `ds-tabs.js` даёт roving tabindex, стрелки ← → ↑ ↓, Home/End, активацию на месте, пропуск отключённых. Из кода: `DSTabs.subtabs(el, {onChange})`. Переполнения нет — у `subtabs()` нет ни обёрток скролла, ни меню «Ещё»: ёмкость держит правило применения, а не рантайм.
+
+Полная анатомия: specs/SubTab.md.
+
 ## Switch
 css: `styles/switch.css` · deps: [label-helper, spinner]
 **Оси:** состояние (off/on) · интерактивное состояние (default/hover/focus/pressed/disabled/loading) · состав (label/helper) · группа+обязательность (независимы).
@@ -1520,10 +1559,10 @@ css: `styles/table-filter.css` · js: `scripts/ds-menu.js` (меню пресе�
 
 ## Tile
 css: `styles/tile.css` · js: `scripts/ds-tile.js` · deps: [icon-button, button, link, chip, badge, alert, divider, read-only-field]
-**Оси:** вариант (обычный/Accordion/Headless) · alert-слот (warning/info/error) · ширина (3–12 колонок).
-**Инварианты:** высота тайла в ряду = высоте самого высокого (`align-self:stretch`+Grid); своих интерактивных состояний у тайла нет.
-**Классы:** `.tile` · `.tile--headless` · `.tile--accordion` · `.tile--collapsed` · `.tile__header` · `.tile__header-main` · `.tile__title-row` · `.tile__title` · `.tile__title-add` · `.tile__subtitle` · `.tile__chiplist` · `.tile__actions` · `.tile__toggle` / `.tile__chevron` · `.tile__alert` · `.tile__body` · `.tile__collapsible` · `.tile__grid` / `.tile__rows` · `.tile__grid-full` (элемент на всю ширину сетки) · `.tile-row` · `.tile-group` (обёртка рядов, зазор 16px) · `.tile-stack`
-**Диагностика:** «Тайлы в одном ряду разной высоты» → ряд должен быть CSS Grid (`align-items:stretch` по умолчанию), не flex с `align-items:start` · «У тайла есть свой hover-эффект» → нарушение инварианта — тайл не должен иметь собственных интерактивных состояний
+**Оси:** вариант (обычный/Accordion/Headless/Card) · alert-слот (warning/info/error, у Card нет) · ширина (3–12 колонок).
+**Инварианты:** высота тайла в ряду = высоте самого высокого (`align-self:stretch`+Grid); своих интерактивных состояний у Tile нет — они есть только у родственника Card (`.tile--card`): Default · Hover · Active · Move · Disabled. Тип TileHeader определяет, чем становится тайл: M — плашка, без хэдера — TileHeadless, Card — карточка.
+**Классы:** `.tile` · `.tile--headless` · `.tile--accordion` · `.tile--collapsed` · `.tile__header` · `.tile__header-main` · `.tile__title-row` · `.tile__title` · `.tile__title-add` · `.tile__subtitle` · `.tile__chiplist` · `.tile__actions` · `.tile__toggle` / `.tile__chevron` · `.tile__alert` · `.tile__body` · `.tile__collapsible` · `.tile__grid` / `.tile__rows` · `.tile__grid-full` (элемент на всю ширину сетки) · `.tile--card` (+ `.is-hover` / `.is-pressed` / `.is-move` / `.is-disabled` / `[aria-disabled]`) · `.tile-row` · `.tile-group` (обёртка рядов, зазор 16px) · `.tile-stack`
+**Диагностика:** «Тайлы в одном ряду разной высоты» → ряд должен быть CSS Grid (`align-items:stretch` по умолчанию), не flex с `align-items:start` · «У тайла есть свой hover-эффект» → нарушение инварианта: состояния есть только у `.tile--card`, у обычного Tile их быть не должно · «Карточка в модалке/списке выглядит как плашка страницы» → нужен `.tile--card`, а не `.tile`: у него своя геометрия (8/16/20/16) и Title на ступень ниже
 
 Основная плашка рабочей области: TileHeader (M) + опц. Alert + контентная область (наполнение индивидуально). Ширина 3–12 колонок, отступы контента 10/20/24/20. Собственных состояний нет. Варианты: `--headless` (без хэдера, отступы 24/24/32/24), `--accordion` (+ `--collapsed`).
 
@@ -1606,6 +1645,88 @@ css: `styles/tile.css` · js: `scripts/ds-tile.js` · deps: [icon-button, button
 `.tile__toggle` — JS-хук на кнопке-шевроне (собственных правил в CSS нет, стилизует IconButton), обязателен: обработчик аккордеона делегирует по нему.
 
 **Из коробки:** подключить `scripts/ds-tile.js` — любая `.tile--accordion` с `.tile__toggle` сворачивается сама (делегированно, переживает перерисовку). Рантайм держит `.tile--collapsed`, `aria-expanded`/`aria-label`/`aria-controls` и шлёт событие `tiletoggle`. Свёрнуто по умолчанию — просто добавить класс в разметке. API: `DSTile.wire(el,{collapsed,onToggle})`, `DSTile.toggle(el,v)`.
+
+## Drawer
+css: `styles/drawer.css` · js: `scripts/ds-drawer.js` · deps: [modal, button, icon-button, read-only-field, label-helper]
+**Оси:** ширина (w3 442 · w4 595 дефолт · w5 747 · w6 900) · подвал (есть / нет) · путь в шапке (есть / нет) · монтирование (слой `.drawer-scrim` / встроенная `.drawer--inline` — только витрины).
+**Инварианты:** слой у Drawer и Modal ОБЩИЙ — `scripts/ds-modal.js` (скрим, портал в body, блокировка прокрутки, inert фона, focus trap, стек, Esc, возврат фокуса); своей копии этой логики Drawer не заводит. Скрим несёт оба класса — `.modal-scrim` и `.drawer-scrim`; без второго панель встаёт по центру. Сторона одна, правая: левый край занят NavPanel. Прокручивается только `.drawer__body`, шапка и подвал закреплены. Высота — 100% вьюпорта, `max-height` у панели нет (в отличие от Modal с 80vh). Подвал необязателен; пустого подвала не бывает.
+**Классы:** `.drawer-scrim` · `.drawer` · `.drawer--w3` / `--w4` / `--w5` / `--w6` · `.drawer--inline` · `.drawer__head` / `__headmain` / `__path` / `__title` / `__acts` / `__close` · `.drawer__alert` · `.drawer__body` / `__body--flush` · `.drawer__sec` / `__sechead` / `__sectitle` / `__secact` · `.drawer__grid` / `--1col` / `.drawer__grid-full` · `.drawer__foot` / `__foot-left` / `__foot-right` · `.is-scrolled` · `data-drawer` / `data-drawer-guarded` / `data-modal-close` / `data-modal-nested`
+**Диагностика:** «Панель встала по центру с полями по краям» → на скриме нет `.drawer-scrim` · «Не открывается по клику, ошибок нет» → триггер добавлен после загрузки, нужен `DSDrawer.bindAll(scope)` · «Фокус гуляет по фону» → подключён `drawer.css`, но не `ds-modal.js` · «Шапка уезжает при прокрутке» → `overflow` стоит на корне `.drawer`, а не на теле
+
+Рантайм `scripts/ds-drawer.js` (out-of-box): авто-привязка `[data-drawer="id"]`, класс скрима, делегирование слоя в `DSModal.open`. API: `DSDrawer.open(scrim, opts)` · `bind(trigger)` · `bindAll(root)` · `close()` · `current()`.
+
+Drawer — когда пользователь остаётся в списке и открывает объекты подряд (карточка доски, строка реестра). Modal — когда задачу надо закончить или бросить. Отдельная страница — когда у объекта своя навигация и свой адрес. Форма поверх открытой панели — вложенным слоем (`data-modal-nested`); второй просмотр поверх первого запрещён.
+
+```html
+<button data-drawer="d1">Открыть карточку</button>
+
+<div class="modal-scrim drawer-scrim" id="d1" hidden>
+  <aside class="drawer drawer--w4" role="dialog" aria-modal="true" aria-labelledby="d1-t">
+    <header class="drawer__head">
+      <div class="drawer__headmain">
+        <p class="drawer__path">Заведение › D-1042</p>
+        <h2 class="drawer__title" id="d1-t">ООО «ЮгСтрой»</h2>
+      </div>
+      <div class="drawer__acts">
+        <span class="drawer__close"><button class="ibtn ibtn--neutral ibtn--m" aria-label="Закрыть панель" data-modal-close>…</button></span>
+      </div>
+    </header>
+    <div class="drawer__body">
+      <section class="drawer__sec">
+        <div class="drawer__sechead"><h3 class="drawer__sectitle">Поля карточки</h3>
+          <span class="drawer__secact">…Добавить поле…</span></div>
+        <div class="drawer__grid">…ReadOnlyField…</div>
+      </section>
+    </div>
+    <div class="drawer__foot">…</div>
+  </aside>
+</div>
+<!-- … полная анатомия: specs/Drawer.md -->
+```
+
+## Kanban
+css: `styles/kanban.css` · js: `scripts/ds-kanban.js` · deps: [tile, chip, badge, avatar, icon-button, button, context-menu, modal, tooltip, snackbar, empty-state, skeleton, illustration]
+**Оси:** доска (группировка · плотность · состав полей · число колонок 3–7) · колонка (тон маркера · свёрнутость) · карточка (плотность · состав чипов).
+**Инварианты:** оба скролла принадлежат `.kanban__viewport`, ряд колонок `.kanban__track` — отдельный элемент внутри него с высотой `auto`. Свести обе роли в один элемент нельзя: у скроллпорта высота определённая, и `stretch` растянет колонки по видимой области, а не по контенту — лишние карточки торчат за коробкой колонки, липкая шапка отваливается на первом экране прокрутки. Хост-контракт: доска обязана быть flex-элементом (`flex: 1; min-height: 0`) в колоночном родителе с заданной высотой. У колонок своего скролла нет, шапки залипают. Липкая шапка обязана иметь непрозрачную заливку: тона состояний в ДС полупрозрачные и кладутся `background-image`-слоем поверх базы `--bg-page`, а не вместо неё. Колонки прижаты друг к другу (`gap: 0`), 16px между карточками соседних колонок даёт паддинг колонок 8+8; по вертикали зазор 8. Своей заливки в покое у колонки нет; под указателем и при переносе тон один — `--primary-bg`, цель дропа отличает кольцо `--primary`, поэтому модификатор пишется как `.kbcol.kbcol--drop`, а гашение hover на время жеста — с `:not(.kbcol--drop)`. Геометрию и состояния карточки задаёт Card (`.tile--card`), а не доска. Статусной модели внутри НЕТ и не будет: компонент общий, на доске живут сделки, задачи и заметки. Ограничения переходов реализует решение — отменяемым `kanban:beforemove`. Колонки тянутся по высоте самой длинной (`align-items` у ряда не переопределять, высоту ряду не задавать). Порядок карточек в колонке значим — автосортировки нет.
+**Классы:** `.kanban` · `.kanban__toolbar` / `__title` / `__toolbar-right` · `.kanban__viewport` · `.kanban__track` · `.kanban__addcol` · `.kanban__flying` · `.kanban__colguide` · `.kanban.is-dragging` / `body.kb-dragging` · `.kbcol` · `.kbcol__head` · `.kbcol__marker` · `.kbcol__name` / `__vname` · `.kbcol__acts` · `.kbcol__body` · `.kbcol__guide` · `.kbcol--drop` / `--collapsed` / `--ghost` / `--selected` / `--moving` · `.kbcol--green/--lblue/--orange/--dpurple/--primary` · `.kbcard` (+ `.tile.tile--card`) · `.kbcard__fields` / `__field` / `__flabel` / `__fvalue` · `.kbcard__meta` / `__stat` · `.kbcard__foot` / `__id` · `.kbcard--compact` / `--ghost` / `--selected` / `--error` · `data-kanban` · `data-kb-col` / `-name` / `-body` / `-count` / `-total` / `-add` / `-addcol` / `-collapse` / `-delcard` / `-delcol` / `-star` / `-confirm` / `-drawer` / `-card-tpl`
+**Диагностика:** «Шапка колонки просвечивает, под ней видно карточки» → тон положен вместо непрозрачной базы, а не слоем поверх · «Скроллится вся страница вместо доски» → треку не задан `min-height: 0` во flex-родителе · «Между карточками соседних колонок 8 вместо 16» → у трека выставлен `gap`, он должен быть 0 · «Список схлопывается при перетаскивании» → нет призрака `.kbcard--ghost` · «Esc снял захват, но карточка осталась в чужой колонке» → не сохранено исходное место · «Кебаб удаляет не ту карточку» → меню общее на доску, нужен запомненный триггер открытия · «Меню на доске не открываются после перерисовки» → `DSMenu.bindAll(scope)` не позван заново · «Колонка не подсвечивается как цель дропа» → `.kbcol:hover` (0,2,0) перебивает `.kbcol--drop` (0,1,0) · «При перетаскивании выделяется текст» → на время жеста нужен `body.kb-dragging`
+
+Рантайм `scripts/ds-kanban.js` (out-of-box): авто-инициализация любой разметки с `data-kanban`. Перетаскивание КАРТОЧЕК указателем (порог 4px, плавающий клон, призрак, линия вставки, автоскролл по обеим осям, отмена по Esc) и КОЛОНОК за шапку (клон шапки, вертикальная линия вставки), клавиатурный эквивалент для обоих (Space — взять, стрелки — перенести, Space — положить, Esc — отменить с возвратом на исходный индекс), гашение выделения текста на время жеста, счётчики и `aria-label` колонок, пустые состояния, звезда, сворачивание, добавление и удаление карточек и колонок, открытие панели деталей по клику на карточке. Меню, подтверждения, снекбар, панель деталей и «усечено → тултип» делегируются `DSMenu` / `DSModal` / `DSSnack` / `DSDrawer` / `DSTooltip`. API: `DSKanban.bind(board)` · `bindAll(root)` · `move(card, col, i)` · `sync(board)`. События: `kanban:beforemove` (ОТМЕНЯЕМОЕ — точка для статусной модели решения) · `kanban:move {card, from, to, index}` · `kanban:add` · `kanban:remove` · `kanban:star` · `kanban:colmove {column, from, to}` · `kanban:colremove` · `kanban:open`.
+
+Доска отвечает на вопрос «как распределена работа и что застряло», реестр — «какие объекты есть и что в них»; это две вьюхи одних данных, переключатель обязателен и фильтр переживает переключение. Колонка — организм доски (288px вместе с паддингом 8, свёрнутая 48, имя читается снизу вверх). Карточка — вложенный компонент на Card: Title `--type-h6-strong` клэмпом 2 строки, чипы под заголовком (иконок у них нет, исключение — «Ключевая сделка» с `zap` в тоне orange), не больше 4 полей в две колонки, метрики и подвал с аватарами. Перенос не подтверждается диалогом (снекбар с «Отменить»), удаление подтверждается alertdialog.
+
+```html
+<div class="kanban" data-kanban data-kb-confirm="kb-confirm" data-kb-drawer="kb-drawer">
+  <div class="kanban__toolbar">…название · счётчик · segctrl · фильтр · кебаб…</div>
+  <div class="kanban__viewport">
+   <div class="kanban__track">
+    <section class="kbcol kbcol--lblue" data-kb-col="draft" data-kb-name="Заведение">
+      <header class="kbcol__head">
+        <span class="kbcol__marker" aria-hidden="true"></span>
+        <span class="kbcol__name">Заведение</span>
+        <span class="kbcol__vname" aria-hidden="true">Заведение</span>
+        <span class="badge badge--text badge--s" data-kb-count>0</span>
+        <span class="kbcol__acts"><!-- add · arrow-right · more-dots, .ibtn--s --></span>
+      </header>
+      <div class="kbcol__body" data-kb-body>
+        <article class="kbcard tile tile--card" tabindex="0" data-kb-card="D-1042">
+          <header class="tile__header">
+            <div class="tile__header-main">
+              <div class="tile__title-row"><h3 class="tile__title">ООО «ЮгСтрой»</h3></div>
+              <div class="tile__chiplist">…чипы под заголовком…</div>
+            </div>
+            <div class="tile__actions">…звезда [data-kb-star] · кебаб…</div>
+          </header>
+          <div class="tile__body">…kbcard__fields · __meta · __foot…</div>
+        </article>
+      </div>
+    </section>
+    <div class="kanban__addcol">…</div>
+   </div>
+  </div>
+</div>
+<!-- … полная анатомия: specs/Kanban.md -->
+```
 
 ## Spacing (Сетка и отступы)
 css: `styles/spacing.css` · deps: — · 1.004
