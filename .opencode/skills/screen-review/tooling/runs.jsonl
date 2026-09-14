@@ -573,3 +573,10 @@
 {"n":573,"t":"2026-09-14T15:04:11.202Z","tool":"сенсор","target":"Projects/ai-bankster-prototype/ActivityLog.html","verdict":"OK","codes":[]}
 {"n":574,"t":"2026-09-14T15:04:11.266Z","tool":"сенсор","target":"Projects/ai-bankster-prototype/MaterialDocument.html","verdict":"OK","codes":["K1"]}
 {"n":575,"t":"2026-09-14T15:04:11.419Z","tool":"нейтральность","target":"репозиторий","verdict":"OK","codes":[]}
+{"n":576,"t":"2026-09-14T18:29:24.806Z","tool":"сенсор","target":"Projects/ai-bankster-prototype/RequestBuilderCompact.html","verdict":"OK","codes":["З11","K4"]}
+{"n":577,"t":"2026-09-14T18:29:24.984Z","tool":"нейтральность","target":"репозиторий","verdict":"OK","codes":[]}
+{"n":578,"t":"2026-09-14T18:37:45.144Z","tool":"сенсор","target":"Projects/ai-bankster-prototype/RequestBuilder.html","verdict":"OK","codes":["З11","K4"]}
+{"n":579,"t":"2026-09-14T18:37:45.207Z","tool":"сенсор","target":"Projects/ai-bankster-prototype/RequestBuilderCompact.html","verdict":"OK","codes":["З11","K4"]}
+{"n":580,"t":"2026-09-14T19:10:10.056Z","tool":"сенсор","target":"Projects/ai-bankster-prototype/RequestBuilder.html","verdict":"OK","codes":["З11","K4"]}
+{"n":581,"t":"2026-09-14T19:10:10.126Z","tool":"сенсор","target":"Projects/ai-bankster-prototype/RequestBuilderCompact.html","verdict":"OK","codes":["З11","K4"]}
+{"n":582,"t":"2026-09-14T19:16:36.846Z","tool":"нейтральность","target":"репозиторий","verdict":"OK","codes":[]}
