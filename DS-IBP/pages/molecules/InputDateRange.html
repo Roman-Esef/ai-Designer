@@ -30,6 +30,9 @@
   /* Поля InputDateRange шире (мин. 186px × 2 + Range_Line ≈ 400px) —
      колонки демо-сеток шире базовых 280px, чтобы примеры не наезжали друг на друга. */
   [data-screen-label="InputDateRange"] .demo-grid { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+  /* Блоки «Использование»: поле 186 × 2 + Range_Line 14 + паддинг стадии 24 × 2 + рамка 1 × 2 = 436.
+     Базовые три колонки 1fr уже поля — оно обрезалось на 46px (overflow:hidden у .use-block). */
+  [data-screen-label="InputDateRange"] .use-grid { grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); }
   /* демо-стадия (docs-split): растяжение на ширину панели демо;
      padding/фон/min-height — из input-pages.css */
   .pg__stage { flex:1; width:100%; }
@@ -61,7 +64,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.010</b></span><span>Обновлено: <b>06.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.010</b></span><span>Обновлено: <b>13.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>InputDateRange</h1>
     <p class="lead">Поле ввода диапазона дат: два <a class="inl" href="InputDate.html">InputDate</a> с префиксами «От» / «До», размещённых горизонтально и соединённых линией Range_Line. При фокусе на поле или по кнопке-календарю поднимается <a class="inl" href="DatePicker.html">DatePicker</a> в режиме диапазона: первая выбранная дата пишется в «От», вторая — в «До». Общая метка сверху и общий хелпер снизу. Стандартная высота поля 40px; размера S у InputDateRange нет.</p>

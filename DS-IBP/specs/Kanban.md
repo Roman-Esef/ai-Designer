@@ -2,7 +2,7 @@
 component: Kanban
 title: "Канбан-доска"
 version: "1.003"
-updated: "10.09.2026"
+updated: "13.09.2026"
 page: pages/organisms/Kanban.html
 page_js: scripts/kanban.page.js
 runtime: scripts/ds-kanban.js

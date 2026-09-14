@@ -6,42 +6,32 @@
 IBP — внутренняя платформа инвестиционного банкинга (пайплайны сделок, клиенты, риск-метрики, отчётность). Интерфейс — плотный, деловой, на русском; акцентный цвет — изумрудно-зелёный. Тон документации — точный и однозначный (таблицы вместо прозы, явные значения токенов), рассчитан на дизайнеров и разработчиков.
 
 ## Формат: ванильный HTML/CSS
-Эта ДС — **чистый HTML + CSS**. Источник истины: `styles/*.css` (токены и классы) и HTML-страницы документации в `pages/`. React-компонентов (`.jsx`/`.d.ts`) здесь нет намеренно — так с файлами напрямую работает любой агент или харнес. Страницы открываются двойным кликом (`file://`) и подключают всю ДС одним линком `styles.css` (для экранов — зеркало `ds.css`); сборка и внешние витрины не нужны. Маркер `<!-- @dsCard … -->` первой строкой страницы сохранён — его проверяет линтер (правило C1).
-
-> Ранее планировался этап A→C (страницы на общем CSS → перевод демо-зон на React-компоненты из бандла). После разворота на ванильный HTML/CSS **этап C неактуален**: страницы документации и есть компоненты — отдельного слоя React-обёрток не будет.
-
+Эта ДС — **чистый HTML + CSS**, без React и без шага сборки. Источник истины: `styles/*.css` (токены и классы) и HTML-страницы документации в `pages/`. Страницы открываются двойным кликом (`file://`). Экран подключает ДС двумя тегами: `ds.css` (все стили) и `scripts/ds.js` (все рантаймы). Маркер `<!-- @dsCard … -->` первой строкой страницы проверяет линтер (правило C1).
 
 ## Структура
 ```
-styles.css               ← корневая точка входа ДС (@import токенов и стилей)
-ds.css                   ← точка подключения ДС для экранов (зеркало styles.css)
+ds.css                   ← единственная точка подключения стилей (@import всех styles/*)
 index.html               ← обзор ДС (карточки компонентов)
-tokens → см. styles/     ← colors.css, typography.css, radius.css, shadow.css
-styles/                  ← CSS фундамента и по файлу на компонент
-fonts/                   ← SB Sans Display / Text / Screen (.otf)
-assets/                  ← logo.svg, illustrations/ (иллюстрации-заглушки)
-scripts/                 ← ds-nav, ds-toc, ds-icons, pg-kit, icons-data, per-page *.page.js
-pages/foundations|atoms|molecules|organisms|patterns/  ← документация
-specs/                   ← md-спеки компонентов (экономят контекст) + _index.md, _cheatsheet.md
-templates/screen/        ← Screen.html — стартовый шаблон экрана
-MAINTAINING.md           ← правила ведения ДС (инжектится в каждый разговор)
+CHANGELOG.md             ← журнал правок; большой — дописывать в секцию даты, целиком не читать
+MAINTAINING.md           ← правила ведения ДС: контракт страницы, чек-листы, проверки
+styles/                  ← CSS фундамента и по файлу на компонент; токены — colors, typography, spacing, radius, shadow
+scripts/                 ← ds.js (точка входа рантаймов), ds-*.js рантаймы, *.page.js страниц, линтер ds-lint.js
+pages/                   ← документация: foundations, atoms, molecules, organisms, patterns, screens, rnd
+specs/                   ← md-спеки компонентов + _index.md (манифест) + _cheatsheet.md (чит-шит)
+templates/               ← screen/Screen.html — стартовый шаблон экрана; local-component/ — заготовка локального компонента
+fixtures/                ← корпус фикстур линтера (пары «эталон / дефект»)
+skills/                  ← ds-integrity-check.md — разбор правил линтера
+fonts/ · assets/         ← SB Sans (.otf) · logo.svg и иллюстрации
 ```
 
 ## Компоненты
-- **Основы:** Типографика, Цвета, Иконки, Иллюстрации, Скругления, Тени.
-- **Атомы (12):** Avatar, Badge, Button, Checkbox, Chip, Divider, IconButton, Label + Helper, Link, ProgressBar, Radiobutton, Switch.
-- **Молекулы (18):** Alert, Breadcrumbs, ButtonGroup, ContextMenu, InputAmountRange, InputAutocomplete, InputDate, InputDateRange, InputText, NavTile, Pagination, ReadOnlyField, SegmentControl, Select, Splitter, Tab, Toast, Tooltip.
-- **Организмы (10):** Entity, Modal, NavPanel, PageHeader, Popover, RiskMetric, SnackBar, TableCell, TableFilter, Tile.
-
-## Шрифты
-SB Sans Display / Text / Screen (`.otf` в `fonts/`, `@font-face` в `styles/typography.css`). Оригинальные файлы перенесены 1:1.
+Актуальный состав и версии — `specs/_index.md`; полноту `index.html` и навигации против папок `pages/` сверяет линтер (правила D1–D4). Перечень здесь намеренно не дублируется: копия расходится с диском.
 
 ## Иконки и иллюстрации
-- Иконки — глиф-сет в `scripts/icons-data.js` (671 KB), вставляются как `<i data-icon="имя"></i>` через `scripts/ds-icons.js` (SVG в `currentColor`). Имена глифов — `specs/Icons.md`.
-- Иллюстрации — SVG-заглушки продукта в `assets/illustrations/`.
-- Логотип — `assets/logo.svg`.
+- Иконки — глиф-сет в `scripts/icons-data.js` (большой, в одну строку — не читать), вставляются как `<i data-icon="имя"></i>` через `scripts/ds-icons.js` (SVG в `currentColor`). Имена глифов — `specs/Icons.md`, поиск — `node scripts/ds-icon.mjs --list <подстрока>`.
+- Иллюстрации — SVG продукта в `assets/illustrations/`.
 
 ## Как пользоваться
-- Правила ведения, чек-листы (новый компонент / правка / экран) и запреты — в `MAINTAINING.md`.
-- Быстрый обзор всех компонентов для сборки экрана — `specs/_cheatsheet.md`.
+- Правила ведения, чек-листы (новый компонент / правка / экран) и команды проверки — `MAINTAINING.md`.
+- Компонент для экрана — блок в `specs/_cheatsheet.md` (точечно, по заголовку), при сложном поведении — полная спека.
 - Новый экран — копия `templates/screen/Screen.html` + компоненты из спек.

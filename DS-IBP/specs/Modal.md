@@ -2,7 +2,7 @@
 component: Modal
 title: "Modal"
 version: "1.008"
-updated: "10.09.2026"
+updated: "13.09.2026"
 page: pages/organisms/Modal.html
 page_js: scripts/modal.page.js
 runtime: scripts/ds-modal.js

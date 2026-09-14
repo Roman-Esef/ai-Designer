@@ -69,11 +69,18 @@ updated: "04.09.2026"
 | `.opencode/commands/screen.md` | команда `/screen` | opencode |
 | `.opencode/commands/screen-check.md` | команда `/screen-check` | opencode |
 | `.opencode/commands/research.md` | команда `/research` | opencode |
+| `.opencode/commands/concepts.md` | команда `/concepts` — несколько концептов текстовыми спеками | opencode |
+| `.opencode/commands/handoff.md`, `resume.md` | команды `/handoff` и `/resume <Задача>` — перенос контекста между сессиями через `Projects/test/<Задача>.handoff.md` | opencode |
 | `.opencode/skills/ds-lookup/` | как искать компоненты в ДС, не сжигая контекст | агент, по своему решению |
 | `.opencode/skills/screen-assembly/` | пошаговая сборка; в `references/` — каркас, рецепты разметки, **хуки рантаймов** | агент |
 | `.opencode/skills/screen-spec/` | формат `<Имя>.screen.md` + шаблон | агент |
-| `.opencode/skills/screen-review/` | **чек-лист приёмки**: grep-проверки, 13 блокеров, 10 замечаний | агент |
+| `.opencode/skills/screen-review/` | **чек-лист приёмки** и оснастка: сенсор `layout-check.mjs`, `lessons-cli.mjs` (журнал уроков, фикстуры, итоговая проверка `gate`) | агент |
+| `.opencode/skills/layout-composition/`, `composition-review/` | композиция и сетка экрана, её приёмка | агент |
+| `.opencode/skills/concept-design/` | шкала «консервативно ↔ концептуально» и формат `<Имя>.concept-<A\|B\|C>.md` | агент |
+| `.opencode/skills/lessons/` | самообучение: урок → закрепление → доказательство откатом | агент |
+| `.opencode/skills/docs-split/` | раскатка страниц документации ДС под «сплиттер + табы» | агент |
 | `.opencode/skills/knowledge-lookup/` | путь к базе знаний, карта её папок, правила поиска и подключения | агент |
+| `.opencode/skills/session-plan/` | смета контекстного окна до старта (`ctx-budget.mjs`), паспорт этапов, границы сессий | агент, в начале крупной задачи |
 | `Projects/test/` | сюда складываются готовые экраны | — |
 
 **Почему `opencode.json` лежит в корне, а не в `.opencode/`.** По документации
@@ -105,6 +112,12 @@ opencode
 | Собрать экран | `/screen DS-IBP/uploads/ТЗ-реестр-сделок.md` |
 | Исследовать, потом собрать | `/research DS-IBP/uploads/ТЗ-реестр-сделок.md` |
 | Проверить готовое | `/screen-check Projects/test/DealRegistry.html` |
+| Несколько концептов до сборки | `/concepts DS-IBP/uploads/ТЗ-реестр-сделок.md` |
+| Посчитать смету захода | `node .opencode/skills/session-plan/tooling/ctx-budget.mjs --stage build --tz <ТЗ> --cheat Table,Modal --out-lines 900` — строка `ВЕРДИКТ:` |
+| Посмотреть состав этапов | `node .opencode/skills/session-plan/tooling/ctx-budget.mjs --stages` |
+| Сверить смету с фактом захода | `node .opencode/skills/session-plan/tooling/ctx-budget.mjs --calibrate --stage build --fact <токенов>` + аргументы сметы |
+| Сохранить контекст / продолжить в новой сессии | `/handoff` · `/resume DealRegistry` |
+| Закрыть заход | `node .opencode/skills/screen-review/tooling/lessons-cli.mjs gate` — строка `ВЕРДИКТ:` |
 | Просто спросить | пишите словами: «есть ли в ДС компонент для…», «чем Chip отличается от Badge» |
 
 Скриншот макета прикладывается в сообщение как файл — если выбранная модель

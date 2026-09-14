@@ -2,7 +2,7 @@
 component: ContextMenu
 title: "Context Menu"
 version: "1.009"
-updated: "05.09.2026"
+updated: "13.09.2026"
 page: pages/molecules/ContextMenu.html
 page_js: scripts/context-menu.page.js
 runtime: scripts/ds-menu.js

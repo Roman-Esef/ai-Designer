@@ -1,0 +1,206 @@
+{
+  "_": [
+    "Паспорт этапов и коэффициенты сметы. Источник истины: состав этапа прозой",
+    "нигде не пересказывается — его печатает `ctx-budget.mjs --stages` (тот же",
+    "приём, что `layout-check.mjs --rules`; копия прозой разъезжается с файлом).",
+    "",
+    "«читает» — инструктаж, который этап грузит в контекст ОБЯЗАТЕЛЬНО. Данные",
+    "задачи (ТЗ, блоки чит-шита, собранный экран) добавляются флагами, потому что",
+    "зависят от конкретного экрана, а не от этапа.",
+    "",
+    "Коэффициенты — оценка, не факт. Калибруются одним замером на рабочем контуре:",
+    "прогнать реальный заход, сравнить факт с расчётом, поправить здесь и поднять",
+    "`селфтест.эталон_токенов`, иначе `--selftest` упадёт. Это сделано нарочно:",
+    "коэффициент не должен меняться мимоходом."
+  ],
+
+  "версия": "1",
+
+  "пороги": {
+    "потолок": 250000,
+    "резерв_доля": 0.2,
+    "внимание": 150000,
+    "_": "рабочий потолок = потолок × (1 − резерв_доля). Резерв — на системный промпт инструмента, вывод команд и сам диалог, которые в смету не входят."
+  },
+
+  "коэффициенты": {
+    "симв_на_токен_кириллица": 2.2,
+    "симв_на_токен_прочее": 3.6,
+    "токенов_на_строку_html": 20,
+    "спека_доля_от_экрана": 0.35,
+    "круги_по_умолчанию": 2,
+    "перечитывание_доля_якорь": 0.15,
+    "перечитывание_доля_целиком": 1,
+    "правка_на_круг_токенов": 2500,
+    "_": [
+      "токенов_на_строку_html — замер 29 292 токена / 1486 строк Portfolio.html.",
+      "спека_доля_от_экрана — замер спеки БЕЗ журнала правок (журнал запрещён, сторож Б32).",
+      "Круги правок считаются поштучно, а не долей от сметы. Причина — замер:",
+      "плоские 25 % давали Portfolio вердикт OK при фактических 220 000+, потому",
+      "что главный расход круга не в правке, а в ПЕРЕЧИТЫВАНИИ экрана. Круг по",
+      "якорю читает 20–40 строк вокруг метки (~15 % экрана), круг с перечитыванием",
+      "целиком — все 100 %. Разница на крупном экране — десятки тысяч токенов за круг."
+    ]
+  },
+
+  "селфтест": {
+    "эталон_строка_кириллица": 3,
+    "эталон_строка_прочее": 8,
+    "эталон_токенов": 4
+  },
+
+  "обратный_тест": {
+    "_": [
+      "Известный провал: экран Portfolio-did, который собирался одним заходом 03–05.09.2026.",
+      "Факт — 220 000–235 000 токенов и заход, который не закрывался. Модель обязана",
+      "дать на этих входах РАЗБИТЬ. Даёт OK — чинится МОДЕЛЬ, а не отчёт: первая",
+      "редакция считала круги правок плоской долей 25 % и выдавала на этом же входе",
+      "OK 148 486, потому что не видела, что главный расход круга — перечитывание экрана.",
+      "Оракул лежит здесь данными, а не в коде селфтеста: иначе он подтверждает сам себя.",
+      "",
+      "«данные_фикс» — числом, а не путём к ТЗ. Оракул обязан быть воспроизводим",
+      "через год: путь к файлу пользователя делает его заложником чужой уборки.",
+      "14.09.2026 из репозитория исчез весь Projects/post/operations-did — включая",
+      "экран, на котором замер и сделан. Число 8 000 — замер того ТЗ (33 998 байт,",
+      "Uploads/03-09-2026/Текущий портфель.md) на момент постановки оракула."
+    ],
+    "этап": "build",
+    "данные_фикс": 8000,
+    "cheat": "Layout,NavPanel,Breadcrumbs,PageHeader,Table,TableCell,TableFilter,Modal,InputText,InputDate,DropdownList,Chip,Badge,Buttons,IconButton,Pagination",
+    "out-lines": 1486,
+    "rounds": 3,
+    "reread": "full",
+    "ждём": "РАЗБИТЬ"
+  },
+
+  "постоянный вход": [
+    "AGENTS.md",
+    ".opencode/rules/ds-rules.md"
+  ],
+
+  "маршруты": {
+    "короткий": {
+      "когда": "смета этапа build укладывается в рабочий потолок; экран до ~800 строк",
+      "этапы": ["plan", "build", "review", "close"]
+    },
+    "длинный": {
+      "когда": "смета build даёт РАЗБИТЬ, или экран заведомо больше ~800 строк (реестр с модалкой фильтра, дашборд)",
+      "этапы": ["plan", "build-main", "build-modals", "hooks-check", "review", "fix", "close"]
+    }
+  },
+
+  "этапы": {
+    "plan": {
+      "роль": "ai-designer",
+      "делает": "разобрать ТЗ, задать вопросы пользователю одним списком, посчитать смету, выбрать маршрут, записать план этапов в handoff",
+      "читает": [
+        ".opencode/agents/ai-designer.md",
+        ".opencode/skills/session-plan/SKILL.md",
+        ".opencode/skills/ds-lookup/SKILL.md",
+        ".opencode/skills/layout-composition/SKILL.md"
+      ],
+      "выход_фикс": 1200,
+      "круги": false
+    },
+
+    "build": {
+      "роль": "screen-builder",
+      "делает": "собрать экран целиком: каркас, контент, модалки, хуки рантаймов, спека",
+      "читает": [
+        ".opencode/agents/screen-builder.md",
+        ".opencode/skills/layout-composition/SKILL.md",
+        ".opencode/skills/ds-lookup/SKILL.md",
+        ".opencode/skills/screen-assembly/SKILL.md",
+        ".opencode/skills/screen-assembly/references/patterns.md",
+        ".opencode/skills/screen-assembly/references/skeleton.html",
+        ".opencode/skills/screen-assembly/references/runtime-hooks.md",
+        ".opencode/skills/screen-spec/SKILL.md",
+        ".opencode/skills/screen-spec/references/template.md",
+        ".opencode/skills/screen-review/references/lessons.md"
+      ],
+      "выход_html": true,
+      "выход_спека": true,
+      "круги": true,
+      "делится_на": ["build-main", "build-modals", "hooks-check"]
+    },
+
+    "build-main": {
+      "роль": "screen-builder",
+      "делает": "каркас из эталона, крошки, PageHeader, основной блок (таблица или ряды тайлов), разделы спеки 1–6",
+      "читает": [
+        ".opencode/agents/screen-builder.md",
+        ".opencode/skills/layout-composition/SKILL.md",
+        ".opencode/skills/ds-lookup/SKILL.md",
+        ".opencode/skills/screen-assembly/SKILL.md",
+        ".opencode/skills/screen-assembly/references/patterns.md",
+        ".opencode/skills/screen-assembly/references/skeleton.html",
+        ".opencode/skills/screen-spec/SKILL.md",
+        ".opencode/skills/screen-spec/references/template.md",
+        ".opencode/skills/screen-review/references/lessons.md"
+      ],
+      "выход_html": true,
+      "выход_спека": true,
+      "круги": true
+    },
+
+    "build-modals": {
+      "роль": "screen-builder",
+      "делает": "модальные окна и вторичные блоки — дозапись по якорю #sec:modals, разделы спеки 7–13",
+      "читает": [
+        ".opencode/agents/screen-builder.md",
+        ".opencode/skills/screen-assembly/references/patterns.md",
+        ".opencode/skills/screen-spec/references/template.md",
+        ".opencode/skills/screen-review/references/lessons.md"
+      ],
+      "выход_html": true,
+      "выход_спека": true,
+      "круги": true
+    },
+
+    "hooks-check": {
+      "роль": "screen-builder",
+      "делает": "проставить хуки рантаймов по всем секциям, прогнать layout-check, починить своё",
+      "читает": [
+        ".opencode/agents/screen-builder.md",
+        ".opencode/skills/screen-assembly/references/runtime-hooks.md",
+        ".opencode/skills/screen-review/references/lessons.md"
+      ],
+      "выход_фикс": 2000,
+      "круги": true
+    },
+
+    "review": {
+      "роль": "screen-reviewer",
+      "делает": "полная приёмка: оба чек-листа и сверка с ТЗ",
+      "читает": [
+        ".opencode/agents/screen-reviewer.md",
+        ".opencode/skills/screen-review/SKILL.md",
+        ".opencode/skills/composition-review/SKILL.md",
+        ".opencode/skills/screen-review/references/lessons.md"
+      ],
+      "выход_фикс": 3000,
+      "круги": false
+    },
+
+    "fix": {
+      "роль": "screen-builder",
+      "делает": "починка по отчёту приёмки — читаются только секции с дефектами, не экран целиком",
+      "читает": [
+        ".opencode/agents/screen-builder.md",
+        ".opencode/skills/screen-review/references/lessons.md"
+      ],
+      "выход_фикс": 4000,
+      "круги": true
+    },
+
+    "close": {
+      "роль": "ai-designer",
+      "делает": "урок с полем «Закрепление», lessons-cli gate, handoff",
+      "читает": [
+        ".opencode/skills/lessons/SKILL.md"
+      ],
+      "выход_фикс": 2500,
+      "круги": false
+    }
+  }
+}

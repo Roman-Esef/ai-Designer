@@ -43,7 +43,8 @@
   <!-- ── Боковое меню ────────────────────────────────────────────────────── -->
   <nav class="nav nav--rail" aria-label="Главное меню">
     <div class="nav__top">
-      <button class="ibtn ibtn--neutral ibtn--s nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+      <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+      <button class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
     </div>
     <div class="nav__list">
       <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
@@ -54,11 +55,11 @@
       </div>
     </div>
     <div class="nav__footer">
-      <div class="nav__user">
+      <a class="nav__user" href="#" aria-label="Открыть личный кабинет">
         <span class="av av--circular av--m"><span class="av__text">АП</span></span>
         <span class="nav__user-text"><span class="nav__user-name">Александров Пётр</span><span class="nav__user-role">Аналитик ДИД</span></span>
-      </div>
-      <button class="ibtn ibtn--neutral ibtn--s nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+      </a>
+      <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
     </div>
   </nav>
 
@@ -77,7 +78,7 @@
 
     <main class="screen__content">
 
-      <!-- ── Шапка страницы ───────────────────────────────────────────────── -->
+      <!-- #sec:head ── Шапка страницы ────────────────────────────────────── -->
       <div class="phead">
         <div class="phead__main">
           <div class="phead__title-row">
@@ -99,7 +100,7 @@
         </div>
       </div>
 
-      <!-- ── Контент ──────────────────────────────────────────────────────── -->
+      <!-- #sec:content ── Контент ────────────────────────────────────────── -->
       <!-- Ряд тайлов: сумма span в ряду = 12 -->
       <div class="tile-row">
         <section class="tile" style="grid-column:span 8">
@@ -135,8 +136,10 @@
   </div>
 </div>
 
-<!-- Модальные окна — здесь, в конце body, с hidden.
-     Триггер помечается data-modal="id-скрима". -->
+<!-- #sec:modals ── Модальные окна — здесь, в конце body, с hidden.
+     Триггер помечается data-modal="id-скрима".
+     Якорь #sec:modals — точка дозаписи для этапа build-modals: модалки
+     вставляются сюда по grep-у якоря, без перечитывания экрана целиком. -->
 
 <script src="../../DS-IBP/scripts/ds.js"></script>
 </body>

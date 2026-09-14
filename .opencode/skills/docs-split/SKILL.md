@@ -1,7 +1,7 @@
 ---
 belongs_to: docs-split
 purpose: Раскатка страниц документации IBP (DS-IBP/pages/**) на паттерн «сплиттер + табы» (docs-split) — процедура, тулчейн, правила чтения
-checked: "30.08.2026 — пилот AllocationBar2, тулчейн check/inject/verify/map работает"
+checked: "30.08.2026 — пилот AllocationBar2, тулчейн check/inject/map работает; 13.09.2026 — verify удалён"
 ---
 
 # Раскатка `DS-IBP/pages/**` на docs-split
@@ -41,7 +41,9 @@ node .opencode/skills/docs-split/tooling/docs-split.mjs <cmd> [page] [--css DS-I
 | `map` | перегенерирует `references/pages-index.md` (структурная карта всех doc-страниц) |
 | `inject <page>` | вставляет полный CSS компонента в `src-code-css` (маппинг имя→css из `DS-IBP/specs/_index.md`; для страниц без спеки — `--css`) |
 | `check <page>` | баланс тегов (вне `<script>`), остатки `ds-toc.js`/`pg-kit.js`/`ds-toc.css`, `.splitpane--app`, один `</body></html>`, 3 `src-code`, panes. Код выхода 1 при FAIL |
-| `verify <page>` | temp-копия в ту же папку + харнесс + headless Chrome `--dump-dom` → компактная диагностика + автоассерты (main.ds-split, TOC, код). Копия удаляется |
+
+Браузерной проверки живости в тулчейне нет (подкоманда `verify` удалена
+13.09.2026 — ds-rules §9). Живость страницы — на приёмке человеком.
 
 ## Уроки раскатки
 
@@ -76,9 +78,9 @@ node .opencode/skills/docs-split/tooling/docs-split.mjs <cmd> [page] [--css DS-I
      (выжимка API из page.js) + `segctrl[data-segctrl]` + три `code-view`.
 3. `inject <page>` — вставить CSS (если нужен `--css`, укажи).
 4. `check <page>` — должен дать ВЕРДИКТ: OK.
-5. `verify <page>` — зелёные автоассерты; глазами — табы, TOC≥11, две колонки
+5. Приёмка `screen-reviewer` — со скопом из карты, не «прочитай страницу целиком».
+   Что проверяет только человек в браузере: табы, TOC≥11, две колонки
    конструктора, демо живо, код заполнен.
-6. Приёмка `screen-reviewer` — со скопом из карты, не «прочитай страницу целиком».
 
 ## Границы
 

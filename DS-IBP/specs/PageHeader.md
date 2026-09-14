@@ -2,7 +2,7 @@
 component: PageHeader
 title: "PageHeader"
 version: "1.010"
-updated: "05.09.2026"
+updated: "13.09.2026"
 page: pages/organisms/PageHeader.html
 runtime: scripts/ds-menu.js, scripts/ds-actions-overflow.js
 css: styles/page-header.css

@@ -1,0 +1,59 @@
+<!-- @dsCard group="Fixtures" name="R-base" viewport="1440x900" -->
+<!-- ФИКСТУРА линтера: F5, вход «JS-шаблон». Эталон `_base.ok.html` + одно изменение.
+     ДЕФЕКТ: NavPanel строится шаблоном в <script>; в шаблоне есть кнопка
+     закрепления и обёртка хоста, но нет строки пользователя в подвале.
+     Вариант @js нужен потому, что F5 читает два входа — статическую разметку и
+     атрибуты class из JS-шаблонов (экраны Post строят панель по роли). Без него
+     «правило видит шаблон» доказывалось бы только на рабочих экранах.
+     ОБВЯЗКА (не дефект, нужна чтобы молчали посторонние правила): nav-panel.css — иначе A2.
+     Правило обязано ПАДАТЬ здесь и МОЛЧАТЬ на эталоне — `lessons-cli verify`. -->
+<!DOCTYPE html>
+<!-- ФИКСТУРА линтера, ряд правил R (каскад раскатки docs-split). Это НЕ
+     страница документации и не открывается в браузере: файл существует только
+     как вход для проверки самих правил. В индекс и в реестры не входит —
+     ds-lint читает ровно те файлы, что переданы аргументом.
+     `_base.ok.html` — эталон: ни одно правило ряда R на нём не срабатывает.
+     Каждая пара <ID>.bad.html отличается от эталона ровно одним дефектом.
+     Разметка и классы — только из ДС (урок Л69: образец, собранный по памяти,
+     задаёт выдуманный язык всему, что от него произошло). -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фикстура R — Дизайн-система</title>
+<link rel="stylesheet" href="../styles/typography.css">
+<link rel="stylesheet" href="../styles/colors.css">
+<link rel="stylesheet" href="../styles/docs-split.css">
+<link rel="stylesheet" href="../styles/splitter.css">
+<link rel="stylesheet" href="../styles/segment-control.css">
+<link rel="stylesheet" href="../styles/input.css">
+<link rel="stylesheet" href="../styles/ds-toc.css">
+<link rel="stylesheet" href="../styles/nav-panel.css">
+<style>
+  .fx-note { font: var(--type-body-m); color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<main class="page ds-split">
+  <p class="meta">Версия: <b>1.000</b> · Обновлено: <b>06.09.2026</b></p>
+  <div class="splitpane">
+    <div class="splitpane__a">
+      <div id="pg-controls">
+        <div class="ctl"><span class="lbl">Вариант</span></div>
+        <div class="inp inp--m"><div class="inp__field"><input class="inp__control"></div></div>
+      </div>
+    </div>
+    <div class="splitpane__b">
+      <p class="fx-note">Область предпросмотра.</p>
+      <nav class="nav nav--rail" id="fx-nav"></nav>
+    </div>
+  </div>
+</main>
+<script>
+  document.getElementById('fx-nav').innerHTML = '<div class="nav-layout"><div class="nav__top"><button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-label="Закрепить панель"></button></div></div>';
+</script>
+<script src="../scripts/ds-toc.js"></script>
+<script src="../scripts/ds-splitter.js"></script>
+<script src="../scripts/docs-split.js"></script>
+</body>
+</html>
