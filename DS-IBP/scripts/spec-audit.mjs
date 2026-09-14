@@ -1,6 +1,7 @@
 /* ============================================================
    SPEC-AUDIT — read-only сверка «правило объявлено — кода нет»
-   (пять проходов ревизии от 05.09.2026).
+   (восемь проходов: пять ревизии от 05.09.2026 + шестой и седьмой от 11.09.2026
+   + восьмой от 13.09.2026).
 
    Что делает: по репозиторию ДС ищет места, где спека/манифест
    обещают поведение, а реализации нет (или она живёт не у владельца).
@@ -17,9 +18,21 @@
         DSTooltip (bind / truncated) в рантаймах.
      5. Селекторы, которые ловят два и более рантайма делегированием
         (спор за элемент).
+     6. Классы, названные в спеке (в обратных кавычках или в примере
+        `class="…"`), которых нет ни в одном styles/*.css. Закрывает
+        ветку «объявлен компонент-родственник, CSS нет» (Л86): `Card
+        (`.tile--card`)` в спеке Tile без правил `.tile--card`.
+     7. Классы из фасета «Классы» чит-шита, которых нет ни в одном
+        styles/*.css. Чит-шит ведётся руками и уже расходился с CSS;
+        проход 6 его не видит — там фильтр по `component:` во фронт-маттере.
+     8. Манифест specs/_index.md против каталога компонентов в правилах
+        агента (.opencode/rules/ds-rules.md §6), в обе стороны. Каталог — копия
+        манифеста в контексте каждого агента; сторож реестров линтера её не
+        читает. Нет файла правил — строка ПРОПУЩЕН.
 
    Код выхода: 1 если в проходе 4 есть не закрытое обещание «усечено →
-   тултип» (это корневой дефект CM, который чинили 05.09), иначе 0.
+   тултип» (это корневой дефект CM, который чинили 05.09) или если проход 8
+   нашёл расхождение манифеста с каталогом; иначе 0.
    ============================================================ */
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -38,6 +51,19 @@ async function list(dir, ext) {
   }
 }
 const read = (p) => readFile(p, 'utf8');
+
+/* Рекурсивный обход дерева (страницы лежат в подпапках pages/<тип>/). */
+async function listRec(dir, ext) {
+  const out = [];
+  let entries;
+  try { entries = await readdir(path.join(ROOT, dir), { withFileTypes: true }); } catch { return out; }
+  for (const e of entries) {
+    const rel = dir + '/' + e.name;
+    if (e.isDirectory()) out.push(...(await listRec(rel, ext)));
+    else if (!ext || e.name.endsWith(ext)) out.push(path.join(ROOT, rel));
+  }
+  return out;
+}
 
 const stylesFiles = await list('styles', '.css');
 const scriptsFiles = await list('scripts', '.js');
@@ -208,11 +234,138 @@ const conflicts = Object.entries(selUse).filter(([, fs]) => new Set(fs).size >= 
 say('Селекторов с 2+ владельцами: ' + conflicts.length);
 for (const [sel, fs] of conflicts) say('  · ' + sel + '  ← ' + [...new Set(fs)].join(', '));
 
+/* ---------- Проход 6: классы, названные в спеке, без правил в styles/*.css ----------
+   Класс компонента-родственника/варианта, названный в спеке (например «Card
+   (`.tile--card`)»), обязан иметь правила в CSS ДС: объявление родственника в
+   прозе — не доказательство его существования (Л86). Классы берутся из спек в
+   обратных кавычках и из примеров `class="…"`; наличие проверяется по всем
+   styles/*.css. Класс, которого нет ни в одном файле стилей, — либо опечатка в
+   спеке, либо объявленный-но-нереализованный компонент.
+
+   Класс с ролью в рантайме — не дефект: `.nav__burger`, `.dpk__prev`,
+   `.preset-item` и подобные живут в `scripts/*.js` как хуки или демо-разметка
+   и стилизуются чужими классами (`.ibtn`, `.btn`). Находка — только то, чего
+   нет НИ в CSS, НИ в скриптах: чисто CSS-модификатор вроде `.tile--card`
+   остаётся в области правила. */
+section('Проход 6 · классы, названные в спеке, которых нет в styles/*.css');
+const specClasses = new Set();
+for (const s of Object.values(specs)) {
+  if (!/^component:\s*.+$/m.test(s)) continue;   // только компоненты, не _cheatsheet/_TEMPLATE/_index
+  const bt = s.match(/`\.([a-z][a-z0-9_-]*)`/g) || [];
+  bt.forEach((x) => specClasses.add(x.slice(2, -1)));
+  const cl = s.match(/class="([^"]+)"/g) || [];
+  cl.forEach((x) => x.replace(/class="([^"]+)"/, (all, v) => v.split(/\s+/).forEach((c) => { if (/^[a-z][a-z0-9_-]*$/.test(c)) specClasses.add(c); })));
+}
+/* Классы, которые реально живут на страницах: в атрибуте `class="…"` или в
+   собственном `<style>` страницы. Их отсутствие в `styles/*.css` — предмет
+   линтера `P5`, а не этого прохода: проход ищет класс, названный в спеке и не
+   реализованный НИГДЕ (случай Л86, `Card`/`.tile--card`). Прозаическое
+   упоминание класса на странице (например, «удалённый `.dtable__edge`») сюда
+   не попадает — иначе проход ослеп бы ровно на том случае, ради которого
+   заведён. */
+const pageClasses = new Set();
+for (const f of await listRec('pages', '.html')) {
+  const h = await read(f);
+  const attrs = h.match(/class="([^"]+)"/g) || [];
+  attrs.forEach((x) => x.replace(/class="([^"]+)"/, (all, v) => v.split(/\s+/).forEach((c) => { if (/^[a-z][a-z0-9_-]*$/.test(c)) pageClasses.add(c); })));
+  for (const blk of (h.match(/<style[^>]*>([\s\S]*?)<\/style>/gi) || [])) {
+    for (const x of (blk.match(/\.([a-z][a-z0-9_-]*)/g) || [])) pageClasses.add(x.slice(1));
+  }
+}
+
+const hasClassRule = (c) => new RegExp('\\.' + c.replace(/-/g, '\\-') + '(?![a-z0-9_-])').test(allStyles);
+const classMiss = [...specClasses].filter((c) => !hasClassRule(c) && !allScripts.includes(c) && !pageClasses.has(c)).sort();
+say('Классов из спек: ' + specClasses.size + ', нет правил в styles/*.css: ' + classMiss.length);
+for (const c of classMiss.slice(0, 40)) say('  · .' + c);
+
+/* ---------- Проход 7: фасет «Классы» чит-шита против styles/*.css ----------
+   Чит-шит — производный источник и ведётся руками; старшинство при конфликте
+   CSS → полная спека → чит-шит. Расхождения уже случались и ловились глазом
+   (размер бургера NavPanel, размер кнопки DatePicker). Проход механизирует
+   сверку: класс, объявленный фасетом «Классы» и не существующий ни в одном
+   styles/*.css, ни в scripts/*.js, — опечатка либо модификатор, который
+   описан, но не реализован.
+
+   Проход 6 сюда не достаёт: он берёт только файлы с `component:` во
+   фронт-маттере, а у `_cheatsheet.md` его нет — чит-шит из той выборки
+   исключён целиком.
+
+   Зависимости из `_index.md` не нужны: сверка идёт по СКЛЕЙКЕ всех
+   styles/*.css, поэтому классы, объявленные в одном блоке, а живущие у
+   соседнего компонента (`tc`, `tbl__row` — в table-cell.css, объявлены у
+   Table), находятся сами. Фильтры те же, что у прохода 6: хук-класс без
+   собственных правил CSS (`.nav__burger`) не дефект — его ищет рантайм. */
+section('Проход 7 · классы из фасета «Классы» чит-шита, которых нет в styles/*.css');
+const sheet = specs['_cheatsheet.md'] || '';
+const sheetClasses = new Set();
+let sheetBlocks = 0;
+for (const block of sheet.split(/^## /m).slice(1)) {
+  const facet = block.split('\n').find((l) => l.startsWith('**Классы:**'));
+  if (!facet) continue;
+  sheetBlocks++;
+  for (const x of (facet.match(/`\.([a-z][a-z0-9_-]*)`/g) || [])) sheetClasses.add(x.slice(2, -1));
+}
+const sheetMiss = [...sheetClasses].filter((c) => !hasClassRule(c) && !allScripts.includes(c) && !pageClasses.has(c)).sort();
+say('Блоков с фасетом «Классы»: ' + sheetBlocks + ', классов: ' + sheetClasses.size
+  + ', нет правил в styles/*.css: ' + sheetMiss.length);
+for (const c of sheetMiss.slice(0, 40)) say('  · .' + c);
+
+/* ---------- Проход 8: манифест против каталога в правилах агента ----------
+   Каталог компонентов в `.opencode/rules/ds-rules.md` §6 — ещё одна копия
+   манифеста `specs/_index.md`, и она лежит в контексте КАЖДОГО агента.
+   Сторож реестров линтера (D1/D5) её не читает: до 13.09.2026 Drawer и Kanban
+   были в манифесте и отсутствовали в каталоге, и агент, которому запрещено
+   изобретать компонент, не узнал бы, что компонент есть.
+   Сверка в обе стороны. Файл правил читается мягко — аудит обязан работать и
+   без агентской оснастки, — но пропуск печатается, а не молчит. Разбор, давший
+   пустой список, — находка: пустая сверка неотличима от чистой. */
+section('Проход 8 · манифест specs/_index.md против каталога компонентов в правилах агента');
+const RULES = path.join(ROOT, '..', '.opencode', 'rules', 'ds-rules.md');
+let catalogMissing = [];
+let catalogExtra = [];
+let catalogBroken = false;
+{
+  const manifestTable = (specs['_index.md'] || '').split(/^## /m)[0];
+  const manifest = new Set();
+  for (const line of manifestTable.split('\n')) {
+    const m = line.match(/^\|\s*([A-Za-z][A-Za-z0-9]*)\s*\|\s*specs\//);
+    if (m) manifest.add(m[1]);
+  }
+  let rules = null;
+  try { rules = await read(RULES); } catch { /* оснастки нет */ }
+  if (rules === null) {
+    say('ПРОПУЩЕН: нет файла правил агента .opencode/rules/ds-rules.md — сверять каталог не с чем');
+  } else {
+    const blk = (rules.split(/^## 6\. Каталог компонентов/m)[1] || '').split(/^## /m)[0];
+    const catalog = new Set();
+    for (const line of blk.split('\n')) {
+      const g = line.match(/^\*\*[^*]+:\*\*\s*(.+)$/);
+      if (!g) continue;
+      for (const item of g[1].split('·')) {
+        const name = item.replace(/\([^)]*\)/g, '').trim();
+        if (name) catalog.add(name);
+      }
+    }
+    catalogMissing = [...manifest].filter((n) => !catalog.has(n)).sort();
+    catalogExtra = [...catalog].filter((n) => !manifest.has(n)).sort();
+    catalogBroken = manifest.size === 0 || catalog.size === 0;
+    say('В манифесте: ' + manifest.size + ', в каталоге правил: ' + catalog.size
+      + ', нет в каталоге: ' + catalogMissing.length + ', нет в манифесте: ' + catalogExtra.length);
+    for (const n of catalogMissing) say('  · ' + n + '  — есть в манифесте, нет в каталоге §6: агент не узнает, что компонент существует');
+    for (const n of catalogExtra) say('  · ' + n + '  — есть в каталоге §6, нет в манифесте: агент будет искать несуществующую спеку');
+    if (catalogBroken) say('  · разбор дал пустой список (' + (manifest.size ? 'каталог §6' : 'манифест') + ') — формат файла изменился, сверка недействительна');
+  }
+}
+const catalogFindings = catalogMissing.length + catalogExtra.length + (catalogBroken ? 1 : 0);
+
 say('');
 say('=== Итог ===');
 say('Проход 4 (усечено → тултип): «ОТКРЫТО» = ' + promiseComponents.length + (promiseComponents.length ? ' → ' + promiseComponents.join(', ') : ' — все закрыты'));
+say('Проход 6 (класс из спеки без правил CSS): ' + classMiss.length + (classMiss.length ? ' — см. список выше' : ' — чисто'));
+say('Проход 7 (класс из чит-шита без правил CSS): ' + sheetMiss.length + (sheetMiss.length ? ' — см. список выше' : ' — чисто'));
+say('Проход 8 (манифест ↔ каталог правил агента): ' + catalogFindings + (catalogFindings ? ' — см. список выше' : ' — чисто'));
 console.log(out.join('\n'));
-const needWork = promiseComponents.length > 0;
+const needWork = promiseComponents.length > 0 || catalogFindings > 0;
 
 /* Журнал прогонов для самообучения агентов. «Сработавший код» здесь — номер
    прохода с НЕНУЛЕВЫМ числом находок: у аудита нет идентификаторов правил,
@@ -223,7 +376,7 @@ const needWork = promiseComponents.length > 0;
    Импорт мягкий: аудит обязан работать и без агентской оснастки. */
 try {
   const { logRun } = await import('../../.opencode/skills/screen-review/tooling/runlog.mjs');
-  const perPass = { 1: stateMiss.length, 2: dataMiss.length, 3: apiMiss.length, 4: promiseComponents.length, 5: conflicts.length };
+  const perPass = { 1: stateMiss.length, 2: dataMiss.length, 3: apiMiss.length, 4: promiseComponents.length, 5: conflicts.length, 6: classMiss.length, 7: sheetMiss.length, 8: catalogFindings };
   const codes = Object.keys(perPass).filter((k) => perPass[k] > 0);
   logRun({ tool: 'аудит', target: 'DS-IBP', verdict: needWork ? 'NEEDS-WORK' : 'OK', codes });
 } catch { /* оснастки нет — аудит работает как работал */ }

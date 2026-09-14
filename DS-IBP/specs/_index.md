@@ -13,7 +13,6 @@ purpose: Манифест спек компонентов. Читай нужну
 | Breadcrumbs | specs/Breadcrumbs.md | styles/breadcrumbs.css | link, context-menu, tooltip | 1.006 |
 | ButtonGroup | specs/ButtonGroup.md | styles/button-group.css | button | 1.004 |
 | Buttons | specs/Buttons.md | styles/button.css | spinner | 1.011 |
-| ButtonTest | specs/ButtonTest.md | styles/button.css | spinner | 1.012 |
 | Chart | specs/Chart.md | styles/chart.css | tooltip, alert, skeleton, segment-control, icon-button, button, table-cell | 1.002 |
 | Checkbox | specs/Checkbox.md | styles/checkbox.css | label-helper | 1.007 |
 | Chip | specs/Chip.md | styles/chip.css | label-helper, spinner | 1.018 |
@@ -29,7 +28,7 @@ purpose: Манифест спек компонентов. Читай нужну
 | IconButton | specs/IconButton.md | styles/icon-button.css | badge, spinner | 1.011 |
 | Icons | specs/Icons.md | — | — | 1.000 |
 | Illustrations | specs/Illustrations.md | styles/illustration.css | — | 1.004 |
-| Layout | specs/Layout.md | styles/layout.css | nav-panel, breadcrumbs, spacing | 1.009 |
+| Layout | specs/Layout.md | styles/layout.css | nav-panel, breadcrumbs, spacing | 1.010 |
 | InputAmountRange | specs/InputAmountRange.md | styles/input-range.css | input, label-helper, tooltip | 1.007 |
 | InputAutocomplete | specs/InputAutocomplete.md | styles/input.css | label-helper, checkbox, chip, tooltip, dropdown-list | 1.016 |
 | InputDate | specs/InputDate.md | styles/input.css | label-helper, tooltip | 1.013 |

@@ -2,7 +2,7 @@
 component: NavPanel
 title: "Панель навигации"
 version: "1.019"
-updated: "07.09.2026"
+updated: "13.09.2026"
 page: pages/organisms/NavPanel.html
 page_js: scripts/nav-panel.page.js
 runtime: scripts/ds-nav-panel.js (+ scripts/ds-tooltip.js — тултип усечённой подписи пункта/футера)

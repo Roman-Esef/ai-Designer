@@ -36,6 +36,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { logRun, codesFrom } from './runlog.mjs';
+import { includersOf } from './fragments.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const DS = path.join(ROOT, 'DS-IBP');
@@ -248,6 +249,47 @@ function analyzeTile(el, line, inStack = false) {
   return { el, line, span, title, cols, fields, directPbars, inStack };
 }
 
+/* Содержимое строковых литералов внутри <script>, позиция в позицию: код,
+   кавычки и всё за пределами скриптов заменены пробелами, переводы строк
+   сохранены. Длина результата равна длине входа, поэтому `lineOf` по нему
+   даёт настоящие номера строк экрана.
+   Зачем: разметка, собранная JS-склейкой, — предмет тех же правил анатомии,
+   что и статическая (см. `markupInScripts` в checkMechanics). */
+function collectScriptMarkup(src) {
+  const out = new Array(src.length).fill(' ');
+  for (let i = 0; i < src.length; i++) if (src[i] === '\n') out[i] = '\n';
+  for (const m of src.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
+    const body = m[1];
+    const base = m.index + m[0].length - body.length - '</script>'.length;
+    /* Код между литералами заполняется «+», а не пробелом. `isLiteralAttr`
+       уже считает плюс признаком склейки, и атрибут, разорванный выражением
+       (`class="ibtn ibtn--' + sz + ' nav__pin"`), отсеивается ТЕМ ЖЕ
+       контрактом, что у Б2 и Б4, — второго разбора не заводится (Л43).
+       Пробел на этом месте давал ЛОЖНЫЙ Б15: разорванный атрибут выглядел
+       литеральным и терял `ibtn--m` вместе с вырезанным выражением. */
+    for (let k = 0; k < body.length; k++) if (body[k] !== '\n') out[base + k] = '+';
+    let i = 0;
+    while (i < body.length) {
+      const quote = body[i];
+      if (quote !== '"' && quote !== "'" && quote !== '`') { i++; continue; }
+      let j = i + 1;
+      while (j < body.length) {
+        if (body[j] === '\\') { j += 2; continue; }
+        if (body[j] === quote) break;
+        /* незакрытая кавычка до конца строки — это не литерал, а апостроф
+           в комментарии или тексте: дальше не тянем, иначе склеим полфайла */
+        if (quote !== '`' && body[j] === '\n') break;
+        j++;
+      }
+      for (let k = i + 1; k < j && k < body.length; k++) {
+        if (body[k] !== '\n') out[base + k] = body[k];
+      }
+      i = j + 1;
+    }
+  }
+  return out.join('');
+}
+
 /* ---------------- механика (Б-блокеры) ---------------- */
 
 function checkMechanics(html, icons, pagePath) {
@@ -280,6 +322,19 @@ function checkMechanics(html, icons, pagePath) {
      кода закрывал Б13 так же, как это делал комментарий. Открывающий тег
      оставляем: по нему Б1 считает `<script src="…ds.js">`. */
   html = html.replace(/(<script\b[^>]*>)([\s\S]*?)(<\/script>)/gi, (m, open, inner, close) => open + blank(inner) + close);
+  /* Отдельный вход для правил анатомии и размеров: разметка, собранная
+     JS-склейкой. Гашение выше лишило Б15 половины рабочих экранов —
+     `Portfolio.html` и `mainPage/index.html` строят навигацию в `buildNav()`
+     внутри <script> (40 % и 56 % файла), и мутация `ibtn--m` → `ibtn--s`
+     не поднимала правило вовсе: сторож есть, дефект внесён, сигнала нет
+     (класс Л71 — правило не применяется).
+     Возвращать скрипты в общий `html` НЕЛЬЗЯ: вернутся ровно те ложные
+     срабатывания, ради которых гашение и вводили. Поэтому именованный вход —
+     как `styleSrc` и `noComments` выше; подписывать на него правило поштучно.
+     Граница честная и проверяемая: атрибут-литерал
+     (`class="ibtn ibtn--neutral ibtn--m nav__burger"`) виден, атрибут,
+     склеенный из кусков (`class="tc' + extra + '"`), — нет (Л70). */
+  const markupInScripts = collectScriptMarkup(noComments);
 
   /* Б1 подключения. Путь к ds.css НЕ фиксирован по числу уровней: экраны лежат
      на разной глубине (`Projects/test/` → `../../DS-IBP/ds.css`,
@@ -318,9 +373,48 @@ function checkMechanics(html, icons, pagePath) {
     ok(html.includes(cls), `Б5 каркас: ${label}`);
   }
 
-  /* Б6 заголовок */
+  /* Б31 — анатомия NavPanel: узлы, которые CSS ПРЯЧЕТ, а не отменяет.
+     `.nav--rail .nav__pin{display:none}` и `.nav--rail .nav__logout{display:none}`
+     (nav-panel.css:72-73, :287) — это скрытие в одном режиме, а не отсутствие:
+     панель переключается в drawer/fixed тем же DOM, и недостающий узел там уже
+     не появится. Эталон каркаса и оба экрана в `Projects/test/post` ушли в
+     работу без `.nav__pin`: F5 линтера этот контракт знает, но его корень —
+     `DS-IBP/`, до `Projects/**` и до эталонов скиллов он не достаёт.
+     Строка пользователя — ссылка на личный кабинет (NavPanel.md:125), не <div>:
+     иначе футер панели недостижим с клавиатуры. */
+  const navSources = [html, markupInScripts];
+  if (navSources.some((s) => s.includes('class="nav '))) {
+    const hasPin = navSources.some((s) => /nav__pin/.test(s));
+    ok(hasPin, hasPin
+      ? 'Б31 анатомия NavPanel: .nav__pin на месте'
+      : 'Б31 анатомия NavPanel: нет .nav__pin — в rail его прячет CSS, но в drawer/fixed взяться ему неоткуда');
+    const badUser = [];
+    for (const src of navSources) {
+      for (const m of src.matchAll(/<([a-zA-Z]+)[^>]*class="([^"]*)"/g)) {
+        if (!isLiteralAttr(m[2])) continue;   // склейка — см. Б15 выше
+        if (!m[2].split(/\s+/).includes('nav__user')) continue;
+        if (m[1].toLowerCase() !== 'a') badUser.push(`<${m[1]}> (строка ${lineOf(src, m.index)})`);
+      }
+    }
+    if (badUser.length) {
+      ok(false, `Б31 .nav__user — ссылка на личный кабинет (<a href>), а не ${[...new Set(badUser)].join(', ')}`);
+    }
+  }
+
+  /* Б6 заголовок.
+     Исключение — стартовая страница: по Layout.md её контентная область — один
+     блок, сетка групп .grid12, без PageHeader (решение владельца 13.09.2026;
+     формулировка Layout.md «заголовок — PageHeader, первый блок» противоречила
+     разделу о стартовой). Признак структурный, а не по тексту: в крошках ровно
+     один пункт и он текущий (у любой другой страницы первая крошка — ссылка на
+     стартовую), в разметке есть .grid12 и нет .phead. Больше одного h1 не
+     разрешено и стартовой. */
   const h1s = [...html.matchAll(/<h1\b/g)].length;
-  ok(h1s === 1 && /phead__title/.test(html), `Б6 ровно один h1 в .phead__title (${h1s})`);
+  const crumbItems = [...html.matchAll(/class="[^"]*\bcrumbs__item\b[^"]*"/g)].map((m) => m[0]);
+  const isStartPage = crumbItems.length === 1 && /\bcrumbs__item--current\b/.test(crumbItems[0])
+    && /class="[^"]*\bgrid12\b/.test(html) && !/\bphead\b/.test(html);
+  if (isStartPage) ok(h1s <= 1, `Б6 стартовая страница: не больше одного h1 (${h1s})`);
+  else ok(h1s === 1 && /phead__title/.test(html), `Б6 ровно один h1 в .phead__title (${h1s})`);
 
   /* Б14 свои классы ширины */
   const classes = [...html.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/)).filter(Boolean);
@@ -512,9 +606,18 @@ function checkMechanics(html, icons, pagePath) {
       ? `Б8 число колонок расходится с шапкой (${head.tracks.length}) на строках: ${off.map((r) => `${r.line}→${r.tracks.length}`).join(', ')} — данные сдвинутся на колонку`
       : `Б8 сетка строк совпадает с шапкой (${head.tracks.length} треков, строк ${gridRows.length})`);
   }
-  const sepRows = [...html.matchAll(/<div class="tbl__row[^"]*"[^>]*>([\s\S]*?)(?=<div class="tbl__row|<\/div>\s*<\/div>)/g)];
+  /* Строка берётся ПАРНЫМ разбором (`tagRange`), а не лоокэхедом до
+     `</div></div>`. Канонический вид колонки действий из чит-шита —
+     `<div class="tc"><div class="tc__hidden">…</div></div>`, и лоокэхед
+     обрывал захват строки внутри неё: хвостовой `.tc--separator` в строку не
+     попадал, последней ячейкой оказывался сам `.tc__hidden`, и Б8 давал
+     ЛОЖНЫЙ FAIL на любом реестре с кнопками в строке. Найдено репетицией
+     14.09.2026; эталон корпуса этого входа не нёс, поэтому шум не всплывал.
+     Ячейка — только элемент-ячейка (`tc`, `th` с модификатором или без), но не
+     BEM-элемент `tc__*`: отсюда запрет `_` сразу после. */
+  const sepRows = [...html.matchAll(/<div class="tbl__row[^"]*"[^>]*>/g)];
   const noSep = sepRows.filter((m) => {
-    const cells = [...m[1].matchAll(/<div class="(t[hc][^"]*)"/g)].map((c) => c[1]);
+    const cells = [...tagRange(html, m.index, 'div').inner.matchAll(/<div class="(t[hc](?!_)[^"]*)"/g)].map((c) => c[1]);
     return cells.length > 2 && !(/--separator/.test(cells[0]) && /--separator/.test(cells[cells.length - 1]));
   }).map((m) => lineOf(html, m.index));
   if (sepRows.length) {
@@ -562,12 +665,21 @@ function checkMechanics(html, icons, pagePath) {
      спекой» без перечня — это сверка каждого компонента с его спекой, а не
      строковая проверка. */
   const sizedM = [];
-  for (const hook of ['nav__burger', 'nav__pin', 'nav__logout']) {
-    const rx = new RegExp('<button[^>]*class="([^"]*\\b' + hook + '\\b[^"]*)"', 'g');
-    for (const m of html.matchAll(rx)) {
-      if (!/\bibtn--m\b/.test(m[1])) sizedM.push(`.${hook} (строка ${lineOf(html, m.index)})`);
+  /* Два входа: статическая разметка и разметка из JS-шаблонов. Один и тот же
+     узел попасть в оба не может — в `html` содержимое <script> погашено, —
+     поэтому двойного счёта нет. */
+  for (const src of [html, markupInScripts]) {
+    for (const hook of ['nav__burger', 'nav__pin', 'nav__logout']) {
+      const rx = new RegExp('<button[^>]*class="([^"]*\\b' + hook + '\\b[^"]*)"', 'g');
+      for (const m of src.matchAll(rx)) {
+        if (!isLiteralAttr(m[1])) continue;   // атрибут разорван склейкой — не список классов (Л70)
+        if (!/\bibtn--m\b/.test(m[1])) sizedM.push(`.${hook} (строка ${lineOf(src, m.index)})`);
+      }
     }
   }
+  /* Ветка .tile__actions читает только статическую разметку: `tagRange` ищет
+     парный тег, а в погашенном окружении границы блока недостоверны. Действия
+     в шапке тайла, собранные JS-склейкой, остаются непроверенными. */
   for (const acts of html.matchAll(/<div[^>]*class="[^"]*\btile__actions\b[^"]*"[^>]*>/g)) {
     const inner = tagRange(html, acts.index, 'div').inner;
     for (const b of inner.matchAll(/<button[^>]*class="([^"]*\bibtn\b[^"]*)"/g)) {
@@ -576,6 +688,40 @@ function checkMechanics(html, icons, pagePath) {
   }
   if (sizedM.length) {
     ok(false, `Б15 размер не по спеке (положен ibtn--m): ${[...new Set(sizedM)].slice(0, 6).join(', ')}`);
+  }
+
+  /* З11 — ЦЕНА ВЕРДИКТА: сколько разметки сенсор не прочитал.
+
+     Атрибут, разорванный выражением, правила отсеивают целиком и правильно:
+     половина JS-выражения значением не является (`isLiteralAttr`, уроки Л70,
+     Л74, Л103). Но отсев МОЛЧАЛИВЫЙ, и это тот же класс, что Л100: зелёный
+     вердикт на файле, часть которого не читалась, неотличим от зелёного
+     вердикта на прочитанном файле. Цена названа числом и строками; чинить их
+     обязанности нет — уменьшается вынесением постоянной части атрибута из
+     склейки.
+
+     Замечание, а не блокер: склейка законна. Объём сигнала на сегодня — пять
+     атрибутов на репозиторий, и это ровно те шаблоны, которые порождают всю
+     навигацию и все ячейки таблицы.
+
+     ФИКСТУРЫ У ЭТОГО ПРАВИЛА НЕТ И БЫТЬ НЕ МОЖЕТ. Эталон корпуса
+     `_base.ok.html` с 12.09.2026 сам несёт разорванный атрибут — он внесён
+     туда намеренно, как состояние БЕЗ дефекта, которым закреплён урок Л103.
+     `verify` требует от правила молчания на эталоне, а предмет З11 в эталоне
+     присутствует по построению, и убрать его нельзя: на нём держится откат
+     Л103. Доказывается мутацией настоящего экрана, как правила с входом-
+     репозиторием (Л95, Л102). */
+  {
+    const glued = [];
+    let total = 0;
+    for (const m of markupInScripts.matchAll(/([a-zA-Z][\w:-]*)="([^"]*)"/g)) {
+      total++;
+      if (!isLiteralAttr(m[2])) glued.push(lineOf(markupInScripts, m.index));
+    }
+    if (glued.length) {
+      const lines = [...new Set(glued)].sort((a, b) => a - b);
+      warn(`З11 атрибутов в JS-шаблонах не прочитано: ${glued.length} из ${total} (строки ${lines.join(', ')}) — значение собрано склейкой, правило отсеивает такой атрибут целиком`);
+    }
   }
 
   /* Б29 — выравнивание пагинатора держит CSS ДС (`margin-left:auto` на
@@ -772,8 +918,17 @@ function checkMechanics(html, icons, pagePath) {
      О фикстурах: спутник заведён только у эталона (`_base.ok.screen.md`).
      На остальных фикстурах Б12 срабатывает — и это верно, они не экраны;
      «ровно один дефект» у корпуса держится по каждой проверке отдельно,
-     а не по каждому файлу. */
-  if (pagePath) {
+     а не по каждому файлу.
+
+     Эталон скилла (`.opencode/skills/<скилл>/references/*.html`) — не экран
+     проекта: он никому не сдаётся на приёмку, спутника-спеки у него нет и не
+     должно быть. Остальные правила на нём работать обязаны — ради них он и
+     линтуется, — а Б12 на нём ложный. Пропуск печатается строкой, молчаливого
+     пропуска нет (ds-rules §9). */
+  const isEtalon = /\/skills\/[^/]+\/references\//.test((pagePath || '').replace(/\\/g, '/'));
+  if (pagePath && isEtalon) {
+    ok(true, 'Б12 ПРОПУЩЕН: эталон скилла — спутника-спеки у него нет по устройству');
+  } else if (pagePath) {
     /* Имя спутника не всегда совпадает с именем файла: экран может лежать в
        своей папке как `index.html`, а спека называться по экрану
        (`mainPage/index.html` ↔ `mainPage/mainPage.screen.md`). Поэтому,
@@ -800,6 +955,28 @@ function checkMechanics(html, icons, pagePath) {
       ok(head[0] === '---' && keys >= 2, keys >= 2 && head[0] === '---'
         ? `Б12 спутник ${path.basename(spec)} на месте, полей в шапке ${keys}`
         : `Б12 у ${path.basename(spec)} нет заполненной YAML-шапки (полей ${keys}) — шапка и есть то, что читает приёмка`);
+
+      /* Б32 — спека описывает СОСТОЯНИЕ экрана, а не его историю. Разделы
+         «Правки ДД.ММ.ГГГГ» копятся заходами и платятся заново каждой
+         сессией, которая открывает файл: замер 14.09.2026 — в
+         `Portfolio.screen.md` журнал занимал 59 % файла, ≈12 500 токенов,
+         при окне сессии 250 000. История живёт в git; изменилось поведение —
+         правится тот раздел, который его описывает, а не дописывается новый.
+
+         Заголовок разбирается построчно, а не одной регуляркой с `\b`:
+         `\b` определён через [A-Za-z0-9_], между пробелом и кириллической
+         буквой границы нет — условие молча не сработало бы ни разу
+         (класс Л51/Л73: синтаксически валидная регулярка, ноль совпадений). */
+      const JOURNAL_HEADS = ['правки', 'история правок', 'журнал правок', 'changelog'];
+      const journal = [];
+      readFileSync(spec, 'utf8').split(/\r?\n/).forEach((l, i) => {
+        if (!/^#{2,3}\s+/.test(l)) return;
+        const t = l.replace(/^#{2,3}\s+/, '').replace(/^\d+[.)]\s*/, '').trim().toLowerCase();
+        if (JOURNAL_HEADS.some((p) => t.startsWith(p))) journal.push(i + 1);
+      });
+      ok(journal.length === 0, journal.length
+        ? `Б32 в ${path.basename(spec)} разделы-журнал, строки ${journal.slice(0, 5).join(', ')}${journal.length > 5 ? ` и ещё ${journal.length - 5}` : ''} — спека описывает состояние экрана, история живёт в git`
+        : 'Б32 спека описывает состояние — разделов-журнала нет');
     }
   }
 
@@ -1056,19 +1233,52 @@ function printRules() {
   log("Кириллическая Б и латинская K — разные ряды; латинские B* принадлежат ds-lint.js.");
 }
 
-/* ---------------- main ---------------- */
+/* ---------------- проверка одного файла ----------------
 
-function main() {
-  const args = process.argv.slice(2);
-  if (args.includes("--rules")) { printRules(); return; }
-  const pageArg = args.find((a) => !a.startsWith('--'));
-  const wIdx = args.indexOf('--width');
-  const width = wIdx >= 0 ? parseInt(args[wIdx + 1], 10) : 1920;
-  if (!pageArg) fail('использование: node layout-check.mjs <путь к <Имя>.html> [--width 1920]');
+   Вынесена из `main()` ради обхода каталога (`--etalons`). До этого тело
+   проверки завершало ПРОЦЕСС в двух местах: `fail()` при ненайденном файле и
+   ветка <ds-include> при шаблоне-исходнике. Обход оборвался бы на первом же
+   таком файле — и оборвался бы МОЛЧА, с нулевым кодом выхода: остальные
+   эталоны выглядели бы проверенными (класс Л100 — молчание читается как
+   чистота).
+
+   Здесь ни одна ветка процесс не завершает. Печать, код выхода и запись в
+   журнал прогонов — дело вызывающего; отчёт возвращается строками, из них же
+   вызывающий берёт сработавшие коды. */
+function checkOne(pageArg, width) {
   const p = path.resolve(ROOT, pageArg);
-  if (!existsSync(p)) fail(`файл не найден: ${pageArg}`);
-  const html = readFileSync(p, 'utf8');
   const name = path.basename(p);
+  const printed = [];
+  const say = (s) => printed.push(s);
+
+  if (!existsSync(p)) {
+    say('ОШИБКА: файл не найден: ' + pageArg);
+    return { status: 'ошибка', path: p, printed, fails: 0, warns: 0 };
+  }
+  const html = readFileSync(p, 'utf8');
+
+  /* Шаблон-исходник — не собранный экран. Файл с активной (вне комментария)
+     меткой <ds-include> собирается ассемблером (Projects/test/post/assemble.mjs),
+     и проверять надо результат, а не источник: у источника нет ни разметки
+     включённых фрагментов, ни смысла экранных проверок (Б12 «нет спутника-
+     спеки» на источнике — ложный FAIL). Пропуск печатается строкой ПРОПУЩЕН:,
+     молчаливого пропуска нет (ds-rules §9). */
+  const noComments = html.replace(/<!--[\s\S]*?-->/g, '');
+  if (/<ds-include\b/i.test(noComments)) {
+    say(`== layout-check ${name} ==`);
+    say('ПРОПУЩЕН: ' + pageArg + ' — шаблон-исходник с неразвёрнутыми <ds-include>; проверять собранный файл (результат assemble.mjs).');
+    return { status: 'пропущен', path: p, printed, fails: 0, warns: 0 };
+  }
+
+  /* Фрагмент — не экран: модалка или таблица без <html>, которую источник
+     вшивает через <ds-include>. Проверяется в собранном файле. Определение и
+     причина — fragments.mjs. */
+  const hosts = includersOf(p);
+  if (hosts.length) {
+    say(`== layout-check ${name} ==`);
+    say('ПРОПУЩЕН: ' + pageArg + ' — фрагмент, вшивается в ' + hosts.map((h) => path.relative(ROOT, h).split(path.sep).join('/')).join(', ') + '; проверять собранный файл.');
+    return { status: 'пропущен', path: p, printed, fails: 0, warns: 0 };
+  }
 
   /* иконки из specs/Icons.md (формат: строка имён через ·) */
   const iconsText = readFileSync(path.join(DS, 'specs', 'Icons.md'), 'utf8');
@@ -1086,9 +1296,6 @@ function main() {
   /* Печатаемое собирается в массив: из него же берутся сработавшие коды для
      журнала прогонов. Разбирать собственный отчёт дешевле, чем вести второй
      перечень идентификаторов рядом с первым — такие перечни расходятся (Л43). */
-  const printed = [];
-  const say = (s) => { printed.push(s); log(s); };
-
   say(`== layout-check ${name} (ширина ${width}) ==`);
   say('[механика]');
   for (const r of mech) say((r.level === 'ok' ? 'PASS  ' : r.level === 'warn' ? 'WARN  ' : 'FAIL  ') + r.label);
@@ -1097,13 +1304,101 @@ function main() {
   say('');
   say(fails.length === 0 ? `ВЕРДИКТ: OK (замечаний: ${warns.length})` : `ВЕРДИКТ: FAIL (${fails.length} блокер, ${warns.length} замечание)`);
 
+  return { status: fails.length === 0 ? 'OK' : 'FAIL', path: p, printed, fails: fails.length, warns: warns.length };
+}
+
+/* ---------------- --etalons: образцы каркаса из скиллов ----------------
+
+   Каркас экрана лежит образцом в `.opencode/skills/<скилл>/references/*.html`,
+   и с него начинается каждая сборка. Разъехавшийся образец разъезжается сразу
+   во всём, что от него произошло (Л69), а прогонять его по одному некому —
+   этот режим обходит все такие файлы разом.
+
+   ЧИСЛО НАЙДЕННОГО ПЕЧАТАЕТСЯ, и пустой обход — это FAIL. Обход, не нашедший
+   ни одного файла, неотличим по выводу от обхода, нашедшего десять чистых:
+   зелёный вердикт на пустом множестве — буквально Л100. Сегодня под глобом
+   лежит ровно один файл, и это стоит видеть в выводе, а не обнаруживать.
+
+   В журнал прогонов режим не пишет: отсечение — `isEtalon` в runlog.mjs, там
+   же причина. */
+function etalons(width) {
+  const base = path.join(ROOT, '.opencode', 'skills');
+  const found = [];
+  if (existsSync(base)) {
+    for (const skill of readdirSync(base, { withFileTypes: true })) {
+      if (!skill.isDirectory()) continue;
+      const refs = path.join(base, skill.name, 'references');
+      if (!existsSync(refs)) continue;
+      for (const f of readdirSync(refs)) {
+        if (f.endsWith('.html')) found.push(path.join(refs, f));
+      }
+    }
+  }
+  found.sort();
+
+  log('== layout-check --etalons: образцы каркаса из .opencode/skills/*/references ==');
+  log('эталонов найдено: ' + found.length);
+  log('');
+  if (!found.length) {
+    log('ВЕРДИКТ: FAIL — обход не нашёл ни одного эталона.');
+    log('Пустой обход с зелёным вердиктом неотличим от чистого (Л100): либо');
+    log('сместился глоб, либо образцы унесли из references/.');
+    process.exit(1);
+  }
+
+  let bad = 0, skipped = 0, warns = 0;
+  for (const abs of found) {
+    const rel = path.relative(ROOT, abs).split(path.sep).join('/');
+    const r = checkOne(rel, width);
+    log('--- ' + rel);
+    for (const s of r.printed) log(s);
+    log('');
+    if (r.status === 'FAIL' || r.status === 'ошибка') bad++;
+    if (r.status === 'пропущен') skipped++;
+    warns += r.warns;
+  }
+
+  log('== итог --etalons ==');
+  log('эталонов ' + found.length + ' · с блокерами ' + bad + ' · пропущено ' + skipped + ' · замечаний ' + warns);
+
+  /* В журнал идёт ОДНА строка на обход, а не строка на файл, и без кодов.
+     Пофайловые прогоны отсечены в `isEtalon` — десяток таких строк вытеснил
+     бы настоящие экраны из окна HORIZON инструмента «сенсор». Сводная строка
+     живёт под СВОИМ именем инструмента, в окно сенсора не входит и нужна
+     ровно для одного: чтобы `lessons-cli state` мог сказать, когда эталоны
+     прогонялись в последний раз. Коды не пишутся намеренно — под именем вне
+     RUN_TOOLS их никто не классифицирует, а лежали бы они как готовые данные
+     о живости правил, которыми не являются. */
+  logRun({ tool: 'эталоны', target: 'эталоны скиллов', verdict: bad === 0 ? 'OK' : 'FAIL', codes: [] });
+  process.exit(bad === 0 ? 0 : 1);
+}
+
+/* ---------------- main ---------------- */
+
+function main() {
+  const args = process.argv.slice(2);
+  if (args.includes("--rules")) { printRules(); return; }
+  const wIdx = args.indexOf('--width');
+  const width = wIdx >= 0 ? parseInt(args[wIdx + 1], 10) : 1920;
+  if (args.includes('--etalons')) { etalons(width); return; }
+
+  // значение `--width` — не путь: без этой оговорки `--width 1920` без файла
+  // уходило проверять несуществующий «1920»
+  const pageArg = args.find((a, i) => !a.startsWith('--') && !(wIdx >= 0 && i === wIdx + 1));
+  if (!pageArg) fail('использование: node layout-check.mjs <путь к <Имя>.html> [--width 1920] | --etalons | --rules');
+
+  const r = checkOne(pageArg, width);
+  for (const s of r.printed) log(s);
+  if (r.status === 'ошибка') process.exit(2);
+  if (r.status === 'пропущен') process.exit(0);
+
   logRun({
     tool: 'сенсор',
-    target: p,
-    verdict: fails.length === 0 ? 'OK' : 'FAIL',
-    codes: codesFrom(printed.join('\n')),
+    target: r.path,
+    verdict: r.status,
+    codes: codesFrom(r.printed.join('\n')),
   });
-  process.exit(fails.length === 0 ? 0 : 1);
+  process.exit(r.fails === 0 ? 0 : 1);
 }
 
 main();

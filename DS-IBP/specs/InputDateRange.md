@@ -2,7 +2,7 @@
 component: InputDateRange
 title: "InputDateRange"
 version: "1.010"
-updated: "06.09.2026"
+updated: "13.09.2026"
 page: pages/molecules/InputDateRange.html
 page_js: scripts/input-date-range.page.js
 runtime: scripts/ds-datepicker.js, scripts/ds-input.js

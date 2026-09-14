@@ -39,7 +39,7 @@ updated: "26.08.2026"
           <span class="chip__remove" role="button" aria-label="Сбросить все фильтры"><i data-icon="close"></i></span>
         </span>
       </div>
-      <button class="ibtn ibtn--neutral ibtn--m" aria-label="Настроить колонки" data-modal="cols-scrim"><i data-icon="settings"></i></button>
+      <button class="ibtn ibtn--neutral ibtn--m" aria-label="Настроить колонки" data-table-settings><i data-icon="settings"></i></button>
       <button class="btn btn--accent btn--s"><i data-icon="add"></i><span class="btn__label">Добавить</span></button>
     </div>
   </div>
@@ -55,8 +55,10 @@ updated: "26.08.2026"
     <div class="tbl" data-table data-sort-rows>
       <!-- Шапка. grid-template-columns ОДИНАКОВЫЙ у шапки и у всех строк.
            Первая и последняя ячейки — служебные разделители по 8px.
-           Замыкающий разделитель забирает остаток: minmax(8px,1fr). -->
-      <div class="tbl__row" style="grid-template-columns:8px 44px 2fr 1.5fr 1fr 120px 96px minmax(8px,1fr);">
+           Замыкающий разделитель забирает остаток: minmax(8px,1fr).
+           `.tbl__row--head` обязателен на строке шапки внутри `.dtable__body`:
+           на нём держится липкая шапка. -->
+      <div class="tbl__row tbl__row--head" style="grid-template-columns:8px 44px 2fr 1.5fr 1fr 120px 96px minmax(8px,1fr);">
         <div class="th th--separator"></div>
         <div class="th th--select">
           <label class="cb cb--no-content"><input type="checkbox" class="cb__input" aria-label="Выбрать все"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span></label>
@@ -228,10 +230,17 @@ CSS (`margin-left:auto` на `.pgn-row__right`), а не разметка: ле�
 
 ---
 
-## Модалка настройки колонок
+## Настройка колонок — руками не собирается
 
-`.modal--w4`, в теле — список колонок с Checkbox и ручкой перетаскивания
-(глиф `drag-dots`), в подвале слева «Сбросить», справа «Применить».
+Стандарт для всех таблиц: на кнопке-шестерёнке в тулбаре ставится
+`data-table-settings`, и это всё. Модалку «Настройка таблицы» (`.modal--w4`)
+целиком строит рантайм `scripts/ds-table-settings.js` (входит в `ds.js`) по
+колонкам из шапки: описание → «Выбрать все» → `divider` → список
+`[checkbox + pin + drag]`, футер «Отменить» + «Применить» справа. Колонки без
+`.th__label` (выбор, действия) служебные — в список не попадают.
+
+Своя разметка модалки и свой `data-modal` вместо этого атрибута — дефект:
+рантайму не за что зацепиться, а ручная копия разойдётся со стандартом.
 
 ---
 

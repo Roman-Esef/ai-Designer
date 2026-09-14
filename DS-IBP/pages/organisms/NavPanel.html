@@ -48,7 +48,7 @@
   .nav-frame .nav { height:100%; }
 
   /* ---------- anatomy ---------- */
-  .anat { display:grid; grid-template-columns: minmax(280px,340px) minmax(260px,1fr); gap:44px; align-items:flex-start; }
+  .anat { display:grid; grid-template-columns: max-content minmax(260px,1fr); gap:44px; align-items:flex-start; }
   @media (max-width:820px){ .anat { grid-template-columns:1fr; } }
   .anat__stage { background: var(--tertiary-light); border:1px solid var(--border-light); border-radius:14px; padding:28px; display:flex; justify-content:center; overflow:auto; }
   .anat__legend { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; counter-reset:a; }
@@ -152,7 +152,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.019</b></span><span>Обновлено: <b>07.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.019</b></span><span>Обновлено: <b>13.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>NavPanel · Панель навигации</h1>
     <p class="lead">Главная навигация приложения в левой части каждой страницы. Отображает все разделы продукта, сгруппированные по подразделениям и типам. Один компонент — три режима: свёрнутый <b>Rail</b>, развёрнутый-оверлей <b>Drawer</b> и закреплённый <b>Fixed</b>.</p>

@@ -23,7 +23,7 @@ const CONTRACT_DIRS = ['pages/atoms/', 'pages/molecules/', 'pages/organisms/'];
 const REGISTRY_DIRS = ['pages/foundations/', 'pages/atoms/', 'pages/molecules/', 'pages/organisms/'];
 // у страниц-экранов и rnd свои разделы и своя роль
 const SKIP_ALL = [/^index\.html$/, /^templates\//];
-// CSS документации и экранов — намеренно вне ds.css/styles.css (не компоненты ДС)
+// CSS документации и экранов — намеренно вне ds.css (не компоненты ДС)
 const CSS_NOT_IN_BUNDLE = ['ds-docs.css', 'ds-nav.css', 'ds-toc.css', 'pg-kit.css', 'docs-split.css', 'input-pages.css', 'screens.css'];
 // hex, которые легальны: демо-тени и шахматная подложка прозрачности
 const HEX_OK = /(chess|checker|shadow-demo|elevation-demo)/i;
@@ -209,8 +209,8 @@ async function loadProject() {
   for (const [c, set] of classOwners) if (set.size === 1) owner.set(c, [...set][0]);
   const cssClasses = new Set(classOwners.keys());
 
-  const [index, nav, specIndex, cheat, dsCss, rootCss, dsRules] = await Promise.all(
-    ['index.html', 'scripts/ds-nav.js', 'specs/_index.md', 'specs/_cheatsheet.md', 'ds.css', 'styles.css', 'MAINTAINING.md'].map((f) => readFile(f))
+  const [index, nav, specIndex, cheat, dsCss, dsRules] = await Promise.all(
+    ['index.html', 'scripts/ds-nav.js', 'specs/_index.md', 'specs/_cheatsheet.md', 'ds.css', 'MAINTAINING.md'].map((f) => readFile(f))
   );
 
   // канонический порядок h2 — из MAINTAINING.md, не дублируем
@@ -221,7 +221,7 @@ async function loadProject() {
       .map((s) => s.split(/\s+[—(]|:/)[0].trim())
       .filter((s) => s && !/^Шапка/.test(s));
   }
-  return { files, list, styleFiles, tokens, owner, cssClasses, index, nav, specIndex, cheat, dsCss, rootCss, canon };
+  return { files, list, styleFiles, tokens, owner, cssClasses, index, nav, specIndex, cheat, dsCss, canon };
 }
 
 /* ---------- глобальные проверки: A3, B6, D3, D4 ---------- */
@@ -231,7 +231,6 @@ async function globalChecks(P, out) {
     const imp = 'url("' + f + '")';
     const miss = [];
     if (!P.dsCss.includes(imp) && !P.dsCss.includes("url('" + f + "')")) miss.push('ds.css');
-    if (!P.rootCss.includes(imp) && !P.rootCss.includes("url('" + f + "')")) miss.push('styles.css');
     if (miss.length) out.push(['BLOCKER', 'A3', f + ' — нет @import в ' + miss.join(' и ')]);
   }
   const react = P.list.filter((f) => /\.(jsx|tsx|d\.ts)$/.test(f) && !/^_ds_/.test(f));
@@ -842,15 +841,20 @@ async function pageChecks(p, P, opts, out) {
      `<main class="page"`. Сенсор экранов вырезает комментарии с 06.09.2026 по
      той же причине; здесь асимметрия дожила до первого корпуса фикстур.
      `html` остаётся сырым: C1 читает первую строку — саму карточку @dsCard. */
+  /* Комментарии вырезаются ПЕРВЫМИ. Обратный порядок давал утечку: слово
+     «<script>» в тексте комментария регулярка принимала за начало скрипта и
+     съедала разметку до первого </script> — правила переставали видеть <main>,
+     хост NavPanel и всё между (поймано 13.09.2026 на фикстуре F5@js; класс
+     Л82 — комментарий, объясняющий правило, выключил его). */
   const markup = html
+    .replace(/<!--[\s\S]*?-->/g, '')
     .replace(RX.styleBlock, '')
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<!--[\s\S]*?-->/g, '');
+    .replace(/<script[\s\S]*?<\/script>/gi, '');
   const styleSrc = (html.match(RX.styleBlock) || []).join('\n');
   const links = all(RX.link, html);
   const scripts = all(RX.src, html);
   const linkNames = links.map(base);
-  const hasBundle = linkNames.includes('ds.css') || linkNames.includes('styles.css');
+  const hasBundle = linkNames.includes('ds.css');
   const say = (lvl, id, msg) => {
     // на экранах контракт разделов и реестры не применяются, таблица-мокап — замечание
     if (isScreen && /^[CD]/.test(id)) return;
@@ -1251,24 +1255,26 @@ async function pageChecks(p, P, opts, out) {
      показывать фрагмент чужого компонента как пример (Каркас экрана, 20.08.2026).
      Проверяем только разметку вне них. */
   const liveMarkup = markup.replace(/<pre[\s\S]*?<\/pre>/gi, '').replace(/<code[\s\S]*?<\/code>/gi, '');
+  /* Узлы, которые экран строит JS-шаблоном, — тоже живая разметка. Экраны Post
+     рендерят панель навигации из каталога ролей: в статике пустой
+     <nav class="nav nav--rail" id="nav">, а .nav__pin и .nav__user-text живут в
+     строке шаблона внутри <script>. `markup` скрипты вырезает, и F5 выносил
+     ложный BLOCKER на полной анатомии (13.09.2026, Portfolio и mainPage) — тот же
+     класс, что сенсор закрыл вариантом Б15@js: правило читало один вход из двух.
+     Из скриптов берутся только атрибуты class="…" — упоминание селектора в
+     querySelector узлом не является. Условие контракта (`when`) по-прежнему
+     проверяется по статике: хост компонента стоит в разметке. */
+  const templateClasses = [...html.replace(/<!--[\s\S]*?-->/g, '').matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)]
+    .flatMap((m) => [...m[1].matchAll(/class=\\?"([^"\\]*)\\?"/g)].map((k) => 'class="' + k[1] + '"'))
+    .join('\n');
   for (const c of ANATOMY_CONTRACTS) {
     if (c.when.test(liveMarkup)) {
-      const missing = c.require.filter(([re]) => !re.test(liveMarkup)).map(([, label]) => label);
+      const missing = c.require.filter(([re]) => !re.test(liveMarkup) && !re.test(templateClasses)).map(([, label]) => label);
       if (missing.length) say('BLOCKER', 'F5', c.name + ' использован не целиком — анатомия урезана под текущий вид вместо взятой как есть (разметка не должна меняться между режимами/состояниями); отсутствует: ' + missing.join(', '));
     }
   }
-  /* G1 — гейт фиделити макету (skills/mockup-fidelity-review.md) отмечен не в чате, а в
-     самом файле: без строки-маркера экран сдавать нельзя (правило
-     процесса, не мнение) — самоотчёт в переписке не переживает новую сессию/другого
-     агента и не проверяем постфактум. Дата в маркере обязана совпадать с датой правки
-     (тот же принцип, что C3), иначе разметка могла измениться уже ПОСЛЕ прогона гейта. */
-  if (isScreen) {
-    const gatePass = html.match(/<!--\s*FIDELITY-GATE:\s*PASS\s*·\s*ширина\s*[\d]+\s*·\s*([\d.]+)\s*-->/i);
-    const gateNA = html.match(/<!--\s*FIDELITY-GATE:\s*N\/A\s*·\s*нет исходного макета\s*·\s*([\d.]+)\s*-->/i);
-    const gate = gatePass || gateNA;
-    if (!gate) say('BLOCKER', 'G1', 'нет строки <!-- FIDELITY-GATE: PASS · ширина <N> · ДД.ММ.ГГГГ --> (сборка по макету) или <!-- FIDELITY-GATE: N/A · нет исходного макета · ДД.ММ.ГГГГ --> (сборка по тексту) сразу после <!DOCTYPE html> — гейт не отмечен как пройденный в самом файле');
-    else if (changed && gate[1] !== (opts.today || today()) && !p.split('/').includes('fixtures')) say('WARN', 'G1', 'экран правился, а дата в FIDELITY-GATE = ' + gate[1] + ', сегодня ' + (opts.today || today()) + ' — гейт нужно перепрогнать после правки и обновить дату');
-  }
+  /* G1 (гейт фиделити макету, маркер FIDELITY-GATE) снят 13.09.2026: на рабочем контуре
+     гейт невыполним — модель не читает изображения, браузер по скрипту запрещён. */
   /* C1 — карточка @dsCard первой строкой */
   if (!/^<!--\s*@dsCard\b/.test(html)) say('BLOCKER', 'C1', 'первая строка — не <!-- @dsCard … -->');
   /* C2/C3 — masthead */
@@ -1337,9 +1343,10 @@ async function pageChecks(p, P, opts, out) {
   }
   /* D7 вне реестров (pages/rnd/* и прочие): версия и дата обязаны совпадать со
      спекой — но только если спека и правда объявляет ЭТУ страницу. Совпадения
-     одного имени файла мало: `pages/rnd/Kanban.html` — концепт, из которого
-     вырос организм, отдельный документ со своей историей, и требовать от него
-     версию компонента бессмысленно. Сверяем с полем `page:` спеки. */
+     одного имени файла мало: концепт в `pages/rnd/`, из которого вырос организм,
+     — отдельный документ со своей историей, и требовать от него версию
+     компонента бессмысленно (так было с концептом Kanban, удалён 13.09.2026).
+     Сверяем с полем `page:` спеки. */
   if (!inRegistry) {
     const s = P.src.get('specs/' + name + '.md');
     const declared = s ? ((s.match(/^page:\s*(\S+)/m) || [])[1] || '').trim() : '';

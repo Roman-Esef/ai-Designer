@@ -339,6 +339,10 @@
   }
 
   /* ---------- образцы вариантов и состояний ---------- */
+  /* Образец с живой колонкой. Колонка не сжимается (flex: 0 0 --kb-col-w = 288px),
+     коробке нужно 288 + паддинг .sample__box 12+12 + рамка 1+1 = 314.
+     320 — запас, чтобы скроллпорт .kanban__viewport не рисовал скролл на округлении. */
+  var COL_SAMPLE_W = '320px';
   function sample(name, html, w) {
     return '<div class="sample"' + (w ? ' style="width:' + w + '"' : '') + '>' +
       '<span class="sample__name">' + name + '</span>' +
@@ -362,11 +366,11 @@
         '<div class="kanban"><section class="kbcol kbcol--' + t[0] + '">' +
         '<header class="kbcol__head"><span class="kbcol__marker" aria-hidden="true"></span>' +
         '<span class="kbcol__name">' + t[1] + '</span>' +
-        '<span class="badge badge--text badge--s">4</span></header></section></div>', '200px');
+        '<span class="badge badge--text badge--s">4</span></header></section></div>', COL_SAMPLE_W);
     }).join(''));
 
     paint(document.getElementById('var-col-collapsed'),
-      sample('Развёрнутая', '<div class="kanban">' + column(COLS[1], opt({}), {}) + '</div>') +
+      sample('Развёрнутая', '<div class="kanban">' + column(COLS[1], opt({}), {}) + '</div>', COL_SAMPLE_W) +
       sample('Свёрнутая — имя читается снизу вверх',
         '<div class="kanban"><div class="kanban__viewport"><div class="kanban__track">' +
         column(COLS[1], opt({}), { mod: 'kbcol--collapsed' }) + '</div></div></div>', '120px'));
@@ -407,9 +411,9 @@
     paint(document.getElementById('states-col'), cs.map(function (s) {
       return sample(s[1], '<div class="kanban"><div class="kanban__viewport"><div class="kanban__track">' +
         column(COLS[0], opt({}), { mod: s[0], empty: s[0] === 'kbcol--collapsed' }) +
-        '</div></div></div>', s[0] === 'kbcol--collapsed' ? '120px' : '');
+        '</div></div></div>', s[0] === 'kbcol--collapsed' ? '120px' : COL_SAMPLE_W);
     }).join('') + sample('Пустая — текст говорит, что сюда класть',
-      '<div class="kanban">' + column(COLS[0], opt({}), { empty: true }) + '</div>'));
+      '<div class="kanban">' + column(COLS[0], opt({}), { empty: true }) + '</div>', COL_SAMPLE_W));
     var host = document.getElementById('states-col');
     if (host && window.DSKanban) {
       Array.prototype.forEach.call(host.querySelectorAll('[data-kb-body]'), function (b) {

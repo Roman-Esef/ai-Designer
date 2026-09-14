@@ -1,7 +1,7 @@
 ---
 belongs_to: docs-split
 purpose: Структурная карта doc-страниц IBP. Читай карту вместо файла целиком. Генерируется командой map, руками не править.
-generated: 2026-09-01
+generated: 2026-09-13
 ---
 
 # Карта страниц документации
@@ -13,7 +13,7 @@ generated: 2026-09-01
 | Страница | Конструктор | Демо | page.js | CSS | Секций | Статус |
 |---|---|---|---|---|---|---|
 | Colors | — | — | — | — | 0 | ⬜ |
-| Elevation | static | — | — | — | 4 | ✅ |
+| Elevation | static | — | — | styles/shadow.css | 4 | ✅ |
 | Icons | — | — | — | — | 0 | ⬜ |
 | Illustrations | — | — | — | styles/illustration.css | 4 | ⬜ |
 | Layout | static | — | layout.page.js | styles/layout.css | 12 | ✅ |
@@ -21,13 +21,12 @@ generated: 2026-09-01
 | Spacing | static | — | — | styles/spacing.css | 7 | ✅ |
 | Typography | — | — | — | — | 4 | ⬜ |
 
-## Atoms (15)
+## Atoms (14)
 
 | Страница | Конструктор | Демо | page.js | CSS | Секций | Статус |
 |---|---|---|---|---|---|---|
 | Avatar | dynamic | — | — | styles/avatar.css | 12 | ✅ |
 | Badge | dynamic | — | — | styles/badge.css | 12 | ✅ |
-| ButtonTest | dynamic | — | — | styles/button.css | 15 | ✅ |
 | Buttons | dynamic | — | — | styles/button.css | 12 | ✅ |
 | Checkbox | dynamic | — | — | styles/checkbox.css | 12 | ✅ |
 | Chip | dynamic | — | chip.page.js | styles/chip.css | 12 | ✅ |
@@ -41,7 +40,7 @@ generated: 2026-09-01
 | Spinner | dynamic | pg-stage | — | styles/spinner.css | 12 | ✅ |
 | Switch | dynamic | — | — | styles/switch.css | 12 | ✅ |
 
-## Molecules (20)
+## Molecules (21)
 
 | Страница | Конструктор | Демо | page.js | CSS | Секций | Статус |
 |---|---|---|---|---|---|---|
@@ -62,19 +61,22 @@ generated: 2026-09-01
 | ReadOnlyField | dynamic | — | read-only-field.page.js | styles/read-only-field.css | 12 | ✅ |
 | SegmentControl | dynamic | — | segment-control.page.js | styles/segment-control.css | 12 | ✅ |
 | Splitter | dynamic | pg-stage | splitter.page.js | styles/splitter.css | 12 | ✅ |
+| SubTab | dynamic | — | sub-tab.page.js | styles/sub-tab.css | 12 | ✅ |
 | Tab | dynamic | — | tab.page.js | styles/tab.css | 12 | ✅ |
 | Toast | dynamic | — | toast.page.js | styles/toast.css | 12 | ✅ |
 | Tooltip | dynamic | pg-stage | tooltip.page.js | styles/tooltip.css | 12 | ✅ |
 
-## Organisms (13)
+## Organisms (15)
 
 | Страница | Конструктор | Демо | page.js | CSS | Секций | Статус |
 |---|---|---|---|---|---|---|
 | AllocationBar | dynamic | pg-stage | allocation-bar.page.js | styles/allocation-bar.css | 12 | ✅ |
 | Chart | dynamic | pg-stage | chart.page.js | styles/chart.css | 12 | ✅ |
+| Drawer | dynamic | pg-stage | drawer.page.js | styles/drawer.css | 12 | ✅ |
 | Entity | static | demo-entity | — | styles/entity.css | 12 | ✅ |
+| Kanban | dynamic | pg-stage | kanban.page.js | styles/kanban.css | 12 | ✅ |
 | Modal | dynamic | pg-stage | modal.page.js | styles/modal.css | 12 | ✅ |
-| NavPanel | dynamic | pg-stage | nav-panel.page.js | styles/nav-panel.css | 12 | ✅ |
+| NavPanel | dynamic | pg-stage | nav-panel.page.js | styles/nav-panel.css | 11 | ✅ |
 | PageHeader | static | demo-scale | page-header.page.js | styles/page-header.css | 12 | ✅ |
 | Popover | dynamic | pg-stage | popover.page.js | styles/popover.css | 12 | ✅ |
 | RiskMetric | dynamic | pg-stage | riskmetric.page.js | styles/riskmetric.css | 12 | ✅ |
@@ -84,10 +86,12 @@ generated: 2026-09-01
 | TableFilter | dynamic | pg-stage | table-filter.page.js | styles/table-filter.css | 11 | ✅ |
 | Tile | static | demo-tile-wrap | — | styles/tile.css | 12 | ✅ |
 
-## Patterns (1)
+## Patterns (3)
 
 | Страница | Конструктор | Демо | page.js | CSS | Секций | Статус |
 |---|---|---|---|---|---|---|
+| HomeRoles | — | demo-menu | — | — | 2 | ⬜ |
 | LocalComponents | — | — | — | — | 11 | ⬜ |
+| Redpolicy | — | — | — | — | 3 | ⬜ |
 
 <!-- Примечания (дописывать руками при необходимости) -->

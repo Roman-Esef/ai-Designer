@@ -11,8 +11,13 @@
    воспроизведённом дефекте и МОЛЧАТЬ на эталоне.
 
    Подкоманды:
+     gate      — проверки по изменениям одной командой в конце захода: гоняет
+                 только сторожей того, что изменилось со снимка. `--full` —
+                 всё, `--dry` — показать шаги, `--changed <путь,…>` — задать
+                 набор изменений (проверка матрицы).
      verify    — прогон фикстур: каждая пара «дефект/эталон» доказывает, что
                  сторож живой. Код выхода 1, если хоть один не доказан.
+                 `--only <ID>` — одно правило, `--corpus sensor|lint` — один корпус.
      coverage  — какие пункты чек-листов закрыты сторожем, какие живут прозой,
                  какие признаны неизмеримыми. Код выхода 1, если пункт не
                  классифицирован (не закрыт и не объявлен суждением).
@@ -33,8 +38,9 @@
    Кодировка и escape: файл правится редактором, НЕ через шелл — шелл-слой
    схлопывает обратные слэши и молча ломает регулярки (урок Л51).
    ============================================================ */
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { includersOf, assembledOf } from './fragments.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -47,13 +53,20 @@ const ANCHORS = path.join(HERE, 'anchors.json');
 const LINT_FIXTURES = path.join(ROOT, 'DS-IBP/fixtures');
 /* Корпус экранов лежит ВНЕ дерева ДС не по вкусу, а по определению правила:
    линтер считает экраном путь, начинающийся с `pages/screens/` или с `../`.
-   Правила A7, F6, L4, L5, G1 внутри `DS-IBP/fixtures/` не срабатывают никогда —
+   Правила A7, F6, L4, L5, L6 внутри `DS-IBP/fixtures/` не срабатывают никогда —
    доказывать их там значило бы доказывать на входе, который им не вход (Л71). */
 const SCREEN_FIXTURES = path.join(ROOT, 'Projects/test/fixtures');
 const RUNS = path.join(HERE, 'runs.jsonl');
 const REFS = path.join(ROOT, '.opencode/skills/screen-review/references');
 const RAW = path.join(REFS, 'lessons-raw.md');
 const CUR = path.join(REFS, 'lessons.md');
+/* Шарды выжимки по scope (Л79). Список объявлен ОДИН раз: до 13.09.2026 он жил
+   в трёх местах — `state`, `journalFiles()` и захардкоженный `[RAW, CUR]` в
+   `check`, — и шарды не попали в `check`: мёртвый якорь в них не ловился (Л43). */
+const SHARDS = [
+  ['docs-split', path.join(ROOT, '.opencode/skills/docs-split/references/lessons.md')],
+  ['lessons', path.join(ROOT, '.opencode/skills/lessons/references/lessons.md')],
+];
 
 const rd = (p) => readFileSync(p, 'utf8');
 const log = (s = '') => console.log(s);
@@ -90,47 +103,78 @@ function runLinter(rel) {
 
 /* ---------------- verify ---------------- */
 
-/* Один корпус фикстур: эталон плюс пары `<ID>.bad.html`. Инструмент передаётся
-   запускалкой — доказательство устроено одинаково для сенсора и для линтера,
-   различаются только словарь уровней и способ вызова. */
-function verifyCorpus(dir, run, title) {
+/* Идентификатор правила по имени фикстуры.
+
+   У одного правила вариантов может быть несколько: дефект тот же, а ВХОД
+   разный. `Б15.bad.html` — статическая разметка, `Б15@js.bad.html` — разметка
+   внутри <script>. Без суффикса корпус держал бы ровно один вход на правило,
+   и способность сторожа читать второй доказывалась бы мутацией руками —
+   то есть не доказывалась бы вовсе (класс Л71: правило РАБОТАЕТ, но не
+   ПРИМЕНЯЕТСЯ к половине рабочих экранов).
+
+   Разделитель — «@», а не точка: идентификаторы вида `K2.1` точку уже
+   содержат, и по ней срез разрезал бы сам идентификатор. */
+const idOfFixture = (f) => f.replace(/\.bad\.html$/, '').split('@')[0];
+
+/* Один корпус фикстур: эталон плюс фикстуры `<ID>[@вариант].bad.html`.
+   Инструмент передаётся запускалкой — доказательство устроено одинаково для
+   сенсора и для линтера, различаются только словарь уровней и способ вызова. */
+function verifyCorpus(dir, run, title, only = null) {
   if (!existsSync(dir)) return { total: 0, bad: 0, missing: title };
   const files = readdirSync(dir);
   const baseName = '_base.ok.html';
+  /* `--only <ID>` отбирает фикстуры ДО прогона эталона: корпус, где нужного
+     правила нет, не стоит ни одного запуска. Ради этого флаг и заведён —
+     доказательство откатом одного сторожа во время работы стоит секунду, а
+     не полный корпус (34 сек на 13.09.2026). */
+  const bads = files.filter((f) => f.endsWith('.bad.html') && (!only || idOfFixture(f) === only)).sort();
+  if (only && !bads.length) return { total: 0, bad: 0 };
   if (!files.includes(baseName)) { log('  нет эталона ' + baseName + ' в ' + title); return { total: 0, bad: 1 }; }
 
   const baseOut = run(baseName);
-  const bads = files.filter((f) => f.endsWith('.bad.html')).sort();
 
   log('== ' + title + ' ==');
   log('эталон: ' + baseName);
   let bad = 0;
+  /* Печатается ИМЯ ФАЙЛА, а не только идентификатор. У правила с вариантами
+     строк несколько, и все они про один и тот же `Б15`: «ДОКАЗАН Б15» дважды
+     неотличимо, а «НЕ ДОКАЗАН Б15» не сказало бы, какая из фикстур мертва. */
   for (const f of bads) {
-    const id = f.replace(/\.bad\.html$/, '');
+    const id = idOfFixture(f);
     const caught = firedOn(run(f), id);
     // на эталоне того же дефекта быть не должно — иначе правило шумит всегда
     const quiet = !firedOn(baseOut, id);
 
     if (caught && quiet) {
-      log('  ДОКАЗАН  ' + id + ' — падает на дефекте, молчит на эталоне');
+      log('  ДОКАЗАН  ' + f + ' → ' + id + ' — падает на дефекте, молчит на эталоне');
     } else {
       bad++;
-      if (!caught) log('  НЕ ДОКАЗАН ' + id + ' — дефект внесён, а находки ' + id + ' нет: сторож мёртв либо не видит вход (класс Л48)');
-      if (!quiet) log('  НЕ ДОКАЗАН ' + id + ' — правило срабатывает и на эталоне: оно шумит, а не ловит');
+      if (!caught) log('  НЕ ДОКАЗАН ' + f + ' → ' + id + ' — дефект внесён, а находки ' + id + ' нет: сторож мёртв либо не видит вход (класс Л48)');
+      if (!quiet) log('  НЕ ДОКАЗАН ' + f + ' → ' + id + ' — правило срабатывает и на эталоне: оно шумит, а не ловит');
     }
   }
   log('');
   return { total: bads.length, bad };
 }
 
-function verify() {
-  log('== verify: доказательство сторожей откатом ==');
+/* `corpus`: null — все три; 'sensor' — корпус сенсора; 'lint' — оба корпуса
+   линтера (страницы и экраны: правило одно, входы разные, Л71). */
+function verify(only = null, corpus = null) {
+  if (corpus && corpus !== 'sensor' && corpus !== 'lint') { log('--corpus: sensor | lint, получено «' + corpus + '»'); return 2; }
+  log('== verify: доказательство сторожей откатом' + (only ? ' — только ' + only : '') + (corpus ? ' — корпус ' + corpus : '') + ' ==');
   log('');
-  const s = verifyCorpus(FIXTURES, (f) => runSensor(path.join(FIXTURES, f)), 'сенсор layout-check (tooling/fixtures)');
-  const l = verifyCorpus(LINT_FIXTURES, (f) => runLinter('fixtures/' + f), 'линтер ds-lint, страницы (DS-IBP/fixtures)');
-  const e = verifyCorpus(SCREEN_FIXTURES, (f) => runLinter('../Projects/test/fixtures/' + f), 'линтер ds-lint, экраны (Projects/test/fixtures)');
+  const none = { total: 0, bad: 0 };
+  const s = corpus === 'lint' ? none : verifyCorpus(FIXTURES, (f) => runSensor(path.join(FIXTURES, f)), 'сенсор layout-check (tooling/fixtures)', only);
+  const l = corpus === 'sensor' ? none : verifyCorpus(LINT_FIXTURES, (f) => runLinter('fixtures/' + f), 'линтер ds-lint, страницы (DS-IBP/fixtures)', only);
+  const e = corpus === 'sensor' ? none : verifyCorpus(SCREEN_FIXTURES, (f) => runLinter('../Projects/test/fixtures/' + f), 'линтер ds-lint, экраны (Projects/test/fixtures)', only);
 
   const total = s.total + l.total + e.total, bad = s.bad + l.bad + e.bad;
+  /* Пустой отбор — не «всё доказано»: обход нуля фикстур с зелёным вердиктом
+     неотличим от чистого (Л100). */
+  if (only && total === 0) {
+    log('  НЕ ДОКАЗАН ' + only + ' — фикстур `' + only + '[@вариант].bad.html` нет' + (corpus ? ' в корпусе ' + corpus : '') + ': сторож не доказан ничем');
+    return 1;
+  }
   log('фикстур: ' + total + ' (сенсор ' + s.total + ' · линтер-страницы ' + l.total + ' · линтер-экраны ' + e.total + '), доказано: ' + (total - bad) + ', не доказано: ' + bad);
   if (bad === 0) log('Каждое проверенное правило подтверждено откатом, а не наличием строки в файле.');
   return bad === 0 ? 0 : 1;
@@ -432,7 +476,7 @@ function cmdCheck() {
   if (!existsSync(ANCHORS)) { log('реестра якорей нет. Создать: anchors --write'); return 1; }
   const reg = JSON.parse(rd(ANCHORS)).пространства || {};
   const known = new Set([...Object.keys(reg), ...NS_FREE]);
-  const fixtures = existsSync(FIXTURES) ? new Set(readdirSync(FIXTURES).filter((f) => f.endsWith('.bad.html')).map((f) => f.replace(/\.bad\.html$/, ''))) : new Set();
+  const fixtures = existsSync(FIXTURES) ? new Set(readdirSync(FIXTURES).filter((f) => f.endsWith('.bad.html')).map(idOfFixture)) : new Set();
 
   const findings = [];
   const stats = { entries: 0, withRule: 0, withFix: 0, anchors: 0, refs: 0 };
@@ -440,7 +484,7 @@ function cmdCheck() {
   /* Номера, которые вообще существуют. Собираются по обоим файлам заранее:
      выжимка ссылается на записи, живущие только в архиве. */
   const knownNums = new Set();
-  for (const file of [RAW, CUR]) for (const e of entriesOf(file).entries) knownNums.add(e.num);
+  for (const file of journalFiles()) for (const e of entriesOf(file).entries) knownNums.add(e.num);
 
   /* Даты записей по номеру — из архива: он полон, в выжимке поле срезано.
      Второй запас — заголовок раздела `## ДД.ММ.ГГГГ — …`: у ранних записей
@@ -464,7 +508,7 @@ function cmdCheck() {
     }
   }
 
-  for (const file of [RAW, CUR]) {
+  for (const file of journalFiles()) {
     const rel = path.relative(ROOT, file).replace(/\\/g, '/');
     const { entries } = entriesOf(file);
     const seen = new Map();
@@ -500,7 +544,7 @@ function cmdCheck() {
         else if (level === 'исполняемое') {
           const sens = [...scope.matchAll(/сенсор:\s*([БЗКK]\d{1,2}(?:\.\d)?)/gu)].map((m) => m[1]);
           for (const id of sens) {
-            if (!fixtures.has(id)) findings.push(['БЛОКЕР', 'Л-ОРАКУЛ', where + ' — объявлено исполняемое закрепление на сенсор:' + id + ', а пары фикстур ' + id + '.bad.html нет. Уровень недоказан и понижается до «временное» (Л42 в новом обличье)']);
+            if (!fixtures.has(id)) findings.push(['БЛОКЕР', 'Л-ОРАКУЛ', where + ' — объявлено исполняемое закрепление на сенсор:' + id + ', а пары фикстур ' + id + '.bad.html (или ' + id + '@<вариант>.bad.html) нет. Уровень недоказан и понижается до «временное» (Л42 в новом обличье)']);
           }
         }
         /* Срок жизни «временного». Уровень задуман как расписка «правило пока
@@ -526,8 +570,12 @@ function cmdCheck() {
         }
       }
 
-      // якоря известных пространств — сверяются с реестром
-      for (const m of text.matchAll(/(линтер|сенсор|чек-лист|аудит):\s*([^\s`,;)]+)/gu)) {
+      /* якоря известных пространств — сверяются с реестром. Цитата мёртвого
+         идентификатора в ёлочках («линтер:G1» — снятый сторож) якорем не
+         считается: так велит скилл lessons. До 13.09.2026 соглашение было
+         записано, а регулярка ёлочки не исключала — первая же такая цитата
+         дала ложный Л-ЯКОРЬ (класс Л42: правило записано, кода нет). */
+      for (const m of text.matchAll(/(?<!«)(линтер|сенсор|чек-лист|аудит):\s*([^\s`,;)]+)/gu)) {
         const ns = m[1];
         let id = m[2].replace(/[.,;:)»]+$/u, '');
         if (ns === 'аудит') { const d = id.match(/(\d)\s*$/); id = d ? d[1] : id; }
@@ -613,6 +661,54 @@ function cmdAdd(draftPath) {
   return cmdCheck();
 }
 
+/* ---------------- давность ритуальных прогонов ----------------
+
+   Два сторожа стерегут не файл, а СОСТОЯНИЕ всего репозитория: нейтральность
+   (`vendor-scan.mjs`) и образцы каркаса (`layout-check.mjs --etalons`). У
+   такого сторожа нет естественного повода запуститься: он не привязан к
+   экрану, который сдают на приёмку, и правило «прогони в конце захода» живёт
+   строкой в скилле. Цена строки видна в журнале: у нейтральности 4 прогона,
+   все 11.09.2026 за две с половиной минуты — это откат при написании самого
+   сторожа, — и после ни одного.
+
+   Решение пересмотрено 13.09.2026. Раньше гейта не было намеренно: боялись
+   девятого входа в тулчейн. Замер показал, что дорого не число входов, а число
+   ОТДЕЛЬНЫХ прогонов (06.09: verify 49 раз, check 34, coverage 27 за 18 задач).
+   Теперь оба сторожа запускает `gate` (подкоманда ниже) — когда изменились
+   текстовые файлы или образцы каркаса. Давность здесь остаётся: она видна и
+   тому, кто гоняет подкоманды поштучно.
+
+   Строка ритуала живёт ТОЛЬКО в `lessons/SKILL.md`: находка `Л-ВЛАДЕЛЕЦ`
+   считает владельцем процедуры файл, содержащий все три слова «исполняемое /
+   временное / неизмеримое», и пересказ в AGENTS.md или ds-rules дал бы
+   блокер. */
+const RITUAL = [
+  ['нейтральность', 'vendor-scan.mjs'],
+  ['эталоны', 'layout-check.mjs --etalons'],
+];
+
+function ritualFreshness() {
+  const runs = readRuns();
+  const last = new Map(), count = new Map();
+  for (const r of runs) {
+    const t = Date.parse(r.t);
+    if (Number.isNaN(t)) continue;
+    count.set(r.tool, (count.get(r.tool) || 0) + 1);
+    const prev = last.get(r.tool);
+    if (!prev || t > prev.t) last.set(r.tool, { t, verdict: r.verdict });
+  }
+
+  log('  давность ритуальных прогонов (их запускает gate при изменениях; пропуск виден здесь):');
+  for (const [tool, how] of RITUAL) {
+    const l = last.get(tool);
+    if (!l) { log('    ' + tool + ' (' + how + '): не прогонялся ни разу'); continue; }
+    const days = Math.floor((Date.now() - l.t) / 86400000);
+    const ago = days <= 0 ? 'сегодня' : days + ' дн. назад';
+    log('    ' + tool + ' (' + how + '): ' + fmtDay(l.t) + ', ' + ago + ' · прогонов ' + count.get(tool) + ' · последний вердикт ' + l.verdict);
+  }
+  log('');
+}
+
 /* ---------------- state ----------------
    Состояние журнала печатается, а не пересказывается прозой: любая записанная
    в текст цифра устаревает на следующей же правке (этот файл появился ровно
@@ -623,8 +719,14 @@ function state() {
   const cur = rd(CUR);
   const nums = (s) => [...s.matchAll(/^### Л(\d+)\./gm)].map((m) => Number(m[1]));
 
+  const live = SHARDS.filter(([, p]) => existsSync(p));
+
   const inRaw = new Set(nums(raw));
   const inCur = new Set(nums(cur));
+  /* Присутствие урока считается по ВСЕМ выжимкам, а не только по основной:
+     запись, вынесенная по адресату в шард, промоутирована и долгом не является (Л79). */
+  const present = new Set(inCur);
+  for (const [, p] of live) for (const n of nums(rd(p))) present.add(n);
 
   const blocks = raw.split(/^(?=### Л\d+\.)/m).filter((b) => /^### Л\d+\./.test(b));
   const decided = new Map();
@@ -634,8 +736,19 @@ function state() {
     decided.set(n, m ? m[1].trim() : null);
   }
 
-  const notInCur = [...inRaw].filter((n) => !inCur.has(n)).sort((a, b) => a - b);
-  const debt = notInCur.filter((n) => !decided.get(n));
+  const notInCur = [...inRaw].filter((n) => !present.has(n)).sort((a, b) => a - b);
+  /* «Промоут: в выжимке / в шард …» — заявка на включение. Если записи нет ни в
+     одной выжимке, заявка не исполнена — это долг: поле «Промоут» объявляет
+     намерение, а не факт (Л80, Л81). «Не промоутить», «выведен … закреплён …»,
+     «слит в Лn» и «не держим» — решения, долгом не являющиеся. */
+  const claimsInclusion = (d) => !!d && /в выжимке|в шард/iu.test(d);
+  const settled = (d) => !!d && /не промоутить|выведен|слит|не держим/iu.test(d);
+  const debt = notInCur.filter((n) => {
+    const d = decided.get(n);
+    if (!d) return true;
+    if (settled(d)) return false;
+    return claimsInclusion(d);
+  });
   const curLines = cur.split(/\r?\n/).length;
 
   const LIMIT_N = 20, LIMIT_L = 150;
@@ -644,7 +757,7 @@ function state() {
   log('  архив:   ' + inRaw.size + ' записей');
   log('  выжимка: ' + inCur.size + ' записей / ' + curLines + ' строк   (предел ' + LIMIT_N + ' / ' + LIMIT_L + ')');
   log('');
-  log('  долг курации (нет в выжимке, решение не записано): ' + debt.length + (debt.length ? ' — ' + debt.map((n) => 'Л' + n).join(' ') : ''));
+  log('  долг курации (нет ни в одной выжимке: решение не записано или заявлено, но не внесено): ' + debt.length + (debt.length ? ' — ' + debt.map((n) => 'Л' + n).join(' ') : ''));
 
   const curBlocks = cur.split(/^(?=### Л\d+\.)/m).filter((b) => /^### Л\d+\./.test(b));
   const withFix = curBlocks.filter((b) => /\*\*Закрепление/.test(b)).length;
@@ -654,20 +767,24 @@ function state() {
      «14 записей» звучит как «столько всего читают», а по scope читают ещё два
      файла. Предел относится к КАЖДОЙ выжимке отдельно — он меряет стоимость
      чтения на одной задаче, а не объём журнала (урок Л79). */
-  const SHARDS = [
-    ['docs-split', '.opencode/skills/docs-split/references/lessons.md'],
-    ['lessons', '.opencode/skills/lessons/references/lessons.md'],
-  ];
-  const live = SHARDS.filter(([, p]) => existsSync(path.join(ROOT, p)));
   if (live.length) {
     log('');
     log('  шарды по scope (свой предел у каждого):');
     for (const [name, p] of live) {
-      const s = rd(path.join(ROOT, p));
+      const s = rd(p);
       log('    ' + name + ': ' + nums(s).length + ' записей / ' + s.split(/\r?\n/).length + ' строк');
     }
   }
   log('');
+  ritualFreshness();
+
+  /* Долг калибровки сметы контекста. Строку печатает САМ ctx-budget — здесь её
+     только показывают: логика долга у одного владельца, копия разошлась бы с
+     оригиналом (Л43). Долг вердикт не краснит: отсутствие замера — это не ложь
+     модели, а несделанная сверка, и она требует реального захода. */
+  const кб = runGateStep({ args: [CTX_BUDGET, '--calibration-state'], cwd: ROOT });
+  const кбСтрока = кб.out.split(/\r?\n/).find((l) => /калибровка сметы/.test(l));
+  if (кбСтрока) { log('  ' + кбСтрока.trim()); log(''); }
 
   const over = inCur.size > LIMIT_N || curLines > LIMIT_L;
   if (over) {
@@ -689,8 +806,13 @@ function state() {
    сработать на настоящей, а дефект — вернуться назавтра после закрытия урока.
 
    Различаются четыре состояния, и различаются машинно:
-     РЕГРЕСС   — код появился ПОЗЖЕ дня, которым урок объявил закрепление.
-                 Сигнала этого рода не было вовсе.
+     РЕГРЕСС   — код ВЕРНУЛСЯ: на файле, который после закрепления уже
+                 проходил без него. Первое срабатывание на новом файле — это
+                 сторож, поймавший новый экземпляр класса, а не сломанная
+                 починка; агрегатные цели («N файлов», режим `--parity`) к
+                 файлу не привязаны и в пофайловый разбор не идут. Если
+                 последний прогон файла чист, регресс уже закрыт и не
+                 показывается (Л49: всегда красный отчёт не несёт сигнала).
      ЖИВОЙ     — встречался в последних HORIZON прогонах инструмента.
      ИСЧЕЗ     — встречался раньше, в последних HORIZON прогонах нет.
                  Это и есть «обучение»: правило перестало срабатывать.
@@ -728,10 +850,7 @@ const fmtDay = (ms) => {
 /* Файлы журнала: архив, выжимка и шарды по scope. Шард — такой же журнал,
    и закрепление, объявленное в нём, обязано проверяться так же (Л79). */
 function journalFiles() {
-  const list = [RAW, CUR,
-    path.join(ROOT, '.opencode/skills/docs-split/references/lessons.md'),
-    path.join(ROOT, '.opencode/skills/lessons/references/lessons.md')];
-  return list.filter((p) => existsSync(p));
+  return [RAW, CUR, ...SHARDS.map(([, p]) => p)].filter((p) => existsSync(p));
 }
 
 /* Якорь → день, которым закрепление объявлено.
@@ -785,9 +904,48 @@ function fixtureIdsFor(ns) {
   const ids = new Set();
   for (const dir of (CORPUS[ns] || [])) {
     if (!existsSync(dir)) continue;
-    for (const f of readdirSync(dir)) if (f.endsWith('.bad.html')) ids.add(f.replace(/\.bad\.html$/, ''));
+    for (const f of readdirSync(dir)) if (f.endsWith('.bad.html')) ids.add(idOfFixture(f));
   }
   return ids;
+}
+
+/* Регресс — не «код сработал после закрепления», а «код ВЕРНУЛСЯ»: на файле,
+   который после закрепления уже проходил без него. Первое срабатывание на
+   новом файле — сторож, поймавший новый экземпляр класса, а не сломанная
+   починка. Агрегатные цели («N файлов», `--parity`, «(несколько)») к файлу не
+   привязаны и в пофайловый разбор не идут. Если последний прогон файла чист,
+   регресс закрыт и не показывается (Л49). */
+const isFileTarget = (t) => /\.html?\b/i.test(String(t || ''));
+
+function findRegressions(runs, fixed) {
+  const byFile = new Map();               // 'инструмент|файл' → прогоны, по времени
+  for (const r of runs) {
+    if (!isFileTarget(r.target)) continue;
+    const k = r.tool + '|' + r.target;
+    if (!byFile.has(k)) byFile.set(k, []);
+    byFile.get(k).push(r);
+  }
+  for (const list of byFile.values()) list.sort((a, b) => Date.parse(a.t) - Date.parse(b.t));
+
+  const out = [];
+  for (const [key, f] of fixed) {
+    const i = key.indexOf(':');
+    const ns = key.slice(0, i), id = key.slice(i + 1);
+    const after = f.day + 24 * 3600 * 1000;
+    let hit = null;
+    for (const [k, list] of byFile) {
+      if (!k.startsWith(ns + '|')) continue;
+      const target = k.slice(ns.length + 1);
+      const rs = list.filter((r) => Date.parse(r.t) >= after);
+      if (!rs.length) continue;
+      const last = rs[rs.length - 1];
+      if (!(last.codes || []).includes(id)) continue;      // последний прогон чист — закрыт
+      const earlierClean = rs.slice(0, -1).some((r) => !(r.codes || []).includes(id));
+      if (earlierClean && !hit) hit = { ns, id, f, last, target };
+    }
+    if (hit) out.push(hit);
+  }
+  return out;
 }
 
 function stats() {
@@ -825,7 +983,7 @@ function stats() {
   log('  дефект, починенный до ' + (times.length ? fmtDay(Math.min(...times)) : '—') + ', сюда не попадёт по построению.');
   log('');
 
-  const regress = [];
+  const regress = findRegressions(runs, fixed);
   let dead = 0, prevented = 0;
 
   for (const ns of RUN_TOOLS) {
@@ -853,10 +1011,6 @@ function stats() {
         else (!hasCorpus || fixtures.has(id) ? never : unproven).push(id);
         continue;
       }
-      const f = fixed.get(ns + ':' + id);
-      const t = Date.parse(last.t);
-      // строго ПОЗЖЕ дня закрепления: прогон того же дня — это и есть прогон, которым закрывали
-      if (f && t >= f.day + 24 * 3600 * 1000) { regress.push({ ns, id, f, last }); continue; }
       (recent.has(id) ? alive : gone).push(id);
     }
     dead += unproven.length;
@@ -887,6 +1041,378 @@ function stats() {
   return regress.length ? 1 : 0;
 }
 
+/* ---------------- gate ----------------
+
+   Одна команда в конце захода вместо шести–девяти отдельных прогонов. Гоняет
+   только то, что стережёт ИЗМЕНИВШЕЕСЯ.
+
+   Зачем. Раньше «гейта нет намеренно»: боялись девятого входа в тулчейн. Замер
+   13.09.2026 показал другую цену — не длительность проверок (0,2–0,3 сек, кроме
+   полного verify — 34 сек), а их ЧИСЛО: 06.09 за 18 задач verify прогнан 49
+   раз, сенсор 150, check 34. Каждый отдельный прогон — отдельный ход агента и
+   вывод, оседающий в контексте. Гейт не новый инструмент, а подкоманда этого
+   же файла: он заменяет входы, а не добавляет слой.
+
+   Изменения без git: снимок `gate-snapshot.json` — отпечатки файлов (путь →
+   mtime:размер) и список УПАВШИХ шагов. Снимка нет — прогон полный. Упавший
+   шаг перезапускается в следующем гейте, даже если файлы не менялись: красное
+   не исчезает молча. Отпечатки сохраняются всегда — иначе один старый красный
+   экран или репозиторный шаг заставлял бы перепроверять всё при каждом
+   запуске, и гейт стал бы «всегда красным» (Л37).
+
+   Вердикт читается строкой `ВЕРДИКТ:`, а не кодом выхода (ds-rules §8). */
+
+const GATE_SNAPSHOT = path.join(HERE, 'gate-snapshot.json');
+const DS = path.join(ROOT, 'DS-IBP');
+const TOOL_REL = '.opencode/skills/screen-review/tooling';
+const VENDOR = path.join(HERE, 'vendor-scan.mjs');
+const SPEC_AUDIT = path.join(DS, 'scripts/spec-audit.mjs');
+const DOCS_SPLIT = path.join(ROOT, '.opencode/skills/docs-split/tooling/docs-split.mjs');
+const CTX_BUDGET = path.join(ROOT, '.opencode/skills/session-plan/tooling/ctx-budget.mjs');
+const SELF = fileURLToPath(import.meta.url);
+
+const GATE_ROOTS = ['DS-IBP/styles', 'DS-IBP/scripts', 'DS-IBP/specs', 'DS-IBP/pages', 'DS-IBP/fixtures',
+  'DS-IBP/ds.css', 'Projects', '.opencode/rules', '.opencode/agents', '.opencode/commands', '.opencode/skills',
+  'AGENTS.md', 'opencode.json'];
+const GATE_SKIP_DIRS = new Set(['node_modules', '.git', 'uploads', 'screenshots']);
+// журнал прогонов и сам снимок меняет гейт — это не изменение работы
+const gateIgnored = (rel) => rel === TOOL_REL + '/runs.jsonl' || rel === TOOL_REL + '/gate-snapshot.json';
+const TEXT_EXT = /\.(md|json|js|mjs|cjs|html|css|txt|ya?ml|jsonc)$/i;
+
+const toRel = (abs) => path.relative(ROOT, abs).split(path.sep).join('/');
+
+function fingerprint() {
+  const out = {};
+  const walk = (abs) => {
+    let st;
+    try { st = statSync(abs); } catch { return; }
+    if (st.isDirectory()) {
+      for (const e of readdirSync(abs, { withFileTypes: true })) {
+        if (e.isDirectory() && GATE_SKIP_DIRS.has(e.name)) continue;
+        walk(path.join(abs, e.name));
+      }
+      return;
+    }
+    const rel = toRel(abs);
+    if (!gateIgnored(rel)) out[rel] = Math.round(st.mtimeMs) + ':' + st.size;
+  };
+  for (const r of GATE_ROOTS) walk(path.join(ROOT, r));
+  return out;
+}
+
+/* Страничный скрипт живёт в `DS-IBP/scripts/<kebab>.page.js`, страница — в
+   `DS-IBP/pages/<раздел>/<Pascal>.html`. Имена сверяются без дефисов и регистра. */
+function pageForScript(rel) {
+  const key = path.basename(rel).replace(/\.page\.js$/, '').replace(/-/g, '').toLowerCase();
+  const found = [];
+  const walk = (abs) => {
+    if (!existsSync(abs)) return;
+    for (const e of readdirSync(abs, { withFileTypes: true })) {
+      const p = path.join(abs, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith('.html') && e.name.replace(/\.html$/, '').toLowerCase() === key) found.push(toRel(p));
+    }
+  };
+  walk(path.join(DS, 'pages'));
+  return found;
+}
+
+const isDocsSplit = (rel) => {
+  try { return readFileSync(path.resolve(ROOT, rel), 'utf8').includes('class="page ds-split"'); } catch { return false; }
+};
+
+/* Шаги. `args` — аргументы node, `cwd` — откуда запускать (линтер разрешает
+   пути от корня ДС). Идентификатор шага дедуплицирует: пять правок стилей
+   дают один глобальный прогон линтера, а не пять. */
+function gateStep(id, paths = null) {
+  const [kind, target] = [id.slice(0, id.indexOf(':') < 0 ? id.length : id.indexOf(':')), id.includes(':') ? id.slice(id.indexOf(':') + 1) : ''];
+  const abs = target ? path.resolve(ROOT, target) : '';
+  const fromDs = target ? path.relative(DS, abs).split(path.sep).join('/') : '';
+  const dsRel = (rel) => path.relative(DS, path.resolve(ROOT, rel)).split(path.sep).join('/');
+  switch (kind) {
+    /* Пакет страниц ДС в полном режиме. Одним вызовом линтера, а не 65:
+       линтер пишет в журнал прогонов строку на вызов, и 65 чистых страниц
+       вытеснили бы настоящие экраны из окна, по которому `stats` делит коды на
+       «живой» и «исчез», — молчание прочиталось бы как обучение (runlog.mjs,
+       отсечение эталонов; поймано на первом полном гейте 13.09.2026). */
+    case 'lint-pages': {
+      const list = [...(paths || [])].sort();
+      return { title: 'линтер, страницы ДС пакетом — файлов: ' + list.length, args: ['scripts/ds-lint-cli.mjs', ...list.map(dsRel)], cwd: DS };
+    }
+    case 'sensor': return { title: 'сенсор ' + target, args: [SENSOR, abs], cwd: ROOT };
+    case 'lint': return { title: 'линтер ' + target, args: ['scripts/ds-lint-cli.mjs', fromDs], cwd: DS };
+    case 'split': return { title: 'docs-split check ' + target, args: [DOCS_SPLIT, 'check', target], cwd: ROOT };
+    case 'lint-global': return { title: 'линтер, глобальные правила', args: ['scripts/ds-lint-cli.mjs'], cwd: DS };
+    case 'parity': return { title: 'линтер --parity (доки = код)', args: ['scripts/ds-lint-cli.mjs', '--parity'], cwd: DS };
+    case 'spec-audit': return { title: 'spec-audit', args: [SPEC_AUDIT], cwd: DS };
+    case 'etalons': return { title: 'сенсор --etalons', args: [SENSOR, '--etalons'], cwd: ROOT };
+    case 'verify-sensor': return { title: 'verify --corpus sensor', args: [SELF, 'verify', '--corpus', 'sensor'], cwd: ROOT };
+    case 'verify-lint': return { title: 'verify --corpus lint', args: [SELF, 'verify', '--corpus', 'lint'], cwd: ROOT };
+    case 'anchors': return { title: 'anchors', args: [SELF, 'anchors'], cwd: ROOT };
+    case 'check': return { title: 'check (форма журнала уроков)', args: [SELF, 'check'], cwd: ROOT };
+    case 'stats': return { title: 'stats (регресс)', args: [SELF, 'stats'], cwd: ROOT };
+    case 'coverage': return { title: 'coverage (чек-листы)', args: [SELF, 'coverage'], cwd: ROOT };
+    case 'vendor': return { title: 'vendor-scan (нейтральность)', args: [VENDOR], cwd: ROOT };
+    /* Селфтест сметы контекста. Заведён 14.09.2026: инструмент написали, сторож
+       (обратный тест на известном провале) написали, а звать его забыли — гейт
+       на правку `stages.json` поднимал один vendor-scan. Сторож без вызывающего
+       не сторож; коэффициент можно было изменить мимоходом, и смета начала бы
+       врать молча. */
+    case 'ctx-budget': return { title: 'ctx-budget --selftest (смета контекста)', args: [CTX_BUDGET, '--selftest'], cwd: ROOT };
+    default: throw new Error('неизвестный шаг гейта: ' + id);
+  }
+}
+
+/* Матрица «изменилось → что гонять». Прозой не пересказывается — состав для
+   любого пути печатает `gate --dry --changed <путь>` (Л43). */
+function gateStepsFor(rel, deleted) {
+  const s = [];
+  const add = (...ids) => s.push(...ids);
+  const inFixtures = rel.split('/').includes('fixtures');
+  const html = rel.endsWith('.html');
+
+  if (deleted) {
+    if (rel.startsWith('DS-IBP/')) add('lint-global', 'parity');
+    return s;
+  }
+  // экран: в репозитории — Projects/**, вне репозитория — только через --changed (проверка откатом на копии)
+  if (html && !inFixtures && (rel.startsWith('Projects/') || rel.startsWith('..'))) {
+    /* Фрагмент модульного экрана инструменты пропускают (fragments.mjs) —
+       проверяется то, во что он вшит: источник и его собранный файл. */
+    const hosts = rel.startsWith('..') ? [] : includersOf(path.resolve(ROOT, rel));
+    if (hosts.length) {
+      for (const h of hosts) {
+        const built = assembledOf(h);
+        for (const t of [h, built].filter(Boolean)) add('sensor:' + toRel(t), 'lint:' + toRel(t));
+      }
+    } else add('sensor:' + rel, 'lint:' + rel);
+  }
+  if (rel.startsWith('Projects/test/fixtures/') || rel.startsWith('DS-IBP/fixtures/')) add('verify-lint', 'anchors');
+
+  if (/^DS-IBP\/pages\/.+\.html$/.test(rel)) {
+    add('lint:' + rel);
+    if (isDocsSplit(rel)) add('split:' + rel);
+  }
+  if (/^DS-IBP\/scripts\/[^/]+\.page\.js$/.test(rel)) {
+    const pages = pageForScript(rel);
+    if (!pages.length) add('lint-global');
+    for (const p of pages) { add('lint:' + p); if (isDocsSplit(p)) add('split:' + p); }
+  } else if (rel === 'DS-IBP/scripts/ds-lint.js' || rel === 'DS-IBP/scripts/ds-lint-cli.mjs') {
+    add('verify-lint', 'anchors', 'lint-global', 'parity');
+  } else if (rel === 'DS-IBP/scripts/spec-audit.mjs') {
+    add('anchors', 'spec-audit');
+  } else if (/^DS-IBP\/scripts\/[^/]+\.js$/.test(rel)) {
+    add('lint-global', 'parity', 'etalons');
+  }
+  if (rel.startsWith('DS-IBP/styles/') || rel === 'DS-IBP/ds.css') add('lint-global', 'parity', 'etalons');
+  if (rel.startsWith('DS-IBP/specs/')) add('parity', 'spec-audit');
+  // каталог компонентов в правилах агента сверяется с манифестом — проход 8 аудита
+  if (rel === '.opencode/rules/ds-rules.md') add('spec-audit');
+
+  if (rel === TOOL_REL + '/layout-check.mjs' || rel.startsWith(TOOL_REL + '/fixtures/')) add('verify-sensor', 'anchors', 'etalons');
+  if (rel === TOOL_REL + '/lessons-cli.mjs' || rel === TOOL_REL + '/runlog.mjs') add('verify-sensor', 'verify-lint', 'anchors', 'check', 'coverage', 'stats');
+  if (rel === TOOL_REL + '/anchors.json') add('anchors', 'check');
+  if (rel.startsWith('.opencode/skills/session-plan/')) add('ctx-budget');
+  if (/^\.opencode\/skills\/[^/]+\/references\/[^/]+\.html$/.test(rel)) add('etalons');
+  if (/(^|\/)lessons(-raw)?\.md$/.test(rel) && rel.startsWith('.opencode/')) add('check', 'stats');
+  if (rel === TOOL_REL + '/coverage.json' || rel === '.opencode/skills/screen-review/SKILL.md' || rel === '.opencode/skills/composition-review/SKILL.md') add('coverage');
+  if (TEXT_EXT.test(rel) && !rel.startsWith('..')) add('vendor');
+  return s;
+}
+
+const GATE_FULL = ['lint-global', 'parity', 'spec-audit', 'etalons', 'verify-sensor', 'verify-lint', 'anchors', 'check', 'stats', 'coverage', 'ctx-budget', 'vendor'];
+// порядок: сначала дешёвое и пофайловое, в конце — дорогое и репозиторное
+const GATE_ORDER = ['sensor', 'lint', 'lint-pages', 'split','lint-global', 'parity', 'spec-audit', 'etalons', 'anchors', 'check', 'coverage', 'ctx-budget', 'stats', 'verify-sensor', 'verify-lint', 'vendor'];
+const kindOf = (id) => id.split(':')[0];
+
+// строки находок, которые показываются при FAIL; остальной вывод остаётся за кадром
+const FINDING = /^\s*(FAIL|BLOCKER|NEEDS-WORK|НЕ ДОКАЗАН|БЛОКЕР|РЕГРЕСС|ОШИБКА|ВЕРДИКТ|ЖУРНАЛ)|Л-[А-ЯЁ]+|находок: [1-9]|^\s{2}\S+:\d+ — /u;
+
+function runGateStep(step) {
+  const t0 = Date.now();
+  let out = '', code = 0;
+  try {
+    out = execFileSync(process.execPath, step.args, { cwd: step.cwd, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, timeout: 300000, windowsHide: true });
+  } catch (e) {
+    out = String(e.stdout || '') + String(e.stderr || '');
+    code = typeof e.status === 'number' ? e.status : 1;
+  }
+  return { out, code, sec: (Date.now() - t0) / 1000 };
+}
+
+function gate() {
+  const full = flag('--full');
+  const dry = flag('--dry');
+  const changedArg = value('--changed');
+  const now = fingerprint();
+  let snapExists = existsSync(GATE_SNAPSHOT);
+  let snap = {}, prevFailed = [];
+  if (snapExists) {
+    try {
+      const j = JSON.parse(rd(GATE_SNAPSHOT));
+      snap = j.files || {};
+      prevFailed = Array.isArray(j.failed) ? j.failed : [];
+    } catch { snapExists = false; }     // битый снимок — как отсутствующий: полный прогон
+  }
+
+  /* Набор изменений. `--changed` подменяет его целиком и снимок не трогает:
+     это режим проверки самой матрицы, а не работы. */
+  let changed = [], deleted = [];
+  if (changedArg) {
+    changed = changedArg.split(',').map((p) => p.trim()).filter(Boolean)
+      .map((p) => { const abs = path.resolve(ROOT, p); return toRel(abs); });
+  } else if (!full && snapExists) {
+    changed = Object.keys(now).filter((k) => now[k] !== snap[k]);
+    deleted = Object.keys(snap).filter((k) => !(k in now));
+  }
+  const isFull = !changedArg && (full || !snapExists);
+
+  const byStep = new Map();          // id шага → пути, которые его вызвали
+  const want = (id, rel) => { if (!byStep.has(id)) byStep.set(id, new Set()); if (rel) byStep.get(id).add(rel); };
+  if (isFull) {
+    for (const rel of Object.keys(now)) {
+      for (const id of gateStepsFor(rel, false)) {
+        if (id.startsWith('lint:DS-IBP/pages/')) want('lint-pages', id.slice(5));
+        else want(id, rel);
+      }
+    }
+    for (const id of GATE_FULL) want(id, null);
+  } else {
+    for (const rel of changed) for (const id of gateStepsFor(rel, false)) want(id, rel);
+    for (const rel of deleted) for (const id of gateStepsFor(rel, true)) want(id, rel);
+  }
+  /* Упавшее в прошлый раз. Пофайловый шаг, чей файл не менялся, НЕ
+     перезапускается: результат не может измениться, а изменённый файл и так
+     попал в набор выше. Такой долг переносится в снимок и печатается одной
+     строкой. Репозиторный шаг зависит от многих файлов — он перезапускается.
+     В режиме `--changed` долг не подмешивается: там проверяется матрица. */
+  const retried = [], carried = [];
+  if (!changedArg && !isFull) {
+    for (const id of prevFailed) {
+      if (byStep.has(id)) continue;
+      const target = id.includes(':') ? id.slice(id.indexOf(':') + 1) : '';
+      if (target && !(target in now)) continue;          // файл удалён — долга больше нет
+      if (target) { carried.push(id); continue; }
+      retried.push(id);
+      if (id === 'lint-pages') for (const rel of Object.keys(now)) { if (/^DS-IBP\/pages\/.+\.html$/.test(rel)) want(id, rel); }
+      else want(id, null);
+    }
+  }
+  const ids =[...byStep.keys()].sort((a, b) => GATE_ORDER.indexOf(kindOf(a)) - GATE_ORDER.indexOf(kindOf(b)) || a.localeCompare(b));
+
+  log('== gate: проверки по изменениям ==');
+  if (isFull) log('режим: полный' + (full ? ' (--full)' : ' (снимка нет — первый прогон на этой машине)'));
+  else log('изменено: ' + changed.length + (deleted.length ? ' · удалено: ' + deleted.length : '') + (changedArg ? ' (задано --changed, снимок не обновляется)' : ''));
+  if (!isFull) for (const rel of [...changed, ...deleted].slice(0, 15)) log('  ' + rel + (deleted.includes(rel) ? ' (удалён)' : ''));
+  if (!isFull && changed.length + deleted.length > 15) log('  … и ещё ' + (changed.length + deleted.length - 15));
+  if (retried.length) log('повтор упавшего в прошлом гейте (репозиторные шаги): ' + retried.length);
+  log('');
+
+  const logCarried = () => {
+    if (!carried.length) return;
+    const files = [...new Set(carried.map((id) => id.slice(id.indexOf(':') + 1)))];
+    log('ДОЛГ: ' + carried.length + ' красн. шаг. на ' + files.length + ' файл. — не менялись, не перезапускались, вердикт не меняют: ' +
+        files.slice(0, 4).map((f) => path.basename(f)).join(', ') + (files.length > 4 ? ' …' : '') + ' (разбор — gate --full)');
+  };
+
+  if (!ids.length) {
+    log(changed.length + deleted.length ? 'изменения не задевают ни одного сторожа — проверок 0' : 'изменений с прошлого гейта нет — проверок 0');
+    logCarried();
+    if (!changedArg && !dry && (changed.length || deleted.length)) saveSnapshot(now, carried);
+    log('ВЕРДИКТ: OK');
+    return 0;
+  }
+  if (dry) {
+    log('шаги (--dry, не запускаются): ' + ids.length);
+    for (const id of ids) log('  ' + gateStep(id, byStep.get(id)).title);
+    return 0;
+  }
+
+  /* Прогон по НАСТОЯЩЕМУ файлу обязан оставить строку в журнале прогонов: на
+     нём стоит `stats`. Инструмент, который молча не пишет, делает регресс
+     невидимым — так с 12.09.2026 линтер не писал ни одного прогона по экрану
+     (путь `../Projects/…` журнал счёл внешним). Сторож стоит здесь, потому что
+     гейт — единственное место, которое знает, что прогон был настоящим. */
+  const journalLines = () => (existsSync(RUNS) ? rd(RUNS).split('\n').filter(Boolean).length : 0);
+  const MUST_LOG = new Set(['sensor', 'lint', 'lint-pages']);
+  const results = [];
+  for (const id of ids) {
+    const step = gateStep(id, byStep.get(id));
+    const target = id.includes(':') ? id.slice(id.indexOf(':') + 1) : '';
+    const before = journalLines();
+    const r = runGateStep(step);
+    // ПРОПУЩЕН — инструмент сам объявил, что файл не его вход; строки в журнале у пропуска нет по устройству
+    if (MUST_LOG.has(kindOf(id)) && !target.startsWith('..') && !/^ПРОПУЩЕН:/m.test(r.out) && journalLines() === before) {
+      r.code = r.code || 1;
+      r.out += '\nЖУРНАЛ: прогон по настоящему файлу не записан в runs.jsonl — stats его не видит (класс Л100)';
+    }
+    results.push({ id, step, debt: retried.includes(id), ...r });
+  }
+
+  /* Вывод сжат: он оседает в контексте агента. Прошедшие пофайловые шаги
+     сворачиваются в строку на вид проверки; находки печатаются только у
+     упавших. Долг прошлых гейтов — упавшее раньше и не задетое текущей
+     правкой — идёт отдельной строкой и вердикт НЕ краснит: иначе старый
+     красный экран краснил бы каждый гейт, и FAIL перестал бы читаться (Л37). */
+  const fresh = results.filter((r) => !r.debt);
+  const failedNow = fresh.filter((r) => r.code !== 0);
+  const okNow = fresh.filter((r) => r.code === 0);
+  const perFile = new Set(['sensor', 'lint', 'split']);
+  const sec = (s) => s.toFixed(1).replace('.', ',') + ' с';
+
+  if (okNow.length <= 8) {
+    for (const r of okNow) log('OK    ' + r.step.title + '  (' + sec(r.sec) + ')');
+  } else {
+    const groups = new Map();
+    for (const r of okNow) {
+      const k = kindOf(r.id);
+      if (!perFile.has(k)) { log('OK    ' + r.step.title + '  (' + sec(r.sec) + ')'); continue; }
+      const g = groups.get(k) || { n: 0, sec: 0, title: r.step.title.split(' ')[0] + (k === 'split' ? ' check' : '') };
+      g.n++; g.sec += r.sec; groups.set(k, g);
+    }
+    for (const g of groups.values()) log('OK    ' + g.title + ' — файлов: ' + g.n + '  (' + sec(g.sec) + ')');
+  }
+  const limit = failedNow.length > 3 ? 8 : 30;
+  for (const r of failedNow) {
+    log('FAIL  ' + r.step.title + '  (' + sec(r.sec) + ')');
+    const lines = r.out.split(/\r?\n/).filter((l) => FINDING.test(l));
+    const show = (lines.length ? lines : r.out.split(/\r?\n/).filter((l) => l.trim()).slice(-10)).slice(0, limit);
+    for (const l of show) log('      ' + l.trimEnd());
+    if (lines.length > limit) log('      … ещё ' + (lines.length - limit) + ' — полный вывод: node ' + r.step.args.map((a) => path.isAbsolute(a) ? toRel(a) : a).join(' '));
+  }
+
+  const debtRes = results.filter((r) => r.debt);
+  const debtRed = debtRes.filter((r) => r.code !== 0);
+  if (debtRes.length) {
+    log('');
+    log('ДОЛГ прошлых гейтов (текущей правкой не задет, вердикт не меняет): красных ' + debtRed.length + ' · починилось ' + (debtRes.length - debtRed.length));
+    for (const r of debtRed.slice(0, 10)) log('      ' + r.step.title);
+    if (debtRed.length > 10) log('      … и ещё ' + (debtRed.length - 10));
+  }
+  if (carried.length) { log(''); logCarried(); }
+
+  // долг курации не зависит от текущей правки и вердикт не краснит, но молча не проходит
+  const st = runGateStep({ args: [SELF, 'state'], cwd: ROOT });
+  const debtLine = st.out.split(/\r?\n/).find((l) => /долг курации/.test(l));
+  /* Тем же приёмом — долг калибровки сметы. Он не зависит ни от правки, ни от
+     вердикта: его нельзя закрыть внутри репозитория, нужен факт реального
+     захода. Поэтому он печатается при закрытии ЛЮБОГО захода, пока не закрыт:
+     напоминание, не требующее, чтобы о нём помнили. */
+  const калибровка = st.out.split(/\r?\n/).find((l) => /калибровка сметы/.test(l));
+
+  if (!changedArg) saveSnapshot(now, [...results.filter((r) => r.code !== 0).map((r) => r.id), ...carried]);
+
+  log('');
+  if (st.code !== 0 && debtLine) log('ВНИМАНИЕ: ' + debtLine.trim() + ' — курация обязательна (скилл lessons)');
+  if (калибровка) log('ВНИМАНИЕ: ' + калибровка.trim());
+  log(failedNow.length ? 'ВЕРДИКТ: FAIL (' + failedNow.length + ' из ' + fresh.length + ')' : 'ВЕРДИКТ: OK (' + fresh.length + ' шаг.)');
+  return failedNow.length ? 1 : 0;
+}
+
+function saveSnapshot(files, failed) {
+  writeFileSync(GATE_SNAPSHOT, JSON.stringify({ files, failed }) + '\n', 'utf8');
+}
+
 /* ---------------- main ---------------- */
 
 const argv = process.argv.slice(2);
@@ -894,7 +1420,8 @@ const cmd = argv[0];
 const flag = (name) => argv.includes(name);
 const value = (name) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : null; };
 
-if (cmd === 'verify') process.exit(verify());
+if (cmd === 'verify') process.exit(verify(value('--only'), value('--corpus')));
+else if (cmd === 'gate') process.exit(gate());
 else if (cmd === 'coverage') process.exit(coverage());
 else if (cmd === 'anchors') process.exit(cmdAnchors(flag('--write')));
 else if (cmd === 'check') process.exit(cmdCheck());
@@ -903,7 +1430,8 @@ else if (cmd === 'state') process.exit(state());
 else if (cmd === 'stats') process.exit(stats());
 else {
   log('Использование:');
-  log('  node lessons-cli.mjs verify            — доказать сторожей откатом на фикстурах');
+  log('  node lessons-cli.mjs gate [--full] [--dry] [--changed <путь,…>] — проверки по изменениям, одной командой в конце захода');
+  log('  node lessons-cli.mjs verify [--only <ID>] [--corpus sensor|lint] — доказать сторожей откатом на фикстурах');
   log('  node lessons-cli.mjs coverage          — чем закрыт каждый пункт чек-листов');
   log('  node lessons-cli.mjs anchors [--write]  — реестр живых идентификаторов против кода');
   log('  node lessons-cli.mjs check             — форма записей журнала: якоря, уровни, поля');

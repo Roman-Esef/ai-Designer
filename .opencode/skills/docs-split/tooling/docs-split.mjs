@@ -11,45 +11,31 @@
                            (CSS берётся из файла, модель его не читает)
      check <page>        — структурные проверки: баланс тегов, остатки
                            ds-toc/pg-kit, splitpane--app, src-code, panes
-     verify <page>       — headless Chrome: temp-копия + харнесс +
-                           --dump-dom → извлечь #diag → удалить копию
+
+   Браузерная подкоманда verify (headless Chrome) удалена 13.09.2026: в рабочем
+   контуре браузер по скрипту запрещён (ds-rules §9), а rollout с ней краснел всегда.
 
    Запуск (из корня репо):
      node .opencode/skills/docs-split/tooling/docs-split.mjs <cmd> [page]
 
-   Код выхода: 1 при любой невыполненной проверке (check/verify), иначе 0.
+   Код выхода: 1 при любой невыполненной проверке, иначе 0.
    ============================================================ */
-import { readFile, writeFile, readdir, unlink, rm } from 'node:fs/promises';
+import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import os from 'node:os';
+import { fileURLToPath } from 'node:url';
 
 const run = promisify(execFile);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const DS = path.join(ROOT, 'DS-IBP');
 const TOOL = path.dirname(fileURLToPath(import.meta.url));
-const HARNESS = path.join(TOOL, 'diag-harness.js');
 const INDEX_MD = path.join(DS, 'specs', '_index.md');
 const PAGES_INDEX = path.join(TOOL, '..', 'references', 'pages-index.md');
 
 const PAGE_DIRS = ['foundations', 'atoms', 'molecules', 'organisms', 'patterns'];
-
-const CHROME_CANDIDATES = [
-  process.env.DS_CHROME,
-  // macOS (корпоративный контур)
-  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
-  '/Applications/Chromium.app/Contents/MacOS/Chromium',
-  // Windows (домашний ПК)
-  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-  path.join(os.homedir(), 'AppData', 'Local', 'Google', 'Chrome', 'Application', 'chrome.exe'),
-  'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
-].filter(Boolean);
 
 /* ---------------- helpers ---------------- */
 
@@ -423,7 +409,6 @@ async function cmdRollout(pageArg) {
   steps.push(['inject css', [tool, 'inject', rel]]);
   steps.push(['inject html', [tool, 'inject', rel, '--html']]);
   steps.push(['check', [tool, 'check', rel]]);
-  steps.push(['verify', [tool, 'verify', rel]]);
   let failed = 0;
   for (const [st, args] of steps) {
     log('\n=== ' + st + ' ===');
@@ -440,67 +425,6 @@ async function cmdRollout(pageArg) {
   log('\n' + '='.repeat(40));
   log(failed === 0 ? 'ВЕРДИКТ: OK' : `ВЕРДИКТ: FAIL (${failed} шаг(а))`);
   process.exit(failed === 0 ? 0 : 1);
-}
-
-/* ---------------- verify ---------------- */
-
-function findChrome() {
-  for (const c of CHROME_CANDIDATES) {
-    if (c && existsSync(c)) return c;
-  }
-  fail('Chrome/Edge не найден — задай путь через DS_CHROME');
-}
-
-async function cmdVerify(pageArg) {
-  const p = pagePath(pageArg);
-  const name = path.basename(p, '.html');
-  const dir = path.dirname(p);
-  const diagPath = path.join(dir, name + '.diag.html');
-
-  const page = await readUtf8(p);
-  const harness = await readUtf8(HARNESS);
-  if (!/<\/body>/i.test(page)) fail(`${name}.html: нет </body>`);
-  const diagHtml = page.replace(/<\/body>/i, `<script>${harness}</script>\n</body>`);
-  await writeUtf8(diagPath, diagHtml);
-
-  const chrome = findChrome();
-  const url = pathToFileURL(diagPath).href;
-  /* уникальный профиль на запуск: общий --user-data-dir блокируется первым
-     headless-процессом и даёт ложные FAIL при параллельных verify (урок Л9) */
-  const profile = path.join(os.tmpdir(), 'opencode', 'dsv-' + Date.now() + '-' + Math.random().toString(36).slice(2));
-
-  try {
-    const { stdout } = await run(chrome, [
-      '--headless=new', '--disable-gpu', '--no-sandbox', '--allow-file-access-from-files',
-      `--user-data-dir=${profile}`, '--window-size=1600,900',
-      '--virtual-time-budget=30000', '--dump-dom', url,
-    ], { maxBuffer: 32 * 1024 * 1024, timeout: 90000, windowsHide: true });
-
-    // последнее вхождение pre#diag (в комментариях страницы может быть похожий текст)
-    const matches = [...stdout.matchAll(/<pre id="diag">([\s\S]*?)<\/pre>/g)];
-    const m = matches.length ? matches[matches.length - 1] : null;
-    log(`== verify ${name} ==`);
-    if (!m) { log('DIAG НЕ НАЙДЕН — страница могла не догрузиться'); process.exitCode = 1; return; }
-    log(m[1].trim());
-    // автоассерты по ключевым инвариантам
-    const d = m[1];
-    const asserts = [
-      [/main\.ds-split: yes/, 'main.ds-split'],
-      [/TOC links: (\d+)/, 'TOC'],
-      [/code-out lengths: (?!-|\/|-?\/)\d+\/\d+\/\d+/, 'код заполнен'],
-    ];
-    let bad = 0;
-    for (const [re, label] of asserts) {
-      const okk = re.test(d);
-      log((okk ? 'PASS' : 'FAIL') + '  автоассерт: ' + label);
-      if (!okk) bad++;
-    }
-    log(bad === 0 ? 'ВЕРДИКТ: OK' : `ВЕРДИКТ: FAIL (${bad})`);
-    process.exitCode = bad === 0 ? 0 : 1;
-  } finally {
-    try { await unlink(diagPath); } catch { /* уже удалён */ }
-    try { await rm(profile, { recursive: true, force: true }); } catch { /* профиль мог не создаться */ }
-  }
 }
 
 /* ---------------- map ---------------- */
@@ -569,7 +493,7 @@ async function cmdMap() {
 const args = process.argv.slice(2);
 const cmd = args[0];
 if (!cmd) {
-  log('Использование: node docs-split.mjs <map|scaffold|inject|rollout|check|verify> [page] [--css styles/x.css] [--html]');
+  log('Использование: node docs-split.mjs <map|scaffold|inject|rollout|check> [page] [--css styles/x.css] [--html]');
   process.exit(1);
 }
 const pageArg = args.slice(1).find((a) => !a.startsWith('--'));
@@ -583,7 +507,6 @@ try {
   else if (cmd === 'inject') await cmdInject(pageArg, explicitCss, wantHtml);
   else if (cmd === 'rollout') await cmdRollout(pageArg);
   else if (cmd === 'check') await cmdCheck(pageArg);
-  else if (cmd === 'verify') await cmdVerify(pageArg);
   else fail(`неизвестная команда: ${cmd}`);
 } catch (e) {
   fail(e.message);

@@ -5,10 +5,10 @@
 
      1. scripts/ds-lint-cli.mjs <page>        — статический ревизор целостности ДС
      2. docs-split.mjs check <page>           — структурные проверки docs-split
-     3. docs-split.mjs verify <page>          — headless-проверка живости
 
-   Для страниц НЕ на docs-split (экраны из Projects/test, старые страницы) шаги 2–3
-   пропускаются — остаётся только ds-lint.
+   Для страниц НЕ на docs-split (экраны из Projects/test, старые страницы) шаг 2
+   пропускается — остаётся только ds-lint. Браузерный шаг verify удалён 13.09.2026:
+   в рабочем контуре браузер по скрипту запрещён (ds-rules §9).
 
    Запуск:
      node scripts/ds-check.mjs <страница>
@@ -29,11 +29,9 @@ const DS_LINT = path.join(ROOT, 'scripts', 'ds-lint-cli.mjs');
 const DOCS_SPLIT = path.join(WS, '.opencode', 'skills', 'docs-split', 'tooling', 'docs-split.mjs');
 
 const argv = process.argv.slice(2);
-const withVerify = argv.includes('--with-verify') || !!process.env.DS_CHROME;
-const skipped = [];
 const page = argv.find((a) => !a.startsWith('--'));
 if (!page) {
-  console.error('Использование: node scripts/ds-check.mjs <страница> [--with-verify]');
+  console.error('Использование: node scripts/ds-check.mjs <страница>');
   process.exit(2);
 }
 
@@ -52,13 +50,6 @@ const steps = [
 ];
 if (isDocsSplit) {
   steps.push(['docs-split check', [DOCS_SPLIT, 'check', pageWs]]);
-  /* Шаг живости запускает headless-браузер. В рабочем контуре это запрещено
-     (ds-rules §9), Chrome там нет, и шаг падал кодом 2 — «ВЕРДИКТ: FAIL» стал
-     штатным состоянием гейта на всех раскатанных страницах. Гейт, который
-     всегда красный, не несёт сигнала (это класс урока Л37). Теперь шаг явный:
-     флаг --with-verify или заданный DS_CHROME. */
-  if (withVerify) steps.push(['docs-split verify', [DOCS_SPLIT, 'verify', pageWs]]);
-  else skipped.push('docs-split verify (нужен браузер; включить — флагом --with-verify или переменной DS_CHROME)');
 }
 
 let failed = 0;
@@ -76,6 +67,5 @@ for (const [name, args] of steps) {
 }
 
 console.log('\n' + '='.repeat(40));
-for (const s of skipped) console.log(`ПРОПУЩЕН: ${s}`);
 console.log(failed === 0 ? 'ВЕРДИКТ: OK' : `ВЕРДИКТ: FAIL (${failed} шаг(а))`);
 process.exit(failed === 0 ? 0 : 1);

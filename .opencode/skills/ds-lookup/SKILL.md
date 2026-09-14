@@ -130,7 +130,7 @@ grep -o "^[^#].*" DS-IBP/specs/Icons.md | tail -1 | tr '·' '\n' | grep -i "arro
 | Типографика (`--type-*`, классы `.ds-*`) | `sed -n '/^## Ключевые/,/^## /p' DS-IBP/specs/Typography.md` |
 | Отступы, шкала `--space-*`, сетка `.grid12`/`.col-N` | `sed -n '/^## Spacing/,/^## /p' DS-IBP/specs/_cheatsheet.md` |
 | Радиусы | `grep -n "radius" DS-IBP/styles/radius.css` |
-| Тени | `grep -n "shadow" DS-IBP/styles/elevation.css` |
+| Тени | `grep -n "shadow" DS-IBP/styles/shadow.css` |
 
 Ищешь конкретный токен по имени — `grep -rn "имя-токена" DS-IBP/styles/`.
 

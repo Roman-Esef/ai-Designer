@@ -442,7 +442,7 @@ function openable(anchor, trigger, menu, placement, align) {
     ['A–Я', 'Быстрый переход по первой букве (typeahead)'],
   ];
   const tb = document.querySelector('#kbd-table');
-  if (tb) tb.innerHTML = rows.map(([k, v]) => `<div class="tbl__row" style="grid-template-columns:8px 0.6fr 2.2fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>${k}</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">${v}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
+  if (tb) tb.innerHTML = rows.map(([k, v]) => `<div class="tbl__row" style="grid-template-columns:8px 1.1fr 1.7fr 8px;"><div class="tc tc--separator"></div><div class="tc"><span class="tc__row"><span class="tc__text"><kbd>${k}</kbd></span></span></div><div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">${v}</span></span></div><div class="tc tc--separator"></div></div>`).join('');
 })();
 
 /* =========================================================================
