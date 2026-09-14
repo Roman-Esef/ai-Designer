@@ -109,6 +109,24 @@
   .thr__compose .inp { width: 100%; }
   .thr__spacer   { flex: 1; }
 
+  /* Два вида композера, переключаются кнопкой refresh рядом с конструктором.
+     Парное [hidden] обязательно — объявленный display перебивает UA-правило. */
+  .thr__variant  { display: flex; flex-direction: column; gap: var(--space-8); }
+  .thr__variant[hidden] { display: none; }
+
+  /* ── Композер-плашка — локальный компонент направления ───────────────────
+     Альтернативный вид поля ввода: текст и ряд действий внутри одной рамки,
+     отправка — квадратной кнопкой со стрелкой. Компонента в ДС нет; поверхность,
+     рамка и фокус взяты у поля ввода ДС (--bg-tile, --border-primary, --primary,
+     --primary-bg-light), радиус — как у поповеров (--radius-xl), кнопки и
+     иконки — Button и IconButton. Рамка подсвечивается только от фокуса в
+     самом тексте, не от кнопок ряда. */
+  .cbox          { display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12) var(--space-12) var(--space-12) var(--space-16); background: var(--bg-tile); border: 1px solid var(--border-primary); border-radius: var(--radius-xl); transition: border-color .15s ease, box-shadow .15s ease; }
+  .cbox:has(.cbox__control:focus) { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-bg-light); }
+  .cbox__control { display: block; width: 100%; min-height: var(--space-40); padding: 0; border: 0; outline: 0; resize: none; background: transparent; font: var(--type-body-m); color: var(--text-primary); }
+  .cbox__control::placeholder { color: var(--text-inactive); opacity: 1; }
+  .cbox__row     { display: flex; align-items: center; gap: var(--space-12); }
+
   /* Стартовое состояние нити центрируется в свободной высоте.
      Парное [hidden] обязательно: объявленный display (0,1,0) перебивает
      UA-правило [hidden]{display:none} (0,0,0), и атрибут молча перестаёт
@@ -314,17 +332,36 @@
             <!-- ── Композер (БТ-3.2, БТ-3.4, БТ-6.1) ─────────────────────── -->
             <div class="thr__compose">
               <div class="chiplist" id="cmpFiles" role="group" aria-label="Файлы, приложенные к сообщению"></div>
-              <div class="inp inp--m inp--multiline">
-                <div class="inp__field">
-                  <textarea class="inp__control" id="cmpInput" rows="2" placeholder="Задайте вопрос, уточните постановку или опишите задачу…" aria-label="Сообщение в нить" aria-describedby="cmpHelp"></textarea>
+
+              <!-- Вид 1: поле ввода ДС + ряд действий под ним -->
+              <div class="thr__variant" data-composer="field">
+                <div class="inp inp--m inp--multiline">
+                  <div class="inp__field">
+                    <textarea class="inp__control" id="cmpInput" rows="2" placeholder="Задайте вопрос, уточните постановку или опишите задачу…" aria-label="Сообщение в нить" aria-describedby="cmpHelp"></textarea>
+                  </div>
+                  <span class="ds-helper ds-helper--left" id="cmpHelp">Enter — отправить, Shift+Enter — перенос строки. К сообщению можно приложить PDF, Word, PowerPoint и Excel.</span>
                 </div>
-                <span class="ds-helper ds-helper--left" id="cmpHelp">Enter — отправить, Shift+Enter — перенос строки. К сообщению можно приложить PDF, Word, PowerPoint и Excel.</span>
+                <div class="thr__row">
+                  <button class="btn btn--outline btn--s" id="btnAttach"><i data-icon="attach"></i><span class="btn__label">Приложить файлы</span></button>
+                  <button class="btn btn--outline btn--s" onclick="location.href='RequestBuilder.html'"><i data-icon="ai-stars"></i><span class="btn__label">Конструктор отчётов</span></button>
+                  <button type="button" class="ibtn ibtn--neutral ibtn--m" data-act="composer-toggle" aria-label="Другой вид поля ввода" data-tooltip="Другой вид поля ввода"><i data-icon="refresh"></i></button>
+                  <span class="thr__spacer"></span>
+                  <button class="btn btn--accent btn--s" id="btnSend"><i data-icon="send"></i><span class="btn__label">Отправить</span></button>
+                </div>
               </div>
-              <div class="thr__row">
-                <button class="btn btn--outline btn--s" id="btnAttach"><i data-icon="attach"></i><span class="btn__label">Приложить файлы</span></button>
-                <button class="btn btn--outline btn--s" onclick="location.href='RequestBuilder.html'"><i data-icon="ai-stars"></i><span class="btn__label">Конструктор отчётов</span></button>
-                <span class="thr__spacer"></span>
-                <button class="btn btn--accent btn--s" id="btnSend"><i data-icon="send"></i><span class="btn__label">Отправить</span></button>
+
+              <!-- Вид 2: композер-плашка — текст и действия внутри одной рамки -->
+              <div class="thr__variant" data-composer="box" hidden>
+                <div class="cbox">
+                  <textarea class="cbox__control" id="cmpInputBox" rows="2" placeholder="Задайте вопрос или опишите задачу…" aria-label="Сообщение в нить" aria-describedby="cmpHelp"></textarea>
+                  <div class="cbox__row">
+                    <button type="button" class="ibtn ibtn--neutral ibtn--m" id="btnAttachBox" aria-label="Приложить файлы" data-tooltip="Приложить файлы"><i data-icon="attach"></i></button>
+                    <button class="btn btn--outline btn--s" onclick="location.href='RequestBuilder.html'"><i data-icon="file-basic"></i><span class="btn__label">Собрать отчёт</span></button>
+                    <button type="button" class="ibtn ibtn--neutral ibtn--m" data-act="composer-toggle" aria-label="Другой вид поля ввода" data-tooltip="Другой вид поля ввода"><i data-icon="refresh"></i></button>
+                    <span class="thr__spacer"></span>
+                    <button type="button" class="btn btn--accent btn--s btn--icon-only" id="btnSendBox" aria-label="Отправить" data-tooltip="Отправить"><i data-icon="arrow-up"></i></button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1053,7 +1090,7 @@
 
   /* ── Отправка сообщения ───────────────────────────────────────────────── */
   function send() {
-    var field = el('cmpInput');
+    var field = composerField();
     var q = field.value.trim();
     if (!q) {
       if (window.DSSnack) window.DSSnack.show({ tone: 'warning', title: 'Пустое сообщение', text: 'Введите вопрос или уточнение.' });
@@ -1150,6 +1187,7 @@
       if (window.DSModal) window.DSModal.closeTop();
       startRun('Перезапуск по прежним вводным для актуализации данных. Предыдущие версии материала сохранены.');
     }
+    else if (act === 'composer-toggle') { setComposer(S.composer === 'box' ? 'field' : 'box', true); }
     else if (act === 'new-report') { location.href = 'RequestThread.html'; }
     else if (act === 'builder') { location.href = 'RequestBuilder.html'; }
     else if (act === 'dl') {
@@ -1173,20 +1211,47 @@
   });
 
   /* ── Кнопки экрана ────────────────────────────────────────────────────── */
-  el('btnSend').addEventListener('click', send);
-  el('cmpInput').addEventListener('keydown', function (e) {
+  /* ── Вид композера: поле ввода ДС или композер-плашка ─────────────────────
+     Текст переносится в другой вид, выбор запоминается в браузере. Хранилище
+     может быть недоступно (приватное окно, file://) — тогда вид не запоминается. */
+  var COMPOSER_KEY = 'ibp.requestThread.composer';
+  S.composer = 'field';
+
+  function composerField() { return el(S.composer === 'box' ? 'cmpInputBox' : 'cmpInput'); }
+
+  function setComposer(kind, focus) {
+    var from = composerField();
+    S.composer = kind === 'box' ? 'box' : 'field';
+    var to = composerField();
+    if (to !== from) to.value = from.value;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-composer]'), function (n) {
+      n.hidden = n.getAttribute('data-composer') !== S.composer;
+    });
+    /* тултип кнопки-переключателя остался бы висеть над скрытым видом */
+    if (window.DSTooltip) window.DSTooltip.hideAll();
+    try { localStorage.setItem(COMPOSER_KEY, S.composer); } catch (err) { /* вид не запоминается */ }
+    if (focus) to.focus();
+  }
+
+  function openFiles() { if (window.DSModal) window.DSModal.open(el('files-scrim')); }
+  function sendOnEnter(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-  });
-  el('btnAttach').addEventListener('click', function () {
-    if (window.DSModal) window.DSModal.open(el('files-scrim'));
-  });
+  }
+
+  el('btnSend').addEventListener('click', send);
+  el('btnSendBox').addEventListener('click', send);
+  el('cmpInput').addEventListener('keydown', sendOnEnter);
+  el('cmpInputBox').addEventListener('keydown', sendOnEnter);
+  el('btnAttach').addEventListener('click', openFiles);
+  el('btnAttachBox').addEventListener('click', openFiles);
   el('btnPickFiles').addEventListener('click', function () {
     S.files = ['Презентация_менеджмента_2026.pptx', 'График_погашений_2028.pdf'];
     drawFiles();
   });
   el('btnExample').addEventListener('click', function () {
-    el('cmpInput').value = 'Какая долговая нагрузка у ГК «Северный агрохолдинг» и когда пик погашений?';
-    el('cmpInput').focus();
+    var field = composerField();
+    field.value = 'Какая долговая нагрузка у ГК «Северный агрохолдинг» и когда пик погашений?';
+    field.focus();
   });
   el('miRestart').addEventListener('click', function () {
     /* у запроса без готового материала перезапускать нечего */
@@ -1256,6 +1321,9 @@
   }, { passive: true });
 
   var params = new URLSearchParams(location.search);
+  var savedComposer = null;
+  try { savedComposer = localStorage.getItem(COMPOSER_KEY); } catch (err) { /* хранилище недоступно */ }
+  setComposer(params.get('composer') || savedComposer, false);
   drawFiles();
 
   if (params.get('run')) {
