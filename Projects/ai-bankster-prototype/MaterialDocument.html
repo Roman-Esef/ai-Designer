@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<!-- Экран «Материал с идеями» (MaterialDocument) модуля Аналитические материалы.
+     Собран на компонентах IBP DS по ТЗ: БТ-1 (выгрузка результата в файл),
+     БТ-4.6/4.7 (версии и их отличия), БТ-3.1 (отдельного чата у документа нет),
+     СТ-2.2/СТ-2.3 (ограничение полноты видно и попадает в файл).
+     Контекст для правки: DS-IBP/specs/_cheatsheet.md. CSS компонентов не читать. -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Материал с идеями — Аналитические материалы — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; scrollbar-gutter: stable; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка этого экрана ──────────────────────────────────────────────
+     Только flex / gap и только на токенах. Длина строки текста документа
+     ограничена, чтобы не выходить за комфортные 50–75 символов. */
+  .doc-text  { display: flex; flex-direction: column; gap: var(--space-12); max-width: 900px; }
+  .doc-list  { display: flex; flex-direction: column; gap: var(--space-16); }
+  .doc-row   { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+
+  /* Строки таблицы идей выравниваются по ширине контейнера — обход дефекта ДС:
+     min-width:max-content у строки вместе с резиновыми треками даёт каждой
+     строке свою ширину, колонки расходятся по вертикали, а .tc__text--truncate
+     не срабатывает. Подробно — в MaterialDocument.screen.md. */
+  .tbl .tbl__row { min-width: 100%; }
+
+  @container screen (max-width: 1240px) {
+    .tile-row > [class*="colw-"] { grid-column: span var(--colw); }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+      <button class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item" href="index.html"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Origination</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="funds"></i></span><span class="nav__label">Фонды</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Отчёты</div>
+        <a class="nav__item nav__item--acc nav__item--selected" href="#" aria-expanded="true" aria-controls="nav-sub-analytics"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">Аналитические материалы</span><span class="nav__caret"><i data-icon="chevron-down"></i></span></a>
+        <div class="nav__sub" id="nav-sub-analytics"><div class="nav__sub-in">
+          <a class="nav__item" href="RequestThread.html"><span class="nav__label">Новый отчёт</span></a>
+          <a class="nav__item" href="RequestHistory.html"><span class="nav__label">История и материалы</span></a>
+          <a class="nav__item" href="ActivityLog.html"><span class="nav__label">Журнал</span></a>
+        </div></div>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Pipeline</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-pipeline"></i></span><span class="nav__label">DCM Pipeline</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="payments-ib"></i></span><span class="nav__label">Реестр платежей IB</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Клиенты и задачи</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="factory-01"></i></span><span class="nav__label">Клиенты</span></a>
+        <a class="nav__item" href="#" aria-label="Задачи, 7"><span class="nav__ico"><i data-icon="tasks"></i></span><span class="nav__label">Задачи</span><span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">7</span></span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <a class="nav__user" href="#" aria-label="Открыть личный кабинет">
+        <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Александров Пётр Константинович</span><span class="nav__user-role">Консультант-аналитик ДИД</span></span>
+      </a>
+      <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <div class="screen">
+
+    <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
+      <li class="crumbs__item"><a class="link link--muted" href="index.html">Главная</a></li>
+      <li class="crumbs__item"><a class="link link--muted" href="RequestHistory.html">Аналитические материалы</a></li>
+      <li class="crumbs__item"><a class="link link--muted" href="RequestThread.html">ГК «Северный агрохолдинг» — выход миноритария</a></li>
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Материал с идеями</span>
+      </li>
+    </nav>
+
+    <main class="screen__content">
+
+      <div class="phead">
+        <div class="phead__main">
+          <div class="phead__title-row">
+            <div class="phead__title-group">
+              <span class="phead__title-ico" aria-hidden="true"><i data-icon="document-check"></i></span>
+              <h1 class="phead__title">ГК «Северный агрохолдинг» — материал с идеями</h1>
+            </div>
+            <div class="phead__chips">
+              <span class="chip chip--rounded chip--s chip--success"><span class="chip__label">Версия 2 — текущая</span></span>
+              <span class="chip chip--rounded chip--s"><span class="chip__label">Детальный</span></span>
+              <span class="chip chip--rounded chip--s chip--warning"><span class="chip__label">Полнота ограничена</span></span>
+            </div>
+            <span class="phead__return">
+              <button class="btn btn--outline btn--xs" onclick="location.href='RequestThread.html'"><i data-icon="flip-backward"></i><span class="btn__label">К нити запроса</span></button>
+            </span>
+          </div>
+          <div class="phead__subtitle">
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="calendar"></i></span>Обновлён 12.09.2026</span>
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="file-basic"></i></span>17 страниц · 4 таблицы · 3 графика</span>
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="target"></i></span>Направление: прямые инвестиции</span>
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="check-shield"></i></span>Маркировка: для внутреннего пользования</span>
+          </div>
+        </div>
+        <div class="phead__actions" data-actions-overflow>
+          <button class="btn btn--outline btn--m" id="btnRestart"><i data-icon="refresh"></i><span class="btn__label">Перезапустить</span></button>
+          <button class="btn btn--accent btn--m" data-modal="export-scrim"><i data-icon="download"></i><span class="btn__label">Выгрузить</span></button>
+          <button class="btn btn--outline btn--m btn--icon-only" aria-label="Ещё действия" aria-haspopup="menu" aria-expanded="false" data-menu="doc-menu"><i data-icon="more-dots"></i></button>
+        </div>
+      </div>
+
+      <div class="tile-group">
+
+        <!-- ── Ряд 1: содержание материала + версии ───────────────────────── -->
+        <div class="tile-row">
+
+          <section class="tile col-8 colw-12">
+            <header class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h3 class="tile__title">Ключевые выводы</h3></div>
+                <p class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="check-circle-filled"></i></span>Раздел 1 из 7 · структура материала предсказуема и не настраивается</p>
+              </div>
+              <div class="tile__actions">
+                <button class="ibtn ibtn--neutral ibtn--m" aria-label="Скопировать раздел" data-act="copy"><i data-icon="copy"></i></button>
+              </div>
+            </header>
+
+            <div class="tile__alert">
+              <div class="alert alert--warning alert--m" role="status" aria-live="polite">
+                <span class="alert__icon" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
+                <div class="alert__body">
+                  <p class="alert__title">Материал подготовлен при частично недоступных источниках</p>
+                  <p class="alert__text">Веб-поиск не отработал, файл Teaser_group.pptx не обработан. Выводы по рынку опираются только на внутренние данные Банка и приложенную отчётность. Это ограничение зафиксировано в самом файле отчёта, а не только на экране.</p>
+                  <div class="alert__buttons">
+                    <button class="btn btn--outline btn--xs btn--warning" id="btnRerunSources"><i data-icon="refresh"></i><span class="btn__label">Повторить сбор источников</span></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tile__body">
+              <div class="tile__grid" style="grid-template-columns:repeat(1,1fr);">
+                <div class="doc-text tile__grid-full">
+                  <p class="ds-body-m">Группа сохраняет положительную динамику EBITDA четвёртый год подряд при растущей долговой нагрузке. Net Debt / EBITDA — 3,4x против ковенантного порога 4,0x, запас сокращается третий квартал подряд.</p>
+                  <p class="ds-body-m">Пик погашений валютного долга приходится на 2027–2028 годы и формирует окно для структурного финансирования выкупа доли миноритария. Собственник подтвердил готовность к частичному выходу на горизонте 12–18 месяцев.</p>
+                  <p class="ds-body-m">Оценка по мультипликаторам сопоставимых компаний даёт диапазон EV 62–71 млрд RUB. Разброс объясняется различием в вертикальной интеграции: у группы собственное кормопроизводство, у трёх из шести peers его нет.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="tile col-4 colw-12">
+            <header class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h3 class="tile__title">Версии материала</h3></div>
+                <p class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="history"></i></span>Все версии сохраняются в неизменном виде</p>
+              </div>
+            </header>
+            <div class="tile__body">
+              <div class="tile__grid" style="grid-template-columns:repeat(1,1fr);">
+                <div class="doc-list tile__grid-full">
+
+                  <div class="entity entity--selected">
+                    <div class="entity__lead"><span class="entity__icon entity__icon--accent" aria-hidden="true"><i data-icon="document-check"></i></span></div>
+                    <div class="entity__main">
+                      <div class="entity__titles">
+                        <p class="entity__header">12.09.2026, 09:05</p>
+                        <div class="entity__labelrow"><span class="entity__label">Версия 2</span></div>
+                      </div>
+                      <div class="entity__subs"><span class="entity__subs-list">Отличие от версии 1: учтена презентация менеджмента, пересчитан диапазон EV, добавлен раздел по ковенантам</span></div>
+                      <div class="entity__chips"><span class="chip chip--s chip--success"><span class="chip__label">Текущая</span></span></div>
+                    </div>
+                    <div class="entity__actions">
+                      <button class="ibtn ibtn--neutral ibtn--s" aria-label="Выгрузить версию 2" data-act="dl" data-fmt="Версия 2, PDF"><i data-icon="download"></i></button>
+                    </div>
+                  </div>
+
+                  <div class="entity">
+                    <div class="entity__lead"><span class="entity__icon" aria-hidden="true"><i data-icon="file-basic"></i></span></div>
+                    <div class="entity__main">
+                      <div class="entity__titles">
+                        <p class="entity__header">11.09.2026, 14:20</p>
+                        <div class="entity__labelrow"><span class="entity__label">Версия 1</span></div>
+                      </div>
+                      <div class="entity__subs"><span class="entity__subs-list">Исходный материал по параметрам конструктора: сценарий «по клиенту», направление «прямые инвестиции»</span></div>
+                      <div class="entity__chips"><span class="chip chip--s chip--warning"><span class="chip__label">Полнота ограничена</span></span></div>
+                    </div>
+                    <div class="entity__actions">
+                      <button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть версию 1" data-act="openv"><i data-icon="visibility-on"></i></button>
+                      <button class="ibtn ibtn--neutral ibtn--s" aria-label="Выгрузить версию 1" data-act="dl" data-fmt="Версия 1, PDF"><i data-icon="download"></i></button>
+                    </div>
+                  </div>
+
+                  <hr class="dvd dvd--h" aria-hidden="true">
+
+                  <div class="alert alert--info alert--m alert--row" role="status" aria-live="polite">
+                    <span class="alert__icon" aria-hidden="true"><i data-icon="Info-circle-filled"></i></span>
+                    <div class="alert__body">
+                      <p class="alert__text">Уточнения по материалу задаются в нити запроса — отдельного диалога у документа нет.</p>
+                      <div class="alert__buttons">
+                        <button class="btn btn--outline btn--xs btn--info" onclick="location.href='RequestThread.html'"><i data-icon="message-star"></i><span class="btn__label">Перейти в нить</span></button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ── Ряд 2: финансовый снимок + выгрузка ────────────────────────── -->
+        <div class="tile-row">
+
+          <section class="tile col-8 colw-12">
+            <header class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h3 class="tile__title">Финансовый снимок</h3></div>
+                <p class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="bar-line-chart"></i></span>Раздел 2 из 7 · источник — консолидированная отчётность МСФО 2022–2025</p>
+              </div>
+            </header>
+            <div class="tile__body">
+              <div class="tile__grid" style="grid-template-columns:repeat(4,1fr);">
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Выручка 2025</span></span>
+                  <div class="rof__row"><span class="rof__value">48 200 000 000,00</span><span class="rof__affix">RUB</span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">EBITDA 2025</span></span>
+                  <div class="rof__row"><span class="rof__value">9 100 000 000,00</span><span class="rof__affix">RUB</span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">EBITDA-маржа</span></span>
+                  <div class="rof__row"><span class="rof__value">18,9 %</span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Net Debt / EBITDA</span></span>
+                  <div class="rof__row"><span class="rof__value">3,4x</span><span class="rof__icon rof__icon--interactive" role="button" tabindex="0" aria-label="Пояснение к показателю" data-tooltip="Ковенантный порог по действующим выпускам — 4,0x" data-tooltip-multiline="yes"><i data-icon="info-circle"></i></span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Оценка EV, диапазон</span></span>
+                  <div class="rof__row"><span class="rof__value">62–71 млрд</span><span class="rof__affix">RUB</span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Сопоставимых компаний</span></span>
+                  <div class="rof__row"><span class="rof__value">6</span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Юридических лиц в группе</span></span>
+                  <div class="rof__row"><span class="rof__value">11</span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Доля миноритария</span></span>
+                  <div class="rof__row"><span class="rof__value">24,9 %</span></div>
+                </div>
+                <div class="tile__grid-full" id="docChart"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="tile col-4 colw-12">
+            <header class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h3 class="tile__title">Выгрузка</h3></div>
+                <p class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="check-shield"></i></span>Файл получает маркировку конфиденциальности Банка</p>
+              </div>
+            </header>
+            <div class="tile__body">
+              <div class="tile__grid" style="grid-template-columns:repeat(1,1fr);">
+                <div class="doc-list tile__grid-full">
+                  <button class="btn btn--outline btn--m btn--fullwidth" data-act="dl" data-fmt="Детальный материал, PDF"><i data-icon="download"></i><span class="btn__label">Детальный материал — PDF</span></button>
+                  <button class="btn btn--outline btn--m btn--fullwidth" data-act="dl" data-fmt="Детальный материал, DOCX"><i data-icon="download"></i><span class="btn__label">Детальный материал — Word</span></button>
+                  <button class="btn btn--outline btn--m btn--fullwidth" data-act="dl" data-fmt="Краткий материал, PDF"><i data-icon="download"></i><span class="btn__label">Краткий материал — PDF</span></button>
+                </div>
+                <div class="rof tile__grid-full">
+                  <span class="ds-label"><span class="ds-label__text">Почему у краткого материала нет Word</span></span>
+                  <div class="rof__row"><span class="rof__value">Краткий материал рассчитан на просмотр и передачу в готовом виде, а не на дальнейшую правку. Выводы и показатели в нём те же, что в детальном.</span></div>
+                </div>
+                <div class="rof tile__grid-full">
+                  <span class="ds-label"><span class="ds-label__text">Доступ к файлу</span></span>
+                  <div class="rof__row"><span class="rof__value">Только пользователи с правами на этот запрос, включая обращение по прямой ссылке. Каждая выгрузка попадает в журнал действий.</span></div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ── Ряд 3: продуктовые идеи ────────────────────────────────────── -->
+        <div class="tile-row">
+          <section class="tile" style="grid-column:span 12">
+            <header class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h3 class="tile__title">Продуктовые идеи</h3></div>
+                <p class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="target"></i></span>Раздел 5 из 7 · состав идей сужен направлением «прямые инвестиции»</p>
+              </div>
+              <div class="tile__actions">
+                <button class="ibtn ibtn--neutral ibtn--m" aria-label="Скопировать раздел" data-act="copy"><i data-icon="copy"></i></button>
+              </div>
+            </header>
+            <div class="tile__body">
+              <div class="tbl" data-table data-sort-rows>
+
+                <div class="tbl__row tbl__row--head" style="grid-template-columns:8px minmax(0,2.6fr) minmax(0,1.6fr) 170px 210px 170px minmax(8px,1fr);">
+                  <div class="th th--separator"></div>
+                  <div class="th" aria-sort="none">
+                    <span class="th__label">Идея</span>
+                    <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="idea" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button></span>
+                    <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                  </div>
+                  <div class="th"><span class="th__label">Продукт Банка</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                  <div class="th"><span class="th__label">Применимость</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                  <div class="th th--right" aria-sort="none" data-sort-type="number">
+                    <span class="th__label">Оценка объёма, RUB</span>
+                    <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="amount" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button></span>
+                    <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                  </div>
+                  <div class="th"><span class="th__label">Горизонт</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                  <div class="th th--separator"></div>
+                </div>
+
+                <div class="tbl__row" style="grid-template-columns:8px minmax(0,2.6fr) minmax(0,1.6fr) 170px 210px 170px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Мезонинное финансирование выкупа доли миноритария</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Мезонин</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Высокая</span></span></span></div>
+                  <div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">3 000 000 000,00</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text">12–18 месяцев</span></span></div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <div class="tbl__row" style="grid-template-columns:8px minmax(0,2.6fr) minmax(0,1.6fr) 170px 210px 170px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Рефинансирование выпуска с погашением в 2027 году</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Облигационный выпуск</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Средняя</span></span></span></div>
+                  <div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">4 800 000 000,00</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text">9–12 месяцев</span></span></div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <div class="tbl__row" style="grid-template-columns:8px minmax(0,2.6fr) minmax(0,1.6fr) 170px 210px 170px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Buy-side M&amp;A: два актива в смежном сегменте переработки</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">M&amp;A-консультирование</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Средняя</span></span></span></div>
+                  <div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">1 200 000 000,00</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text">18–24 месяца</span></span></div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <div class="tbl__row" style="grid-template-columns:8px minmax(0,2.6fr) minmax(0,1.6fr) 170px 210px 170px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Хеджирование валютного риска по графику погашений</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Валютный своп</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Высокая</span></span></span></div>
+                  <div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">6 100 000 000,00</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text">3–6 месяцев</span></span></div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <div class="tbl__row" style="grid-template-columns:8px minmax(0,2.6fr) minmax(0,1.6fr) 170px 210px 170px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Финансирование модернизации кормового кластера</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Инвестиционный кредит</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Средняя</span></span></span></div>
+                  <div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">2 400 000 000,00</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text">12–18 месяцев</span></span></div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+                <div class="tbl__row" style="grid-template-columns:8px minmax(0,2.6fr) minmax(0,1.6fr) 170px 210px 170px minmax(8px,1fr);">
+                  <div class="tc tc--separator"></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Размещение свободной ликвидности дочерних обществ</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Депозитный продукт</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="chip chip--s"><span class="chip__label">Низкая</span></span></span></div>
+                  <div class="tc tc--numbers"><span class="tc__row"><span class="tc__text">800 000 000,00</span></span></div>
+                  <div class="tc"><span class="tc__row"><span class="tc__text">3–6 месяцев</span></span></div>
+                  <div class="tc tc--separator"></div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ── Ряд 4: источники и ограничения ─────────────────────────────── -->
+        <div class="tile-row">
+          <section class="tile" style="grid-column:span 12">
+            <header class="tile__header">
+              <div class="tile__header-main">
+                <div class="tile__title-row"><h3 class="tile__title">Источники и ограничения полноты</h3></div>
+                <p class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="Info-circle-filled"></i></span>Раздел 7 из 7 · тот же перечень попадает в файл отчёта</p>
+              </div>
+            </header>
+            <div class="tile__body">
+              <div class="tile__grid" style="grid-template-columns:repeat(4,1fr);">
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Внутренние данные Банка</span></span>
+                  <div class="rof__row"><span class="rof__value rof__value--chips"><div class="chiplist chiplist--s"><span class="chip chip--s chip--success"><span class="chip__label">Использованы</span></span></div></span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Внешние источники</span></span>
+                  <div class="rof__row"><span class="rof__value rof__value--chips"><div class="chiplist chiplist--s"><span class="chip chip--s chip--error"><span class="chip__label">Недоступны</span></span></div></span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Приложенные файлы</span></span>
+                  <div class="rof__row"><span class="rof__value rof__value--chips"><div class="chiplist chiplist--s"><span class="chip chip--s chip--warning"><span class="chip__label">2 из 3</span></span></div></span></div>
+                </div>
+                <div class="rof">
+                  <span class="ds-label"><span class="ds-label__text">Разделы материала</span></span>
+                  <div class="rof__row"><span class="rof__value rof__value--chips"><div class="chiplist chiplist--s"><span class="chip chip--s chip--warning"><span class="chip__label">5 из 7 полностью</span></span></div></span></div>
+                </div>
+                <div class="rof tile__grid-full">
+                  <span class="ds-label"><span class="ds-label__text">Что именно не учтено и как это влияет на выводы</span></span>
+                  <div class="rof__row"><span class="rof__value">Внешние отраслевые обзоры и котировки сопоставимых компаний не получены: диапазон EV рассчитан по данным Банка и по отчётности группы, точность оценки ниже обычной. Файл Teaser_group.pptx защищён от чтения и не учтён — сведения о планах собственника взяты только из презентации менеджмента. Разделы «Рынок и конкуренты» и «Регуляторная среда» сформированы частично и помечены в документе.</span></div>
+                </div>
+                <div class="rof tile__grid-full">
+                  <span class="ds-label"><span class="ds-label__text">Использованные материалы</span></span>
+                  <div class="rof__row"><span class="rof__value rof__value--chips"><div class="chiplist chiplist--s">
+                    <span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">Отчётность МСФО 2022–2025</span></span>
+                    <span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">Презентация менеджмента 2026</span></span>
+                    <span class="chip chip--s"><span class="chip__icon"><i data-icon="server-05"></i></span><span class="chip__label">Лимиты и обороты Банка</span></span>
+                    <span class="chip chip--s"><span class="chip__icon"><i data-icon="server-05"></i></span><span class="chip__label">История сделок Банка</span></span>
+                    <span class="chip chip--s"><span class="chip__icon"><i data-icon="server-05"></i></span><span class="chip__label">Реестр обеспечения</span></span>
+                  </div></span></div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Меню «Ещё действия» (БТ-4.8) ─────────────────────────────────────── -->
+<span class="menu-anchor">
+  <div id="doc-menu" class="menu menu--floating" role="menu" hidden>
+    <button type="button" class="menu__item" role="menuitem" onclick="location.href='RequestThread.html'">
+      <span class="menu__item-icon"><i data-icon="message-star"></i></span><span class="menu__item-label">Задать уточнение в нити</span>
+    </button>
+    <button type="button" class="menu__item" role="menuitem" data-act="copy">
+      <span class="menu__item-icon"><i data-icon="copy"></i></span><span class="menu__item-label">Скопировать материал целиком</span>
+    </button>
+    <hr class="menu__divider">
+    <button type="button" class="menu__item" role="menuitem" data-modal="access-scrim">
+      <span class="menu__item-icon"><i data-icon="lock"></i></span><span class="menu__item-label">Права доступа к материалу</span>
+    </button>
+    <button type="button" class="menu__item" role="menuitem" onclick="location.href='ActivityLog.html'">
+      <span class="menu__item-icon"><i data-icon="registry"></i></span><span class="menu__item-label">Журнал действий по материалу</span>
+    </button>
+  </div>
+</span>
+
+<!-- ── Модалка выгрузки (БТ-1.4, БТ-1.6, БТ-1.9) ────────────────────────── -->
+<div class="modal-scrim" id="export-scrim" hidden>
+  <div class="modal modal--w4" role="dialog" aria-modal="true" aria-labelledby="exp-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="exp-title">Выгрузить материал</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__alert">
+      <div class="alert alert--info alert--m alert--flush" role="status" aria-live="polite">
+        <span class="alert__icon" aria-hidden="true"><i data-icon="Info-circle-filled"></i></span>
+        <div class="alert__body">
+          <p class="alert__text">Ограничение полноты этого материала будет записано в сам файл. Повторная выгрузка не требует повторного анализа.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal__body">
+      <div class="tile__grid" style="grid-template-columns:repeat(1,1fr);">
+        <div class="cb-group" role="group" aria-labelledby="exp-vol-t">
+          <p class="cb-group__title" id="exp-vol-t">Детальный материал, 17 страниц</p>
+          <div class="cb-group__items">
+            <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">PDF</span></span></label>
+            <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Word</span><span class="ds-helper ds-helper--left">Текст, заголовки и таблицы правятся как содержимое документа</span></span></label>
+          </div>
+        </div>
+        <hr class="dvd dvd--h" aria-hidden="true">
+        <div class="cb-group" role="group" aria-labelledby="exp-brief-t">
+          <p class="cb-group__title" id="exp-brief-t">Краткий материал, 3 страницы</p>
+          <div class="cb-group__items">
+            <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">PDF</span><span class="ds-helper ds-helper--left">Те же выводы и показатели, что в детальном; Word для краткого не предлагается</span></span></label>
+          </div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Версия материала</span></span>
+          <div class="rof__row"><span class="rof__value">Версия 2 от 12.09.2026 — текущая. Любая предыдущая версия выгружается из блока «Версии материала».</span></div>
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button class="btn btn--accent btn--m" id="btnExport" data-modal-close><i data-icon="download"></i><span class="btn__label">Сформировать файлы</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- ── Модалка прав доступа (БТ-9, БТ-1.10) ─────────────────────────────── -->
+<div class="modal-scrim" id="access-scrim" hidden>
+  <div class="modal modal--w4" role="dialog" aria-modal="true" aria-labelledby="acc-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="acc-title">Права доступа к материалу</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div class="tile__grid" style="grid-template-columns:repeat(1,1fr);">
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Кто видит материал</span></span>
+          <div class="rof__row"><span class="rof__value">Только вы. По умолчанию пользователь видит собственные запросы и материалы.</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Прямая ссылка</span></span>
+          <div class="rof__row"><span class="rof__value">Не даёт доступа пользователю без прав на запрос.</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Вызов из встречи</span></span>
+          <div class="rof__row"><span class="rof__value">Права определяются правилами Аналитические материалы и не расширяются внешним вызовом.</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Что фиксируется в журнале</span></span>
+          <div class="rof__row"><span class="rof__value">Создание запроса, загрузка файлов, подготовка и выгрузка материала, предоставление доступа другим сотрудникам.</span></div>
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Понятно</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="../../DS-IBP/scripts/ds.js"></script>
+<script>
+/* ============================================================================
+   Скрипт экрана «Материал с идеями».
+
+   Рантаймы ДС дают модалки, меню, тултипы, сортировку и порядок строк таблицы
+   идей, изменение ширины и порядка колонок. Здесь — только:
+
+   · построение графика погашений вызовом рантайма DSChart (Chart строится
+     из данных, руками SVG не верстается — правило компонента);
+   · сообщения о выгрузке, копировании и перезапуске (БТ-1.6, БТ-4.5).
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  /* График погашений валютного долга — раздел «Финансовый снимок» (БТ-1.3) */
+  var host = document.getElementById('docChart');
+  if (host && window.DSChart) {
+    host.appendChild(window.DSChart.make({
+      type: 'bar', size: 'm',
+      title: 'График погашений валютного долга',
+      subtitle: 'RUB, по годам',
+      categories: ['2026', '2027', '2028', '2029', '2030'],
+      series: [{ id: 'debt', name: 'Погашения', data: [2100000000, 4800000000, 6100000000, 1400000000, 900000000] }],
+      refLine: { value: 5000000000, label: 'Комфортный порог' }
+    }));
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-act]');
+    if (!t) return;
+    var act = t.getAttribute('data-act');
+    if (act === 'dl' && window.DSToast) {
+      window.DSToast.show({ message: t.getAttribute('data-fmt') + ' — файл сформирован и промаркирован', kind: 'bar', tone: 'success', duration: 3000 });
+    }
+    if (act === 'copy' && window.DSSnack) {
+      window.DSSnack.show({ tone: 'success', title: 'Скопировано', text: 'Содержимое перенесено в буфер обмена с сохранением заголовков и таблиц.' });
+    }
+    if (act === 'openv' && window.DSSnack) {
+      window.DSSnack.show({ tone: 'info', title: 'Открыта версия 1', text: 'Версия 1 от 11.09.2026. Текущей остаётся версия 2.' });
+    }
+  });
+
+  document.getElementById('btnExport').addEventListener('click', function () {
+    if (window.DSSnack) {
+      window.DSSnack.show({
+        tone: 'success', title: 'Файлы сформированы',
+        text: 'Детальный материал в PDF и Word. Маркировка конфиденциальности проставлена, выгрузка записана в журнал действий.'
+      });
+    }
+  });
+
+  document.getElementById('btnRestart').addEventListener('click', function () {
+    if (window.DSSnack) {
+      window.DSSnack.show({
+        tone: 'info', title: 'Перезапуск по прежним вводным',
+        text: 'Будет подготовлена версия 3 на актуальных данных. Версии 1 и 2 сохранятся без изменений.',
+        buttons: [{ label: 'Открыть нить', variant: 'outline', href: 'RequestThread.html' }]
+      });
+    }
+  });
+
+  document.getElementById('btnRerunSources').addEventListener('click', function () {
+    if (window.DSToast) {
+      window.DSToast.show({ message: 'Повторный сбор внешних источников запущен', kind: 'bar', duration: 3000 });
+    }
+  });
+})();
+</script>
+</body>
+</html>
