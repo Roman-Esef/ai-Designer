@@ -126,4 +126,4 @@ Button, LabelHelper, Entity, Chip, IconButton и ContextMenu; своими ос�
   компонента загрузки файлов» — `RequestBuilder.screen.md`, раздел 15.
 - Все страницы прототипа, включая главную, проходят статический сенсор приёмки
   без блокеров:
-  `node .opencode/skills/screen-review/tooling/layout-check.mjs Projects/ai-bankster-prototype-v02/<Имя>.html`
+  `node .opencode/skills/screen-review/tooling/layout-check.mjs Concepts/ai-bankster-prototype-v02/<Имя>.html`
