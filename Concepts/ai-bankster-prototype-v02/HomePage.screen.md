@@ -1,7 +1,7 @@
 ---
 screen: HomePage
 title: Главная страница IBP
-file: Projects/ai-bankster-prototype-v02/index.html
+file: Concepts/ai-bankster-prototype-v02/index.html
 source: макеты главной страницы и бокового меню «Аналитические отчёты»; каталог разделов — DS-IBP/scripts/ibp-home.js
 version: "1.000"
 created: "12.09.2026"
@@ -97,6 +97,9 @@ components: [Layout, NavPanel, Breadcrumbs, NavTile, Badge, Avatar, IconButton, 
 **Футер панели:** Александров Пётр Константинович, Консультант-аналитик ДИД.
 Данные пользователя — из каталога ДС (`ibp-home.js`, `IBPHome.user`). Строки
 организации в футере нет: она убрана из компонента (NavPanel, `footerHTML`).
+**В макете** строка пользователя на всех экранах прототипа ведёт на хаб проектов
+(корневой `index.html`, путь `../../index.html`, `aria-label="Хаб проектов"`) — служебный переход, в продукт не
+переносится.
 
 ## 6. Поведение
 

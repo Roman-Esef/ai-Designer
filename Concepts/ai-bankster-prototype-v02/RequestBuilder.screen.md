@@ -1,7 +1,7 @@
 ---
 screen: RequestBuilder
 title: Новый отчёт — режим конструктора
-file: Projects/ai-bankster-prototype-v02/RequestBuilder.html
+file: Concepts/ai-bankster-prototype-v02/RequestBuilder.html
 source: ТЗ (БТ-1, БТ-2, БТ-5, БТ-10); черновой прототип модуля; решение заказчика от 13.09.2026 — конструктор в теле нити
 version: "2.009"
 created: "12.09.2026"

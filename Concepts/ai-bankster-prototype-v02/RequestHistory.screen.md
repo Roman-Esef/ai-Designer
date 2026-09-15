@@ -1,7 +1,7 @@
 ---
 screen: RequestHistory
 title: История и материалы
-file: Projects/ai-bankster-prototype-v02/RequestHistory.html
+file: Concepts/ai-bankster-prototype-v02/RequestHistory.html
 source: ТЗ (БТ-1.7, БТ-4, БТ-9); черновой прототип модуля
 version: "1.004"
 created: "12.09.2026"

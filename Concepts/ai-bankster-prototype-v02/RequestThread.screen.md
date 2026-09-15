@@ -1,7 +1,7 @@
 ---
 screen: RequestThread
 title: Новый отчёт (нить запроса)
-file: Projects/ai-bankster-prototype-v02/RequestThread.html
+file: Concepts/ai-bankster-prototype-v02/RequestThread.html
 source: ТЗ (БТ-2, БТ-3, БТ-4, БТ-6, БТ-7, БТ-8); черновой прототип модуля; макет экрана — сообщение заказчика от 12.09.2026
 version: "1.018"
 created: "12.09.2026"

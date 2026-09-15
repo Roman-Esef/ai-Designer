@@ -1,7 +1,7 @@
 ---
 screen: ActivityLog
 title: Журнал действий
-file: Projects/ai-bankster-prototype-v02/ActivityLog.html
+file: Concepts/ai-bankster-prototype-v02/ActivityLog.html
 source: ТЗ (БТ-11, БТ-1.10, БТ-9)
 version: "1.002"
 created: "12.09.2026"
