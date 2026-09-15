@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ============================================================
-   LAYOUT-CHECK — статическая проверка раскладки экрана из Projects/test/.
+   LAYOUT-CHECK — статическая проверка раскладки экрана из Concepts/ и Projects/.
    Замена скриншотной проверки вёрстки: никакого браузера,
    никакого рендера, никакого запуска Chrome. Чистый Node.
 
@@ -337,11 +337,12 @@ function checkMechanics(html, icons, pagePath) {
   const markupInScripts = collectScriptMarkup(noComments);
 
   /* Б1 подключения. Путь к ds.css НЕ фиксирован по числу уровней: экраны лежат
-     на разной глубине (`Projects/test/` → `../../DS-IBP/ds.css`,
-     `Projects/post/<направление>/<экран>/` → `../../../../DS-IBP/ds.css`).
+     на разной глубине (`Concepts/<Имя>/` → `../../DS-IBP/ds.css`,
+     `Projects/post/<направление>/<экран>/` → `../../../../DS-IBP/ds.css`,
+     корневой хаб `index.html` → `DS-IBP/ds.css`).
      Раньше здесь была зашита строка `../../../ds.css` — путь структуры до
      переезда ДС в `DS-IBP/` (01.09.2026), из-за чего Б1 падал на ЛЮБОМ экране
-     репозитория, включая заведомо правильные из `Projects/test/`. */
+     репозитория, включая заведомо правильные из тогдашней песочницы. */
   const dsCssLinks = (html.match(/href="[^"]*\bds\.css"/g) || []);
   ok(dsCssLinks.length === 1,
     `Б1 ровно один ds.css (${dsCssLinks.length})`);
@@ -399,6 +400,27 @@ function checkMechanics(html, icons, pagePath) {
     if (badUser.length) {
       ok(false, `Б31 .nav__user — ссылка на личный кабинет (<a href>), а не ${[...new Set(badUser)].join(', ')}`);
     }
+  }
+
+  /* Б33 — интерактивные Entity подряд без контейнера `.entity-list`.
+     `.entity--interactive` выносит подложку hover наружу: `padding: 8px 10px`
+     компенсирован `margin: -8px -10px` (entity.css). Соседние строки в своём
+     контейнере с зазором меньше 16px накрывают друг друга подложкой; штатный
+     зазор даёт только `.entity-list` (Entity 1.008). Поймано пользователем на
+     хабе проектов 15.09.2026: строки стояли через 4px.
+     Геометрию зазора статика не измерит, поэтому правило структурное: строк
+     несколько — контейнер обязан быть. «Несколько» — две и больше в разметке
+     или хотя бы одна в JS-шаблоне: шаблон строки рендерится циклом. Одиночная
+     статическая строка (карточка объекта) правилу не подпадает. Классы берутся
+     и из разметки, и из литералов скриптов (вход `markupInScripts`, как у Б31). */
+  const classTokens = (src) => [...src.matchAll(/class="([^"]*)"/g)].flatMap((m) => m[1].split(/[\s+]+/));
+  const interStatic = classTokens(html).filter((c) => c === 'entity--interactive').length;
+  const interScript = classTokens(markupInScripts).filter((c) => c === 'entity--interactive').length;
+  if (interStatic >= 2 || interScript >= 1) {
+    const hasEntityList = [html, markupInScripts].some((s) => classTokens(s).includes('entity-list'));
+    ok(hasEntityList, hasEntityList
+      ? 'Б33 интерактивные Entity собраны в .entity-list'
+      : `Б33 интерактивных Entity в разметке ${interStatic}, в JS-шаблонах ${interScript}, а .entity-list нет — подложка hover выносится на 8px (отрицательный margin компонента) и накроет соседнюю строку`);
   }
 
   /* Б6 заголовок.
@@ -1097,11 +1119,18 @@ function runGeometry(rows, standalone, width) {
       out.push({ level: 'warn', label: `K5 «${t.title}»: ${t.cols} колонки при рекомендации ${k5rec} — помещается больше` });
     }
 
-    /* K4: ширина по объёму */
+    /* K4: ширина по объёму. Объём — это поля ReadOnlyField или таблица/график
+       (чек-лист composition-review, K4). Тайл без полей и без таблицы — список,
+       колонка навигации — под правило не подпадает: переносить в нём нечего, а
+       ширину задаёт раскладка экрана. Раньше минимум 4 колонки требовался и от
+       такого тайла: хаб проектов (15.09.2026) с тремя колонками по 3 из 12 и
+       списками Entity получал ложный FAIL «0 полей на 3 колонках». */
     const fcount = t.fields.length;
     const hasTable = /class="tbl|chart-host/.test(t.el);
     const expected = hasTable ? 12 : (fcount >= 10 ? 8 : fcount >= 6 ? 6 : fcount >= 3 ? 4 : 4);
-    if (t.span < expected && t.span <= 4) {
+    if (fcount === 0 && !hasTable) {
+      out.push({ level: 'info', label: `K4 «${t.title}»: полей и таблицы нет — ширина по объёму неприменима` });
+    } else if (t.span < expected && t.span <= 4) {
       out.push({ level: 'fail', label: `K4 «${t.title}» (строка ${t.line}): ${fcount} полей на ${t.span} колонках — положено от ${expected} (поля переносятся)` });
     } else if (t.span === 12 && fcount <= 5 && !hasTable) {
       out.push({ level: 'warn', label: `K4 «${t.title}»: тайл на всю ширину под ${fcount} полей — пустота справа` });

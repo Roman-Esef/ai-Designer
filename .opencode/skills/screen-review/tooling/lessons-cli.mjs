@@ -54,8 +54,12 @@ const LINT_FIXTURES = path.join(ROOT, 'DS-IBP/fixtures');
 /* Корпус экранов лежит ВНЕ дерева ДС не по вкусу, а по определению правила:
    линтер считает экраном путь, начинающийся с `pages/screens/` или с `../`.
    Правила A7, F6, L4, L5, L6 внутри `DS-IBP/fixtures/` не срабатывают никогда —
-   доказывать их там значило бы доказывать на входе, который им не вход (Л71). */
-const SCREEN_FIXTURES = path.join(ROOT, 'Projects/test/fixtures');
+   доказывать их там значило бы доказывать на входе, который им не вход (Л71).
+   С 15.09.2026 корпус лежит в оснастке (подпапка tooling/fixtures), а не в
+   удалённой песочнице Projects/test. Сенсорный корпус эту подпапку не читает:
+   verifyCorpus обходит каталог без вложенных. */
+const SCREEN_FIXTURES_REL = '.opencode/skills/screen-review/tooling/fixtures/lint-screens';
+const SCREEN_FIXTURES = path.join(ROOT, SCREEN_FIXTURES_REL);
 const RUNS = path.join(HERE, 'runs.jsonl');
 const REFS = path.join(ROOT, '.opencode/skills/screen-review/references');
 const RAW = path.join(REFS, 'lessons-raw.md');
@@ -166,7 +170,7 @@ function verify(only = null, corpus = null) {
   const none = { total: 0, bad: 0 };
   const s = corpus === 'lint' ? none : verifyCorpus(FIXTURES, (f) => runSensor(path.join(FIXTURES, f)), 'сенсор layout-check (tooling/fixtures)', only);
   const l = corpus === 'sensor' ? none : verifyCorpus(LINT_FIXTURES, (f) => runLinter('fixtures/' + f), 'линтер ds-lint, страницы (DS-IBP/fixtures)', only);
-  const e = corpus === 'sensor' ? none : verifyCorpus(SCREEN_FIXTURES, (f) => runLinter('../Projects/test/fixtures/' + f), 'линтер ds-lint, экраны (Projects/test/fixtures)', only);
+  const e = corpus === 'sensor' ? none : verifyCorpus(SCREEN_FIXTURES, (f) => runLinter('../' + SCREEN_FIXTURES_REL + '/' + f), 'линтер ds-lint, экраны (tooling/fixtures/lint-screens)', only);
 
   const total = s.total + l.total + e.total, bad = s.bad + l.bad + e.bad;
   /* Пустой отбор — не «всё доказано»: обход нуля фикстур с зелёным вердиктом
@@ -1069,11 +1073,18 @@ const VENDOR = path.join(HERE, 'vendor-scan.mjs');
 const SPEC_AUDIT = path.join(DS, 'scripts/spec-audit.mjs');
 const DOCS_SPLIT = path.join(ROOT, '.opencode/skills/docs-split/tooling/docs-split.mjs');
 const CTX_BUDGET = path.join(ROOT, '.opencode/skills/session-plan/tooling/ctx-budget.mjs');
+const PROJECTS_HUB = path.join(HERE, 'projects-hub.mjs');
+const AGENT_CONFIG = path.join(HERE, 'agent-config.mjs');
 const SELF = fileURLToPath(import.meta.url);
 
 const GATE_ROOTS = ['DS-IBP/styles', 'DS-IBP/scripts', 'DS-IBP/specs', 'DS-IBP/pages', 'DS-IBP/fixtures',
-  'DS-IBP/ds.css', 'Projects', '.opencode/rules', '.opencode/agents', '.opencode/commands', '.opencode/skills',
-  'AGENTS.md', 'opencode.json'];
+  'DS-IBP/ds.css', 'Projects', 'Concepts', '.opencode/rules', '.opencode/agents', '.opencode/commands', '.opencode/skills',
+  'AGENTS.md', '.opencode/opencode.json', '.opencode/opencode.jsonc', 'opencode.json', 'opencode.jsonc',
+  'index.html', 'index.screen.md', 'hub.js'];
+// конфиг агентного CLI: живёт в .opencode/, корневые пути — чтобы гейт увидел появившийся второй слой (agent-config.mjs, КФ1)
+const AGENT_CONFIG_FILES = new Set(['.opencode/opencode.json', '.opencode/opencode.jsonc', 'opencode.json', 'opencode.jsonc']);
+// хаб проектов в корне: страница, её спека и реестр
+const HUB_FILES = new Set(['index.html', 'index.screen.md', 'hub.js']);
 const GATE_SKIP_DIRS = new Set(['node_modules', '.git', 'uploads', 'screenshots']);
 // журнал прогонов и сам снимок меняет гейт — это не изменение работы
 const gateIgnored = (rel) => rel === TOOL_REL + '/runs.jsonl' || rel === TOOL_REL + '/gate-snapshot.json';
@@ -1159,6 +1170,17 @@ function gateStep(id, paths = null) {
        не сторож; коэффициент можно было изменить мимоходом, и смета начала бы
        врать молча. */
     case 'ctx-budget': return { title: 'ctx-budget --selftest (смета контекста)', args: [CTX_BUDGET, '--selftest'], cwd: ROOT };
+    /* Хаб проектов. Реестр hub.js в корне ведётся руками (по file://
+       страница папки не обходит), поэтому забытый проект или концепт молча не появляется
+       на хабе — сторож делает это красным гейтом. Селфтест — откат на
+       временном дереве, гоняется, когда правят самого сторожа. */
+    case 'projects': return { title: 'projects-hub (реестр хаба проектов)', args: [PROJECTS_HUB], cwd: ROOT };
+    case 'projects-selftest': return { title: 'projects-hub --selftest', args: [PROJECTS_HUB, '--selftest'], cwd: ROOT };
+    /* Конфиг агентного CLI. Конфиг читается и из корня, и из .opencode/ — второй
+       файл молча складывает права из двух слоёв; модель в репозитории на
+       другом контуре не стартует. Решение 15.09.2026, шапка agent-config.mjs. */
+    case 'agent-config': return { title: 'agent-config (один конфиг, без модели)', args: [AGENT_CONFIG], cwd: ROOT };
+    case 'agent-config-selftest': return { title: 'agent-config --selftest', args: [AGENT_CONFIG, '--selftest'], cwd: ROOT };
     default: throw new Error('неизвестный шаг гейта: ' + id);
   }
 }
@@ -1171,12 +1193,18 @@ function gateStepsFor(rel, deleted) {
   const inFixtures = rel.split('/').includes('fixtures');
   const html = rel.endsWith('.html');
 
+  // проекты, концепты и сам хаб, в том числе удалённое: реестр хаба мог разойтись с папками
+  const screenArea = rel.startsWith('Projects/') || rel.startsWith('Concepts/');
+  if ((screenArea && !inFixtures) || HUB_FILES.has(rel)) add('projects');
+  // конфиг, в том числе удалённый или появившийся в корне
+  if (AGENT_CONFIG_FILES.has(rel)) add('agent-config');
+
   if (deleted) {
     if (rel.startsWith('DS-IBP/')) add('lint-global', 'parity');
     return s;
   }
-  // экран: в репозитории — Projects/**, вне репозитория — только через --changed (проверка откатом на копии)
-  if (html && !inFixtures && (rel.startsWith('Projects/') || rel.startsWith('..'))) {
+  // экран: в репозитории — Projects/**, Concepts/** и хаб; вне репозитория — только через --changed (проверка откатом на копии)
+  if (html && !inFixtures && (screenArea || rel === 'index.html' || rel.startsWith('..'))) {
     /* Фрагмент модульного экрана инструменты пропускают (fragments.mjs) —
        проверяется то, во что он вшит: источник и его собранный файл. */
     const hosts = rel.startsWith('..') ? [] : includersOf(path.resolve(ROOT, rel));
@@ -1187,7 +1215,7 @@ function gateStepsFor(rel, deleted) {
       }
     } else add('sensor:' + rel, 'lint:' + rel);
   }
-  if (rel.startsWith('Projects/test/fixtures/') || rel.startsWith('DS-IBP/fixtures/')) add('verify-lint', 'anchors');
+  if (rel.startsWith(SCREEN_FIXTURES_REL + '/') || rel.startsWith('DS-IBP/fixtures/')) add('verify-lint', 'anchors');
 
   if (/^DS-IBP\/pages\/.+\.html$/.test(rel)) {
     add('lint:' + rel);
@@ -1209,10 +1237,13 @@ function gateStepsFor(rel, deleted) {
   // каталог компонентов в правилах агента сверяется с манифестом — проход 8 аудита
   if (rel === '.opencode/rules/ds-rules.md') add('spec-audit');
 
-  if (rel === TOOL_REL + '/layout-check.mjs' || rel.startsWith(TOOL_REL + '/fixtures/')) add('verify-sensor', 'anchors', 'etalons');
+  // корпус экранов линтера — подпапка tooling/fixtures, но сенсор его не читает
+  if (rel === TOOL_REL + '/layout-check.mjs' || (rel.startsWith(TOOL_REL + '/fixtures/') && !rel.startsWith(SCREEN_FIXTURES_REL + '/'))) add('verify-sensor', 'anchors', 'etalons');
   if (rel === TOOL_REL + '/lessons-cli.mjs' || rel === TOOL_REL + '/runlog.mjs') add('verify-sensor', 'verify-lint', 'anchors', 'check', 'coverage', 'stats');
   if (rel === TOOL_REL + '/anchors.json') add('anchors', 'check');
   if (rel.startsWith('.opencode/skills/session-plan/')) add('ctx-budget');
+  if (rel === TOOL_REL + '/projects-hub.mjs') add('projects-selftest', 'projects');
+  if (rel === TOOL_REL + '/agent-config.mjs') add('agent-config-selftest', 'agent-config');
   if (/^\.opencode\/skills\/[^/]+\/references\/[^/]+\.html$/.test(rel)) add('etalons');
   if (/(^|\/)lessons(-raw)?\.md$/.test(rel) && rel.startsWith('.opencode/')) add('check', 'stats');
   if (rel === TOOL_REL + '/coverage.json' || rel === '.opencode/skills/screen-review/SKILL.md' || rel === '.opencode/skills/composition-review/SKILL.md') add('coverage');
@@ -1220,9 +1251,9 @@ function gateStepsFor(rel, deleted) {
   return s;
 }
 
-const GATE_FULL = ['lint-global', 'parity', 'spec-audit', 'etalons', 'verify-sensor', 'verify-lint', 'anchors', 'check', 'stats', 'coverage', 'ctx-budget', 'vendor'];
+const GATE_FULL = ['lint-global', 'parity', 'spec-audit', 'etalons', 'verify-sensor', 'verify-lint', 'anchors', 'check', 'stats', 'coverage', 'ctx-budget', 'projects-selftest', 'projects', 'agent-config-selftest', 'agent-config', 'vendor'];
 // порядок: сначала дешёвое и пофайловое, в конце — дорогое и репозиторное
-const GATE_ORDER = ['sensor', 'lint', 'lint-pages', 'split','lint-global', 'parity', 'spec-audit', 'etalons', 'anchors', 'check', 'coverage', 'ctx-budget', 'stats', 'verify-sensor', 'verify-lint', 'vendor'];
+const GATE_ORDER = ['sensor', 'lint', 'lint-pages', 'split', 'projects-selftest', 'projects', 'agent-config-selftest', 'agent-config', 'lint-global', 'parity', 'spec-audit', 'etalons', 'anchors', 'check', 'coverage', 'ctx-budget', 'stats', 'verify-sensor', 'verify-lint', 'vendor'];
 const kindOf = (id) => id.split(':')[0];
 
 // строки находок, которые показываются при FAIL; остальной вывод остаётся за кадром

@@ -44,6 +44,12 @@ body.ds-has-nav { padding-left: var(--ds-nav-w); }
   flex: 1; overflow-y: auto; overscroll-behavior: contain;
   padding: 14px 12px 28px;
 }
+/* закреплённый низ: выход в хаб проектов, не скроллится со списком */
+.ds-nav__footer {
+  flex: none;
+  padding: 12px;
+  border-top: 1px solid var(--border-light);
+}
 .ds-nav__scroll::-webkit-scrollbar { width: 8px; }
 .ds-nav__scroll::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 8px; }
 

@@ -976,9 +976,9 @@ css: `styles/snackbar.css` · js: `scripts/ds-notify.js` · deps: [button, link]
 ## Entity
 css: `styles/entity.css` · deps: [avatar, chip, icon-button, button, badge]
 **Оси:** размер (S 32/M 40/L 96) · ведущий элемент (иконка/аватар/чекбокс/грип) · состав (chips/actions ≤в кебаб/subheaders с клэмпом 2 строк).
-**Инварианты:** Label — только одна строка; действия — максимум 2, больше → кебаб.
-**Классы:** .entity · .entity--s/--m/--l · .entity--inline · .entity__lead · .entity__icon · .entity__main · .entity__titles · .entity__header · .entity__labelrow · .entity__label · .entity__label--truncate · .entity__prefix / __postfix · .entity__bookmark · .entity__subs · .entity__subs--single · .entity__subs-more · .entity__chips · .entity__icons · .entity__actions · .entity__drag · .entity--interactive · .entity--selected · .entity--skeleton · .entity--empty · .entity--error
-**Диагностика:** «Заголовок вылезает/переносится на 3+ строки» → `.entity__label--truncate` · «Больше двух кнопок в блоке действий теснятся» → кебаб `[data-menu]` + `scripts/ds-menu.js`, не свой список · «Subheaders занимают лишние строки» → клэмп `.entity__subs` (2 строки) + счётчик `.entity__subs-more` · «Аватар/иконка пуста в скелетоне» → `.entity--skeleton` (`.sk-surface` на иконке, сохраняет размер/радиус) · «Клик по вложенной кнопке выбирает/открывает строку» → проверить stopPropagation — элемент должен быть настоящей кнопкой, не div
+**Инварианты:** Label — только одна строка; действия — максимум 2, больше → кебаб; `.entity--interactive` выносит подложку hover наружу на 8px по вертикали и 10px по бокам (отрицательный margin) → **соседние интерактивные строки — только в `.entity-list`** (зазор 16px), у родителя списка поля ≥ 8/10px; корень может быть `<a>` (строка-ссылка, подчёркивание сбрасывает компонент).
+**Классы:** .entity-list · .entity · .entity--s/--m/--l · .entity--inline · .entity__lead · .entity__icon · .entity__main · .entity__titles · .entity__header · .entity__labelrow · .entity__label · .entity__label--truncate · .entity__prefix / __postfix · .entity__bookmark · .entity__subs · .entity__subs--single · .entity__subs-more · .entity__chips · .entity__icons · .entity__actions · .entity__drag · .entity--interactive · .entity--selected · .entity--skeleton · .entity--empty · .entity--error
+**Диагностика:** «Заголовок вылезает/переносится на 3+ строки» → `.entity__label--truncate` · «Больше двух кнопок в блоке действий теснятся» → кебаб `[data-menu]` + `scripts/ds-menu.js`, не свой список · «Subheaders занимают лишние строки» → клэмп `.entity__subs` (2 строки) + счётчик `.entity__subs-more` · «Аватар/иконка пуста в скелетоне» → `.entity--skeleton` (`.sk-surface` на иконке, сохраняет размер/радиус) · «Клик по вложенной кнопке выбирает/открывает строку» → проверить stopPropagation — элемент должен быть настоящей кнопкой, не div · «Подложка hover накрывает соседнюю строку» → строки не в `.entity-list` (свой контейнер с зазором < 16px; сенсор экранов — Б33)
 
 Отображение объектов (компании, люди, файлы, метрики) в тайлах, списках и формах. Ведущий элемент + Header · Label · Subheaders + Chips + IconButton-группа + действия. Собственного фона нет, тянется на ширину контейнера. Размеры: `--s` 32 · `--m` 40 · `--l` 96.
 
@@ -1006,6 +1006,12 @@ css: `styles/entity.css` · deps: [avatar, chip, icon-button, button, badge]
     <button class="btn btn--outline btn--xs" aria-haspopup="menu"><span class="btn__label">Button</span><i data-icon="chevron-down"></i></button>
     <button class="ibtn ibtn--neutral ibtn--s" aria-label="Убрать"><i data-icon="close"></i></button>
   </div>
+</div>
+
+<!-- список интерактивных строк: только в .entity-list, иначе подложки hover наложатся -->
+<div class="entity-list">
+  <a class="entity entity--interactive" href="…"><div class="entity__lead">…</div><div class="entity__main">…</div></a>
+  <a class="entity entity--interactive" href="…"><div class="entity__lead">…</div><div class="entity__main">…</div></a>
 </div>
 ```
 

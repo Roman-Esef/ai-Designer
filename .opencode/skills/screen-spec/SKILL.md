@@ -27,7 +27,7 @@ metadata:
 ## Правила заполнения
 
 1. **Файл лежит рядом с HTML** и называется так же:
-   `Projects/test/DealRegistry.html` → `Projects/test/DealRegistry.screen.md`.
+   `Concepts/DealRegistry/DealRegistry.html` → `Concepts/DealRegistry/DealRegistry.screen.md`.
 
 2. **YAML-шапка обязательна** — по ней экран находят автоматически.
    Поле `components` перечисляет все использованные компоненты ДС.

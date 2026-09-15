@@ -16,7 +16,7 @@
  *
  *   node ctx-budget.mjs --stages
  *   node ctx-budget.mjs --stage build --tz <путь> --cheat Table,Modal --out-lines 900
- *   node ctx-budget.mjs --stage review --screen Projects/test/DealRegistry.html --tz <путь>
+ *   node ctx-budget.mjs --stage review --screen Concepts/DealRegistry/DealRegistry.html --tz <путь>
  *   node ctx-budget.mjs --selftest
  *
  * Истина — строка ВЕРДИКТ, а не код выхода (ds-rules §8).
