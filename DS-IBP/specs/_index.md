@@ -24,7 +24,7 @@ purpose: Манифест спек компонентов. Читай нужну
 | EmptyState | specs/EmptyState.md | styles/empty-state.css | illustration, button | 1.002 |
 | Elevation | specs/Elevation.md | styles/shadow.css | — | 1.002 |
 | Drawer | specs/Drawer.md | styles/drawer.css | modal, button, icon-button, read-only-field, label-helper | 1.000 |
-| Entity | specs/Entity.md | styles/entity.css | avatar, chip, icon-button, button, badge | 1.007 |
+| Entity | specs/Entity.md | styles/entity.css | avatar, chip, icon-button, button, badge | 1.008 |
 | IconButton | specs/IconButton.md | styles/icon-button.css | badge, spinner | 1.011 |
 | Icons | specs/Icons.md | — | — | 1.000 |
 | Illustrations | specs/Illustrations.md | styles/illustration.css | — | 1.004 |

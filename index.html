@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!-- Хаб проектов: одна точка входа в дизайн-систему IBP, проекты (Projects/) и
+     концепты (Concepts/). Каркас стартовой страницы (Layout): шапки страницы
+     нет, крошка одна, фон — background-illustration. Вместо NavTile — три
+     колонки Tile со списком Entity (.entity-list). Состав меню и колонок — из
+     реестра hub.js; новая запись добавляется в реестр, эта страница не
+     правится. Спека — index.screen.md. -->
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = 'DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Хаб проектов — IBP</title>
+<link rel="icon" type="image/svg+xml" href="DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="DS-IBP/ds.css">
+<style>
+  /* ---------- хаб проектов: только раскладка на токенах ---------- */
+  body { margin: 0; font-family: var(--font-text), system-ui, sans-serif; color: var(--text-primary); }
+
+  /* фоновая иллюстрация стартовой страницы (Layout: cover, opacity .6) */
+  .home-wrap { position: relative; min-height: calc(100vh - var(--layout-crumbs-h)); }
+  .home-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("DS-IBP/assets/illustrations/background-illustration.svg") center/cover no-repeat;
+    opacity: .6;
+    pointer-events: none;
+  }
+
+  /* Сетка колонок — штатная .grid12 стартовой страницы (Layout), ширина колонки —
+     пара .col-3 / .colw-6 (Spacing; Tile, «Ширина тайла задаётся только
+     средствами ДС»). Здесь только подъём над абсолютной иллюстрацией. */
+  .hub-groups { position: relative; }
+
+  /* Перестроение по рецепту стартовой страницы (Layout): первый шаг — штатная
+     пара .col-N / .colw-N, второй парой не выражается и обязан иметь ту же
+     специфичность (0,2,0) и стоять ниже правила пары. */
+  @container screen (max-width: 1700px) { .grid12 > [class*="colw-"] { grid-column: span var(--colw); } }
+  @container screen (max-width: 900px)  { .grid12 > .tile { grid-column: span 12; } }
+</style>
+</head>
+<body>
+<div class="nav-layout">
+  <!-- меню строится экранным скриптом из реестра hub.js -->
+  <nav class="nav nav--rail" id="nav" aria-label="Главное меню"></nav>
+
+  <div class="screen">
+    <nav class="crumbs" aria-label="Хлебные крошки">
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Хаб проектов</span>
+      </li>
+    </nav>
+    <main class="screen__content">
+      <div class="home-wrap">
+        <!-- колонки строятся экранным скриптом из реестра hub.js -->
+        <div class="grid12 hub-groups" id="hub-groups"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="DS-IBP/scripts/ds.js"></script>
+<script src="DS-IBP/scripts/ibp-home.js"></script>
+<script src="hub.js"></script>
+<script>
+/* экранный скрипт: меню панели и колонки строятся из реестра window.IBPHub
+   (hub.js); ссылки в реестре — от корня, то есть от папки этой страницы */
+(function () {
+  'use strict';
+  var ENTRIES = window.IBPHub || [];
+  var USER_LINK_FROM = ' href="#" aria-label="Открыть личный кабинет"';
+  var USER_LINK_TO = ' href="index.html" aria-current="page" aria-label="Хаб проектов"';
+  /* порядок колонок и блоков меню */
+  var GROUPS = [
+    { key: 'ds', label: 'Дизайн-система' },
+    { key: 'projects', label: 'Проекты' },
+    { key: 'concepts', label: 'Концепты' }
+  ];
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function ic(name) { return '<i data-icon="' + esc(name) + '"></i>'; }
+  function itemsOf(key) { return ENTRIES.filter(function (p) { return p.group === key; }); }
+  /* подпись папки: root записи, у ДС — папка стартовой страницы */
+  function folderOf(p) { return p.root || p.href.replace(/\/[^/]*$/, ''); }
+
+  function buildNav() {
+    var nav = document.getElementById('nav');
+    var s = '<div class="nav__top">'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Свернуть меню">' + ic('left-menu') + '</button>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель">' + ic('pin-menu') + '</button>'
+      + '</div>';
+    s += '<div class="nav__list">';
+    s += '<a class="nav__item nav__item--selected" href="index.html" aria-current="page"><span class="nav__ico">' + ic('main-page') + '</span><span class="nav__label">Хаб проектов</span></a>';
+    GROUPS.forEach(function (g) {
+      var items = itemsOf(g.key);
+      if (!items.length) return;
+      s += '<div class="nav__block">';
+      s += '<div class="nav__block-label">' + esc(g.label) + '</div>';
+      items.forEach(function (p) {
+        s += '<a class="nav__item" href="' + esc(p.href) + '"><span class="nav__ico">' + ic(p.icon) + '</span>'
+          + '<span class="nav__label">' + esc(p.title) + '</span></a>';
+      });
+      s += '</div>';
+    });
+    s += '</div>';
+    /* Футер — анатомия NavPanel целиком (линтер F5). Строка пользователя во всех
+       экранах проектов и концептов ведёт сюда, поэтому на хабе она — текущая
+       страница. Разметка — IBPHome.footerHTML из каталога ДС, ссылка подменяется здесь. */
+    s += (window.IBPHome && window.IBPHome.footerHTML)
+      ? window.IBPHome.footerHTML('Хаб проектов').replace(USER_LINK_FROM, USER_LINK_TO)
+      : '<div class="nav__footer">'
+        + '<a class="nav__user" href="index.html" aria-current="page" aria-label="Хаб проектов">'
+        + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
+        + '<span class="nav__user-text">'
+        + '<span class="nav__user-name">Александров Петр Константинович</span>'
+        + '<span class="nav__user-role">Хаб проектов</span>'
+        + '</span></a>'
+        + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>'
+        + '</div>';
+    nav.innerHTML = s;
+    if (window.DSNavPanel) window.DSNavPanel.bind(nav);
+  }
+
+  /* строка — Entity-ссылка; соседние строки только внутри .entity-list (Entity 1.008) */
+  function rowHTML(p) {
+    return '<a class="entity entity--interactive" href="' + esc(p.href) + '">'
+      + '<div class="entity__lead"><span class="entity__icon" aria-hidden="true">' + ic(p.icon) + '</span></div>'
+      + '<div class="entity__main">'
+      + '<div class="entity__titles">'
+      + '<p class="entity__header">' + esc(folderOf(p)) + '</p>'
+      + '<div class="entity__labelrow">'
+      + '<span class="entity__label entity__label--truncate" data-tooltip="' + esc(p.title) + '" data-tooltip-truncated="only">' + esc(p.title) + '</span>'
+      + '</div>'
+      + '</div>'
+      + '<div class="entity__subs entity__subs--single"><span class="entity__subs-list">' + esc(p.desc) + '</span></div>'
+      + '</div>'
+      + '</a>';
+  }
+
+  function buildGroups() {
+    var host = document.getElementById('hub-groups');
+    var html = '';
+    GROUPS.forEach(function (g) {
+      var items = itemsOf(g.key);
+      if (!items.length) return;
+      html += '<section class="tile col-3 colw-6">';
+      html += '<header class="tile__header"><div class="tile__header-main"><div class="tile__title-row">'
+        + '<h2 class="tile__title">' + esc(g.label) + '</h2>'
+        + '</div></div></header>';
+      html += '<div class="tile__body"><div class="entity-list">' + items.map(rowHTML).join('') + '</div></div>';
+      html += '</section>';
+    });
+    host.innerHTML = html;
+  }
+
+  buildNav();
+  buildGroups();
+  if (window.dsIcons) window.dsIcons.apply(document);
+})();
+</script>
+</body>
+</html>

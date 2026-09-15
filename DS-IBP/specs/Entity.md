@@ -1,8 +1,8 @@
 ---
 component: Entity
 title: "Entity"
-version: "1.007"
-updated: "11.09.2026"
+version: "1.008"
+updated: "15.09.2026"
 page: pages/organisms/Entity.html
 css: styles/entity.css
 deps: [avatar, chip, icon-button, button, badge]
@@ -22,6 +22,8 @@ status: manual
 - Действия (EntityActions) — максимум 2; больше → кебаб-меню, не третья кнопка в ряд.
 - Вложенный интерактив (кнопка действия, чекбокс выбора) не всплывает до обработчика строки (`stopPropagation`) — иначе клик по вложенной кнопке одновременно выберет/откроет строку.
 - EntityTextMaster/EntitySubtitleGroup/EntityIconButtonGroup/EntityActions — внутренние узлы DS-разметки, отдельно не публикуются.
+- `.entity--interactive` выносит подложку hover наружу: `padding: 8px 10px` компенсирован `margin: -8px -10px`, контент стоит на одной вертикали с окружением, а подложка выходит за строку на 8px сверху и снизу и на 10px по бокам. Отсюда два правила: **соседние интерактивные строки — только внутри `.entity-list`** (зазор 16px = две выноски, подложки стыкуются без наложения; свой контейнер с меньшим зазором — подложка накрывает соседа), и **родитель списка даёт поля не меньше 8/10px** (тело Tile — с запасом), иначе подложку обрежет. Охраняется правилом Б33 сенсора экранов.
+- Корень может быть ссылкой `<a class="entity …">`, когда строка ведёт на объект: подчёркивание сбрасывает компонент (`a.entity`), экран его не переписывает.
 
 ## Диагностика
 - «Заголовок вылезает/переносится на 3+ строки» → `.entity__label--truncate`
@@ -29,6 +31,8 @@ status: manual
 - «Subheaders занимают лишние строки» → клэмп `.entity__subs` (2 строки) + счётчик `.entity__subs-more`
 - «Аватар/иконка пуста в скелетоне» → `.entity--skeleton` (`.sk-surface` на иконке, сохраняет размер/радиус)
 - «Клик по вложенной кнопке выбирает/открывает строку» → проверить stopPropagation — элемент должен быть настоящей кнопкой, не div
+- «Подложка hover накрывает соседнюю строку» → строки стоят в своём контейнере с зазором меньше 16px; собрать их в `.entity-list`
+- «Строка-ссылка подчёркнута» → корень `<a>` без класса `.entity`: подчёркивание сбрасывает только `a.entity`
 
 ## Размеры
 Три размера по величине ведущего элемента; типографика и зазоры масштабируются вместе.
@@ -55,7 +59,7 @@ status: manual
 - Вложенные подкомпоненты (EntityTextMaster, EntitySubtitleGroup, EntityIconButtonGroup, EntityActions) — только в ДС дизайнеров, отдельно не публикуются.
 
 ## Состояния
-- `.entity--interactive` — кликабельный тайл: hover-фон `--bgtable-row-hover`, фокус-обводка.
+- `.entity--interactive` — кликабельный тайл: hover-фон `--bgtable-row-hover`, фокус-обводка. Подложка выносится наружу на 8/10px — несколько строк подряд собираются в `.entity-list`.
 - `.entity--selected` — выбран, фон `--primary-bg`; CSS реагирует и на `[aria-selected="true"]` напрямую — класс нужен только для форс-состояния витрины (RulesAudit W1, 12.08.2026).
 - `.entity--selectable` — реальный чекбокс в `.entity__lead` (множественный выбор).
 - `.entity--skeleton` — загрузка: ведущая иконка получает `.sk-surface` (сохраняет размер/радиус), строки — `.sk-line`; общий компонент Skeleton (styles/skeleton.css), `aria-busy`; шиммер замедляется при reduced-motion.
@@ -104,6 +108,12 @@ status: manual
     <button class="btn btn--outline btn--xs" aria-haspopup="menu">…</button>
     <button class="ibtn ibtn--neutral ibtn--s" aria-label="Убрать"><svg…></svg></button>
   </div>
+</div>
+
+<!-- список интерактивных строк-ссылок -->
+<div class="entity-list">
+  <a class="entity entity--interactive" href="…">…</a>
+  <a class="entity entity--interactive" href="…">…</a>
 </div>
 ```
 
@@ -159,7 +169,8 @@ interface EntityProps {
 | .entity__icons | div | EntityIconButtonGroup (IconButton S) |
 | .entity__actions | div | EntityActions: до 2 кнопок + закрытие; align-self start |
 | .entity__drag | button | Грип переупорядочивания |
-| .entity--interactive | .entity | Кликабельный тайл |
+| .entity--interactive | .entity | Кликабельный тайл; подложка выносится на 8/10px |
+| .entity-list | div | Список сущностей: flex-колонка, зазор 16px; соседние `--interactive` — только внутри |
 | .entity--selected | .entity | Выбран, фон --primary-bg |
 | .entity--skeleton | .entity | Загрузка: .sk-surface на иконке + .sk-line в строках, aria-busy |
 | .entity--empty | .entity | Нет данных, Label «—» |

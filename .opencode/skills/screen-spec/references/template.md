@@ -1,7 +1,7 @@
 ---
 screen: DealRegistry
 title: Реестр сделок
-file: Projects/test/DealRegistry.html
+file: Concepts/DealRegistry/DealRegistry.html
 source: ТЗ — DS-IBP/uploads/ТЗ-реестр-сделок.docx
 version: "1.000"
 created: "26.08.2026"

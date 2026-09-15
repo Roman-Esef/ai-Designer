@@ -155,7 +155,8 @@ node .opencode/skills/screen-review/tooling/lessons-cli.mjs add --from <черн
 ```
 .opencode/skills/screen-review/tooling/fixtures/   корпус сенсора (Б, З, К, K)
 DS-IBP/fixtures/                    корпус линтера, СТРАНИЦЫ (A…F, C1/C2/C7, L1/L2, R)
-Projects/test/fixtures/             корпус линтера, ЭКРАНЫ (A7, F6, L4, L5, L6)
+.opencode/skills/screen-review/tooling/fixtures/lint-screens/
+                                    корпус линтера, ЭКРАНЫ (A7, F6, L4, L5, L6)
   _base.ok.html     эталон без дефектов
   <ID>.bad.html     эталон + РОВНО ОДИН дефект
   <ID>@<вариант>.bad.html   тот же дефект на другом ВХОДЕ правила

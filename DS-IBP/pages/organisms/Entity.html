@@ -128,8 +128,8 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     Обзор компонентов
   </a>
   <div class="meta">
-    <span>Версия <b>1.007</b></span>
-    <span>Обновлено <b>11.09.2026</b></span>
+    <span>Версия <b>1.008</b></span>
+    <span>Обновлено <b>15.09.2026</b></span>
     <span>CSS <b>styles/entity.css</b></span>
     <span>Зависимости <b>avatar, chip, icon-button, button, badge</b></span>
   </div>
@@ -392,6 +392,28 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
 <div class="subsec" data-screen-label="ClickTarget">
     <h3>Клик по тайлу и вложенные действия</h3>
     <p class="desc">В интерактивном режиме (<code class="tok">entity--interactive</code>) кликабельна вся строка целиком, а не только Label — это увеличивает область попадания и упрощает выбор в списках. Если внутри тайла есть собственные интерактивные элементы (кнопка действия, чекбокс выбора), их клик не должен всплывать до обработчика строки (<code class="tok">stopPropagation</code>) — иначе клик по кнопке «Удалить» одновременно откроет/выберет саму сущность.</p>
+  </div>
+
+<div class="subsec" data-screen-label="EntityList">
+    <h3>Список интерактивных строк</h3>
+    <p class="desc">Интерактивная строка выносит подложку hover наружу: <code class="tok">padding: 8px 10px</code> компенсирован <code class="tok">margin: -8px -10px</code>, поэтому контент стоит на одной вертикали с окружением, а подложка выходит за строку на 8px сверху и снизу. Несколько строк подряд собираются только в <code class="tok">.entity-list</code>: зазор 16px — ровно две выноски, подложки соседей стыкуются и не накрывают друг друга. Свой контейнер с зазором меньше 16px даёт наложение — на экранах его ловит сенсор (Б33). Родитель списка даёт поля не меньше 8/10px, иначе подложку обрежет. Строка, ведущая на объект, — ссылка <code class="tok">&lt;a class="entity entity--interactive"&gt;</code>: подчёркивание сбрасывает компонент.</p>
+    <div class="st-card">
+      <div class="st-card__label"><b>Список</b> · .entity-list, наведите на строку</div>
+      <div class="entity-list">
+        <a class="entity entity--interactive" href="#">
+          <div class="entity__lead"><span class="entity__icon"><i data-icon="bank"></i></span></div>
+          <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label">ООО ЮгСтрой</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">ИНН 7701234567</span></div></div>
+        </a>
+        <a class="entity entity--interactive" href="#">
+          <div class="entity__lead"><span class="entity__icon"><i data-icon="bank"></i></span></div>
+          <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label">АО СеверИнвест</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">ИНН 7702345678</span></div></div>
+        </a>
+        <a class="entity entity--interactive" href="#">
+          <div class="entity__lead"><span class="entity__icon"><i data-icon="bank"></i></span></div>
+          <div class="entity__main"><div class="entity__titles"><p class="entity__header">Контрагент</p><div class="entity__labelrow"><span class="entity__label">ПАО ВостокЛизинг</span></div></div><div class="entity__subs entity__subs--single"><span class="entity__subs-list">ИНН 7703456789</span></div></div>
+        </a>
+      </div>
+    </div>
   </div>
   </section>
 
@@ -962,6 +984,23 @@ function buildEntity(cfg) {
 }
 .entity--interactive:hover { background: var(--bgtable-row-hover); }
 .entity--interactive:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+
+/* Корень-ссылка: строка ведёт на объект. Цвет задаёт .entity, здесь только
+   сброс браузерного подчёркивания — экран его не переписывает. */
+a.entity { text-decoration: none; }
+
+/* Список сущностей. Интерактивная строка выносит подложку наружу отрицательным
+   margin (8px по вертикали, 10px по горизонтали), чтобы контент стоял на одной
+   вертикали с окружением. Поэтому соседние строки ставятся только сюда: зазор
+   16px = две выноски по 8px, подложки соседей стыкуются без наложения. Поля
+   8/10px вокруг списка даёт родитель (тело Tile — с запасом). */
+.entity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+}
+.entity-list[hidden] { display: none; }
 /* Класс .entity--selected — форс-состояние витрины; реальный выбор из списка
    несёт aria-selected="true" на самом тайле (RulesAudit W1). */
 .entity:is(.entity--selected,[aria-selected="true"]) { background: var(--primary-bg); }

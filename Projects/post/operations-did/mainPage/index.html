@@ -99,6 +99,11 @@
      Каталог не трогаем: он общий для ДС, а пути к экранам знает только этот экран.
      Пункты без реальной страницы остаются href="#". */
   var PAGE_HREFS = { 'current-portfolio': '../Portfolio-did/Portfolio.html' };
+  /* строка пользователя в футере меню ведёт на хаб проектов (корневой index.html).
+     Футер отдаёт IBPHome.footerHTML с зашитым href="#" — подменяем ссылку
+     здесь, каталог ДС не трогаем. Проверяет сторож projects-hub.mjs. */
+  var USER_LINK_FROM = ' href="#" aria-label="Открыть личный кабинет"';
+  var USER_LINK_TO = ' href="../../../../index.html" aria-label="Хаб проектов"';
 
   function ic(name) { return '<i data-icon="' + name + '"></i>'; }
   function pageHref(id) { return PAGE_HREFS[id] || '#'; }
@@ -137,9 +142,9 @@
     });
     s += '</div>';
     s += (window.IBPHome && window.IBPHome.footerHTML)
-      ? window.IBPHome.footerHTML(role, { logoutModal: 'role-modal', logoutLabel: 'Сменить роль / выйти' })
+      ? window.IBPHome.footerHTML(role, { logoutModal: 'role-modal', logoutLabel: 'Сменить роль / выйти' }).replace(USER_LINK_FROM, USER_LINK_TO)
       : '<div class="nav__footer">'
-        + '<a class="nav__user" href="#" aria-label="Открыть личный кабинет">'
+        + '<a class="nav__user" href="../../../../index.html" aria-label="Хаб проектов">'
         + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
         + '<span class="nav__user-text">'
         + '<span class="nav__user-name">Александров Петр Константинович</span>'

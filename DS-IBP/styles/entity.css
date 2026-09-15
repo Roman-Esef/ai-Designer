@@ -235,6 +235,23 @@
 }
 .entity--interactive:hover { background: var(--bgtable-row-hover); }
 .entity--interactive:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+
+/* Корень-ссылка: строка ведёт на объект. Цвет задаёт .entity, здесь только
+   сброс браузерного подчёркивания — экран его не переписывает. */
+a.entity { text-decoration: none; }
+
+/* Список сущностей. Интерактивная строка выносит подложку наружу отрицательным
+   margin (8px по вертикали, 10px по горизонтали), чтобы контент стоял на одной
+   вертикали с окружением. Поэтому соседние строки ставятся только сюда: зазор
+   16px = две выноски по 8px, подложки соседей стыкуются без наложения. Поля
+   8/10px вокруг списка даёт родитель (тело Tile — с запасом). */
+.entity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+}
+.entity-list[hidden] { display: none; }
 /* Класс .entity--selected — форс-состояние витрины; реальный выбор из списка
    несёт aria-selected="true" на самом тайле (RulesAudit W1). */
 .entity:is(.entity--selected,[aria-selected="true"]) { background: var(--primary-bg); }

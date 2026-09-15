@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<!-- Экран «Журнал действий» (ActivityLog) модуля Аналитические материалы.
+     Собран на компонентах IBP DS по ТЗ: БТ-11 (журнал действий и хранение
+     материалов), БТ-1.10 (каждая выгрузка фиксируется), БТ-9 (права).
+     Контекст для правки: DS-IBP/specs/_cheatsheet.md. CSS компонентов не читать. -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Журнал действий — Аналитические материалы — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; scrollbar-gutter: stable; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка этого экрана ──────────────────────────────────────────────
+     Экран-реестр: вертикальный ритм 12px, таблица занимает всю свободную
+     высоту (.screen--app + .dtable--fill). Над таблицей — одна плашка правил
+     хранения: она фиксированной высоты и высоту у таблицы не отнимает сверх
+     своей. */
+  .screen__content { gap: var(--space-12); }
+  .log-pane { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .log-pane[hidden] { display: none; }
+
+  /* Тулбар без заголовка: слева фильтр, справа настройка колонок. В ДС зоны
+     тулбара выровнены по нижнему краю — под двухстрочный блок «заголовок +
+     счётчик»; без него шестерёнка встаёт на 6px ниже фильтра. Выравнивание по
+     центру — как у варианта ДС «тулбар над таблицей» (.dtable-toolbar). */
+  .dtable__toolbar { align-items: center; }
+
+  /* Сетка полей в модалке. .tile__grid берёт зазоры из --tile-gap-row и
+     --tile-gap-col, а их задаёт только тайл: вне тайла зазоров нет, и ряды
+     полей слипались. Здесь сетке передаются те же переменные — 24px. */
+  .modal__body > .tile__grid { --tile-gap-row: var(--space-24); --tile-gap-col: var(--space-24); }
+
+  /* Строки таблицы выравниваются по ширине скроллпорта — обход дефекта ДС:
+     min-width:max-content у строки прокручиваемой таблицы вместе с резиновыми
+     треками даёт каждой строке свою ширину, колонки расходятся по вертикали,
+     усечение не срабатывает. Подробно — в ActivityLog.screen.md. */
+  .dtable__body .tbl__row { min-width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+      <button class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item" href="index.html"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Origination</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="funds"></i></span><span class="nav__label">Фонды</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Отчёты</div>
+        <a class="nav__item nav__item--acc" href="#" aria-expanded="true" aria-controls="nav-sub-analytics"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">Аналитические материалы</span><span class="nav__caret"><i data-icon="chevron-down"></i></span></a>
+        <div class="nav__sub" id="nav-sub-analytics"><div class="nav__sub-in">
+          <a class="nav__item" href="RequestThread.html"><span class="nav__label">Новый отчёт</span></a>
+          <a class="nav__item" href="RequestHistory.html"><span class="nav__label">История и материалы</span></a>
+          <a class="nav__item nav__item--selected" href="ActivityLog.html" aria-current="page"><span class="nav__label">Журнал</span></a>
+        </div></div>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Pipeline</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-pipeline"></i></span><span class="nav__label">DCM Pipeline</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="payments-ib"></i></span><span class="nav__label">Реестр платежей IB</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Клиенты и задачи</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="factory-01"></i></span><span class="nav__label">Клиенты</span></a>
+        <a class="nav__item" href="#" aria-label="Задачи, 7"><span class="nav__ico"><i data-icon="tasks"></i></span><span class="nav__label">Задачи</span><span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">7</span></span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <a class="nav__user" href="../../index.html" aria-label="Хаб проектов">
+        <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Александров Пётр Константинович</span><span class="nav__user-role">Консультант-аналитик ДИД</span></span>
+      </a>
+      <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <div class="screen screen--app">
+
+    <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
+      <li class="crumbs__item"><a class="link link--muted" href="index.html">Главная</a></li>
+      <li class="crumbs__item"><a class="link link--muted" href="RequestHistory.html">Аналитические материалы</a></li>
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Журнал действий</span>
+      </li>
+    </nav>
+
+    <main class="screen__content">
+
+      <div class="phead">
+        <div class="phead__main">
+          <div class="phead__title-row">
+            <div class="phead__title-group">
+              <h1 class="phead__title">Журнал действий</h1>
+            </div>
+            <div class="phead__chips">
+              <span class="chip chip--rounded chip--s chip--info"><span class="chip__label">Доступно уполномоченным сотрудникам</span></span>
+            </div>
+          </div>
+          <div class="phead__subtitle">
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="check-shield"></i></span>Срок хранения записей — 5 лет</span>
+            <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="server-05"></i></span>Обработка и хранение — в контуре Банка</span>
+            <span class="phead__meta"><span class="phead__meta-ico phead__meta-ico--ok"><i data-icon="check-circle"></i></span>Данные не используются для обучения моделей</span>
+          </div>
+        </div>
+        <div class="phead__actions" data-actions-overflow>
+          <button class="btn btn--outline btn--m" data-modal="retention-scrim"><i data-icon="help-circle"></i><span class="btn__label">Правила хранения</span></button>
+          <button class="btn btn--accent btn--m" id="btnExportLog"><i data-icon="download"></i><span class="btn__label">Выгрузить журнал</span></button>
+        </div>
+      </div>
+
+      <div class="log-pane">
+        <div class="dtable dtable--fill" role="region" aria-label="Записи журнала">
+          <div class="dtable__toolbar">
+            <div class="dtable__toolbar-left">
+              <div class="tfilter" role="group" aria-label="Фильтр таблицы">
+                <button class="btn btn--outline btn--s tfilter__open" aria-haspopup="dialog" aria-expanded="false" data-modal="logfilter-scrim"><i data-icon="filter"></i><span class="btn__label">Фильтр</span></button>
+                <span class="chip chip--edit chip--m tfilter__applied" tabindex="0"><span class="chip__label">Применено: 1</span><span class="chip__remove" role="button" aria-label="Сбросить все фильтры"><i data-icon="close"></i></span></span>
+              </div>
+            </div>
+            <div class="dtable__toolbar-right">
+              <button class="ibtn ibtn--neutral ibtn--m" aria-label="Настроить колонки" data-table-settings><i data-icon="settings"></i></button>
+            </div>
+          </div>
+
+          <div class="dtable__body">
+            <div class="tbl" data-table data-sort-rows>
+
+              <div class="tbl__row tbl__row--head" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="th th--separator"></div>
+                <div class="th th--sorted" aria-sort="descending" data-sort-type="date">
+                  <span class="th__label">Дата</span>
+                  <span class="th__tools">
+                    <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
+                    <button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="date" aria-label="Сортировать"><i data-icon="arrow-narrow-down"></i></button>
+                  </span>
+                  <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                </div>
+                <div class="th"><span class="th__label">Время</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                <div class="th" aria-sort="none">
+                  <span class="th__label">Сотрудник</span>
+                  <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="user" aria-label="Сортировать"><i data-icon="arrow-up-down"></i></button></span>
+                  <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
+                </div>
+                <div class="th"><span class="th__label">Действие</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                <div class="th"><span class="th__label">Объект и подробности</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                <div class="th"><span class="th__label">Результат</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+                <div class="th th--separator"></div>
+              </div>
+
+              <div class="tbl__row" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">12.09.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">14:22</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Александров П. К.</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="download"></i></span><span class="tc__text tc__text--truncate">Выгрузка материала</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ГК «Северный агрохолдинг» — материал с идеями, версия 2, PDF и Word</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Успешно</span></span></span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+
+              <div class="tbl__row" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">12.09.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">09:05</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Александров П. К.</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="ai-stars"></i></span><span class="tc__text tc__text--truncate">Подготовка материала</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ГК «Северный агрохолдинг» — создана версия 2 по уточнению из нити</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Полнота ограничена</span></span></span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+
+              <div class="tbl__row" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">12.09.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">08:51</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Александров П. К.</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="add"></i></span><span class="tc__text tc__text--truncate">Создание запроса</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «ЮгСтрой» — M&amp;A в смежном сегменте, черновик из конструктора</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Успешно</span></span></span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+
+              <div class="tbl__row" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">11.09.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">14:03</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Александров П. К.</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="attach"></i></span><span class="tc__text tc__text--truncate">Загрузка файлов</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">3 файла к запросу «ГК «Северный агрохолдинг» — выход миноритария»</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">2 из 3</span></span></span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+
+              <div class="tbl__row" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">11.09.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">13:58</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Система встреч</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="link-external"></i></span><span class="tc__text tc__text--truncate">Вызов из рабочего места</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Встреча 10.09.2026 передала контекст в конструктор запроса</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Успешно</span></span></span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+
+              <div class="tbl__row" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">10.09.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">09:16</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Александров П. К.</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="user-circle"></i></span><span class="tc__text tc__text--truncate">Предоставление доступа</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Материал по бенефициару Токарев П. А. открыт Смирновой Е. В.</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Успешно</span></span></span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+
+              <div class="tbl__row" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">09.09.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">16:04</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Александров П. К.</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="download"></i></span><span class="tc__text tc__text--truncate">Выгрузка материала</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">АО «Метизный завод» — краткий материал, PDF</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Успешно</span></span></span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+
+              <div class="tbl__row" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">08.09.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">13:31</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Александров П. К.</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="ai-stars"></i></span><span class="tc__text tc__text--truncate">Подготовка материала</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Рынок минеральных удобрений, СЗФО — все источники данных недоступны</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="chip chip--s chip--error"><span class="chip__label">Ошибка</span></span></span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+
+              <div class="tbl__row" style="grid-template-columns:8px 150px 100px minmax(0,1.6fr) 220px minmax(0,2.2fr) 150px minmax(8px,1fr);">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">06.09.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text">11:47</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">Александров П. К.</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__icon tc__icon--lead"><i data-icon="trash"></i></span><span class="tc__text tc__text--truncate">Удаление запроса</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="tc__text tc__text--truncate">ООО «Агро-Транзит» — перемещён в корзину, окончательное стирание 06.10.2026</span></span></div>
+                <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Успешно</span></span></span></div>
+                <div class="tc tc--separator"></div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="dtable__footer">
+            <div class="pgn-row">
+              <div class="pgn-row__left">
+                <div class="pgn-info"><span class="pgn-info__item">Записей за выбранный период: 248</span></div>
+              </div>
+              <!-- Пагинатор собран разметкой, а не хуком data-pagination:
+                   рантайм ds-pagination.js читает data-total/-page/-page-size
+                   в плоский state, а buildRow ждёт их во вложенном o.pager —
+                   значения теряются и рисуется демо-дефолт. Дефект ДС описан
+                   в ActivityLog.screen.md; файлы ДС не правились. -->
+              <div class="pgn-row__right">
+                <div class="pgn">
+                  <span class="pgn__pagesize"><span class="pgn__pagesize-label">Показывать строк: <b>50</b></span><button class="pgn__pagesize-btn" aria-haspopup="listbox" aria-label="Изменить размер страницы"><i data-icon="chevron-down"></i></button></span>
+                  <span class="pgn__range">1 из 5</span>
+                  <nav class="pgn__nav" aria-label="Страницы">
+                    <button class="pgn__arrow" aria-label="Предыдущая страница" aria-disabled="true"><i data-icon="chevron-left"></i></button>
+                    <button class="pgn__num" aria-current="page">1</button>
+                    <button class="pgn__num">2</button>
+                    <button class="pgn__num">3</button>
+                    <button class="pgn__num">4</button>
+                    <button class="pgn__num">5</button>
+                    <button class="pgn__arrow" aria-label="Следующая страница"><i data-icon="chevron-right"></i></button>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Модалка фильтра журнала (созависима с кнопкой «Фильтр») ───────────── -->
+<div class="modal-scrim" id="logfilter-scrim" hidden data-modal-guarded>
+  <div class="modal modal--w6 tfm" role="dialog" aria-modal="true" aria-labelledby="logtfm-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="logtfm-title">Фильтр</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body modal__body--flush">
+      <div class="tfm__body">
+        <nav class="tabs tabs--vert tfm__nav" aria-label="Разделы фильтра">
+          <button type="button" class="tab tab--m tab--vert tab--selected" aria-current="true" data-target="log-sec-general"><span class="tab__label">Общая информация</span><span class="tab__badge">1</span></button>
+          <button type="button" class="tab tab--m tab--vert" data-target="log-sec-dates"><span class="tab__label">Даты</span></button>
+        </nav>
+        <div class="tfm__panel">
+
+          <section class="tfm__sec" id="log-sec-general">
+            <h3 class="tfm__sec-title">Общая информация</h3>
+            <div class="tfm__grid">
+              <div class="inp inp--m">
+                <label class="ds-label" for="logUser"><span class="ds-label__text">Сотрудник</span></label>
+                <div class="inp__field" role="combobox" aria-expanded="false" aria-controls="ddl-log-user" data-ddl="ddl-log-user">
+                  <input class="inp__control" id="logUser" placeholder="Любой">
+                  <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+                </div>
+                <div id="ddl-log-user" class="ddl ddl--floating" role="listbox">
+                  <button class="ddl__item" role="option" aria-selected="false"><span class="ddl__item-body"><span class="ddl__item-label">Александров П. К.</span></span></button>
+                  <button class="ddl__item" role="option" aria-selected="false"><span class="ddl__item-body"><span class="ddl__item-label">Смирнова Е. В.</span></span></button>
+                  <button class="ddl__item" role="option" aria-selected="false"><span class="ddl__item-body"><span class="ddl__item-label">Система встреч</span></span></button>
+                </div>
+              </div>
+
+              <div class="inp inp--m">
+                <label class="ds-label" for="logObject"><span class="ds-label__text">Объект анализа</span></label>
+                <div class="inp__field">
+                  <input class="inp__control" id="logObject" placeholder="Наименование объекта">
+                </div>
+              </div>
+
+              <div class="tfm__span-2">
+                <div class="cb-group" role="group" aria-labelledby="log-act-t">
+                  <p class="cb-group__title" id="log-act-t">Действие</p>
+                  <div class="cb-group__items">
+                    <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Создание запроса</span></span></label>
+                    <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Загрузка файлов</span></span></label>
+                    <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Подготовка материала</span></span></label>
+                    <label class="cb"><input type="checkbox" class="cb__input" checked><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Выгрузка материала</span></span></label>
+                    <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Предоставление доступа</span></span></label>
+                    <label class="cb"><input type="checkbox" class="cb__input"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Удаление запроса</span></span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="tfm__sec" id="log-sec-dates">
+            <h3 class="tfm__sec-title">Даты</h3>
+            <div class="tfm__grid">
+              <div class="inp-range inp-range--date tfm__span-2">
+                <label class="ds-label"><span class="ds-label__text">Период записей</span></label>
+                <div class="inp-range__row">
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">От</span>
+                      <input class="inp__control" inputmode="numeric" placeholder="ДД.ММ.ГГГГ" value="01.09.2026" aria-label="Период записей, от">
+                      <span class="inp__acts"><button type="button" class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                  <span class="inp-range__line" aria-hidden="true"></span>
+                  <div class="inp inp--m inp-range__field">
+                    <div class="inp__field">
+                      <span class="inp__prefix">До</span>
+                      <input class="inp__control" inputmode="numeric" placeholder="ДД.ММ.ГГГГ" value="12.09.2026" aria-label="Период записей, до">
+                      <span class="inp__acts"><button type="button" class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button></span>
+                    </div>
+                  </div>
+                </div>
+                <span class="ds-helper ds-helper--left">Записи журнала хранятся 5 лет — период можно задать за любой месяц в пределах срока хранения</span>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Очистить фильтр</span></button>
+        <button class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Применить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- ── Модалка правил хранения (БТ-11.2, БТ-11.4, БТ-11.5, БТ-11.6) ─────── -->
+<div class="modal-scrim" id="retention-scrim" hidden>
+  <div class="modal modal--w5" role="dialog" aria-modal="true" aria-labelledby="ret-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="ret-title">Правила хранения и обработки</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div class="tile__grid" style="grid-template-columns:repeat(2,1fr);">
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Записи журнала</span></span>
+          <div class="rof__row"><span class="rof__value">5 лет с даты события</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Запросы и диалоги</span></span>
+          <div class="rof__row"><span class="rof__value">3 года с даты последнего обращения</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Приложенные файлы</span></span>
+          <div class="rof__row"><span class="rof__value">3 года, вместе с запросом</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Удалённые запросы</span></span>
+          <div class="rof__row"><span class="rof__value">30 дней в корзине, затем стираются</span></div>
+        </div>
+        <div class="rof tile__grid-full">
+          <span class="ds-label"><span class="ds-label__text">Что фиксируется</span></span>
+          <div class="rof__row"><span class="rof__value">Создание запроса, загрузка файлов, подготовка и выгрузка материала, предоставление доступа другим сотрудникам, удаление и восстановление запроса.</span></div>
+        </div>
+        <div class="rof tile__grid-full">
+          <span class="ds-label"><span class="ds-label__text">Обучение моделей и контур обработки</span></span>
+          <div class="rof__row"><span class="rof__value">Данные пользователей и загруженные материалы не используются для обучения моделей. Обработка и хранение остаются в информационном контуре Банка.</span></div>
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Понятно</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="../../DS-IBP/scripts/ds.js"></script>
+<script>
+/* ============================================================================
+   Скрипт экрана «Журнал действий».
+
+   Рантаймы ДС дают сортировку, порядок и ширину колонок, настройку колонок,
+   пагинацию, модалки и выпадающие списки. Здесь — только якорные переходы
+   по разделам модалки фильтра (ДС оставляет их потребителю) и сообщение о
+   выгрузке журнала (БТ-11.3).
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  var navBtns = document.querySelectorAll('.tfm__nav [data-target]');
+  Array.prototype.forEach.call(navBtns, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(navBtns, function (b) {
+        b.classList.toggle('tab--selected', b === btn);
+        b.setAttribute('aria-current', b === btn ? 'true' : 'false');
+      });
+      var sec = document.getElementById(btn.getAttribute('data-target'));
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  document.getElementById('btnExportLog').addEventListener('click', function () {
+    if (window.DSSnack) {
+      window.DSSnack.show({
+        tone: 'success', title: 'Журнал выгружен',
+        text: '248 записей за период 01.09.2026 — 12.09.2026. Файл промаркирован по политике Банка, сама выгрузка записана в журнал.'
+      });
+    }
+  });
+})();
+</script>
+</body>
+</html>
