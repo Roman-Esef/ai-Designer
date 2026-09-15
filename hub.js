@@ -53,5 +53,14 @@ window.IBPHub = [
     href: 'Concepts/ai-bankster-prototype/index.html',
     root: 'Concepts/ai-bankster-prototype',
     icon: 'folder'
+  },
+  {
+    id: 'ai-bankster-prototype-v02',
+    group: 'concepts',
+    title: 'AI Pitcher',
+    desc: 'Прототип v02: чат с конструктором запроса и просмотром материала',
+    href: 'Concepts/ai-bankster-prototype-v02/index.html',
+    root: 'Concepts/ai-bankster-prototype-v02',
+    icon: 'ai-stars'
   }
 ];
