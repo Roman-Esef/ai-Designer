@@ -37,12 +37,12 @@ window.IBPHub = [
     icon: 'layer-01'
   },
   {
-    id: 'operations-did',
+    id: 'post',
     group: 'projects',
-    title: 'Портфель ДИД',
-    desc: 'Финансист ДИД: главная и текущий портфель',
-    href: 'Projects/post/operations-did/mainPage/index.html',
-    root: 'Projects/post/operations-did',
+    title: 'Post — ДИД',
+    desc: 'Финансист ДИД: главная, текущий портфель, страница сделки',
+    href: 'Projects/post/mainPage/index.html',
+    root: 'Projects/post',
     icon: 'folder'
   },
   {
