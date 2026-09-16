@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<!-- Pipeline Management — сделки и лиды из всех pipeline проекта одним экраном.
+     Вид: канбан-доска (колонки по стадиям или по дескам) или таблица.
+     Данные: Все / Pipeline (сделки) / Лиды. Под каждой колонкой доски — сумма
+     дохода и объёма карточек колонки. Клик по карточке или строке — панель
+     сделки (Drawer). Стрелка в шапке колонки — «провалиться» в деск или стадию.
+
+     Основа — Kanban из ДС (DS-IBP/specs/Kanban.md); собственное поверх ДС:
+     итоги колонки (.pm-colsum), лента групп «Лиды / Pipeline» (.pm-rail),
+     зазор между группами колонок. Всё — на токенах, см. спеку экрана.
+     Разметка доски, таблицы и списков строится экранным скриптом из
+     data/pipeline-data.js. Якоря секций: #sec:head, #sec:content, #sec:modals, #sec:script. -->
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Management — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка экрана ────────────────────────────────────────────────────
+     Экран-реестр: ритм 12px (шапка → тулбар → доска/таблица), рабочая
+     область .screen--app, доска и таблица занимают всю оставшуюся высоту. */
+  .screen__content { gap: var(--space-12); }
+
+  .pm-toolbar { display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap; flex: none; min-width: 0; }
+  /* левая зона не ужимается меньше своего содержимого: на узком экране
+     правая зона переносится строкой ниже, а не наезжает на фильтр */
+  .pm-toolbar__left { flex: 1 0 auto; display: flex; align-items: center; gap: var(--space-8); }
+  .pm-toolbar__right { margin-left: auto; display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap; }
+
+  /* Хост-контракт Kanban: колоночный родитель с определённой высотой */
+  .pm-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .pm-pane { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .pm-pane[hidden] { display: none; }
+
+  /* Доска без собственного тулбара: лента групп → вьюпорт, зазор 8 */
+  .pm-pane .kanban { gap: var(--space-8); }
+
+  /* ── Лента групп «Лиды / Pipeline» над колонками ─────────────────────────
+     Живёт вне вьюпорта (у вьюпорта один скролл, и ряд колонок в нём не
+     трогаем), горизонтальную прокрутку повторяет сдвигом. */
+  .pm-rail { position: relative; flex: none; overflow: hidden; height: var(--space-32); }
+  .pm-rail[hidden] { display: none; }
+  .pm-rail__track { position: absolute; top: 0; left: 0; height: 100%; }
+  .pm-rail__seg {
+    position: absolute; top: 0; height: 100%;
+    display: flex; align-items: center; gap: var(--space-8);
+    padding: 0 var(--space-8);
+    border-bottom: 1px solid var(--border-primary);
+    white-space: nowrap; overflow: hidden;
+  }
+  .pm-rail__name { font: var(--type-body-m-strong); color: var(--text-primary); }
+  .pm-rail__sum { margin-left: auto; font: var(--type-body-s); color: var(--text-secondary); }
+
+  /* Разрыв между группами колонок: лиды и сделки не сливаются в один ряд */
+  .kbcol.pm-col--group-start { margin-left: var(--space-24); }
+
+  /* ── Итоги колонки: липкий подвал ────────────────────────────────────────
+     Колонка тянется по самой длинной (инвариант Kanban), поэтому подвал,
+     прижатый margin-top:auto и залипающий снизу, всегда виден у нижней
+     кромки вьюпорта. Непрозрачная база + тон состояния слоем — как у шапки. */
+  .pm-pane .kbcol__body { margin-bottom: var(--space-8); }
+  .pm-colsum {
+    position: sticky; bottom: 0; z-index: 2;
+    margin: auto calc(-1 * var(--kb-col-pad)) calc(-1 * var(--kb-col-pad));
+    padding: var(--space-8) var(--space-16);
+    display: flex; flex-direction: column; gap: var(--space-2);
+    border-top: 1px solid var(--border-light);
+    border-radius: 0 0 var(--radius-m) var(--radius-m);
+    background-color: var(--bg-page);
+  }
+  .pm-colsum__row { display: flex; align-items: baseline; gap: var(--space-8); min-width: 0; }
+  .pm-colsum__label { font: var(--type-body-xs); color: var(--text-inactive); }
+  .pm-colsum__value { margin-left: auto; font: var(--type-body-s-strong); color: var(--text-primary); white-space: nowrap; }
+  .pm-colsum__value--sub { font: var(--type-body-xs); color: var(--text-secondary); }
+  .kbcol:hover > .pm-colsum,
+  .kbcol.kbcol--drop > .pm-colsum { background-image: linear-gradient(var(--primary-bg), var(--primary-bg)); }
+  .kanban.is-dragging .kbcol:hover:not(.kbcol--drop) > .pm-colsum { background-image: none; }
+  .kbcol--collapsed > .pm-colsum { display: none; }
+
+  /* «+N» у значения поля карточки */
+  .pm-more { color: var(--text-inactive); }
+
+  /* ── Панель сделки (Drawer) ──────────────────────────────────────────── */
+  .pm-drawer-tabs { margin-bottom: var(--space-16); }
+  .pm-dpane[hidden] { display: none; }
+  .pm-dpane { display: flex; flex-direction: column; gap: var(--space-24); }
+  .pm-dhead { display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap; min-width: 0; }
+  .pm-comment {
+    display: flex; flex-direction: column; gap: var(--space-4);
+    padding: var(--space-12) var(--space-16);
+    border-radius: var(--radius-m);
+    background: var(--bgtable-row-hover);
+  }
+  .pm-comment__meta { font: var(--type-body-xs); color: var(--text-inactive); }
+  .pm-comment__text { font: var(--type-body-m); color: var(--text-primary); }
+  .pm-list { display: flex; flex-direction: column; gap: var(--space-12); }
+  .pm-person { display: flex; align-items: center; gap: var(--space-12); min-width: 0; }
+  .pm-person__text { display: flex; flex-direction: column; min-width: 0; }
+  .pm-person__name { font: var(--type-body-m); color: var(--text-primary); }
+  .pm-person__role { font: var(--type-body-xs); color: var(--text-inactive); }
+  .pm-actions-row { display: flex; gap: var(--space-8); flex-wrap: wrap; }
+
+  /* ── Модалка «Новая сделка» ──────────────────────────────────────────── */
+  .pm-field { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+  .pm-form > .inp { width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item" href="index.html"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Origination</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="file-check"></i></span><span class="nav__label">Обязательные сделки</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="deals-possible-deals"></i></span><span class="nav__label">Возможные сделки</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="file-basic"></i></span><span class="nav__label">Лиды</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="important-leads"></i></span><span class="nav__label">Обязательные лиды</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="possible-leads"></i></span><span class="nav__label">Возможные лиды</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Pipeline</div>
+        <a class="nav__item nav__item--selected" href="PipelineManagement.html" aria-current="page"><span class="nav__ico"><i data-icon="layout-grid-01"></i></span><span class="nav__label">Pipeline Management</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="pipeline"></i></span><span class="nav__label">Pipeline</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="ckp-pipeline"></i></span><span class="nav__label">Pipeline ЦКП</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="mna-pipeline"></i></span><span class="nav__label">M&amp;A Pipeline</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="kpki-cal"></i></span><span class="nav__label">Календарь КПКИ</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Текущий портфель</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="current-depo"></i></span><span class="nav__label">Текущий портфель ДИД</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="cash-flow"></i></span><span class="nav__label">CF СБИ</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="corporate-transactions"></i></span><span class="nav__label">Корпоративные запросы</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Отчёты</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="rwa"></i></span><span class="nav__label">RWA</span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <a class="nav__user" href="../../index.html" aria-label="Хаб проектов">
+        <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Александров Пётр Константинович</span><span class="nav__user-role">Руководитель деска</span></span>
+      </a>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <div class="screen screen--app">
+
+    <nav class="crumbs" aria-label="Хлебные крошки" id="pm-crumbs">
+      <li class="crumbs__item"><a class="link link--muted" href="index.html">Главная</a></li>
+      <li class="crumbs__item crumbs__item--current"><span class="crumbs__current" aria-current="page">Pipeline Management</span></li>
+    </nav>
+
+    <main class="screen__content">
+
+      <!-- #sec:head ── Шапка страницы ────────────────────────────────────── -->
+      <div class="phead">
+        <div class="phead__main">
+          <div class="phead__title-row">
+            <div class="phead__title-group">
+              <h1 class="phead__title" id="pm-title">Pipeline Management</h1>
+            </div>
+          </div>
+          <div class="phead__subtitle" id="pm-meta"></div>
+        </div>
+        <div class="phead__actions">
+          <button type="button" class="btn btn--outline btn--m" id="pm-report"><i data-icon="download"></i><span class="btn__label">Краткий отчёт</span></button>
+          <span class="menu-anchor">
+            <button type="button" class="btn btn--accent btn--m" id="pm-new" aria-haspopup="menu" aria-expanded="false" data-menu="pm-add-menu" data-menu-align="end"><i data-icon="add"></i><span class="btn__label">Добавить</span><i class="btn__chevron" data-icon="chevron-down"></i></button>
+            <div id="pm-add-menu" class="menu menu--floating" role="menu" hidden>
+              <button type="button" class="menu__item" role="menuitem" data-pm-new-kind="deal"><span class="menu__item-icon"><i data-icon="folder"></i></span><span class="menu__item-label">Сделка</span></button>
+              <button type="button" class="menu__item" role="menuitem" data-pm-new-kind="lead"><span class="menu__item-icon"><i data-icon="file-basic"></i></span><span class="menu__item-label">Лид</span></button>
+            </div>
+          </span>
+        </div>
+      </div>
+
+      <!-- #sec:content ── Тулбар: фильтр · провал · данные · колонки · вид ── -->
+      <div class="pm-toolbar">
+        <!-- Слева: состав данных → фильтр. Левая зона не ужимается меньше
+             содержимого, .tfilter внутри неё добирает остаток ширины -->
+        <div class="pm-toolbar__left">
+          <div class="segctrl segctrl--s" role="radiogroup" aria-label="Данные" data-segctrl data-pm-seg="mode">
+            <div class="segctrl__thumb"></div>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="all"><span class="segctrl__label">Все</span><span class="badge badge--text badge--s" data-pm-count="all">0</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0" data-value="deal"><span class="segctrl__label">Pipeline</span><span class="badge badge--text badge--s" data-pm-count="deal">0</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="lead"><span class="segctrl__label">Лиды</span><span class="badge badge--text badge--s" data-pm-count="lead">0</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="star"><span class="segctrl__label">Избранные</span><span class="badge badge--text badge--s" data-pm-count="star">0</span></button>
+          </div>
+          <div class="tfilter" role="group" aria-label="Фильтр">
+            <button type="button" class="btn btn--outline btn--s tfilter__open" aria-haspopup="dialog" aria-expanded="false" data-modal="filter-scrim"><i data-icon="filter"></i><span class="btn__label">Фильтр</span></button>
+            <span class="chip chip--edit chip--m tfilter__applied" tabindex="0" id="pm-applied" hidden><span class="chip__label">Применено: 0</span><span class="chip__remove" role="button" aria-label="Сбросить все фильтры"><i data-icon="close"></i></span></span>
+            <span class="chip chip--edit chip--m" tabindex="0" id="pm-drill" hidden><span class="chip__label">Деск: IND</span><span class="chip__remove" role="button" aria-label="Выйти из раздела" data-pm-drill-clear><i data-icon="close"></i></span></span>
+          </div>
+        </div>
+
+        <!-- Справа — настройки доски, затем вид. Зона прижата вправо: когда
+             настройки доски скрыты (вид «Таблица»), «Доска / Таблица» не сдвигается -->
+        <div class="pm-toolbar__right">
+          <div class="segctrl segctrl--s" role="radiogroup" aria-label="Карточки" data-segctrl data-pm-seg="density" id="pm-seg-density">
+            <div class="segctrl__thumb"></div>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0" data-value="full"><span class="segctrl__label">Подробные</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="compact"><span class="segctrl__label">Компактные</span></button>
+          </div>
+          <div class="segctrl segctrl--s" role="radiogroup" aria-label="Колонки доски" data-segctrl data-pm-seg="group" id="pm-seg-group">
+            <div class="segctrl__thumb"></div>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="stage"><span class="segctrl__label">По статусам</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0" data-value="desk"><span class="segctrl__label">По дескам</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="lead"><span class="segctrl__label">По ведущему</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="product"><span class="segctrl__label">По продуктам</span></button>
+          </div>
+          <div class="segctrl segctrl--s" role="radiogroup" aria-label="Вид" data-segctrl data-pm-seg="view">
+            <div class="segctrl__thumb"></div>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0" data-value="board"><i data-icon="layout-grid-01"></i><span class="segctrl__label">Доска</span></button>
+            <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="table"><i data-icon="list-view-01"></i><span class="segctrl__label">Таблица</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pm-stage">
+        <div class="pm-pane" id="pm-board-pane"></div>
+        <div class="pm-pane" id="pm-table-pane" hidden></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- #sec:modals ── Меню колонки ─────────────────────────────────────────── -->
+<div id="kb-col-menu" class="menu menu--floating" role="menu" hidden>
+  <button type="button" class="menu__item" role="menuitem" data-pm-drill-menu><span class="menu__item-icon"><i data-icon="arrow-right"></i></span><span class="menu__item-label">Открыть отдельно</span></button>
+  <button type="button" class="menu__item" role="menuitem" data-kb-collapse><span class="menu__item-icon"><i data-icon="minimize"></i></span><span class="menu__item-label">Свернуть / развернуть</span></button>
+</div>
+
+<!-- Панель сделки (Drawer). Шапку заполняет рантайм доски (data-kb-d-*),
+     содержимое — экранный скрипт по id карточки. -->
+<div class="modal-scrim drawer-scrim" id="deal-drawer" hidden>
+  <aside class="drawer drawer--w5" role="dialog" aria-modal="true" aria-labelledby="dd-title">
+    <header class="drawer__head">
+      <div class="drawer__headmain">
+        <p class="drawer__path"><span data-kb-d-col>Стадия</span> › <span data-kb-d-id>D-0000</span></p>
+        <div class="pm-dhead">
+          <h2 class="drawer__title" id="dd-title" data-kb-d-title>Клиент</h2>
+          <span id="dd-chips"></span>
+        </div>
+      </div>
+      <div class="drawer__acts">
+        <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="В избранное" aria-pressed="false" id="dd-star"><i data-icon="star"></i></button>
+        <span class="drawer__close"><button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Закрыть панель" data-modal-close><i data-icon="close"></i></button></span>
+      </div>
+    </header>
+    <div class="drawer__body">
+      <div class="tabs tabs--horiz pm-drawer-tabs" role="tablist" data-tabs id="dd-tabs">
+        <button type="button" class="tab tab--m tab--selected" role="tab" aria-selected="true" tabindex="0" data-pane="info"><span class="tab__label">Общая информация</span></button>
+        <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1" data-pane="meetings"><span class="tab__label">Встречи</span><span class="tab__badge" id="dd-meet-count">2</span></button>
+        <button type="button" class="tab tab--m" role="tab" aria-selected="false" tabindex="-1" data-pane="team"><span class="tab__label">Команда</span><span class="tab__badge" id="dd-team-count">3</span></button>
+      </div>
+      <div class="pm-dpane" data-dpane="info" id="dd-info"></div>
+      <div class="pm-dpane" data-dpane="meetings" id="dd-meetings" hidden></div>
+      <div class="pm-dpane" data-dpane="team" id="dd-team" hidden></div>
+    </div>
+  </aside>
+</div>
+
+<!-- Модалка фильтра — штатная структура TableFilter (.tfm) -->
+<div class="modal-scrim" id="filter-scrim" hidden>
+  <div class="modal modal--w6 tfm" role="dialog" aria-modal="true" aria-labelledby="filter-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="filter-title">Фильтр</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body modal__body--flush">
+      <div class="tfm__body">
+        <nav class="tabs tabs--vert tfm__nav" aria-label="Разделы фильтра">
+          <button type="button" class="tab tab--m tab--vert tab--selected" aria-current="true" data-target="tfm-sec-desk"><span class="tab__label">Дески</span><span class="tab__badge" data-f-badge="desk" hidden>0</span></button>
+          <button type="button" class="tab tab--m tab--vert" data-target="tfm-sec-flags"><span class="tab__label">Признаки</span><span class="tab__badge" data-f-badge="flags" hidden>0</span></button>
+          <button type="button" class="tab tab--m tab--vert" data-target="tfm-sec-team"><span class="tab__label">Команда сделки</span><span class="tab__badge" data-f-badge="lead" hidden>0</span></button>
+        </nav>
+        <div class="tfm__panel">
+          <section class="tfm__sec" id="tfm-sec-desk" aria-labelledby="tfm-sec-desk-t">
+            <p class="tfm__sec-title" id="tfm-sec-desk-t">Дески</p>
+            <div class="tfm__grid" id="f-desks"></div>
+          </section>
+          <section class="tfm__sec" id="tfm-sec-flags" aria-labelledby="tfm-sec-flags-t">
+            <p class="tfm__sec-title" id="tfm-sec-flags-t">Признаки</p>
+            <div class="tfm__grid">
+              <label class="cb"><input type="checkbox" class="cb__input" data-f-flag="key"><span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">Только ключевые сделки</span></span></label>
+            </div>
+          </section>
+          <section class="tfm__sec" id="tfm-sec-team" aria-labelledby="tfm-sec-team-t">
+            <p class="tfm__sec-title" id="tfm-sec-team-t">Ведущий сделки</p>
+            <div class="tfm__grid" id="f-leads"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" id="f-clear"><span class="btn__label">Очистить фильтр</span></button>
+        <button type="button" class="btn btn--accent btn--m" id="f-apply" data-modal-close><span class="btn__label">Применить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Модалка «Новая сделка / Новый лид» -->
+<div class="modal-scrim" id="new-deal" hidden data-modal-guarded>
+  <div class="modal modal--w4" role="dialog" aria-modal="true" aria-labelledby="nd-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="nd-title">Новая сделка</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body pm-form">
+      <div class="pm-field">
+        <span class="ds-label"><span class="ds-label__text">Тип</span></span>
+        <div class="segctrl segctrl--fullwidth" role="radiogroup" aria-label="Тип" data-segctrl id="nd-kind">
+          <div class="segctrl__thumb"></div>
+          <button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0" data-value="deal"><span class="segctrl__label">Сделка</span></button>
+          <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="lead"><span class="segctrl__label">Лид</span></button>
+        </div>
+      </div>
+      <div class="inp inp--m">
+        <label class="ds-label" for="nd-client"><span class="ds-label__text">Клиент</span></label>
+        <div class="inp__field"><input class="inp__control" id="nd-client" placeholder="Например, ООО «Ромашка»"></div>
+      </div>
+      <div class="pm-field">
+        <span class="ds-label"><span class="ds-label__text">Деск</span></span>
+        <div class="segctrl segctrl--fullwidth" role="radiogroup" aria-label="Деск" data-segctrl id="nd-desk"></div>
+      </div>
+      <div class="inp inp--m">
+        <label class="ds-label" for="nd-stage"><span class="ds-label__text">Стадия</span></label>
+        <div class="inp__field" data-ddl="nd-stage-list">
+          <input class="inp__control" id="nd-stage" readonly>
+          <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+        </div>
+        <div id="nd-stage-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+      </div>
+      <div class="inp inp--m">
+        <label class="ds-label" for="nd-product"><span class="ds-label__text">Продукт</span></label>
+        <div class="inp__field"><input class="inp__control" id="nd-product" value="Акционерный мезонин"></div>
+      </div>
+      <div class="inp inp--m">
+        <label class="ds-label" for="nd-volume"><span class="ds-label__text">Объём по продукту</span></label>
+        <div class="inp__field"><input class="inp__control" id="nd-volume" inputmode="decimal" value="500"><span class="inp__postfix">млн RUB</span></div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button type="button" class="btn btn--accent btn--m" id="nd-save" data-modal-close><span class="btn__label">Создать</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="data/pipeline-data.js"></script>
+<script src="../../DS-IBP/scripts/ds.js"></script>
+
+<!-- #sec:script ── Модель экрана: фильтрация, доска, таблица, панель ──────
+     Рантаймы ДС дают поведение компонентов (перенос, меню, модалки, табы,
+     сортировку). Экран отвечает только за данные: какие карточки видны,
+     в какой колонке, итоги колонок и правила переноса (kanban:beforemove). -->
+<script>
+(function () {
+  'use strict';
+
+  var D = window.PMData;
+  var ALL_STAGES = D.leadStages.concat(D.dealStages);
+  var state = {
+    mode: 'deal',         /* all | deal | lead */
+    group: 'desk',        /* stage | desk */
+    view: 'board',        /* board | table */
+    density: 'full',      /* full | compact */
+    drill: null,          /* { type: 'desk'|'stage', key } */
+    filter: { desks: [], leads: [], key: false, star: false }
+  };
+
+  /* ---------- справочники и форматирование ---------- */
+  function byKey(list, k, v) { for (var i = 0; i < list.length; i++) if (list[i][k] === v) return list[i]; return null; }
+  function stageOf(key) { return byKey(ALL_STAGES, 'key', key); }
+  function deskOf(code) { return byKey(D.desks, 'code', code); }
+  function person(id) { return byKey(D.people, 'id', id); }
+  function isLeadStage(key) { return !!byKey(D.leadStages, 'key', key); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  var nf1 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 });
+  var nf0 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
+  function money(mln) {
+    return mln >= 1000 ? nf1.format(mln / 1000) + ' млрд RUB' : nf1.format(mln) + ' млн RUB';
+  }
+  function ic(name) { return '<i data-icon="' + name + '"></i>'; }
+
+  /* ---------- видимые данные ----------
+     Измерения доски: stage · desk · lead (ведущий) · product. У сделки с
+     несколькими продуктами колонка — по первому (основному) продукту. */
+  function val(it, f) { return f === 'product' ? it.products[0] : it[f]; }
+  function setVal(it, f, v) {
+    if (f === 'product') { it.products[0] = v; return; }
+    it[f] = v;
+    if (f === 'lead') { /* новый ведущий — первым в команде */
+      it.team = [v].concat(it.team.filter(function (id) { return id !== v; }));
+    }
+  }
+  function isMixed() { return state.mode === 'all' || state.mode === 'star'; }
+  function passFilter(it) {
+    var f = state.filter;
+    if (f.desks.length && f.desks.indexOf(it.desk) < 0) return false;
+    if (f.leads.length && f.leads.indexOf(it.lead) < 0) return false;
+    if (f.key && !it.key) return false;
+    if (state.drill && val(it, state.drill.type) !== state.drill.key) return false;
+    return true;
+  }
+  function passMode(it, mode) {
+    if (mode === 'all') return true;
+    if (mode === 'star') return !!it.star;
+    return it.kind === mode;
+  }
+  function visible() {
+    return D.items.filter(function (it) { return passMode(it, state.mode) && passFilter(it); });
+  }
+  /* в провале колонки не могут повторять измерение провала */
+  function grouping() {
+    if (state.drill && state.drill.type === state.group) return state.drill.type === 'stage' ? 'desk' : 'stage';
+    return state.group;
+  }
+  function columns() {
+    var g = grouping();
+    if (g === 'desk') {
+      var fd = state.filter.desks;
+      return D.desks.filter(function (d) { return !fd.length || fd.indexOf(d.code) >= 0; })
+        .map(function (d) { return { key: d.code, name: d.name, tone: '', hint: d.title, field: 'desk' }; });
+    }
+    if (g === 'lead') {
+      var fl = state.filter.leads;
+      return D.people.filter(function (p) { return !fl.length || fl.indexOf(p.id) >= 0; })
+        .map(function (p) { return { key: p.id, name: p.short, tone: '', hint: p.name + ' · ' + p.role, field: 'lead' }; });
+    }
+    if (g === 'product') {
+      return D.products.map(function (name) { return { key: name, name: name, tone: '', field: 'product' }; });
+    }
+    var st = state.mode === 'lead' ? D.leadStages : state.mode === 'deal' ? D.dealStages : ALL_STAGES;
+    return st.map(function (s) {
+      return { key: s.key, name: s.name, tone: s.tone, field: 'stage', group: isLeadStage(s.key) ? 'lead' : 'deal' };
+    });
+  }
+  /* измерение уже видно по колонке или по провалу — на карточке не повторяем */
+  function shown(f) { return grouping() === f || (state.drill && state.drill.type === f); }
+
+  /* ---------- карточка ---------- */
+  function chipsHTML(it) {
+    var out = [];
+    if (!shown('desk')) out.push('<span class="chip chip--xs chip--fit"><span class="chip__label">' + it.desk + '</span></span>');
+    if (!shown('stage')) out.push('<span class="chip chip--xs chip--rounded"><span class="chip__label">' + esc(stageOf(it.stage).name) + '</span></span>');
+    /* при группировке по стадиям тип читается из ленты групп — чип не нужен */
+    if (isMixed() && it.kind === 'lead' && !shown('stage')) {
+      out.push('<span class="chip chip--xs chip--lblue chip--fit"><span class="chip__label">Лид</span></span>');
+    }
+    if (it.key) {
+      out.push('<span class="chip chip--xs chip--rounded chip--orange"><span class="chip__icon">' + ic('zap') + '</span><span class="chip__label">Ключевая сделка</span></span>');
+    }
+    return '<div class="tile__chiplist">' + out.join('') + '</div>';
+  }
+  function more(n) { return n > 0 ? ' <span class="pm-more">+' + n + '</span>' : ''; }
+  function avatarsHTML(it) {
+    var shown = it.team.slice(0, 3).map(function (id) {
+      var p = person(id);
+      return '<span class="av av--s av--circular" aria-hidden="true"><span class="av__text">' + p.ini + '</span></span>';
+    }).join('');
+    var rest = it.team.length - 3;
+    var names = it.team.map(function (id) { return person(id).short; }).join(', ');
+    return '<span class="av-group av-group--s" role="group" aria-label="Команда: ' + esc(names) + '" data-tooltip="' + esc(names) + '">' + shown +
+      (rest > 0 ? '<span class="av-group__more" aria-hidden="true">+' + rest + '</span>' : '') + '</span>';
+  }
+  function cardHTML(it) {
+    var p = person(it.lead);
+    var cls = 'kbcard tile tile--card' + (state.density === 'compact' ? ' kbcard--compact' : '');
+    return '<article class="' + cls + '" tabindex="0" data-kb-card="' + it.id + '">' +
+      '<header class="tile__header">' +
+        '<div class="tile__header-main">' +
+          '<div class="tile__title-row"><h3 class="tile__title">' + esc(it.client) + '</h3></div>' +
+          chipsHTML(it) +
+        '</div>' +
+        '<div class="tile__actions">' +
+          '<button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="В избранное" aria-pressed="' + it.star + '" data-kb-star>' + ic(it.star ? 'star-filled' : 'star') + '</button>' +
+        '</div>' +
+      '</header>' +
+      '<div class="tile__body">' +
+        '<div class="kbcard__fields">' +
+          '<div class="kbcard__field"><span class="kbcard__flabel">Ведущий</span><span class="kbcard__fvalue">' + p.short + '</span></div>' +
+          '<div class="kbcard__field"><span class="kbcard__flabel">Продукты сделки</span><span class="kbcard__fvalue">' + esc(it.products[0]) + more(it.products.length - 1) + '</span></div>' +
+          '<div class="kbcard__field"><span class="kbcard__flabel">Объём, млн RUB</span><span class="kbcard__fvalue">' + nf0.format(it.volume) + '</span></div>' +
+          '<div class="kbcard__field"><span class="kbcard__flabel">Доход, млн RUB</span><span class="kbcard__fvalue">' + nf1.format(it.profit) + '</span></div>' +
+        '</div>' +
+        '<div class="kbcard__meta">' +
+          '<span class="kbcard__stat" data-tooltip="Документы">' + ic('file-attachment') + it.docs + '</span>' +
+          '<span class="kbcard__stat" data-tooltip="Задачи: выполнено из всего">' + ic('check-circle') + it.tasksDone + '/' + it.tasksTotal + '</span>' +
+        '</div>' +
+        '<div class="kbcard__foot">' + avatarsHTML(it) + '<span class="kbcard__id">' + it.id + '</span></div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  /* ---------- колонка и доска ---------- */
+  function sumHTML(list) {
+    var profit = 0, volume = 0;
+    list.forEach(function (it) { profit += it.profit; volume += it.volume; });
+    return '<div class="pm-colsum__row"><span class="pm-colsum__label">Доход</span><span class="pm-colsum__value">' + money(profit) + '</span></div>' +
+      '<div class="pm-colsum__row"><span class="pm-colsum__label">Объём</span><span class="pm-colsum__value pm-colsum__value--sub">' + money(volume) + '</span></div>';
+  }
+  function columnHTML(c, list, groupStart) {
+    var drillLabel = 'Открыть «' + c.name + '» отдельно';
+    var cls = 'kbcol' + (c.tone ? ' kbcol--' + c.tone : '') + (groupStart ? ' pm-col--group-start' : '');
+    return '<section class="' + cls + '" data-kb-col="' + c.key + '" data-kb-name="' + esc(c.name) + '"' +
+        (c.group ? ' data-pm-group="' + c.group + '"' : '') + ' data-pm-field="' + c.field + '"' +
+        ' data-kb-empty-text="Нет карточек. Перетащите сюда или создайте новую.">' +
+      '<header class="kbcol__head"' + (c.hint ? ' data-tooltip="' + esc(c.hint) + '"' : '') + '>' +
+        '<span class="kbcol__marker" aria-hidden="true"></span>' +
+        '<span class="kbcol__name">' + esc(c.name) + '</span>' +
+        '<span class="kbcol__vname" aria-hidden="true">' + esc(c.name) + '</span>' +
+        '<span class="badge badge--text badge--s" data-kb-count>' + list.length + '</span>' +
+        '<span class="kbcol__acts">' +
+          '<button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Создать в «' + esc(c.name) + '»" data-modal="new-deal" data-pm-add>' + ic('add') + '</button>' +
+          (state.drill ? '' : '<button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="' + esc(drillLabel) + '" data-pm-drill>' + ic('arrow-right') + '</button>') +
+          '<button type="button" class="ibtn ibtn--neutral ibtn--s" aria-label="Действия с колонкой «' + esc(c.name) + '»" data-menu="kb-col-menu">' + ic('more-dots') + '</button>' +
+        '</span>' +
+      '</header>' +
+      '<div class="kbcol__body" data-kb-body>' + list.map(cardHTML).join('') + '</div>' +
+      '<div class="pm-colsum" data-pm-sum>' + sumHTML(list) + '</div>' +
+    '</section>';
+  }
+  function showRail() { return grouping() === 'stage' && isMixed(); }
+  function renderBoard() {
+    var host = document.getElementById('pm-board-pane');
+    var items = visible();
+    var field = grouping();
+    var prevGroup = null;
+    var cols = columns().map(function (c) {
+      var list = items.filter(function (it) { return val(it, field) === c.key; });
+      var start = showRail() && prevGroup && c.group !== prevGroup;
+      prevGroup = c.group;
+      return columnHTML(c, list, start);
+    }).join('');
+    host.innerHTML =
+      '<div class="kanban" data-kanban data-kb-drawer="deal-drawer" aria-label="Доска Pipeline Management">' +
+        '<div class="pm-rail" id="pm-rail"' + (showRail() ? '' : ' hidden') + '><div class="pm-rail__track" id="pm-rail-track"></div></div>' +
+        '<div class="kanban__viewport"><div class="kanban__track">' + cols + '</div></div>' +
+      '</div>';
+    var board = host.querySelector('[data-kanban]');
+    rebind(host);
+    if (window.DSKanban) DSKanban.bind(board);
+    wireRail(board);
+  }
+
+  /* лента групп: сегменты ложатся ровно над своими колонками */
+  function updateRail(board) {
+    var track = document.getElementById('pm-rail-track');
+    if (!track || !showRail()) return;
+    var items = visible();
+    track.innerHTML = [['lead', 'Лиды'], ['deal', 'Pipeline']].map(function (g) {
+      var cols = board.querySelectorAll('.kbcol[data-pm-group="' + g[0] + '"]');
+      if (!cols.length) return '';
+      var first = cols[0], last = cols[cols.length - 1];
+      var left = first.offsetLeft, width = last.offsetLeft + last.offsetWidth - left;
+      var list = items.filter(function (it) { return it.kind === g[0]; });
+      var profit = list.reduce(function (s, it) { return s + it.profit; }, 0);
+      return '<div class="pm-rail__seg" style="left:' + left + 'px;width:' + width + 'px">' +
+        '<span class="pm-rail__name">' + g[1] + '</span>' +
+        '<span class="badge badge--text badge--s">' + list.length + '</span>' +
+        '<span class="pm-rail__sum">Доход ' + money(profit) + '</span></div>';
+    }).join('');
+  }
+  function wireRail(board) {
+    var vp = board.querySelector('.kanban__viewport');
+    var tr = board.querySelector('.kanban__track');
+    var railTrack = document.getElementById('pm-rail-track');
+    vp.addEventListener('scroll', function () {
+      if (railTrack) railTrack.style.transform = 'translateX(' + (-vp.scrollLeft) + 'px)';
+    }, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(function () { updateRail(board); }).observe(tr);
+    updateRail(board);
+  }
+
+  /* ---------- таблица ---------- */
+  var GRID = 'grid-template-columns:8px 260px 120px 120px 120px 220px 160px 220px 150px 150px 150px 120px minmax(8px,1fr);';
+  function th(label, key, type, extra) {
+    return '<div class="th' + (extra || '') + '" aria-sort="none"' + (type ? ' data-sort-type="' + type + '"' : '') + '>' +
+      '<span class="th__label">' + label + '</span>' +
+      '<span class="th__tools">' +
+        (extra && extra.indexOf('th--pinned') >= 0
+          ? '<button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="true" aria-label="Открепить колонку">' + ic('pin-filled') + '</button>'
+          : '<button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку">' + ic('pin') + '</button>') +
+        '<button class="ibtn ibtn--neutral ibtn--s th__sort" data-sort="' + key + '" aria-label="Сортировать">' + ic('arrow-up-down') + '</button>' +
+      '</span>' +
+      '<span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>';
+  }
+  function td(html, cls, sortValue) {
+    return '<div class="tc' + (cls || '') + '"' + (sortValue != null ? ' data-sort-value="' + sortValue + '"' : '') + '><span class="tc__row">' + html + '</span></div>';
+  }
+  function txt(s) { return '<span class="tc__text tc__text--truncate">' + esc(s) + '</span>'; }
+  function dateKey(s) { var p = s.split('.'); return p[2] + p[1] + p[0]; }
+  function renderTable() {
+    var host = document.getElementById('pm-table-pane');
+    var items = visible();
+    var head = '<div class="tbl__row tbl__row--head" style="' + GRID + '">' +
+      '<div class="th th--separator"></div>' +
+      th('Клиент', 'client', 'text', ' th--pinned') + th('ID', 'id', 'text') + th('Тип', 'kind', 'text') +
+      th('Деск', 'desk', 'text') + th('Стадия', 'stage', 'text') + th('Ведущий', 'lead', 'text') +
+      th('Продукты', 'product', 'text') + th('Объём, млн RUB', 'volume', 'number', ' th--right') +
+      th('Доход, млн RUB', 'profit', 'number', ' th--right') + th('Признак', 'key', 'text') +
+      th('Изменено', 'updated', 'date') +
+      '<div class="th th--separator"></div></div>';
+    var rows = items.map(function (it) {
+      return '<div class="tbl__row" style="' + GRID + '" data-pm-row="' + it.id + '" tabindex="0">' +
+        '<div class="tc tc--separator"></div>' +
+        td(txt(it.client), ' tc--pinned') +
+        td(txt(it.id)) +
+        td('<span class="chip chip--s chip--fit' + (it.kind === 'lead' ? ' chip--lblue' : '') + '"><span class="chip__label">' + (it.kind === 'lead' ? 'Лид' : 'Сделка') + '</span></span>') +
+        td('<span class="chip chip--s chip--fit"><span class="chip__label">' + it.desk + '</span></span>') +
+        td('<span class="chip chip--s chip--rounded"><span class="chip__label">' + esc(stageOf(it.stage).name) + '</span></span>', '', ALL_STAGES.indexOf(stageOf(it.stage))) +
+        td(txt(person(it.lead).short)) +
+        td(txt(it.products.join(', '))) +
+        td('<span class="tc__text">' + nf0.format(it.volume) + '</span>', ' tc--numbers', it.volume) +
+        td('<span class="tc__text">' + nf1.format(it.profit) + '</span>', ' tc--numbers', it.profit) +
+        td(it.key ? '<span class="chip chip--s chip--rounded chip--orange"><span class="chip__icon">' + ic('zap') + '</span><span class="chip__label">Ключевая</span></span>' : '<span class="tc__empty">—</span>') +
+        td('<span class="tc__text">' + it.updated + '</span>', '', dateKey(it.updated)) +
+        '<div class="tc tc--separator"></div></div>';
+    }).join('');
+    var body = items.length
+      ? '<div class="tbl tbl--scroll" data-table data-sort-rows>' + head + rows + '</div>'
+      : '<div class="dtable__empty"><div class="es es--m"><span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>' +
+        '<div class="es__body"><p class="es__title">Ничего не найдено</p><p class="es__text">Измените фильтр или состав данных.</p></div></div></div>';
+    host.innerHTML = '<div class="dtable dtable--fill"><div class="dtable__body">' + body + '</div></div>';
+    rebind(host);
+    if (window.DSTable) { DSTable.bindAll(host); DSTable.wireAll(host); }
+  }
+
+  /* ---------- шапка, счётчики, крошки ---------- */
+  function renderChrome() {
+    var items = visible();
+    var inDrill = D.items.filter(passFilter);
+    document.querySelectorAll('[data-pm-count]').forEach(function (b) {
+      var k = b.getAttribute('data-pm-count');
+      b.textContent = inDrill.filter(function (it) { return passMode(it, k); }).length;
+    });
+    var deals = items.filter(function (it) { return it.kind === 'deal'; }).length;
+    var leads = items.length - deals;
+    var profit = items.reduce(function (s, it) { return s + it.profit; }, 0);
+    var volume = items.reduce(function (s, it) { return s + it.volume; }, 0);
+    var meta = [];
+    if (state.mode !== 'lead') meta.push(['briefcase', 'Сделок: ' + deals]);
+    if (state.mode !== 'deal') meta.push(['file-basic', 'Лидов: ' + leads]);
+    meta.push(['bar-chart-square', 'Объём ' + money(volume)]);
+    meta.push(['arrow-trend-up', 'Доход ' + money(profit)]);
+    document.getElementById('pm-meta').innerHTML = meta.map(function (m) {
+      return '<span class="phead__meta"><span class="phead__meta-ico">' + ic(m[0] === 'briefcase' ? 'folder' : m[0]) + '</span>' + m[1] + '</span>';
+    }).join('');
+
+    var title = 'Pipeline Management', drillLabel = '';
+    if (state.drill) {
+      var dt = state.drill.type, dk = state.drill.key;
+      if (dt === 'desk') { title = deskOf(dk).name; drillLabel = 'Деск: ' + dk; }
+      else if (dt === 'stage') { title = 'Статус: ' + stageOf(dk).name; drillLabel = title; }
+      else if (dt === 'lead') { title = 'Ведущий: ' + person(dk).short; drillLabel = title; }
+      else { title = 'Продукт: ' + dk; drillLabel = title; }
+    }
+    document.getElementById('pm-title').textContent = title;
+    document.title = title + ' — IBP';
+    var crumbs = '<li class="crumbs__item"><a class="link link--muted" href="index.html">Главная</a></li>';
+    crumbs += state.drill
+      ? '<li class="crumbs__item"><a class="link link--muted" href="#" data-pm-drill-clear>Pipeline Management</a></li>' +
+        '<li class="crumbs__item crumbs__item--current"><span class="crumbs__current" aria-current="page">' + esc(title) + '</span></li>'
+      : '<li class="crumbs__item crumbs__item--current"><span class="crumbs__current" aria-current="page">Pipeline Management</span></li>';
+    document.getElementById('pm-crumbs').innerHTML = crumbs;
+
+    var drill = document.getElementById('pm-drill');
+    drill.hidden = !state.drill;
+    drill.querySelector('.chip__label').textContent = drillLabel;
+
+    var n = state.filter.desks.length + state.filter.leads.length + (state.filter.key ? 1 : 0) + (state.filter.star ? 1 : 0);
+    var applied = document.getElementById('pm-applied');
+    applied.hidden = !n;
+    applied.querySelector('.chip__label').textContent = 'Применено: ' + n;
+
+    /* группировку задаёт провал; в таблице колонок нет */
+    /* в таблице колонок нет; в провале нельзя группировать по измерению провала */
+    var segGroup = document.getElementById('pm-seg-group');
+    segGroup.hidden = state.view === 'table';
+    segGroup.querySelectorAll('.segctrl__item').forEach(function (b) {
+      if (state.drill && b.getAttribute('data-value') === state.drill.type) b.setAttribute('aria-disabled', 'true');
+      else b.removeAttribute('aria-disabled');
+    });
+    document.getElementById('pm-seg-density').hidden = state.view === 'table';
+    if (window.dsIcons && dsIcons.apply) {
+      dsIcons.apply(document.getElementById('pm-meta'));
+      dsIcons.apply(document.getElementById('pm-crumbs'));
+    }
+  }
+
+  function render() {
+    renderChrome();
+    document.getElementById('pm-board-pane').hidden = state.view !== 'board';
+    document.getElementById('pm-table-pane').hidden = state.view !== 'table';
+    if (state.view === 'board') renderBoard(); else renderTable();
+    syncSegs();
+  }
+
+  /* Пересборка = новые узлы: рантаймы ДС связывают разметку один раз,
+     поэтому каждому новому поддереву их зовут заново (как kanban.page.js). */
+  function rebind(scope) {
+    if (window.dsIcons && dsIcons.apply) dsIcons.apply(scope);
+    if (window.DSMenu && DSMenu.bindAll) DSMenu.bindAll(scope);
+    if (window.DSModal && DSModal.bindAll) DSModal.bindAll(scope);
+    if (window.DSDrawer && DSDrawer.bindAll) DSDrawer.bindAll(scope);
+    if (window.DSIllustrations && DSIllustrations.render) DSIllustrations.render();
+  }
+
+  /* сегмент-контролы отражают состояние (в т.ч. после программной смены) */
+  function setSeg(el, value) {
+    if (!el) return;
+    el.querySelectorAll('.segctrl__item').forEach(function (b) {
+      var on = b.getAttribute('data-value') === value;
+      b.setAttribute('aria-checked', String(on));
+      b.setAttribute('tabindex', on ? '0' : '-1');
+    });
+    if (window.DSTabs && DSTabs.positionThumb) DSTabs.positionThumb(el);
+  }
+  function syncSegs() {
+    setSeg(document.querySelector('[data-pm-seg="mode"]'), state.mode);
+    setSeg(document.querySelector('[data-pm-seg="density"]'), state.density);
+    setSeg(document.querySelector('[data-pm-seg="group"]'), grouping());
+    setSeg(document.querySelector('[data-pm-seg="view"]'), state.view);
+  }
+
+  /* ---------- события тулбара ---------- */
+  document.addEventListener('click', function (e) {
+    var seg = e.target.closest('[data-pm-seg] .segctrl__item');
+    if (seg) {
+      var k = seg.closest('[data-pm-seg]').getAttribute('data-pm-seg');
+      var v = seg.getAttribute('data-value');
+      if (state[k] !== v) {
+        state[k] = v;
+        /* провал в стадию чужого типа данных теряет смысл */
+        if (k === 'mode' && state.drill && state.drill.type === 'stage' && (v === 'deal' || v === 'lead') &&
+            (isLeadStage(state.drill.key) ? 'lead' : 'deal') !== v) state.drill = null;
+        render();
+      }
+      return;
+    }
+
+    if (e.target.closest('[data-pm-drill-clear]')) { e.preventDefault(); state.drill = null; render(); return; }
+
+    var drill = e.target.closest('[data-pm-drill]');
+    if (drill) { drillInto(drill.closest('.kbcol')); return; }
+    if (e.target.closest('[data-pm-drill-menu]')) { drillInto(lastColMenuCol); return; }
+
+    if (e.target.closest('#pm-report')) {
+      if (window.DSSnack) DSSnack.show({ tone: 'success', title: 'Краткий отчёт сформирован', text: 'Файл pipeline-' + new Date().toLocaleDateString('ru-RU') + '.xlsx загружен' });
+      return;
+    }
+
+    var row = e.target.closest('[data-pm-row]');
+    if (row && !e.target.closest('button, a, input, .th')) { openDrawer(row.getAttribute('data-pm-row'), row); return; }
+
+    var add = e.target.closest('[data-pm-add]');
+    if (add) { prepareNew(add.closest('.kbcol')); return; }
+
+    /* «Добавить ▾» → Сделка / Лид */
+    var kind = e.target.closest('[data-pm-new-kind]');
+    if (kind) {
+      prepareNew(null, kind.getAttribute('data-pm-new-kind'));
+      var scrim = document.getElementById('new-deal');
+      if (window.DSModal) DSModal.open(scrim, { returnFocus: document.getElementById('pm-new') });
+    }
+  });
+
+  var lastColMenuCol = null;
+  document.addEventListener('pointerdown', function (e) {
+    var t = e.target.closest('[data-menu="kb-col-menu"]');
+    if (t) lastColMenuCol = t.closest('.kbcol');
+  }, true);
+
+  function drillInto(col) {
+    if (!col) return;
+    state.drill = { type: col.getAttribute('data-pm-field'), key: col.getAttribute('data-kb-col') };
+    if (state.drill.type === 'stage' && (state.mode === 'deal' || state.mode === 'lead')) {
+      state.mode = isLeadStage(state.drill.key) ? 'lead' : 'deal';
+    }
+    render();
+  }
+
+  /* Enter/Space на строке таблицы открывает панель */
+  document.addEventListener('keydown', function (e) {
+    var row = e.target.closest && e.target.closest('[data-pm-row]');
+    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDrawer(row.getAttribute('data-pm-row'), row); }
+  });
+
+  /* ---------- правила доски ---------- */
+  document.addEventListener('kanban:beforemove', function (e) {
+    var d = e.detail;
+    if (d.from.getAttribute('data-pm-field') !== 'stage') return;
+    var fromLead = isLeadStage(d.from.getAttribute('data-kb-col'));
+    var toLead = isLeadStage(d.to.getAttribute('data-kb-col'));
+    if (fromLead !== toLead) {
+      e.preventDefault();
+      if (window.DSSnack) DSSnack.show({
+        tone: 'warning',
+        title: 'Перенос недоступен',
+        text: fromLead ? 'Лид не переносится в стадии сделок: после «Передан в Pipeline» по нему заводится сделка.' : 'Сделку нельзя вернуть в стадию лида.'
+      });
+    }
+  });
+  document.addEventListener('kanban:move', function (e) {
+    var d = e.detail;
+    var it = byKey(D.items, 'id', d.card.getAttribute('data-kb-card'));
+    if (!it) return;
+    var field = d.to.getAttribute('data-pm-field');
+    setVal(it, field, d.to.getAttribute('data-kb-col'));
+    /* чип карточки и итоги обеих колонок */
+    var tmp = document.createElement('div');
+    tmp.innerHTML = cardHTML(it);
+    var chips = d.card.querySelector('.tile__chiplist');
+    if (chips) chips.replaceWith(tmp.querySelector('.tile__chiplist'));
+    if (window.dsIcons) dsIcons.apply(d.card);
+    refreshSums(d.card.closest('[data-kanban]'));
+    renderChrome();
+  });
+  document.addEventListener('kanban:star', function (e) {
+    var it = byKey(D.items, 'id', e.detail.card.getAttribute('data-kb-card'));
+    if (it) it.star = e.detail.on;
+  });
+  document.addEventListener('kanban:colmove', function (e) {
+    var board = e.target.closest ? e.target.closest('[data-kanban]') : null;
+    if (!board || !showRail()) return;
+    var seen = board.querySelectorAll('.kbcol'), deal = false, broken = false;
+    seen.forEach(function (c) {
+      if (c.getAttribute('data-pm-group') === 'deal') deal = true;
+      else if (deal) broken = true;
+    });
+    if (broken) {
+      render();
+      if (window.DSSnack) DSSnack.show({ tone: 'warning', title: 'Порядок стадий восстановлен', text: 'Стадии лидов идут перед стадиями Pipeline.' });
+    }
+  });
+  function refreshSums(board) {
+    if (!board) return;
+    var items = visible();
+    board.querySelectorAll('.kbcol').forEach(function (col) {
+      var f = col.getAttribute('data-pm-field'), k = col.getAttribute('data-kb-col');
+      col.querySelector('[data-pm-sum]').innerHTML = sumHTML(items.filter(function (it) { return val(it, f) === k; }));
+    });
+    updateRail(board);
+  }
+
+  /* ---------- панель сделки ---------- */
+  var drawerItem = null;
+  function rof(label, value, full) {
+    return '<div class="rof' + (full ? ' drawer__grid-full' : '') + '"><span class="ds-label"><span class="ds-label__text">' + label + '</span></span>' +
+      '<div class="rof__row"><span class="rof__value">' + value + '</span></div></div>';
+  }
+  function fillDrawer(it) {
+    drawerItem = it;
+    var st = stageOf(it.stage), dk = deskOf(it.desk), p = person(it.lead);
+    var scrim = document.getElementById('deal-drawer');
+    scrim.querySelector('[data-kb-d-col]').textContent = st.name;
+    scrim.querySelector('[data-kb-d-id]').textContent = it.id;
+    scrim.querySelector('[data-kb-d-title]').textContent = it.client;
+    document.getElementById('dd-chips').innerHTML =
+      '<span class="chip chip--s chip--rounded"><span class="chip__label">' + esc(st.name) + '</span></span>' +
+      (it.key ? ' <span class="chip chip--s chip--rounded chip--orange"><span class="chip__icon">' + ic('zap') + '</span><span class="chip__label">Ключевая сделка</span></span>' : '');
+    var star = document.getElementById('dd-star');
+    star.setAttribute('aria-pressed', String(it.star));
+    star.innerHTML = ic(it.star ? 'star-filled' : 'star');
+
+    document.getElementById('dd-info').innerHTML =
+      '<section class="drawer__sec"><div class="drawer__sechead"><h3 class="drawer__sectitle">Общая информация</h3></div>' +
+        '<div class="drawer__grid">' +
+          rof('Клиент', esc(it.client)) + rof('Холдинг', esc(it.holding)) +
+          rof('Тип', it.kind === 'lead' ? 'Лид' : 'Сделка') + rof('Деск', dk.name + ' · ' + dk.title) +
+          rof('Дата создания', it.created) + rof('Ведущий', p.short) +
+          rof('Продукты сделки', esc(it.products.join(', ')), true) +
+          rof('Объём по продукту, млн RUB', nf0.format(it.volume)) + rof('Ожидаемый доход, млн RUB', nf1.format(it.profit)) +
+          rof('Описание сделки', esc(it.desc), true) +
+        '</div></section>' +
+      '<section class="drawer__sec"><div class="drawer__sechead"><h3 class="drawer__sectitle">Комментарии</h3></div>' +
+        '<div class="pm-list">' + (it.comments.length ? it.comments.map(function (c) {
+          return '<div class="pm-comment"><span class="pm-comment__meta">' + esc(c.author) + ' · ' + c.at + '</span><span class="pm-comment__text">' + esc(c.text) + '</span></div>';
+        }).join('') : '<span class="pm-person__role">Комментариев пока нет</span>') +
+        '<div class="pm-actions-row"><button type="button" class="btn btn--outline btn--s">' + ic('add') + '<span class="btn__label">Добавить комментарий</span></button></div></div></section>' +
+      (it.linked ? '<section class="drawer__sec"><div class="drawer__sechead"><h3 class="drawer__sectitle">Связи</h3></div>' +
+        '<div class="drawer__grid">' + rof('Исходный лид', '<a class="link link--accent link--m" href="#">' + it.linked + '</a>') + '</div></section>' : '');
+
+    document.getElementById('dd-meetings').innerHTML =
+      '<section class="drawer__sec"><div class="drawer__sechead"><h3 class="drawer__sectitle">Встречи</h3>' +
+        '<span class="drawer__secact"><button type="button" class="btn btn--transparent btn--s">' + ic('calendar-plus') + '<span class="btn__label">Назначить встречу</span></button></span></div>' +
+        '<div class="drawer__grid drawer__grid--1col">' + it.meetings.map(function (m) {
+          return rof(m.at + ' · ' + m.place, esc(m.topic));
+        }).join('') + '</div></section>';
+    document.getElementById('dd-meet-count').textContent = it.meetings.length;
+
+    document.getElementById('dd-team').innerHTML =
+      '<section class="drawer__sec"><div class="drawer__sechead"><h3 class="drawer__sectitle">Команда сделки</h3></div>' +
+        '<div class="pm-list">' + it.team.map(function (id) {
+          var q = person(id);
+          return '<div class="pm-person"><span class="av av--circular av--m" aria-hidden="true"><span class="av__text">' + q.ini + '</span></span>' +
+            '<span class="pm-person__text"><span class="pm-person__name">' + q.name + (id === it.lead ? ' · ведущий' : '') + '</span>' +
+            '<span class="pm-person__role">' + q.role + '</span></span></div>';
+        }).join('') + '</div></section>';
+    document.getElementById('dd-team-count').textContent = it.team.length;
+
+    showPane('info');
+    rebind(scrim);
+  }
+  function showPane(name) {
+    document.querySelectorAll('#dd-tabs .tab').forEach(function (t) {
+      var on = t.getAttribute('data-pane') === name;
+      t.classList.toggle('tab--selected', on);
+      t.setAttribute('aria-selected', String(on));
+      t.setAttribute('tabindex', on ? '0' : '-1');
+    });
+    document.querySelectorAll('[data-dpane]').forEach(function (p) { p.hidden = p.getAttribute('data-dpane') !== name; });
+  }
+  document.getElementById('dd-tabs').addEventListener('click', function (e) {
+    var t = e.target.closest('.tab');
+    if (t) showPane(t.getAttribute('data-pane'));
+  });
+  document.addEventListener('kanban:open', function (e) {
+    var it = byKey(D.items, 'id', e.detail.card.getAttribute('data-kb-card'));
+    if (it) fillDrawer(it);
+  });
+  function openDrawer(id, from) {
+    var it = byKey(D.items, 'id', id);
+    if (!it) return;
+    fillDrawer(it);
+    var scrim = document.getElementById('deal-drawer');
+    if (window.DSDrawer) DSDrawer.open(scrim, { returnFocus: from });
+  }
+  document.getElementById('dd-star').addEventListener('click', function () {
+    if (!drawerItem) return;
+    drawerItem.star = !drawerItem.star;
+    this.setAttribute('aria-pressed', String(drawerItem.star));
+    this.innerHTML = ic(drawerItem.star ? 'star-filled' : 'star');
+    if (window.dsIcons) dsIcons.apply(this);
+    var card = document.querySelector('[data-kb-card="' + drawerItem.id + '"] [data-kb-star]');
+    if (card) {
+      card.setAttribute('aria-pressed', String(drawerItem.star));
+      card.innerHTML = ic(drawerItem.star ? 'star-filled' : 'star');
+      if (window.dsIcons) dsIcons.apply(card);
+    }
+  });
+
+  /* ---------- фильтр ---------- */
+  function cbHTML(attr, value, label, hint) {
+    return '<label class="cb"><input type="checkbox" class="cb__input" ' + attr + '="' + value + '">' +
+      '<span class="cb__box"><span class="cb__mark">' + ic('check') + '</span></span>' +
+      '<span class="cb__content"><span class="cb__label">' + label + '</span>' +
+      (hint ? '<span class="ds-helper ds-helper--left">' + hint + '</span>' : '') + '</span></label>';
+  }
+  document.getElementById('f-desks').innerHTML = D.desks.map(function (d) { return cbHTML('data-f-desk', d.code, d.name, d.title); }).join('');
+  document.getElementById('f-leads').innerHTML = D.people.map(function (p) { return cbHTML('data-f-lead', p.id, p.short, p.role); }).join('');
+
+  var filterScrim = document.getElementById('filter-scrim');
+  function formToFilter() {
+    return {
+      desks: [].map.call(filterScrim.querySelectorAll('[data-f-desk]:checked'), function (i) { return i.getAttribute('data-f-desk'); }),
+      leads: [].map.call(filterScrim.querySelectorAll('[data-f-lead]:checked'), function (i) { return i.getAttribute('data-f-lead'); }),
+      key: filterScrim.querySelector('[data-f-flag="key"]').checked
+    };
+  }
+  function filterToForm(f) {
+    filterScrim.querySelectorAll('[data-f-desk]').forEach(function (i) { i.checked = f.desks.indexOf(i.getAttribute('data-f-desk')) >= 0; });
+    filterScrim.querySelectorAll('[data-f-lead]').forEach(function (i) { i.checked = f.leads.indexOf(i.getAttribute('data-f-lead')) >= 0; });
+    filterScrim.querySelector('[data-f-flag="key"]').checked = f.key;
+    badges();
+  }
+  function badges() {
+    var f = formToFilter();
+    var set = function (k, n) { var b = filterScrim.querySelector('[data-f-badge="' + k + '"]'); b.textContent = n; b.hidden = !n; };
+    set('desk', f.desks.length); set('lead', f.leads.length); set('flags', f.key ? 1 : 0);
+  }
+  filterScrim.addEventListener('change', badges);
+  document.querySelector('.tfilter__open').addEventListener('click', function () { filterToForm(state.filter); });
+  document.getElementById('f-apply').addEventListener('click', function () { state.filter = formToFilter(); render(); });
+  document.getElementById('f-clear').addEventListener('click', function () { filterToForm({ desks: [], leads: [], key: false, star: false }); });
+  filterScrim.querySelector('.tfm__nav').addEventListener('click', function (e) {
+    var t = e.target.closest('[data-target]');
+    if (!t) return;
+    filterScrim.querySelectorAll('.tfm__nav .tab').forEach(function (x) {
+      x.classList.toggle('tab--selected', x === t);
+      if (x === t) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current');
+    });
+    document.getElementById(t.getAttribute('data-target')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  /* крестик чипа «Применено: N» — сброс всего фильтра (событие TableFilter) */
+  document.addEventListener('tfilter:reset', function () {
+    state.filter = { desks: [], leads: [], key: false, star: false };
+    render();
+  });
+  document.getElementById('pm-applied').addEventListener('click', function (e) {
+    if (e.target.closest('.chip__remove')) { state.filter = { desks: [], leads: [], key: false, star: false }; render(); }
+  });
+
+  /* ---------- новая сделка / лид ---------- */
+  var nd = { kind: 'deal', desk: D.desks[0].code, stage: null };
+  document.getElementById('nd-desk').innerHTML = '<div class="segctrl__thumb"></div>' + D.desks.map(function (d, i) {
+    return '<button type="button" class="segctrl__item" role="radio" aria-checked="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '" data-value="' + d.code + '"><span class="segctrl__label">' + d.code + '</span></button>';
+  }).join('');
+  function stageList() {
+    var st = nd.kind === 'lead' ? D.leadStages : D.dealStages;
+    if (!nd.stage || isLeadStage(nd.stage) !== (nd.kind === 'lead')) nd.stage = st[0].key;
+    document.getElementById('nd-stage-list').innerHTML = st.map(function (s) {
+      return '<button type="button" class="ddl__item" role="option" aria-selected="' + (s.key === nd.stage) + '" data-value="' + s.key + '"><span class="ddl__item-body"><span class="ddl__item-label">' + esc(s.name) + '</span></span></button>';
+    }).join('');
+    document.getElementById('nd-stage').value = stageOf(nd.stage).name;
+  }
+  function prefill(f, k) {
+    if (f === 'desk') nd.desk = k;
+    else if (f === 'stage') { nd.stage = k; nd.kind = isLeadStage(k) ? 'lead' : 'deal'; }
+    else if (f === 'lead') nd.lead = k;
+    else if (f === 'product') nd.product = k;
+  }
+  function syncNew() {
+    document.getElementById('nd-title').textContent = nd.kind === 'lead' ? 'Новый лид' : 'Новая сделка';
+    document.querySelector('#nd-save .btn__label').textContent = nd.kind === 'lead' ? 'Создать лид' : 'Создать сделку';
+    setSeg(document.getElementById('nd-kind'), nd.kind);
+    setSeg(document.getElementById('nd-desk'), nd.desk);
+    stageList();
+  }
+  function prepareNew(col, kind) {
+    nd.kind = kind || (state.mode === 'lead' ? 'lead' : 'deal');
+    nd.stage = null;
+    nd.lead = null; nd.product = null;
+    if (state.drill) prefill(state.drill.type, state.drill.key);
+    if (col) prefill(col.getAttribute('data-pm-field'), col.getAttribute('data-kb-col'));
+    document.getElementById('nd-product').value = nd.product || 'Акционерный мезонин';
+    document.getElementById('nd-client').value = '';
+    syncNew();
+    setTimeout(syncNew, 0); /* thumb меряется после показа модалки */
+  }
+  document.getElementById('new-deal').addEventListener('click', function (e) {
+    var k = e.target.closest('#nd-kind .segctrl__item');
+    if (k) { nd.kind = k.getAttribute('data-value'); syncNew(); return; }
+    var d = e.target.closest('#nd-desk .segctrl__item');
+    if (d) { nd.desk = d.getAttribute('data-value'); }
+  });
+  document.addEventListener('click', function (e) {
+    var o = e.target.closest('#nd-stage-list .ddl__item');
+    if (o) { nd.stage = o.getAttribute('data-value'); document.getElementById('nd-stage').value = stageOf(nd.stage).name; }
+  });
+  document.getElementById('nd-save').addEventListener('click', function () {
+    var client = document.getElementById('nd-client').value.trim() || 'Новый клиент';
+    var vol = parseFloat(document.getElementById('nd-volume').value.replace(',', '.')) || 0;
+    var it = {
+      id: (nd.kind === 'lead' ? 'L-' : 'D-') + (30000 + D.items.length),
+      kind: nd.kind, client: client, holding: '—', desk: nd.desk, stage: nd.stage,
+      key: false, star: state.mode === 'star', lead: nd.lead || 'pkk', team: [nd.lead || 'pkk'],
+      products: [document.getElementById('nd-product').value.trim() || '—'],
+      volume: vol, profit: Math.round(vol * 0.02 * 10) / 10,
+      docs: 0, tasksDone: 0, tasksTotal: 0,
+      created: new Date().toLocaleDateString('ru-RU'), updated: new Date().toLocaleDateString('ru-RU'),
+      desc: 'Описание не заполнено.', comments: [], meetings: [], linked: null
+    };
+    D.items.unshift(it);
+    if (!passMode(it, state.mode)) state.mode = 'all';
+    render();
+    if (window.DSSnack) DSSnack.show({ tone: 'success', title: (it.kind === 'lead' ? 'Лид создан' : 'Сделка создана'), text: it.id + ' · ' + client + ' · ' + deskOf(it.desk).name });
+    var card = document.querySelector('[data-kb-card="' + it.id + '"]');
+    if (card) card.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

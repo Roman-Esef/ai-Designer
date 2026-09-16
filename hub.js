@@ -62,5 +62,14 @@ window.IBPHub = [
     href: 'Concepts/ai-bankster-prototype-v02/index.html',
     root: 'Concepts/ai-bankster-prototype-v02',
     icon: 'ai-stars'
+  },
+  {
+    id: 'pipeline-manager-kanban',
+    group: 'concepts',
+    title: 'Pipeline Management',
+    desc: 'Сделки и лиды всех pipeline: канбан по стадиям и дескам, таблица',
+    href: 'Concepts/pipeline-manager-kanban/index.html',
+    root: 'Concepts/pipeline-manager-kanban',
+    icon: 'layout-grid-01'
   }
 ];
