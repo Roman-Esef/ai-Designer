@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<script>window.__DS_ROOT = '../../../../DS-IBP/';</script>
+<script>window.__DS_ROOT = '../../../DS-IBP/';</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Текущий портфель ДИД — IBP</title>
-<link rel="icon" type="image/svg+xml" href="../../../../DS-IBP/assets/logo.svg">
-<link rel="stylesheet" href="../../../../DS-IBP/ds.css">
+<link rel="icon" type="image/svg+xml" href="../../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../../DS-IBP/ds.css">
 <style>
   /* ---------- только раскладка экрана, на токенах ДС ---------- */
   *, *::before, *::after { box-sizing: border-box; }
@@ -89,7 +89,7 @@
             <!-- Шапка. grid-template-columns одинаковый у шапки и всех строк -->
             <div class="tbl__row tbl__row--head" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 150px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
               <div class="th th--separator"></div>
-              <div class="th th--pinned" aria-sort="none" data-sort-type="number">
+              <div class="th th--pinned" data-col="id" aria-sort="none" data-sort-type="number">
                 <span class="th__label">Номер сделки</span>
                 <span class="th__tools">
                   <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="true" aria-label="Открепить колонку"><i data-icon="pin-filled"></i></button>
@@ -97,7 +97,7 @@
                 </span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th th--pinned" aria-sort="none" data-sort-type="text">
+              <div class="th th--pinned" data-col="name" aria-sort="none" data-sort-type="text">
                 <span class="th__label">Наименование сделки</span>
                 <span class="th__tools">
                   <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="true" aria-label="Открепить колонку"><i data-icon="pin-filled"></i></button>
@@ -105,27 +105,27 @@
                 </span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="status">
                 <span class="th__label">Статус</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="statusTsup">
                 <span class="th__label">Статус ЦУП</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="statusOps">
                 <span class="th__label">Статус Operations</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="statusMon">
                 <span class="th__label">Статус Мониторинг</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th" aria-sort="none" data-sort-type="text">
+              <div class="th" data-col="restricted" aria-sort="none" data-sort-type="text">
                 <span class="th__label">Ограниченный доступ</span>
                 <span class="th__tools">
                   <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
@@ -133,12 +133,12 @@
                 </span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="desk">
                 <span class="th__label">Деск</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="balances">
                 <span class="th__label">Балансы сделки</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
@@ -146,7 +146,7 @@
               <!-- Private Equity — флаг, а не текст: значение сортировки берётся
                    из data-sort-value ячейки (1 / 0), иначе строки без PE читались
                    бы как пустые и всегда падали вниз при обоих направлениях -->
-              <div class="th" aria-sort="none" data-sort-type="number">
+              <div class="th" data-col="isPE" aria-sort="none" data-sort-type="number">
                 <span class="th__label">Private Equity</span>
                 <span class="th__tools">
                   <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
@@ -154,37 +154,37 @@
                 </span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="mainProductDid">
                 <span class="th__label">Основной продукт ДИД</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="productsDidNames">
                 <span class="th__label">Продукты ДИД</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="productsNames">
                 <span class="th__label">Продукты</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="knr">
                 <span class="th__label">КНР</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="gsz">
                 <span class="th__label">ГСЗ</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="currencies">
                 <span class="th__label">Валюты</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th th--sorted" aria-sort="descending" data-sort-type="date">
+              <div class="th th--sorted" data-col="signDate" aria-sort="descending" data-sort-type="date">
                 <span class="th__label">Дата подписания</span>
                 <span class="th__tools">
                   <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
@@ -192,7 +192,7 @@
                 </span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th" aria-sort="none" data-sort-type="date">
+              <div class="th" data-col="firstDisb" aria-sort="none" data-sort-type="date">
                 <span class="th__label">Дата первой выдачи</span>
                 <span class="th__tools">
                   <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
@@ -200,7 +200,7 @@
                 </span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th" aria-sort="none" data-sort-type="date">
+              <div class="th" data-col="endDate" aria-sort="none" data-sort-type="date">
                 <span class="th__label">Дата окончания</span>
                 <span class="th__tools">
                   <button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button>
@@ -208,22 +208,22 @@
                 </span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="director">
                 <span class="th__label">Директор</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="manager">
                 <span class="th__label">Менеджер</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="tsupEmployee">
                 <span class="th__label">Сотрудник ЦУП</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
               </div>
-              <div class="th">
+              <div class="th" data-col="finTpl">
                 <span class="th__label">Фин. расчеты в шаблоне</span>
                 <span class="th__tools"><button class="ibtn ibtn--neutral ibtn--s th__pin" aria-pressed="false" aria-label="Закрепить колонку"><i data-icon="pin"></i></button></span>
                 <span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span>
@@ -691,8 +691,8 @@
 
 <script src="../data/mock-deals.js"></script>
 <script src="../data/deals-store.js"></script>
-<script src="../../../../DS-IBP/scripts/ds.js"></script>
-<script src="../../../../DS-IBP/scripts/ibp-home.js"></script>
+<script src="../../../DS-IBP/scripts/ds.js"></script>
+<script src="../../../DS-IBP/scripts/ibp-home.js"></script>
 <script>
 /* Экранный скрипт: меню панели навигации строится из каталога ibp-home.js
    (window.IBPHome) по роли «Финансист ДИД»; пункт «Текущий портфель» selected. */
@@ -704,7 +704,7 @@
      Футер отдаёт IBPHome.footerHTML с зашитым href="#" — подменяем ссылку
      здесь, каталог ДС не трогаем. Проверяет сторож projects-hub.mjs. */
   var USER_LINK_FROM = ' href="#" aria-label="Открыть личный кабинет"';
-  var USER_LINK_TO = ' href="../../../../index.html" aria-label="Хаб проектов"';
+  var USER_LINK_TO = ' href="../../../index.html" aria-label="Хаб проектов"';
 
   function ic(name) { return '<i data-icon=\'' + name + '\'></i>'; }
 
@@ -745,7 +745,7 @@
     s += (window.IBPHome && window.IBPHome.footerHTML)
       ? window.IBPHome.footerHTML(role).replace(USER_LINK_FROM, USER_LINK_TO)
       : '<div class="nav__footer">'
-        + '<a class="nav__user" href="../../../../index.html" aria-label="Хаб проектов">'
+        + '<a class="nav__user" href="../../../index.html" aria-label="Хаб проектов">'
         + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
         + '<span class="nav__user-text">'
         + '<span class="nav__user-name">Александров Петр Константинович</span>'
@@ -866,60 +866,67 @@
     d.textContent = v == null ? '' : String(v);
     return d.innerHTML;
   }
-  function textCell(v, extraClass) {
+  /* data-col — ключ колонки. По нему рантайм таблицы (ds-table.js, adoptRow)
+     сопоставляет ячейку дописанной строки с колонкой шапки: к моменту создания
+     сделки колонки могли переехать, сменить ширину или скрыться. Тот же ключ
+     стоит на .th в шапке — соответствие держат они вдвоём, а не порядок */
+  function cellOpen(key, extraClass, attrs) {
+    return '<div class="tc' + (extraClass ? ' ' + extraClass : '') + '" data-col="' + key + '"' + (attrs || '') + '>';
+  }
+  function textCell(key, v, extraClass) {
     var val = (v == null || v === '') ? '—' : v;
-    return '<div class="tc' + (extraClass ? ' ' + extraClass : '') + '"><span class="tc__row"><span class="tc__text tc__text--truncate">' + esc(val) + '</span></span></div>';
+    return cellOpen(key, extraClass) + '<span class="tc__row"><span class="tc__text tc__text--truncate">' + esc(val) + '</span></span></div>';
   }
-  function joinedCell(list) { return textCell(list && list.length ? list.join(', ') : ''); }
-  function statusChip(tone, label, avatarLetter) {
+  function joinedCell(key, list) { return textCell(key, list && list.length ? list.join(', ') : ''); }
+  function statusChip(key, tone, label, avatarLetter) {
     var avatar = avatarLetter ? '<span class="chip__avatar av av--circular"><span class="av__text">' + esc(avatarLetter) + '</span></span>' : '';
-    return '<div class="tc"><span class="tc__row"><span class="chip chip--s chip--rounded ' + tone + '">' + avatar + '<span class="chip__label">' + esc(label) + '</span></span></span></div>';
+    return cellOpen(key) + '<span class="tc__row"><span class="chip chip--s chip--rounded ' + tone + '">' + avatar + '<span class="chip__label">' + esc(label) + '</span></span></span></div>';
   }
-  function peCell(isPE) {
+  function peCell(key, isPE) {
     /* data-sort-value — колонка-флаг: «нет PE» показывается прочерком, а прочерк
        рантайм считает пустым значением и всегда уводит вниз (при любом
        направлении). Явные 1/0 дают честный цикл: по возрастанию сверху сделки
        без PE, по убыванию — сделки PE */
-    if (!isPE) return '<div class="tc" data-sort-value="0"><span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>';
-    return '<div class="tc" data-sort-value="1"><span class="tc__row"><span class="chip chip--s chip--pe chip--fit"><span class="chip__label">PE</span></span></span></div>';
+    if (!isPE) return cellOpen(key, '', ' data-sort-value="0"') + '<span class="tc__row"><span class="tc__text tc__text--truncate">—</span></span></div>';
+    return cellOpen(key, '', ' data-sort-value="1"') + '<span class="tc__row"><span class="chip chip--s chip--pe chip--fit"><span class="chip__label">PE</span></span></span></div>';
   }
-  function currencyCell(list) {
-    if (!list || !list.length) return textCell('');
+  function currencyCell(key, list) {
+    if (!list || !list.length) return textCell(key, '');
     var chips = list.map(function (c) { return '<span class="chip chip--s chip--fit"><span class="chip__label">' + esc(c) + '</span></span>'; }).join('');
-    return '<div class="tc"><span class="tc__row">' + chips + '</span></div>';
+    return cellOpen(key) + '<span class="tc__row">' + chips + '</span></div>';
   }
-  function linkCell(list) {
+  function linkCell(key, list) {
     var val = (list && list.length) ? list.join(', ') : '';
-    if (!val) return textCell('');
-    return '<div class="tc"><span class="tc__row"><a class="link link--accent tc__text tc__text--truncate" href="#">' + esc(val) + '</a></span></div>';
+    if (!val) return textCell(key, '');
+    return cellOpen(key) + '<span class="tc__row"><a class="link link--accent tc__text tc__text--truncate" href="#">' + esc(val) + '</a></span></div>';
   }
 
   function renderRow(deal) {
     var cells = [];
     cells.push('<div class="tc tc--separator"></div>');
-    cells.push(textCell(deal.id, 'tc--pinned'));
-    cells.push(textCell(deal.name, 'tc--pinned'));
-    cells.push(statusChip(TONE_GENERAL[deal.status] || 'chip--dark', deal.status));
-    cells.push(statusChip(TONE_GENERAL[deal.statusTsup] || 'chip--dark', deal.statusTsup, 'Ц'));
-    cells.push(statusChip(TONE_GENERAL[deal.statusOps] || 'chip--dark', deal.statusOps, 'O'));
-    cells.push(statusChip(TONE_MON[deal.statusMon] || 'chip--dark', deal.statusMon, 'М'));
-    cells.push(textCell(deal.restricted));
-    cells.push(textCell(deal.desk));
-    cells.push(joinedCell(deal.balances));
-    cells.push(peCell(deal.isPE));
-    cells.push(textCell(deal.mainProductDid));
-    cells.push(joinedCell(deal.productsDidNames));
-    cells.push(joinedCell(deal.productsNames));
-    cells.push(linkCell(deal.knr));
-    cells.push(textCell(deal.gsz));
-    cells.push(currencyCell(deal.currencies));
-    cells.push(textCell(deal.signDate));
-    cells.push(textCell(deal.firstDisb));
-    cells.push(textCell(deal.endDate));
-    cells.push(textCell(deal.director));
-    cells.push(textCell(deal.manager));
-    cells.push(textCell(deal.tsupEmployee));
-    cells.push(textCell(deal.finTpl));
+    cells.push(textCell('id', deal.id, 'tc--pinned'));
+    cells.push(textCell('name', deal.name, 'tc--pinned'));
+    cells.push(statusChip('status', TONE_GENERAL[deal.status] || 'chip--dark', deal.status));
+    cells.push(statusChip('statusTsup', TONE_GENERAL[deal.statusTsup] || 'chip--dark', deal.statusTsup, 'Ц'));
+    cells.push(statusChip('statusOps', TONE_GENERAL[deal.statusOps] || 'chip--dark', deal.statusOps, 'O'));
+    cells.push(statusChip('statusMon', TONE_MON[deal.statusMon] || 'chip--dark', deal.statusMon, 'М'));
+    cells.push(textCell('restricted', deal.restricted));
+    cells.push(textCell('desk', deal.desk));
+    cells.push(joinedCell('balances', deal.balances));
+    cells.push(peCell('isPE', deal.isPE));
+    cells.push(textCell('mainProductDid', deal.mainProductDid));
+    cells.push(joinedCell('productsDidNames', deal.productsDidNames));
+    cells.push(joinedCell('productsNames', deal.productsNames));
+    cells.push(linkCell('knr', deal.knr));
+    cells.push(textCell('gsz', deal.gsz));
+    cells.push(currencyCell('currencies', deal.currencies));
+    cells.push(textCell('signDate', deal.signDate));
+    cells.push(textCell('firstDisb', deal.firstDisb));
+    cells.push(textCell('endDate', deal.endDate));
+    cells.push(textCell('director', deal.director));
+    cells.push(textCell('manager', deal.manager));
+    cells.push(textCell('tsupEmployee', deal.tsupEmployee));
+    cells.push(textCell('finTpl', deal.finTpl));
     cells.push('<div class="tc tc--separator"></div>');
     return '<div class="tbl__row" data-row="' + esc(deal.id) + '" style="grid-template-columns:' + GRID + ';">' + cells.join('') + '</div>';
   }
@@ -952,6 +959,20 @@
   var frag = document.createDocumentFragment();
   Array.prototype.slice.call(wrap.children).forEach(function (row) { frag.appendChild(row); });
   headRow.parentNode.insertBefore(frag, headRow.nextSibling);
+
+  /* ---------- переход на страницу сделки: двойной клик по строке ----------
+     Штатный рантайм таблицы двойной клик не обслуживает (ds-table.js знает
+     только фокус строки и чекбоксы), поэтому переход — экранный. Номер сделки
+     уже стоит на строке в data-row (renderRow), отдельный ключ не нужен; шапка
+     data-row не несёт и под селектор не попадает. Двойной клик по собственным
+     интерактивным элементам ячейки (ссылка КНР, чекбокс) переходом не считается:
+     у них своё поведение. */
+  tbl.addEventListener('dblclick', function (e) {
+    if (e.target.closest('a, button, input, label')) return;
+    var row = e.target.closest('.tbl__row[data-row]');
+    if (!row) return;
+    window.location.href = '../deal_post/Deal.html?id=' + encodeURIComponent(row.getAttribute('data-row'));
+  });
 
   /* ---------- пагинация: реальные total/страницы, окно по DOM-порядку ---------- */
   var footerHost = document.querySelector('.dtable__footer');

@@ -86,6 +86,9 @@
       if (!label) return; /* служебные (выбор/действие) — не настраиваются */
       columns.push({
         id: i,
+        /* ключ колонки (data-col) — по нему ячейка строки, дописанной экраном
+           уже после снимка, находит свою колонку (см. syncRows) */
+        key: th.dataset.col || '',
         label: label,
         pinned: th.classList.contains('th--pinned'),
         visible: true,
@@ -109,6 +112,46 @@
     };
   }
 
+  /* ---------- модель догоняет состав строк ---------- */
+  /* Снимок колонок делается один раз и живёт на таблице: пересоздать его
+     нельзя — ссылки на ячейки СКРЫТЫХ колонок держит только он, в DOM их нет.
+     Но состав строк между открытиями меняется: реестр дописывает сделки мимо
+     рантайма. Поэтому модель не пересоздаётся, а догоняет DOM — ушедшие строки
+     выбрасываются, пришедшие дописываются.
+     Видимая ячейка новой строки берётся по позиции (adoptRow из ds-table.js
+     уже привёл строку к форме шапки: разделитель + видимые колонки +
+     разделитель), ячейка скрытой колонки — со склада row.__dsColCells.
+     Строка, в которой нашлась не каждая колонка (нет data-col, разъехалась
+     разметка), в модель не берётся: неполный набор ячеек при «Применить»
+     собрал бы строку короче шапки, и всё правее съехало бы на трек. */
+  function syncRows(state) {
+    var rows = dataRowsOf(state.table, state.headerRow);
+    var visible = state.columns.filter(function (c) { return c.visible; });
+    var nextRows = [], nextLead = [], nextTrail = [];
+    var nextCells = state.columns.map(function () { return []; });
+
+    rows.forEach(function (row) {
+      var known = state.dataRows.indexOf(row);
+      var cells = state.columns.map(function (c, ci) {
+        if (known >= 0) return c.rowCells[known];
+        if (c.visible) return row.children[visible.indexOf(c) + 1];
+        return c.key ? (row.__dsColCells || {})[c.key] : null;
+      });
+      if (known < 0 && row.children.length !== visible.length + 2) return;
+      for (var ci = 0; ci < cells.length; ci++) if (!cells[ci]) return;
+
+      nextRows.push(row);
+      nextLead.push(row.children[0]);
+      nextTrail.push(row.children[row.children.length - 1]);
+      cells.forEach(function (cell, ci) { nextCells[ci].push(cell); });
+    });
+
+    state.dataRows = nextRows;
+    state.dataLead = nextLead;
+    state.dataTrail = nextTrail;
+    state.columns.forEach(function (c, ci) { c.rowCells = nextCells[ci]; });
+  }
+
   /* ---------- применение к таблице ---------- */
   function commit(state, working) {
     var visible = working.filter(function (c) { return c.visible; });
@@ -130,6 +173,19 @@
     rebuildRow(state.headerRow, state.leadSep, visible.map(function (c) { return c.headerCell; }), state.trailSep);
     state.dataRows.forEach(function (row, k) {
       rebuildRow(row, state.dataLead[k], visible.map(function (c) { return c.rowCells[k]; }), state.dataTrail[k]);
+    });
+
+    /* ячейки скрытых колонок уходят из DOM и ждут на СВОЕЙ строке — тогда
+       склад один и тот же для строк разметки и для строк, дописанных экраном
+       (их туда кладёт adoptRow из ds-table.js), и syncRows берёт оттуда же */
+    working.forEach(function (c) {
+      if (c.visible || !c.key) return;
+      c.rowCells.forEach(function (cell, k) {
+        var row = state.dataRows[k];
+        if (!cell || !row) return;
+        if (!row.__dsColCells) row.__dsColCells = {};
+        row.__dsColCells[c.key] = cell;
+      });
     });
 
     /* закрепление: классы + синхронизация .th__pin в шапке */
@@ -324,6 +380,7 @@
       var state = table.__dsTableSettings || captureState(table);
       if (!state) return;
       if (!table.__dsTableSettings) table.__dsTableSettings = state;
+      else syncRows(state);   /* строки могли добавиться после снимка */
       openSettings(state);
     });
   }
