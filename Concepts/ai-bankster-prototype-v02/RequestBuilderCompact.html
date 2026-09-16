@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<!-- Экран «Новый отчёт» в режиме конструктора — компактный вариант
+     (RequestBuilderCompact). Альтернатива RequestBuilder.html по замечанию
+     заказчика от 14.09.2026: из-за хелперов и заголовков блоков форма вышла
+     слишком высокой. Поля и поведение те же, что в основном варианте, но без
+     заголовков блоков и хелперов под полями — пояснения собраны в окне
+     «Подсказки и ограничения» (иконка в шапке тайла). Сегмент-контролы размера S
+     по ширине содержимого, поле контекста растягивается по высоте, файлы — в одну
+     строку. Собран на компонентах IBP DS по ТЗ: БТ-5 (конструктор), БТ-2 (входные
+     файлы), БТ-1 (объём и формат выгрузки), БТ-10 (вызов из другого рабочего места).
+     Контекст для правки: DS-IBP/specs/_cheatsheet.md. CSS компонентов не читать. -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Конструктор отчётов, компактный вариант — Новый отчёт — AI Pitcher — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; scrollbar-gutter: stable; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка: та же, что у «Нового отчёта» (RequestThread.html) ─────────
+     Только grid / flex / gap и только на токенах. Панель «Недавние запросы» —
+     колонка на всю высоту между меню и рабочей областью; крошки и шапка
+     страницы стоят только над контентом. */
+  .app-shell     { display: flex; height: 100vh; }
+  .app-shell > .screen { flex: 1; min-width: 0; }
+
+  /* ── Панель «Недавние запросы» — локальный компонент направления ─────────
+     Та же панель, что в нити: разбор — RequestThread.screen.md, раздел 5. */
+  .hist {
+    flex: 0 0 320px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-page);
+    border-right: 1px solid var(--border-light);
+  }
+  /* Кнопки закреплены над списком, прокручиваются только подпись и список;
+     место под полосу зарезервировано, правый паддинг уменьшен на её ширину —
+     края строк совпадают с кнопками. Разбор — в нити. */
+  .hist__acts    { flex: none; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-16); border-bottom: 1px solid transparent; }
+  .hist__acts.is-scrolled { border-bottom-color: var(--border-light); }
+  .hist__body    { flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; display: flex; flex-direction: column; gap: var(--space-16); padding: 0 calc(var(--space-16) - var(--space-8)) var(--space-16) var(--space-16); }
+  .hist__list    { display: flex; flex-direction: column; gap: var(--space-4); }
+  .hist__foot    { flex: none; display: flex; padding: var(--space-12) var(--space-16); border-top: 1px solid var(--border-light); }
+  .hist__item    { padding: var(--space-8) var(--space-12); border-radius: var(--radius-m); cursor: pointer; transition: background-color .15s ease; }
+  .hist__item:hover { background: var(--bgtable-row-hover); }
+  .hist__item:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+  .hist__item[aria-current="true"] { background: var(--bgtable-row-focus); }
+
+  /* ── Тело в режиме конструктора ──────────────────────────────────────────
+     Та же колонка, что у ленты нити (880px по центру), и своя прокрутка —
+     обязательная форма скролл-контейнера (чек-лист К3). Поля ввода сообщения
+     в этом режиме нет. */
+  /* position: relative — чтобы закрытые выпадающие списки полей обрезались
+     скролл-контейнером. Закрытый список ДС остаётся в поле невидимым блоком
+     position:absolute; без позиционирующего предка внутри скролла он
+     расширял прокрутку всего документа. Открытый список рантайм переносит в
+     слой ds-float-layer с position:fixed — его это не задевает. */
+  .bld-scroll    { position: relative; flex: 1; min-height: 0; overflow-y: auto; }
+  .bld-col       { max-width: 880px; margin: 0 auto; }
+
+  /* .inp по умолчанию 280px — в сетке тайла поле тянется на клетку, как
+     .tfm__grid > .inp в самой ДС. */
+  .tile__grid > .inp { width: 100%; }
+  /* Сетка в окне подсказок: .tile__grid берёт зазоры из --tile-gap-row и
+     --tile-gap-col, а их задаёт только тайл — вне тайла ряды слипались.
+     Здесь сетке передаются те же переменные — 24px. */
+  .modal__body > .tile__grid { --tile-gap-row: var(--space-24); --tile-gap-col: var(--space-24); }
+  /* Подпись + сегмент-контрол. align-items: flex-start обязателен: в
+     flex-колонке SegmentControl растягивается stretch'ем, и серый трек уходит
+     за сегменты (чек-лист К2). Контрол — по ширине содержимого. */
+  .bld-field     { display: flex; flex-direction: column; align-items: flex-start; gap: var(--gap-label-field); min-width: 0; }
+  /* Поле и то, что к нему относится, — чипы типового фокуса под полем
+     контекста, кнопка выбора под списком файлов — колонкой через 8px */
+  .bld-stack     { align-self: stretch; display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
+  .bld-stack > .inp { width: 100%; }
+  .bld-row       { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+
+  /* Строка файла — в одну линию: Entity (иконка, имя, размер), состояние
+     чипом и два действия. Компонента «файл в списке загрузки» в ДС нет:
+     строку собирает локальная обёртка, анатомия Entity не трогается. */
+  .bld-files     { display: flex; flex-direction: column; gap: var(--space-8); }
+  .bld-file      { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-8) var(--space-12); background: var(--bg-page); border-radius: var(--radius-xl); }
+  .bld-file > .entity { flex: 1; min-width: 0; }
+  .bld-file__acts { flex: none; display: flex; gap: var(--space-4); }
+  /* Подвал формы: нехватка сведений, разделитель, строка запуска */
+  .bld-end       { display: flex; flex-direction: column; gap: var(--space-16); margin-top: var(--space-24); }
+  .bld-foot      { display: flex; align-items: center; gap: var(--space-16); }
+  .bld-foot__note { flex: 1; min-width: 0; }
+  .bld-foot__acts { flex: none; display: flex; gap: var(--space-8); }
+  /* Парное [hidden]: объявленный display перебивает UA-правило [hidden] */
+  .bld-note[hidden] { display: none; }
+
+  /* Полосы прокрутки внутри блоков — тот же рецепт, что у тела модалки ДС
+     (modal.css): 8px, бегунок --border-light со скруглением. Общего класса
+     полосы прокрутки в ДС нет.
+     Бегунок виден только во время прокрутки: класс is-scrolling ставит скрипт
+     экрана на событии scroll и снимает через секунду тишины. Под курсором
+     бегунок тоже проявляется — чтобы его можно было взять мышью. Место под
+     полосу зарезервировано всегда, контент при появлении бегунка не сдвигается.
+     Firefox не знает ::-webkit-scrollbar — ему тонкая полоса того же цвета. */
+  .hist__body::-webkit-scrollbar,
+  .bld-scroll::-webkit-scrollbar { width: var(--space-8); }
+  .hist__body::-webkit-scrollbar-thumb,
+  .bld-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: var(--radius-m); }
+  .hist__body.is-scrolling::-webkit-scrollbar-thumb,
+  .bld-scroll.is-scrolling::-webkit-scrollbar-thumb,
+  .hist__body::-webkit-scrollbar-thumb:hover,
+  .bld-scroll::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+  @supports not selector(::-webkit-scrollbar) {
+    .hist__body, .bld-scroll { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+    .hist__body.is-scrolling, .bld-scroll.is-scrolling { scrollbar-color: var(--border-light) transparent; }
+  }
+
+  /* Узкий экран: панель прячется целиком, как в нити */
+  @media (max-width: 1200px) {
+    .hist { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+      <button class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item" href="index.html"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Origination</div>
+        <a class="nav__item nav__item--selected" href="RequestThread.html" aria-current="page"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="funds"></i></span><span class="nav__label">Фонды</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Pipeline</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-pipeline"></i></span><span class="nav__label">DCM Pipeline</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="payments-ib"></i></span><span class="nav__label">Реестр платежей IB</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Клиенты и задачи</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="factory-01"></i></span><span class="nav__label">Клиенты</span></a>
+        <a class="nav__item" href="#" aria-label="Задачи, 7"><span class="nav__ico"><i data-icon="tasks"></i></span><span class="nav__label">Задачи</span><span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">7</span></span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <a class="nav__user" href="../../index.html" aria-label="Хаб проектов">
+        <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Александров Пётр Константинович</span><span class="nav__user-role">Консультант-аналитик ДИД</span></span>
+      </a>
+      <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <!-- Панель и рабочая область — одна строка, как у «Нового отчёта» -->
+  <div class="app-shell">
+
+    <!-- ── Панель «Недавние запросы» (БТ-4.1) ─────────────────────────────── -->
+    <aside class="hist" aria-label="Недавние запросы">
+      <div class="hist__acts">
+        <button class="btn btn--accent btn--m btn--fullwidth" onclick="location.href='RequestThread.html'"><i data-icon="add"></i><span class="btn__label">Новый отчёт</span></button>
+        <!-- Конструктор уже открыт: кнопка не перезагружает форму, а возвращает к её началу -->
+        <button class="btn btn--outline btn--m btn--fullwidth" id="btnBuilderTop"><i data-icon="ai-stars"></i><span class="btn__label">Конструктор отчётов</span></button>
+      </div>
+      <div class="hist__body">
+        <span class="ds-label"><span class="ds-label__text">Недавние запросы</span></span>
+        <div class="hist__list" id="histList" role="list"></div>
+      </div>
+      <div class="hist__foot">
+        <a class="link link--accent link--s link--with-icon" href="RequestHistory.html">
+          <span class="link__icon"><i data-icon="history"></i></span>
+          Все запросы и материалы
+        </a>
+      </div>
+    </aside>
+
+    <div class="screen screen--app">
+
+      <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
+        <li class="crumbs__item"><a class="link link--muted" href="index.html">Главная</a></li>
+        <li class="crumbs__item"><a class="link link--muted" href="RequestThread.html">AI Pitcher</a></li>
+        <li class="crumbs__item crumbs__item--current">
+          <span class="crumbs__current" aria-current="page">Новый отчёт</span>
+        </li>
+      </nav>
+
+      <main class="screen__content">
+
+        <div class="phead">
+          <div class="phead__main">
+            <div class="phead__title-row">
+              <div class="phead__title-group">
+                <h1 class="phead__title">Новый отчёт</h1>
+              </div>
+              <!-- Выход из режима конструктора обратно в диалог -->
+              <span class="phead__return">
+                <button class="btn btn--outline btn--xs" onclick="location.href='RequestThread.html'"><i data-icon="flip-backward"></i><span class="btn__label">К диалогу</span></button>
+              </span>
+            </div>
+            <div class="phead__subtitle">
+              <span class="phead__meta"><span class="phead__meta-ico"><i data-icon="ai-stars"></i></span>Конструктор отчётов</span>
+              <span class="phead__meta"><span class="phead__meta-ico phead__meta-ico--ok"><i data-icon="check-circle"></i></span>Черновик сохраняется автоматически</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Конструктор в теле нити (БТ-5), компактный вариант ──────────── -->
+        <div class="bld-scroll">
+          <div class="bld-col">
+            <div class="tile-group">
+              <div class="tile-row">
+                <section class="tile" style="grid-column:span 12" aria-labelledby="bld-title">
+                  <header class="tile__header">
+                    <div class="tile__header-main">
+                      <div class="tile__title-row"><h3 class="tile__title" id="bld-title">Параметры отчёта</h3></div>
+                    </div>
+                    <div class="tile__actions">
+                      <!-- Костыль прототипа, вне правил ДС: открывает другой вариант
+                           формы, чтобы показать заказчику оба. Уберём, когда вариант
+                           будет выбран. -->
+                      <button class="ibtn ibtn--neutral ibtn--m" id="btnVariant" data-href="RequestBuilder.html" aria-label="Показать обычный вариант формы"><i data-icon="refresh"></i></button>
+                      <button class="ibtn ibtn--neutral ibtn--m" aria-label="Подсказки и ограничения" data-modal="limits-scrim"><i data-icon="help-circle"></i></button>
+                    </div>
+                  </header>
+
+                  <!-- Предзаполнение при вызове из другого рабочего места
+                       (БТ-5.11, БТ-10.2) — показывается по адресу ?from=meeting -->
+                  <div class="tile__alert bld-note" id="prefillAlert" hidden>
+                    <div class="alert alert--info alert--m" role="status" aria-live="polite">
+                      <span class="alert__icon" aria-hidden="true"><i data-icon="Info-circle-filled"></i></span>
+                      <div class="alert__body">
+                        <p class="alert__title">Контекст перенесён из встречи 10.09.2026</p>
+                        <p class="alert__text">Объект анализа, фокус и материалы подставлены из карточки встречи. Все значения можно изменить — на права доступа вызов извне не влияет.</p>
+                        <div class="alert__buttons">
+                          <button class="btn btn--transparent btn--xs btn--info" id="btnClearCtx"><span class="btn__label">Очистить подстановку</span></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="tile__body">
+                    <!-- Поля — одной сеткой без заголовков блоков и хелперов:
+                         пояснения к полям собраны в окне «Подсказки и ограничения».
+                         Порядок полей — как в черновом прототипе. -->
+                    <div class="tile__grid tile__grid--gap-24" style="grid-template-columns:repeat(3,minmax(0,1fr));">
+
+                      <!-- Сценарий (БТ-5.2) -->
+                      <div class="bld-field tile__grid-full">
+                        <span class="ds-label" id="lblScenario"><span class="ds-label__text">Сценарий</span></span>
+                        <div class="segctrl segctrl--s" role="radiogroup" aria-labelledby="lblScenario" data-segctrl id="segScenario">
+                          <div class="segctrl__thumb"></div>
+                          <button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0" data-value="Материал по клиенту"><span class="segctrl__label">По клиенту</span></button>
+                          <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="Материал по рынку и региону"><span class="segctrl__label">По рынку и региону</span></button>
+                        </div>
+                      </div>
+
+                      <!-- Объект анализа (БТ-5.5) -->
+                      <div class="inp inp--m" style="grid-column:span 2">
+                        <label class="ds-label" for="fObject"><span class="ds-label__text">Объект анализа<span class="cb__req">*</span></span></label>
+                        <div class="inp__field" role="combobox" aria-expanded="false" aria-controls="ddl-object" data-ddl="ddl-object">
+                          <span class="inp__lead"><i data-icon="client-search"></i></span>
+                          <input class="inp__control" id="fObject" value="ГК «Северный агрохолдинг»" placeholder="Компания, группа, бенефициар или рынок">
+                          <span class="inp__acts">
+                            <button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button>
+                          </span>
+                        </div>
+                        <div id="ddl-object" class="ddl ddl--floating ddl--scroll" role="listbox">
+                          <div class="ddl__group">Совпадения по реестру</div>
+                          <button class="ddl__item" role="option" aria-selected="true" data-val="ГК «Северный агрохолдинг»">
+                            <span class="ddl__item-body">
+                              <span class="ddl__item-label">ГК «Северный агрохолдинг»</span>
+                              <span class="ds-helper">Группа, 11 юридических лиц · ИНН головной 7714032184</span>
+                            </span>
+                          </button>
+                          <button class="ddl__item" role="option" aria-selected="false" data-val="АО «Северный агрохолдинг»">
+                            <span class="ddl__item-body">
+                              <span class="ddl__item-label">АО «Северный агрохолдинг»</span>
+                              <span class="ds-helper">Головная компания группы · ИНН 7714032184</span>
+                            </span>
+                          </button>
+                          <button class="ddl__item" role="option" aria-selected="false" data-val="ООО «Северный агрохолдинг — Юг»">
+                            <span class="ddl__item-body">
+                              <span class="ddl__item-label">ООО «Северный агрохолдинг — Юг»</span>
+                              <span class="ds-helper">Дочернее общество · ИНН 6165190833</span>
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="inp inp--m">
+                        <label class="ds-label" for="fInn"><span class="ds-label__text">ИНН / ОГРН (Не обязательно)</span></label>
+                        <div class="inp__field">
+                          <span class="inp__lead"><i data-icon="passport"></i></span>
+                          <input class="inp__control" id="fInn" value="7714032184" placeholder="ИНН, ОГРН или код Банка">
+                        </div>
+                      </div>
+
+                      <!-- Контекст и фокус (БТ-5.6): поле тянется по высоте за правый
+                           нижний угол. Типовой фокус (БТ-5.7) — чипы сразу под полем. -->
+                      <div class="bld-stack tile__grid-full">
+                        <div class="inp inp--m inp--multiline inp--resizable">
+                          <label class="ds-label" for="fCtx"><span class="ds-label__text">Контекст и фокус анализа</span></label>
+                          <!-- .inp__box обязателен для --resizable: от него позиционируется
+                               крестик очистки, иначе крестик встаёт от ближайшего
+                               позиционированного предка — тела конструктора -->
+                          <div class="inp__box">
+                            <div class="inp__field">
+                              <textarea class="inp__control" id="fCtx" rows="3">Собственник рассматривает частичный выход. Интересует применимость мезонина под выкуп доли миноритария, оценка через мультипликаторы сопоставимых компаний и график погашений валютного долга до 2028 года.</textarea>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="chiplist" role="group" aria-label="Типовой фокус — добавить в текст" id="ctxExamples">
+                          <span class="chip chip--edit chip--s" tabindex="0" data-tpl="Оценить долговую нагрузку и запас по ковенантам на горизонте трёх лет."><span class="chip__label">Долговая нагрузка и ковенанты</span></span>
+                          <span class="chip chip--edit chip--s" tabindex="0" data-tpl="Подобрать сопоставимые компании и оценить бизнес по мультипликаторам."><span class="chip__label">Оценка по мультипликаторам</span></span>
+                          <span class="chip chip--edit chip--s" tabindex="0" data-tpl="Проверить структуру владения и конечных бенефициаров группы."><span class="chip__label">Структура владения</span></span>
+                          <span class="chip chip--edit chip--s" tabindex="0" data-tpl="Оценить потребность в рефинансировании и окно для выхода на рынок."><span class="chip__label">Рефинансирование</span></span>
+                          <span class="chip chip--edit chip--s" tabindex="0" data-tpl="Сравнить с отраслевыми бенчмарками по марже и оборачиваемости."><span class="chip__label">Отраслевые бенчмарки</span></span>
+                        </div>
+                      </div>
+
+                      <!-- Направление анализа (БТ-5.4) -->
+                      <div class="bld-field tile__grid-full">
+                        <span class="ds-label" id="lblDirection"><span class="ds-label__text">Направление анализа</span></span>
+                        <div class="segctrl segctrl--s" role="radiogroup" aria-labelledby="lblDirection" data-segctrl id="segDirection">
+                          <div class="segctrl__thumb"></div>
+                          <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="Полный анализ"><span class="segctrl__label">Полный анализ</span></button>
+                          <button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0" data-value="Прямые инвестиции"><span class="segctrl__label">Прямые инвестиции</span></button>
+                          <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="M&amp;A"><span class="segctrl__label">M&amp;A</span></button>
+                          <button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-value="Рынки капитала"><span class="segctrl__label">Рынки капитала</span></button>
+                        </div>
+                      </div>
+
+                      <!-- Объём, формат и язык (БТ-5.3, БТ-1.4) — поля выбора в один ряд.
+                           Объём показывает число страниц прямо в значении поля. -->
+                      <div class="inp inp--m">
+                        <label class="ds-label" for="fVolume"><span class="ds-label__text">Объём</span></label>
+                        <div class="inp__field" role="combobox" aria-expanded="false" aria-controls="ddl-volume" data-ddl="ddl-volume">
+                          <input class="inp__control" id="fVolume" value="Детальный, 10–20 стр." readonly>
+                          <span class="inp__acts">
+                            <button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button>
+                          </span>
+                        </div>
+                        <div id="ddl-volume" class="ddl ddl--floating" role="listbox">
+                          <button class="ddl__item" role="option" aria-selected="true" data-val="Детальный, 10–20 стр."><span class="ddl__item-body"><span class="ddl__item-label">Детальный</span><span class="ds-helper">10–20 страниц, таблицы и графики</span></span></button>
+                          <button class="ddl__item" role="option" aria-selected="false" data-val="Краткий, 2–3 стр."><span class="ddl__item-body"><span class="ddl__item-label">Краткий</span><span class="ds-helper">2–3 страницы, те же выводы</span></span></button>
+                        </div>
+                      </div>
+
+                      <div class="inp inp--m">
+                        <label class="ds-label" for="fFormat"><span class="ds-label__text">Формат файла</span></label>
+                        <div class="inp__field" role="combobox" aria-expanded="false" aria-controls="ddl-format" data-ddl="ddl-format">
+                          <input class="inp__control" id="fFormat" value="PDF и Word" readonly>
+                          <span class="inp__acts">
+                            <button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button>
+                          </span>
+                        </div>
+                        <div id="ddl-format" class="ddl ddl--floating" role="listbox">
+                          <button class="ddl__item" role="option" aria-selected="true" data-val="PDF и Word"><span class="ddl__item-body"><span class="ddl__item-label">PDF и Word</span></span></button>
+                          <button class="ddl__item" role="option" aria-selected="false" data-val="PDF"><span class="ddl__item-body"><span class="ddl__item-label">PDF</span></span></button>
+                          <button class="ddl__item" role="option" aria-selected="false" data-val="Word"><span class="ddl__item-body"><span class="ddl__item-label">Word</span></span></button>
+                        </div>
+                      </div>
+
+                      <div class="inp inp--m">
+                        <label class="ds-label" for="fLang"><span class="ds-label__text">Язык</span></label>
+                        <div class="inp__field" role="combobox" aria-expanded="false" aria-controls="ddl-lang" data-ddl="ddl-lang">
+                          <input class="inp__control" id="fLang" value="Русский" readonly>
+                          <span class="inp__acts">
+                            <button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button>
+                          </span>
+                        </div>
+                        <div id="ddl-lang" class="ddl ddl--floating" role="listbox">
+                          <button class="ddl__item" role="option" aria-selected="true" data-val="Русский"><span class="ddl__item-body"><span class="ddl__item-label">Русский</span></span></button>
+                          <button class="ddl__item" role="option" aria-selected="false" data-val="English"><span class="ddl__item-body"><span class="ddl__item-label">English</span></span></button>
+                        </div>
+                      </div>
+
+                      <!-- Материалы для анализа (БТ-2): файлы в одну строку и кнопка выбора -->
+                      <div class="bld-field tile__grid-full">
+                        <span class="ds-label"><span class="ds-label__text">Материалы для анализа</span></span>
+                        <div class="bld-stack">
+                          <div class="bld-files" id="fileList"></div>
+                          <div class="bld-row">
+                            <button class="btn btn--outline btn--s" id="btnAddFile"><i data-icon="attach"></i><span class="btn__label">Выбрать файлы</span></button>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <!-- Готовность и запуск (БТ-5.9, БТ-5.10) -->
+                    <div class="bld-end">
+                      <div class="bld-note" id="readyNote" hidden>
+                        <div class="alert alert--warning alert--m" role="alert" aria-live="assertive">
+                          <span class="alert__icon" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
+                          <div class="alert__body">
+                            <p class="alert__title">Не хватает сведений</p>
+                            <p class="alert__text" id="readyText">Чтобы запустить подготовку, укажите: объект анализа.</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <hr class="dvd dvd--h" aria-hidden="true">
+
+                      <div class="bld-foot">
+                        <span class="ds-helper ds-helper--left ds-helper--with-icon bld-foot__note">
+                          <span class="ds-helper__icon" aria-hidden="true"><i data-icon="clock-timer"></i></span>
+                          <span class="ds-helper__text">Подготовка — до 30 минут</span>
+                        </span>
+                        <div class="bld-foot__acts">
+                          <button class="btn btn--outline btn--s" onclick="location.href='RequestThread.html'"><span class="btn__label">Отмена</span></button>
+                          <button class="btn btn--accent btn--s" id="btnRun"><i data-icon="ai-stars"></i><span class="btn__label">Запустить подготовку</span></button>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ── Кебаб-меню запроса (БТ-4.8) — то же, что в нити ───────────────────── -->
+<!-- Прямым ребёнком body без обёртки .menu-anchor: она inline-flex и давала бы
+     строку текста под каркасом — страница прокручивалась бы на 20px. -->
+<div id="hist-menu" class="menu menu--floating" role="menu" hidden>
+  <div class="menu__label">Запрос</div>
+  <button type="button" class="menu__item" role="menuitem" data-modal="rename-scrim">
+    <span class="menu__item-icon"><i data-icon="edit"></i></span><span class="menu__item-label">Переименовать</span>
+  </button>
+  <button type="button" class="menu__item" role="menuitem" id="miDuplicate">
+    <span class="menu__item-icon"><i data-icon="copy"></i></span><span class="menu__item-label">Дублировать запрос</span>
+  </button>
+  <button type="button" class="menu__item" role="menuitem" id="miRestart">
+    <span class="menu__item-icon"><i data-icon="refresh"></i></span><span class="menu__item-label">Перезапустить по прежним вводным</span>
+  </button>
+  <hr class="menu__divider">
+  <button type="button" class="menu__item" role="menuitem" onclick="location.href='RequestHistory.html'">
+    <span class="menu__item-icon"><i data-icon="history"></i></span><span class="menu__item-label">Все запросы</span>
+  </button>
+  <button type="button" class="menu__item menu__item--danger" role="menuitem" data-modal="delete-scrim">
+    <span class="menu__item-icon"><i data-icon="trash"></i></span><span class="menu__item-label">Удалить запрос</span>
+  </button>
+</div>
+
+<!-- ── Модалка переименования (БТ-4.8) ──────────────────────────────────── -->
+<div class="modal-scrim" id="rename-scrim" hidden data-modal-guarded>
+  <div class="modal modal--w4" role="dialog" aria-modal="true" aria-labelledby="rename-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="rename-title">Переименовать запрос</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div class="inp inp--m">
+        <label class="ds-label" for="renameField"><span class="ds-label__text">Название запроса</span></label>
+        <div class="inp__field">
+          <input class="inp__control" id="renameField" value="ГК «Северный агрохолдинг» — выход миноритария" aria-describedby="rename-help">
+        </div>
+        <span class="ds-helper ds-helper--left" id="rename-help">Название видно в истории запросов и в уведомлениях</span>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Сохранить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- ── Модалка удаления (БТ-4.8: удаление обратимо) ─────────────────────── -->
+<div class="modal-scrim" id="delete-scrim" hidden>
+  <div class="modal modal--w3" role="alertdialog" aria-modal="true" aria-labelledby="delete-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="delete-title">Удалить запрос?</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <p class="ds-body-m">Запрос, все его версии материала и приложенные файлы уйдут в корзину.</p>
+      <p class="ds-body-s">Восстановить запрос можно в течение 30 дней — из раздела «История и материалы».</p>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button class="btn btn--accent btn--m btn--danger" id="btnDelete" data-modal-close><span class="btn__label">Удалить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- ── Подсказки и ограничения (БТ-5, БТ-2.8, БТ-1.9) ───────────────────────
+     В компактном варианте хелперов под полями нет: пояснения к полям собраны
+     здесь, над ограничениями на файлы и правилами выгрузки. -->
+<div class="modal-scrim" id="limits-scrim" hidden>
+  <div class="modal modal--w6" role="dialog" aria-modal="true" aria-labelledby="limits-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="limits-title">Подсказки и ограничения</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div class="tile__grid" style="grid-template-columns:1fr 1fr;">
+        <div class="rof tile__grid-full">
+          <span class="ds-label"><span class="ds-label__text">Сценарий</span></span>
+          <div class="rof__row"><span class="rof__value">По клиенту — компания, группа или бенефициар: конкретное лицо определяется по объекту анализа. По рынку и региону — отрасль, сегмент или география: объектом анализа выступает рынок, а не контрагент.</span></div>
+        </div>
+        <div class="rof tile__grid-full">
+          <span class="ds-label"><span class="ds-label__text">Контекст и фокус анализа</span></span>
+          <div class="rof__row"><span class="rof__value">Опишите задачу, а не только объект: что проверить, какие гипотезы важны, что уже известно. Чипы под полем дописывают в текст типовые формулировки.</span></div>
+        </div>
+        <div class="rof tile__grid-full">
+          <span class="ds-label"><span class="ds-label__text">Направление анализа</span></span>
+          <div class="rof__row"><span class="rof__value">Сужает состав выводов и продуктовых идей, но не глубину сбора данных.</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Объём</span></span>
+          <div class="rof__row"><span class="rof__value">Детальный — 10–20 страниц, таблицы и графики. Краткий — 2–3 страницы, те же выводы.</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Подготовка</span></span>
+          <div class="rof__row"><span class="rof__value">До 30 минут. Работа продолжится, даже если закрыть инструмент; запрос появится в «Недавних запросах», ход подготовки — в нити.</span></div>
+        </div>
+      </div>
+
+      <hr class="dvd dvd--h" aria-hidden="true">
+
+      <div class="tile__grid" style="grid-template-columns:1fr 1fr;">
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Файлов на один запрос</span></span>
+          <div class="rof__row"><span class="rof__value">не более 10</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Размер одного файла</span></span>
+          <div class="rof__row"><span class="rof__value">не более 30 МБ</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Форматы входных файлов</span></span>
+          <div class="rof__row"><span class="rof__value">PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX</span></div>
+        </div>
+        <div class="rof">
+          <span class="ds-label"><span class="ds-label__text">Сканированные документы</span></span>
+          <div class="rof__row"><span class="rof__value">распознаются автоматически</span></div>
+        </div>
+        <div class="rof tile__grid-full">
+          <span class="ds-label"><span class="ds-label__text">Правила выгрузки</span></span>
+          <div class="rof__row"><span class="rof__value">Детальный материал — PDF и Word, краткий — только PDF. Файл получает принятую в Банке маркировку конфиденциальности и доступен только пользователям с правами на запрос, включая обращение по прямой ссылке.</span></div>
+        </div>
+        <div class="rof tile__grid-full">
+          <span class="ds-label"><span class="ds-label__text">Обработка данных</span></span>
+          <div class="rof__row"><span class="rof__value">Загруженные материалы не используются для обучения моделей, обработка и хранение остаются в информационном контуре Банка.</span></div>
+        </div>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Понятно</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="../../DS-IBP/scripts/ds.js"></script>
+<script>
+/* ============================================================================
+   Скрипт экрана «Новый отчёт» в режиме конструктора — компактный вариант.
+
+   Рантаймы ДС дают поведение компонентов: сегмент-контролы (data-segctrl),
+   выпадающие списки (data-ddl), модалки, меню. Здесь — только модель данных,
+   которой в ДС нет:
+
+   · панель «Недавние запросы» — те же данные и строки, что в нити;
+   · блокировка запуска до заполнения обязательных сведений (БТ-5.10);
+   · правило «краткий материал выгружается только в PDF» (БТ-1.4);
+   · список приложенных файлов с состоянием обработки каждого (БТ-2.6, БТ-2.7);
+   · подстановка типовых формулировок фокуса в текст контекста (БТ-5.7);
+   · предзаполнение из другого рабочего места по адресу ?from=meeting (БТ-5.11).
+
+   В отличие от основного варианта хелперов под полями нет — подменять их
+   тексты не нужно; пояснения живут в окне «Подсказки и ограничения».
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  function el(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  /* Пересборка поддерева через innerHTML отвязывает рантаймы ДС —
+     связываем заново одной функцией (урок Л93). */
+  function rebind(scope) {
+    if (window.dsIcons) window.dsIcons.apply(scope);
+    if (window.DSMenu) window.DSMenu.bindAll(scope);
+    if (window.DSModal) window.DSModal.bindAll(scope);
+    if (window.DSChip) window.DSChip.refresh(scope);
+  }
+
+  /* ── Недавние запросы (БТ-4.1): те же данные и строки, что в нити ─────── */
+  var HIST = [
+    { id: 1,  title: 'ГК «Северный агрохолдинг» — выход миноритария',        kind: 'По клиенту · Группа · Детальный',      versions: 2, upd: '12 минут назад',  state: 'ready' },
+    { id: 2,  title: 'ПАО «Волга-Агро» — оценка перед встречей',             kind: 'По клиенту · Компания · Детальный',    versions: 1, upd: '40 минут назад',  state: 'running' },
+    { id: 3,  title: 'ООО «ЮгСтрой» — M&A в смежном сегменте',               kind: 'По клиенту · Компания · Детальный',    versions: 0, upd: 'сегодня, 08:50', state: 'draft' },
+    { id: 4,  title: 'Логистика последней мили, Юг России',                  kind: 'По рынку · Регион',                    versions: 0, upd: 'вчера, 17:40',   state: 'answer' },
+    { id: 5,  title: 'Бенефициар Токарев П. А. — активы и структура владения', kind: 'По клиенту · Бенефициар · Детальный', versions: 3, upd: '10.09.2026',     state: 'ready' },
+    { id: 6,  title: 'АО «Метизный завод» — рефинансирование выпуска',       kind: 'По клиенту · Компания · Краткий',      versions: 1, upd: '09.09.2026',     state: 'ready' },
+    { id: 7,  title: 'Рынок минеральных удобрений, СЗФО',                    kind: 'По рынку · Регион · Детальный',        versions: 0, upd: '08.09.2026',     state: 'error' },
+    { id: 8,  title: 'ГК «Северный агрохолдинг» — долговой профиль',         kind: 'По клиенту · Группа · Краткий',        versions: 1, upd: '05.09.2026',     state: 'ready' },
+    { id: 9,  title: 'Сравнение peers в агросекторе за 2025 год',            kind: 'По рынку · Отрасль',                   versions: 0, upd: '03.09.2026',     state: 'answer' },
+    { id: 10, title: 'ООО «Каспий-Порт» — расширение терминала',             kind: 'По клиенту · Компания · Детальный',    versions: 2, upd: '28.08.2026',     state: 'ready' }
+  ];
+  var HIST_CHIP = {
+    ready:   { cls: ' chip--success', label: 'Материал готов' },
+    running: { cls: ' chip--info',    label: 'Подготовка идёт' },
+    draft:   { cls: '',               label: 'Черновик' },
+    answer:  { cls: ' chip--info',    label: 'Ответ в диалоге' },
+    error:   { cls: ' chip--error',   label: 'Ошибка подготовки' }
+  };
+
+  /* Текущей строки нет: у нового отчёта запроса ещё нет */
+  function histHTML(h) {
+    var c = HIST_CHIP[h.state];
+    var versions = h.versions ? 'Версий: ' + h.versions : 'Без отчёта';
+    return '<div class="hist__item" role="listitem" tabindex="0" data-thread="' + h.id + '">' +
+      '<div class="entity entity--s">' +
+      '<div class="entity__main">' +
+        '<div class="entity__titles">' +
+          '<p class="entity__header">' + esc(h.kind) + '</p>' +
+          '<div class="entity__labelrow"><span class="entity__label entity__label--truncate">' + esc(h.title) + '</span></div>' +
+        '</div>' +
+        '<div class="entity__subs"><span class="entity__subs-list">' + versions + ' · обновлён ' + esc(h.upd) + '</span></div>' +
+        '<div class="entity__chips"><span class="chip chip--s' + c.cls + '"><span class="chip__label">' + c.label + '</span></span></div>' +
+      '</div>' +
+      '<div class="entity__actions">' +
+        '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Действия с запросом «' + esc(h.title) + '»" aria-haspopup="menu" data-menu="hist-menu"><i data-icon="more-dots"></i></button>' +
+      '</div></div></div>';
+  }
+  function drawHist() {
+    el('histList').innerHTML = HIST.map(histHTML).join('');
+    rebind(el('histList'));
+  }
+
+  /* Строка списка открывает запрос в нити; кебаб открывает меню и запоминает,
+     к какому запросу оно относится */
+  var menuRow = null;
+  el('histList').addEventListener('click', function (e) {
+    var row = e.target.closest('[data-thread]');
+    if (!row) return;
+    if (e.target.closest('.entity__actions')) { menuRow = row.getAttribute('data-thread'); return; }
+    location.href = 'RequestThread.html?id=' + row.getAttribute('data-thread');
+  });
+  el('histList').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var row = e.target.closest('[data-thread]');
+    if (!row || e.target.closest('.entity__actions')) return;
+    e.preventDefault();
+    location.href = 'RequestThread.html?id=' + row.getAttribute('data-thread');
+  });
+  el('btnBuilderTop').addEventListener('click', function () {
+    document.querySelector('.bld-scroll').scrollTop = 0;
+  });
+  el('miDuplicate').addEventListener('click', function () {
+    if (window.DSSnack) window.DSSnack.show({ tone: 'success', title: 'Запрос дублирован', text: 'Создана копия запроса с теми же вводными и файлами.' });
+  });
+  el('miRestart').addEventListener('click', function () {
+    /* перезапуск идёт в нити запроса — открываем её */
+    if (menuRow) location.href = 'RequestThread.html?id=' + menuRow;
+  });
+  el('btnDelete').addEventListener('click', function () {
+    if (window.DSSnack) window.DSSnack.show({
+      tone: 'info', title: 'Запрос удалён', text: 'Восстановить можно в течение 30 дней.',
+      buttons: [{ label: 'Отменить удаление', variant: 'outline' }]
+    });
+  });
+
+  /* ── Приложенные файлы (БТ-2.6): строка в одну линию ──────────────────── */
+  var FILES = [
+    { name: 'Отчётность_МСФО_2025.pdf', size: '4,2 МБ', state: 'ok' },
+    { name: 'Teaser_group.pptx', size: '8,1 МБ', state: 'err' },
+    { name: 'Презентация_менеджмента_2026.pptx', size: '15,4 МБ', state: 'ok' }
+  ];
+  var FILE_CHIP = {
+    ok:  { cls: ' chip--success', label: 'Обработан',         icon: 'check-circle' },
+    err: { cls: ' chip--error',   label: 'Защищён паролем',   icon: 'alert-circle' },
+    run: { cls: ' chip--info',    label: 'Извлечение данных', icon: 'clock-timer' }
+  };
+
+  function drawFiles() {
+    el('fileList').innerHTML = FILES.map(function (f, i) {
+      var c = FILE_CHIP[f.state];
+      return '<div class="bld-file">' +
+        '<div class="entity entity--s">' +
+          '<div class="entity__lead"><span class="entity__icon" aria-hidden="true"><i data-icon="' + (f.state === 'err' ? 'file-off-close' : 'file-check') + '"></i></span></div>' +
+          '<div class="entity__main"><div class="entity__titles"><div class="entity__labelrow">' +
+            '<span class="entity__label entity__label--truncate">' + esc(f.name) + '</span>' +
+            '<span class="entity__postfix">' + esc(f.size) + '</span>' +
+          '</div></div></div>' +
+        '</div>' +
+        '<span class="chip chip--s' + c.cls + '"><span class="chip__marker"><i data-icon="' + c.icon + '"></i></span><span class="chip__label">' + c.label + '</span></span>' +
+        '<div class="bld-file__acts">' +
+          '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Заменить файл ' + esc(f.name) + '" data-act="replace" data-i="' + i + '"><i data-icon="syncronyze"></i></button>' +
+          '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить файл ' + esc(f.name) + '" data-act="remove" data-i="' + i + '"><i data-icon="trash"></i></button>' +
+        '</div></div>';
+    }).join('');
+    rebind(el('fileList'));
+  }
+
+  /* ── Правило формата и готовность к запуску ───────────────────────────── */
+  function sync() {
+    var brief = el('fVolume').value.indexOf('Краткий') === 0;
+    var object = el('fObject').value.trim();
+
+    /* БТ-1.4: краткий материал выгружается только в PDF — прочие варианты
+       формата недоступны, в поле фиксируется PDF */
+    Array.prototype.forEach.call(el('ddl-format').querySelectorAll('.ddl__item'), function (o) {
+      var pdf = o.getAttribute('data-val') === 'PDF';
+      if (brief && !pdf) o.setAttribute('aria-disabled', 'true'); else o.removeAttribute('aria-disabled');
+      if (brief) o.setAttribute('aria-selected', pdf ? 'true' : 'false');
+    });
+    if (brief) el('fFormat').value = 'PDF';
+
+    /* БТ-5.10: запуск блокируется до заполнения обязательных сведений */
+    var missing = [];
+    if (!object) missing.push('объект анализа');
+    el('btnRun').disabled = missing.length > 0;
+    el('readyNote').hidden = missing.length === 0;
+    el('readyText').textContent = 'Чтобы запустить подготовку, укажите: ' + missing.join(', ') + '.';
+  }
+
+  el('fObject').addEventListener('input', sync);
+
+  /* Поля выбора объёма, формата и языка: список открывает рантайм ДС
+     (data-ddl), значение в поле и отметку выбранной опции пишет экран */
+  function bindSelect(listId, inputId) {
+    el(listId).addEventListener('click', function (e) {
+      var opt = e.target.closest('.ddl__item');
+      if (!opt || opt.getAttribute('aria-disabled') === 'true') return;
+      Array.prototype.forEach.call(el(listId).querySelectorAll('.ddl__item'), function (o) {
+        o.setAttribute('aria-selected', o === opt ? 'true' : 'false');
+      });
+      el(inputId).value = opt.getAttribute('data-val');
+      sync();
+    });
+  }
+  bindSelect('ddl-volume', 'fVolume');
+  bindSelect('ddl-format', 'fFormat');
+  bindSelect('ddl-lang', 'fLang');
+
+  /* Выбор объекта из списка совпадений (БТ-5.5 — неоднозначность) */
+  el('ddl-object').addEventListener('click', function (e) {
+    var opt = e.target.closest('.ddl__item');
+    if (!opt) return;
+    el('fObject').value = opt.getAttribute('data-val');
+    sync();
+  });
+
+  /* Подстановка типовых формулировок фокуса (БТ-5.7) */
+  el('ctxExamples').addEventListener('click', function (e) {
+    var chip = e.target.closest('[data-tpl]');
+    if (!chip) return;
+    var field = el('fCtx');
+    var add = chip.getAttribute('data-tpl');
+    field.value = field.value.trim() ? field.value.trim() + ' ' + add : add;
+    field.focus();
+  });
+
+  /* Файлы: заменить и удалить (БТ-2.7) */
+  el('fileList').addEventListener('click', function (e) {
+    var t = e.target.closest('[data-act]');
+    if (!t) return;
+    var i = Number(t.getAttribute('data-i'));
+    if (t.getAttribute('data-act') === 'remove') { FILES.splice(i, 1); drawFiles(); }
+    if (t.getAttribute('data-act') === 'replace') {
+      FILES[i] = { name: 'Тизер_группы_2026_open.pptx', size: '7,4 МБ', state: 'run' };
+      drawFiles();
+      setTimeout(function () {
+        FILES[i] = { name: 'Тизер_группы_2026_open.pptx', size: '7,4 МБ', state: 'ok' };
+        drawFiles();
+      }, 1400);
+    }
+  });
+  el('btnAddFile').addEventListener('click', function () {
+    FILES.push({ name: 'Ковенантный_пакет_2025.pdf', size: '2,1 МБ', state: 'run' });
+    drawFiles();
+    var i = FILES.length - 1;
+    setTimeout(function () {
+      FILES[i].state = 'ok';
+      drawFiles();
+    }, 1500);
+  });
+
+  /* ── Вариант формы (костыль прототипа, вне правил ДС) ────────────────────
+     Иконка в шапке тайла открывает другой вариант формы — обычный или
+     компактный, — чтобы показать заказчику оба. Параметры адреса (например
+     ?from=meeting) сохраняются. Уберём, когда вариант будет выбран. */
+  el('btnVariant').addEventListener('click', function () {
+    location.href = this.getAttribute('data-href') + location.search;
+  });
+
+  /* ── Предзаполнение из другого рабочего места (БТ-5.11, БТ-10.2) ──────── */
+  if (new URLSearchParams(location.search).get('from') === 'meeting') el('prefillAlert').hidden = false;
+  el('btnClearCtx').addEventListener('click', function () {
+    el('fObject').value = '';
+    el('fInn').value = '';
+    el('fCtx').value = '';
+    el('prefillAlert').hidden = true;
+    sync();
+    el('fObject').focus();
+  });
+
+  /* ── Запуск: запрос создан, ход работы — в нити ───────────────────────── */
+  el('btnRun').addEventListener('click', function () {
+    if (window.DSToast) window.DSToast.show({ message: 'Запрос создан, подготовка запущена', kind: 'bar', tone: 'success', duration: 2000 });
+    setTimeout(function () { location.href = 'RequestThread.html?run=1'; }, 700);
+  });
+
+  /* ── Полосы прокрутки: видны только во время прокрутки ───────────────── */
+  function autoHideScrollbar(node) {
+    var timer = null;
+    node.addEventListener('scroll', function () {
+      node.classList.add('is-scrolling');
+      clearTimeout(timer);
+      timer = setTimeout(function () { node.classList.remove('is-scrolling'); }, 1000);
+    }, { passive: true });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.hist__body, .bld-scroll'), autoHideScrollbar);
+
+  /* Кнопки панели закреплены над списком: пока список прокручен, под ними линия */
+  var histBody = document.querySelector('.hist__body'), histActs = document.querySelector('.hist__acts');
+  histBody.addEventListener('scroll', function () {
+    histActs.classList.toggle('is-scrolled', histBody.scrollTop > 0);
+  }, { passive: true });
+
+  drawHist();
+  drawFiles();
+  sync();
+})();
+</script>
+</body>
+</html>

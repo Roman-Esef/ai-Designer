@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<!-- Главная страница IBP для роли «Консультант-аналитик ДИД».
+     Раскладка стартовой страницы — по правилу Layout: шапки страницы нет,
+     крошка одна, контент — сетка групп .grid12 (.col-3 / .colw-6), внутри
+     группы заголовок H5 Strong и тайлы NavTile, фон — background-illustration.
+     Раздел прототипа — «AI Pitcher» в группе Origination: обычный тайл,
+     ведёт сразу в «Новый отчёт».
+     Контекст для правки: DS-IBP/specs/_cheatsheet.md. CSS компонентов не читать. -->
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Главная — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; scrollbar-gutter: stable; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка этого экрана ──────────────────────────────────────────────
+     Только раскладка на токенах. Сетку групп даёт штатная .grid12 из ДС,
+     ширину группы — пара .col-3 / .colw-6; экран своей сетки не строит.
+
+     Фоновая иллюстрация — признак стартовой страницы (Layout, «Раскладка
+     стартовой страницы»): cover, opacity .6, под контентом. */
+  .home-wrap { position: relative; min-height: calc(100vh - var(--layout-crumbs-h)); }
+  .home-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("../../DS-IBP/assets/illustrations/background-illustration.svg") center/cover no-repeat;
+    opacity: .6;
+    pointer-events: none;
+  }
+  .home-groups { position: relative; }
+  .home-group { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; }
+  .home-group .ntile { width: auto; min-width: 0; }
+  .home-group__head { font: var(--type-h5-strong); color: var(--text-primary); margin: 0; }
+
+  /* Перестроение 4 → 2 → 1. Первый шаг — штатная пара .col-N / .colw-N.
+     Второй парой не выражается и пишется экраном, но обязан иметь ту же
+     специфичность (0,2,0) и стоять ниже правила пары. */
+  @container screen (max-width: 1700px) { .grid12 > [class*="colw-"] { grid-column: span var(--colw); } }
+  @container screen (max-width: 900px)  { .grid12 > .home-group { grid-column: span 12; } }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+      <button class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item nav__item--selected" href="index.html" aria-current="page"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Origination</div>
+        <a class="nav__item" href="RequestThread.html"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="funds"></i></span><span class="nav__label">Фонды</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Pipeline</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-pipeline"></i></span><span class="nav__label">DCM Pipeline</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="payments-ib"></i></span><span class="nav__label">Реестр платежей IB</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Клиенты и задачи</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="factory-01"></i></span><span class="nav__label">Клиенты</span></a>
+        <a class="nav__item" href="#" aria-label="Задачи, 7"><span class="nav__ico"><i data-icon="tasks"></i></span><span class="nav__label">Задачи</span><span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">7</span></span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <a class="nav__user" href="../../index.html" aria-label="Хаб проектов">
+        <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Александров Пётр Константинович</span><span class="nav__user-role">Консультант-аналитик ДИД</span></span>
+      </a>
+      <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <div class="screen">
+
+    <nav class="crumbs" aria-label="Хлебные крошки">
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Главная</span>
+      </li>
+    </nav>
+
+    <main class="screen__content">
+      <div class="home-wrap">
+        <div class="grid12 home-groups">
+
+          <section class="home-group col-3 colw-6">
+            <h2 class="home-group__head">Origination</h2>
+
+            <a class="ntile" href="RequestThread.html">
+              <span class="illu ntile__illu" data-illu="rwa" aria-hidden="true"></span>
+              <h3 class="ntile__title">AI Pitcher</h3>
+              <p class="ntile__desc">Подготовка отчетов для встречи с клиентом</p>
+            </a>
+
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="sales-projects" aria-hidden="true"></span>
+              <h3 class="ntile__title">Проекты продаж CIB</h3>
+              <p class="ntile__desc">Продуктовые предложения ДКК, ДККК, ДГР и ДИД</p>
+            </a>
+
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="dcm-potentials" aria-hidden="true"></span>
+              <h3 class="ntile__title">Потенциалы DCM</h3>
+              <p class="ntile__desc">Кредиты клиентов банка с потенциалом перевода в облигации</p>
+            </a>
+
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="reserve" aria-hidden="true"></span>
+              <h3 class="ntile__title">Калькулятор</h3>
+              <p class="ntile__desc">Расчёт облигаций</p>
+            </a>
+
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="qliksense-reports" aria-hidden="true"></span>
+              <h3 class="ntile__title">Фонды</h3>
+              <p class="ntile__desc">Анализ фондов, активов и поиск потенциалов</p>
+            </a>
+          </section>
+
+
+          <section class="home-group col-3 colw-6">
+            <h2 class="home-group__head">Pipeline</h2>
+
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="dcm-pipeline" aria-hidden="true"></span>
+              <h3 class="ntile__title">DCM Pipeline</h3>
+              <p class="ntile__desc">Текущие проекты направления DCM</p>
+            </a>
+
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="payment-ib" aria-hidden="true"></span>
+              <h3 class="ntile__title">Реестр платежей IB</h3>
+              <p class="ntile__desc">Платежи по всем направлениям IB</p>
+            </a>
+          </section>
+
+          <section class="home-group col-3 colw-6">
+            <h2 class="home-group__head">Клиенты и задачи</h2>
+
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="clients" aria-hidden="true"></span>
+              <h3 class="ntile__title">Клиенты</h3>
+              <p class="ntile__desc">Работа с моими клиентами</p>
+            </a>
+
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="tasks" aria-hidden="true"></span>
+              <h3 class="ntile__title">Задачи</h3>
+              <p class="ntile__desc">Все задачи моего деска</p>
+            </a>
+          </section>
+
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="../../DS-IBP/scripts/ds.js"></script>
+</body>
+</html>
