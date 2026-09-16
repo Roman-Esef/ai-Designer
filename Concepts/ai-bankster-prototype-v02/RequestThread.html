@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<!-- Экран «Новый отчёт» / нить запроса (RequestThread) раздела «AI Pitcher».
+     Собран на компонентах IBP DS по ТЗ: БТ-3 (диалог), БТ-4 (история
+     запросов слева), БТ-6 (уточнения и управление выполнением), БТ-7 (шаги
+     подготовки), БТ-8 (уведомления), БТ-2 (файлы к сообщению).
+     По умолчанию открывается пустой нитью — это точка входа в раздел.
+     Конструктор запроса — не отдельный экран, а панель, выезжающая внутри
+     поля ввода: выбор в ней дописывает в запрос готовые фрагменты текста.
+     Контекст для правки: DS-IBP/specs/_cheatsheet.md. CSS компонентов не читать. -->
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Новый отчёт — AI Pitcher — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; scrollbar-gutter: stable; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка этого экрана ──────────────────────────────────────────────
+     Только grid / flex / gap и только на токенах. Ни цвета, ни размера шрифта,
+     ни «px на глаз»: плашки даёт Tile, строки истории — Entity, текст —
+     утилиты типографики ДС.
+
+     Панель истории — колонка на всю высоту между меню и рабочей областью.
+     Крошки и шапка страницы остаются над контентом, а не над панелью: так на
+     узком экране панель прячется целиком, не задевая остальную раскладку. */
+  .app-shell     { display: flex; height: 100vh; }
+  .app-shell > .screen { flex: 1; min-width: 0; }
+
+  /* ── Панель «Недавние запросы» — локальный компонент направления ───────────
+     Компонента «список нитей» в ДС нет; панель собрана из Button, LabelHelper,
+     Entity, Chip, IconButton и ContextMenu, остальное — раскладка и состояния
+     самой панели. Все значения — токенами ДС.
+     Фон — как у рабочей области (--bg-page, им .screen красит страницу):
+     белая панель сливалась с белым боковым меню. */
+  .hist {
+    flex: 0 0 320px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-page);
+    border-right: 1px solid var(--border-light);
+  }
+  /* Кнопка «Новый отчёт», подпись и поиск закреплены над списком и не
+     прокручиваются; прокручивается только список. Чтобы строки не съезжали
+     относительно шапки, у скролл-контейнера место под полосу зарезервировано
+     всегда (scrollbar-gutter: stable), а правый паддинг уменьшен на её ширину:
+     8px полосы + 8px паддинга = те же 16px. Пока список прокручен, под
+     шапкой линия — как у шапки модалки ДС. */
+  .hist__acts    { flex: none; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-16) var(--space-16) var(--space-12); }
+  .hist__head    { flex: none; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-4) var(--space-16) var(--space-12); border-bottom: 1px solid transparent; transition: border-color .15s ease; }
+  .hist__head.is-scrolled { border-bottom-color: var(--border-light); }
+  .hist__label-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+  .hist__count   { flex: none; white-space: nowrap; font: var(--type-body-xs); color: var(--text-secondary); }
+  .hist__body    { flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; display: flex; flex-direction: column; gap: var(--space-16); padding: var(--space-4) calc(var(--space-16) - var(--space-8)) var(--space-16) var(--space-16); }
+  .hist__list    { display: flex; flex-direction: column; gap: var(--space-4); }
+  .hist__foot    { flex: none; display: flex; padding: var(--space-12) var(--space-16); border-top: 1px solid var(--border-light); }
+
+  /* ── Поиск по чатам — локальный компонент направления ────────────────────
+     Простой поиск по текстовым совпадениям в названии и типе запроса.
+     Совпадения подсвечены в строке, пустой результат — отдельным состоянием. */
+  .hsearch       { display: flex; align-items: center; gap: var(--space-8); height: calc(var(--space-32) + var(--space-4)); padding: 0 var(--space-6) 0 var(--space-12); background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-m); transition: border-color .15s ease, box-shadow .15s ease; }
+  .hsearch:hover { border-color: var(--border-primary); }
+  .hsearch:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 14%, transparent); }
+  .hsearch__ico  { flex: none; display: flex; width: 16px; height: 16px; color: var(--text-secondary); transition: color .15s ease; }
+  .hsearch__ico > [data-icon] { width: 100%; height: 100%; }
+  .hsearch:focus-within .hsearch__ico { color: var(--primary); }
+  .hsearch__control { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; background: transparent; font: var(--type-body-s); color: var(--text-primary); }
+  .hsearch__control::placeholder { color: var(--text-inactive); opacity: 1; }
+  .hsearch__control::-webkit-search-cancel-button { display: none; }
+  .hsearch__clear { flex: none; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: var(--radius-s); background: transparent; color: var(--text-secondary); cursor: pointer; }
+  .hsearch__clear:hover { background: var(--bgtable-row-hover); color: var(--text-primary); }
+  .hsearch__clear[hidden] { display: none; }
+  .hsearch__clear > [data-icon] { width: 16px; height: 16px; }
+  .hist__hl      { color: inherit; background: color-mix(in srgb, var(--primary) 18%, transparent); border-radius: var(--radius-2xs); box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent); }
+  .hist__empty   { display: flex; flex-direction: column; align-items: center; gap: var(--space-8); padding: var(--space-32) var(--space-16); text-align: center; font: var(--type-body-s); color: var(--text-secondary); }
+  .hist__empty[hidden] { display: none; }
+  .hist__empty-ico { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--primary-bg); color: var(--primary); }
+  .hist__empty-ico > [data-icon] { width: 20px; height: 20px; }
+
+  /* Строка списка — собственная обёртка вокруг Entity. Состояния (наведение,
+     текущая нить) задаёт она, а не компонент: состояние компонента задаёт
+     только сам компонент, а у Entity выбор рассчитан на 6 % от --primary и
+     на такой подложке не читается. */
+  /* Наведение — как у пункта бокового меню, но на тон темнее. В меню это
+     --bgtable-row-hover на белом; на фоне панели (--bg-page) он не виден.
+     Локальный токен --hist-row-hover — смесь цвета текущей нити
+     (--bgtable-row-focus) с фоном панели: тот же зелёно-серый оттенок,
+     заметно светлее выбранной строки. Кандидат в ДС: подсветка строки
+     на фоне страницы. */
+  .hist          { --hist-row-hover: color-mix(in srgb, var(--bgtable-row-focus) 45%, var(--bg-page)); }
+  .hist__item    { padding: var(--space-8) var(--space-12); border-radius: var(--radius-m); cursor: pointer; transition: background-color .15s ease; }
+  .hist__item:hover { background: var(--hist-row-hover); }
+  .hist__item:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+  .hist__item[aria-current="true"] { background: var(--bgtable-row-focus); }
+
+  /* Нить — скролл-колонка (flex:1; min-height:0; overflow-y:auto — обязательная
+     форма скролл-контейнера, чек-лист К3) и закреплённый под ней композер. */
+  .thr           { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-16); }
+  .thr__scroll   { flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; display: flex; flex-direction: column; }
+  /* Нить идёт сверху вниз, как в современных AI-чатах: короткий диалог
+     стоит у верха области, а не прижат к полю ввода. margin слева/справа
+     держит колонку по центру */
+  .thr__col      { max-width: 880px; width: 100%; margin: 0 auto; padding-top: var(--space-8); display: flex; flex-direction: column; gap: var(--space-24); }
+
+  /* ── Сообщения нити — раскладка привычных AI-чатов ──────────────────────
+     Сообщение пользователя — бабл справа, без аватара и имени: пользователь
+     знает, кто он. Ответ AI Pitcher — текст на всю колонку под тихой строкой
+     с глифом. Время — самым мелким стилем и бледным цветом, чтобы не спорило
+     с текстом. Появляется только новое сообщение, а не вся нить заново. */
+  .msg           { display: flex; flex-direction: column; gap: var(--space-6); min-width: 0; }
+  .msg--user     { align-items: flex-end; }
+  .msg__bubble   { display: flex; flex-direction: column; gap: var(--space-8); max-width: min(80%, 640px); padding: var(--space-10) var(--space-16); color: var(--text-primary); background: color-mix(in srgb, var(--primary) 9%, var(--bg-tile)); border-radius: var(--radius-3xl) var(--radius-3xl) var(--radius-s) var(--radius-3xl); }
+  .msg__bubble .ds-body-m { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .msg__time     { font: var(--type-body-xs); color: var(--text-inactive); }
+  .msg--user > .msg__time { padding-right: var(--space-4); }
+  .msg__meta     { display: flex; align-items: center; gap: var(--space-6); }
+  .msg__ico      { display: flex; flex: none; width: 16px; height: 16px; color: var(--primary); }
+  .msg__ico > [data-icon] { width: 100%; height: 100%; }
+  .msg__name     { font: var(--type-body-s-strong); color: var(--text-primary); }
+  .msg__meta > .msg__time::before { content: "·"; margin-right: var(--space-6); }
+  .msg__body     { display: flex; flex-direction: column; gap: var(--space-12); min-width: 0; }
+  .msg.is-new    { animation: msgIn .4s cubic-bezier(.22, 1, .36, 1) both; }
+  .msg--user.is-new > .msg__bubble { transform-origin: right bottom; animation: msgBubbleIn .4s cubic-bezier(.22, 1, .36, 1) both; }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes msgBubbleIn { from { transform: scale(.94); } }
+
+  /* ── Индикатор «AI Pitcher думает» — локальный компонент направления ────
+     Подготовка материала идёт на стороне агентной системы до 30 минут и
+     пошагово не показывается. В нити остаётся спокойная строка: маленький
+     лоадер, мягко переливающаяся фраза и прошедшее время.
+     Вращающийся лоадер заперт в собственной рамке (contain: strict): без неё
+     углы поворачиваемого квадрата расширяли прокручиваемую область нити,
+     полоса прокрутки мигала и весь чат дёргался по горизонтали.
+     В прототипе клик по строке завершает подготовку. */
+  .think         { display: inline-flex; align-items: center; gap: var(--space-10); align-self: flex-start; padding: var(--space-4) var(--space-8) var(--space-4) 0; font: var(--type-body-m); color: var(--text-secondary); text-align: left; cursor: pointer; background: none; border: 0; border-radius: var(--radius-m); }
+  .think:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .think__loader { flex: none; display: block; width: 16px; height: 16px; contain: strict; }
+  .think__loader::before { content: ""; display: block; box-sizing: border-box; width: 100%; height: 100%; border: 2px solid color-mix(in srgb, var(--primary) 20%, transparent); border-top-color: var(--primary); border-radius: var(--radius-full); animation: thinkSpin .9s linear infinite; }
+  .think__text   { color: transparent; background: linear-gradient(90deg, var(--text-secondary) 0%, var(--text-secondary) 40%, var(--text-inactive) 50%, var(--text-secondary) 60%, var(--text-secondary) 100%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; animation: thinkShimmer 3.2s ease-in-out infinite; transition: opacity .3s ease; }
+  .think__text.is-out { opacity: 0; }
+  .think__time   { font: var(--type-body-xs); color: var(--text-inactive); font-variant-numeric: tabular-nums; }
+  @keyframes thinkSpin { to { transform: rotate(360deg); } }
+  @keyframes thinkShimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+  /* ── Карточка материала в нити ───────────────────────────────────────────
+     Файл как вложение на всю ширину колонки: глиф, название (открывает
+     просмотр), параметры, кнопка «Просмотр» и «Скачать» с меню форматов. */
+  .doc           { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-12); background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-xl); transition: border-color .15s ease, box-shadow .2s ease; }
+  .doc:hover     { border-color: var(--border-primary); box-shadow: 0 4px 16px color-mix(in srgb, var(--text-primary) 6%, transparent); }
+  .doc__ico      { flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--radius-m); color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, var(--bg-tile)); }
+  .doc__ico > [data-icon] { width: 22px; height: 22px; }
+  .doc__main     { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+  .doc__title    { display: block; max-width: 100%; padding: 0; overflow: hidden; font: var(--type-body-m-strong); color: var(--text-primary); text-align: left; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; background: none; border: 0; }
+  .doc__title:hover { color: var(--primary-dark); text-decoration: underline; text-underline-offset: 3px; }
+  .doc__title:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-2xs); }
+  .doc__meta     { overflow: hidden; font: var(--type-body-xs); color: var(--text-secondary); white-space: nowrap; text-overflow: ellipsis; }
+  .doc__acts     { flex: none; display: flex; align-items: center; gap: var(--space-8); }
+
+  /* ── Ошибка подготовки в нити ────────────────────────────────────────────
+     Не только сообщает о сбое: говорит, что случилось, что поможет его
+     исправить, и даёт два выхода — вернуть текст запроса в поле для правки
+     или перезапустить подготовку. После перезапуска действия скрываются. */
+  .err           { display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-16); background: var(--bg-tile); border: 1px solid color-mix(in srgb, var(--error) 28%, var(--border-light)); border-radius: var(--radius-xl); }
+  .err__head     { display: flex; align-items: flex-start; gap: var(--space-12); }
+  .err__ico      { flex: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius-full); color: var(--error); background: var(--error-bg); }
+  .err__ico > [data-icon] { width: 20px; height: 20px; }
+  .err__titles   { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+  .err__title    { margin: 0; font: var(--type-body-m-strong); color: var(--text-primary); }
+  .err__text     { margin: 0; font: var(--type-body-m); color: var(--text-secondary); }
+  .err__fix      { margin-left: calc(36px + var(--space-12)); padding: var(--space-12) var(--space-16); background: var(--bg-page); border-radius: var(--radius-m); }
+  .err__cap      { margin: 0 0 var(--space-6); font: var(--type-body-s-strong); color: var(--text-primary); }
+  .err__list     { display: flex; flex-direction: column; gap: var(--space-4); margin: 0; padding-left: var(--space-20); font: var(--type-body-s); color: var(--text-primary); }
+  .err__list li::marker { color: var(--primary); }
+  .err__acts     { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-left: calc(36px + var(--space-12)); }
+  .err.is-resolved .err__acts { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .msg, .msg *, .think *, .think__loader::before, .pv { animation: none !important; transition: none !important; }
+  }
+  .thr__text     { display: flex; flex-direction: column; gap: var(--space-8); }
+  .thr__row      { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+  /* Содержимое тайла в ответе агента. У .tile__body своего ритма нет
+     (display: block), и прогресс, разделитель, шаги, карточка файла и кнопки
+     прилипали друг к другу. Ритм между блоками — 24px, как между шагами. */
+  .thr__stack    { display: flex; flex-direction: column; gap: var(--space-24); }
+  /* Сетка параметров запроса в ответе агента стоит вне тайла, а .tile__grid
+     берёт зазоры из --tile-gap-row / --tile-gap-col, которые задаёт только
+     тайл, — без них колонки стояли вплотную. Те же переменные — 24px. */
+  .msg__body > .tile__grid { --tile-gap-row: var(--space-24); --tile-gap-col: var(--space-24); }
+  /* Иконка подзаголовка тайла. Контейнер .tile__subtitle-icon в ДС — 16px, но
+     размер глифа он не задаёт, и глиф остаётся со своими 24px по умолчанию
+     (ds-icons.js): иконка выходила за контейнер и была крупнее текста.
+     Глиф занимает контейнер целиком. */
+  .tile__subtitle-icon > [data-icon] { width: 100%; height: 100%; }
+
+  /* ── Композер с конструктором — локальный компонент направления ─────────
+     Поле запроса, ряд действий и выезжающий под ними конструктор — одна
+     карточка. Компонента в ДС нет: поверхности, рамки, радиусы и типографика —
+     токены ДС, остальное — кандидат в новый компонент.
+
+     Конструктор не уводит со страницы: каждый выбор дописывает в поле готовый
+     фрагмент запроса. Фрагменты подсвечены «зеркалом» — под прозрачным
+     textarea лежит тот же текст той же гарнитурой, где фрагменты обёрнуты
+     в <mark>. Поле и зеркало стоят в одной ячейке грида: высоту задаёт
+     зеркало, и поле растёт по тексту без скрипта. */
+  .thr__compose  { max-width: 880px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-8); }
+
+  .cmp {
+    --cmp-ring: color-mix(in srgb, var(--primary) 14%, transparent);
+    --cmp-ease: cubic-bezier(.22, 1, .36, 1);
+    --cmp-shadow: 0 1px 2px color-mix(in srgb, var(--text-primary) 6%, transparent), 0 8px 24px color-mix(in srgb, var(--text-primary) 6%, transparent);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-tile);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--cmp-shadow);
+    transition: border-color .2s ease, box-shadow .3s ease;
+  }
+  .cmp:has(.cmp__control:focus) { border-color: var(--primary); box-shadow: 0 0 0 4px var(--cmp-ring), var(--cmp-shadow); }
+  /* Открытый конструктор: рамка — медленно текущий градиент бренда */
+  .cmp::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(110deg, var(--primary), var(--info-light), var(--primary-light), var(--primary));
+    background-size: 300% 100%;
+    -webkit-mask: linear-gradient(black 0 0) content-box, linear-gradient(black 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity .35s ease;
+  }
+  .cmp.is-building { border-color: transparent; box-shadow: 0 16px 48px color-mix(in srgb, var(--primary-dark) 14%, transparent); }
+  .cmp.is-building::before { opacity: 1; animation: cmpFlow 8s linear infinite; }
+  @keyframes cmpFlow { to { background-position: 300% 0; } }
+
+  .cmp__main     { display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12) var(--space-12) var(--space-12) var(--space-16); }
+  .cmp__files:empty { display: none; }
+
+  .cmp__field    { position: relative; display: grid; max-height: 240px; overflow-y: auto; }
+  .cmp__field > .cmp__mirror,
+  .cmp__field > .cmp__control {
+    grid-area: 1 / 1;
+    min-height: var(--space-48);
+    margin: 0;
+    padding: var(--space-4) 0;
+    border: 0;
+    font: var(--type-body-m);
+    letter-spacing: normal;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+  .cmp__mirror   { color: transparent; pointer-events: none; }
+  .cmp__control  { display: block; width: 100%; height: 100%; resize: none; overflow: hidden; outline: 0; background: transparent; color: var(--text-primary); caret-color: var(--primary); }
+  .cmp__control::placeholder { color: var(--text-inactive); opacity: 1; }
+  /* Подсветка фрагмента: отступ нарисован тенью, а не паддингом — паддинг
+     сдвинул бы строки зеркала относительно текста в поле */
+  .cmp__mark {
+    color: transparent;
+    background: color-mix(in srgb, var(--primary) 13%, transparent);
+    border-radius: var(--radius-2xs);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 13%, transparent);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .cmp__mark.is-new { animation: cmpMarkIn 1.6s var(--cmp-ease) both; }
+  @keyframes cmpMarkIn {
+    0%   { background: color-mix(in srgb, var(--primary) 42%, transparent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 26%, transparent); }
+    100% { background: color-mix(in srgb, var(--primary) 13%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 13%, transparent); }
+  }
+
+  .cmp__row      { display: flex; align-items: center; gap: var(--space-8); }
+  .cmp__spacer   { flex: 1; }
+  .cmp__clear[hidden] { display: none; }
+  .cmp__clear    { animation: cmpPop .3s var(--cmp-ease) both; }
+  @keyframes cmpPop { from { opacity: 0; transform: scale(.6) rotate(-90deg); } }
+  .cmp__tgl      { transition: background-color .2s ease, border-color .2s ease, color .2s ease; }
+  .cmp__tgl[aria-expanded="true"] { background: color-mix(in srgb, var(--primary) 10%, transparent); border-color: var(--primary); color: var(--primary-dark); }
+  .cmp__tgl-ico  { position: relative; display: inline-block; flex: none; width: 18px; height: 18px; }
+  .cmp__tgl-ico > [data-icon] { position: absolute; inset: 0; transition: transform .4s var(--cmp-ease), opacity .2s ease; }
+  .cmp__tgl-ico > [data-icon="close"] { opacity: 0; transform: rotate(-90deg) scale(.5); }
+  .cmp__tgl[aria-expanded="true"] .cmp__tgl-ico > [data-icon="ai-stars"] { opacity: 0; transform: rotate(90deg) scale(.5); }
+  .cmp__tgl[aria-expanded="true"] .cmp__tgl-ico > [data-icon="close"] { opacity: 1; transform: none; }
+
+  .cmp__hint     { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-4) var(--space-16); font: var(--type-body-xs); color: var(--text-secondary); }
+  .cmp__hint kbd { display: inline-block; min-width: 18px; padding: 0 var(--space-4); font: inherit; text-align: center; color: var(--text-secondary); background: var(--bg-tile); border: 1px solid var(--border-light); border-bottom-width: 2px; border-radius: var(--radius-s); }
+
+  /* ── Конструктор: выезжающая панель ─────────────────────────────────────
+     Высота анимируется через grid-template-rows 0fr → 1fr: панель выезжает
+     вниз на собственную высоту без замера скриптом. Содержимое догоняет
+     с небольшой задержкой и лёгким сдвигом, секции появляются лесенкой.
+     Своей прокрутки у панели нет: форма целиком помещается по высоте,
+     место под неё уступает нить. */
+  .cmp__drawer   { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s var(--cmp-ease); }
+  .cmp__drawer.is-open { grid-template-rows: 1fr; }
+  .cmp__drawer-in { min-height: 0; overflow: hidden; }
+  .bld {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    padding: var(--space-16);
+    border-top: 1px solid var(--border-light);
+    opacity: 0;
+    transform: translateY(-16px);
+    transition: opacity .25s ease, transform .55s var(--cmp-ease);
+  }
+  .cmp__drawer.is-open .bld { opacity: 1; transform: none; transition-delay: .06s; }
+  .cmp__drawer.is-open .bld > * { animation: bldIn .6s var(--cmp-ease) both; animation-delay: calc(var(--i, 0) * 55ms + 90ms); }
+  @keyframes bldIn { from { opacity: 0; transform: translateY(-10px); } }
+
+  .bld__head     { display: flex; align-items: flex-start; gap: var(--space-12); }
+  .bld__titles   { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+  .bld__title    { margin: 0; font: var(--type-body-m-strong); color: var(--text-primary); }
+  .bld__sub      { margin: 0; font: var(--type-body-s); color: var(--text-secondary); }
+
+  /* Быстрый ввод предыдущего запроса */
+  .brecent       { display: flex; align-items: center; gap: var(--space-12); width: 100%; padding: var(--space-8) var(--space-16) var(--space-8) var(--space-8); font: inherit; color: inherit; text-align: left; cursor: pointer; border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent); border-radius: var(--radius-xl); background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 8%, transparent), color-mix(in srgb, var(--primary) 1%, transparent)); transition: border-color .15s ease, transform .15s ease; }
+  .brecent[hidden] { display: none; }
+  .brecent:hover { border-color: color-mix(in srgb, var(--primary) 42%, transparent); }
+  .brecent:active { transform: scale(.995); }
+  .brecent:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .brecent__ico  { flex: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--bg-tile); color: var(--primary); box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent); }
+  .brecent__ico > [data-icon] { width: 18px; height: 18px; }
+  .brecent__txt  { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .brecent__cap  { font: var(--type-body-xs); color: var(--text-secondary); }
+  .brecent__q    { font: var(--type-body-s); color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brecent__go   { flex: none; display: flex; align-items: center; gap: var(--space-4); font: var(--type-body-s-strong); color: var(--primary-dark); }
+  .brecent__go > [data-icon] { width: 18px; height: 18px; transition: transform .25s var(--cmp-ease); }
+  .brecent:hover .brecent__go > [data-icon] { transform: translateX(4px); }
+
+  /* Секция конструктора: номер шага и подпись слева, контролы справа */
+  .bsec          { display: grid; grid-template-columns: 184px minmax(0, 1fr); gap: var(--space-8) var(--space-16); align-items: start; padding-top: var(--space-12); border-top: 1px dashed var(--border-light); }
+  .bsec__label   { display: flex; align-items: center; gap: var(--space-8); min-height: var(--space-40); font: var(--type-body-s-strong); color: var(--text-primary); }
+  .bsec__num     { flex: none; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: var(--radius-full); font: var(--type-body-xs); font-weight: 600; color: var(--primary-dark); background: color-mix(in srgb, var(--primary) 10%, transparent); transition: background-color .25s ease, color .25s ease; }
+  .bsec__num > [data-icon] { display: none; width: 14px; height: 14px; }
+  .bsec.is-done .bsec__num { background: var(--primary); color: var(--text-on-dark); }
+  .bsec.is-done .bsec__n { display: none; }
+  .bsec.is-done .bsec__num > [data-icon] { display: block; animation: bldPop .4s var(--cmp-ease) both; }
+  @keyframes bldPop { from { opacity: 0; transform: scale(.3) rotate(-30deg); } }
+  .bsec__ctl     { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
+  .bsec__titles  { display: flex; flex-direction: column; min-width: 0; }
+  .bsec__hint    { font: var(--type-body-xs); color: var(--text-secondary); }
+  /* подпись относится к чипам, а не к полю: ближе к ним, дальше от поля */
+  .bfind + .bsec__hint { margin: var(--space-4) 0 calc(-1 * var(--space-4)); }
+
+  /* Поиск объекта */
+  .bfind         { display: flex; align-items: center; gap: var(--space-8); height: var(--space-40); padding: 0 var(--space-12); border: 1px solid var(--border-light); border-radius: var(--radius-m); background: var(--bg-page); transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease; }
+  .bfind:hover   { border-color: var(--border-primary); }
+  .bfind:focus-within { background: var(--bg-tile); border-color: var(--primary); box-shadow: 0 0 0 3px var(--cmp-ring); }
+  .bfind__ico    { flex: none; display: flex; width: 18px; height: 18px; color: var(--text-secondary); transition: color .15s ease; }
+  .bfind__ico > [data-icon] { width: 100%; height: 100%; }
+  .bfind:focus-within .bfind__ico { color: var(--primary); }
+  .bfind__control { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; background: transparent; font: var(--type-body-m); color: var(--text-primary); }
+  .bfind__control::placeholder { color: var(--text-inactive); opacity: 1; }
+  .bfind__control::-webkit-search-cancel-button { display: none; }
+
+  /* Варианты объекта — пилюли с типом */
+  .bopts         { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+  .bopt          { display: inline-flex; align-items: center; gap: var(--space-8); max-width: 100%; min-height: 32px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-4); font: var(--type-body-s); color: var(--text-primary); cursor: pointer; background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-full); transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease; }
+  .bopt:hover    { border-color: var(--primary-light); background: color-mix(in srgb, var(--primary) 4%, var(--bg-tile)); }
+  .bopt:active   { transform: scale(.97); }
+  .bopt:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .bopt__tag     { flex: none; padding: var(--space-2) var(--space-8); border-radius: var(--radius-full); font: var(--type-body-xs); color: var(--text-secondary); background: var(--bg-page); transition: background-color .2s ease, color .2s ease; }
+  .bopt__label   { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bopt__check   { display: inline-flex; flex: none; width: 0; height: 16px; opacity: 0; overflow: hidden; transition: width .25s var(--cmp-ease), opacity .2s ease; }
+  .bopt__check > [data-icon] { flex: none; width: 16px; height: 16px; }
+  .bopt[aria-checked="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--bg-tile)); color: var(--primary-dark); }
+  .bopt[aria-checked="true"] .bopt__tag { background: var(--primary); color: var(--text-on-dark); }
+  .bopt[aria-checked="true"] .bopt__check { width: 16px; opacity: 1; }
+  .bopt.is-extra { animation: bldIn .45s var(--cmp-ease) both; animation-delay: calc(var(--i, 0) * 40ms); }
+  /* «Показать ещё» — остальные объекты из истории запросов */
+  .bmore         { display: inline-flex; align-items: center; gap: var(--space-4); min-height: 32px; padding: var(--space-4) var(--space-12); font: var(--type-body-s-strong); color: var(--primary-dark); cursor: pointer; background: transparent; border: 0; border-radius: var(--radius-full); transition: background-color .15s ease; }
+  .bmore:hover   { background: color-mix(in srgb, var(--primary) 8%, transparent); }
+  .bmore:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .bmore > [data-icon] { width: 16px; height: 16px; transition: transform .3s var(--cmp-ease); }
+  .bmore[aria-expanded="true"] > [data-icon] { transform: rotate(180deg); }
+  .bopt--custom  { padding-left: var(--space-8); border-style: dashed; color: var(--primary-dark); }
+  .bopt--custom > [data-icon] { flex: none; width: 16px; height: 16px; }
+
+  /* Типовой фокус — переключаемые чипы: «+» превращается в галочку */
+  .bchip         { display: inline-flex; align-items: center; gap: var(--space-6); min-height: 32px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8); font: var(--type-body-s); color: var(--text-primary); cursor: pointer; background: transparent; border: 1px dashed var(--border-primary); border-radius: var(--radius-full); transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease; }
+  .bchip:hover   { border-style: solid; border-color: var(--primary); background: color-mix(in srgb, var(--primary) 4%, transparent); }
+  .bchip:active  { transform: scale(.97); }
+  .bchip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .bchip__ico    { position: relative; flex: none; width: 16px; height: 16px; color: var(--primary); }
+  .bchip__ico > [data-icon] { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform .4s var(--cmp-ease), opacity .2s ease; }
+  .bchip__ico > [data-icon="check"] { opacity: 0; transform: rotate(-45deg) scale(.4); }
+  .bchip[aria-pressed="true"] { border-style: solid; border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, transparent); color: var(--primary-dark); }
+  .bchip[aria-pressed="true"] .bchip__ico > [data-icon="add"] { opacity: 0; transform: rotate(90deg) scale(.4); }
+  .bchip[aria-pressed="true"] .bchip__ico > [data-icon="check"] { opacity: 1; transform: none; }
+
+  /* Направление — чипы с радиокнопкой: один выбор, повторный клик снимает */
+  .bradios       { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+  .bradio        { display: inline-flex; align-items: center; gap: var(--space-8); min-height: 32px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8); font: var(--type-body-s); color: var(--text-primary); cursor: pointer; background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-full); transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease; }
+  .bradio:hover  { border-color: var(--primary-light); background: color-mix(in srgb, var(--primary) 4%, var(--bg-tile)); }
+  .bradio:active { transform: scale(.97); }
+  .bradio:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .bradio__dot   { position: relative; flex: none; width: 16px; height: 16px; border: 1.5px solid var(--border-primary); border-radius: var(--radius-full); transition: border-color .2s ease; }
+  .bradio__dot::after { content: ""; position: absolute; inset: 3px; border-radius: inherit; background: var(--primary); transform: scale(0); transition: transform .3s var(--cmp-ease); }
+  .bradio[aria-checked="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--bg-tile)); color: var(--primary-dark); }
+  .bradio[aria-checked="true"] .bradio__dot { border-color: var(--primary); }
+  .bradio[aria-checked="true"] .bradio__dot::after { transform: scale(1); }
+
+  /* Низ конструктора: срок подготовки */
+  .bld__foot     { display: flex; align-items: center; gap: var(--space-8); padding-top: var(--space-12); border-top: 1px dashed var(--border-light); font: var(--type-body-s); color: var(--text-secondary); }
+  .bld__foot-ico { flex: none; display: flex; width: 18px; height: 18px; color: var(--primary); }
+  .bld__foot-ico > [data-icon] { width: 100%; height: 100%; }
+
+  /* Приветствие пустой нити: три строки с переносами из макета — у тела
+     пустого состояния ДС ширина 420px, строки в неё не помещались */
+  .thr__start .es--l .es__body { max-width: 760px; }
+
+
+  @container screen (max-width: 960px) {
+    .bsec  { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cmp, .cmp *, .cmp::before, .cmp *::after { animation: none !important; transition: none !important; }
+  }
+
+  /* Стартовое состояние нити центрируется в свободной высоте.
+     Парное [hidden] обязательно: объявленный display (0,1,0) перебивает
+     UA-правило [hidden]{display:none} (0,0,0), и атрибут молча перестаёт
+     работать — то же соглашение, что у компонентов ДС. */
+  .thr__start    { flex: 1; min-height: 0; display: flex; align-items: safe center; justify-content: center; }
+  .thr__start[hidden] { display: none; }
+
+  /* Полосы прокрутки внутри блоков — тот же рецепт, что у тела модалки ДС
+     (modal.css): 8px, бегунок --border-light со скруглением. Общего класса
+     полосы прокрутки в ДС нет.
+     Бегунок виден только во время прокрутки: класс is-scrolling ставит скрипт
+     экрана на событии scroll и снимает через секунду тишины. Под курсором
+     бегунок тоже проявляется — чтобы его можно было взять мышью. Место под
+     полосу зарезервировано всегда, контент при появлении бегунка не сдвигается.
+     Firefox не знает ::-webkit-scrollbar — ему тонкая полоса того же цвета. */
+  .hist__body::-webkit-scrollbar,
+  .thr__scroll::-webkit-scrollbar,
+  .cmp__field::-webkit-scrollbar { width: var(--space-8); }
+  .cmp__field::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: var(--radius-m); }
+  .hist__body::-webkit-scrollbar-thumb,
+  .thr__scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: var(--radius-m); }
+  .hist__body.is-scrolling::-webkit-scrollbar-thumb,
+  .thr__scroll.is-scrolling::-webkit-scrollbar-thumb,
+  .hist__body::-webkit-scrollbar-thumb:hover,
+  .thr__scroll::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+  @supports not selector(::-webkit-scrollbar) {
+    .hist__body, .thr__scroll { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+    .hist__body.is-scrolling, .thr__scroll.is-scrolling { scrollbar-color: var(--border-light) transparent; }
+  }
+
+  /* Узкий экран: панель прячется целиком — в мобильной версии она уйдёт
+     под кнопку. Порог считается от окна, панель лежит вне .screen. */
+  @media (max-width: 1200px) {
+    .hist { display: none; }
+  }
+  @container screen (max-width: 1240px) {
+    .tile-row > [class*="colw-"] { grid-column: span var(--colw); }
+  }
+
+  /* ── Просмотр материала — локальный компонент направления ────────────────
+     Панель справа от нити вместо модального окна: диалог остаётся перед
+     глазами. Ширина — переменная --pv-w, меняется перетаскиванием левого
+     края. Документ — отрисованный Markdown на «листе» поверх фона страницы. */
+  .pv            { --pv-w: 560px; position: relative; flex: 0 0 var(--pv-w); width: var(--pv-w); min-width: 0; display: flex; flex-direction: column; background: var(--bg-tile); border-left: 1px solid var(--border-light); container: pv / inline-size; animation: pvIn .45s cubic-bezier(.22, 1, .36, 1) both; }
+  .pv[hidden]    { display: none; }
+  @keyframes pvIn { from { opacity: 0; transform: translateX(32px); } }
+  html.is-col-resizing, html.is-col-resizing * { cursor: col-resize !important; user-select: none !important; }
+
+  /* край для перетаскивания: широкая зона захвата, тонкая линия и ручка */
+  .pv__grip      { position: absolute; top: 0; bottom: 0; left: -6px; z-index: 2; width: 12px; cursor: col-resize; touch-action: none; outline: 0; }
+  .pv__grip::before { content: ""; position: absolute; top: 0; bottom: 0; left: 5px; width: 2px; background: transparent; transition: background-color .15s ease; }
+  .pv__grip::after { content: ""; position: absolute; top: 50%; left: 3px; width: 6px; height: 44px; margin-top: -22px; border-radius: var(--radius-full); background: var(--primary); opacity: 0; transform: scaleY(.6); transition: opacity .15s ease, transform .2s ease; }
+  .pv__grip:hover::before, .pv__grip:focus-visible::before, .pv.is-resizing .pv__grip::before { background: var(--primary); }
+  .pv__grip:hover::after, .pv__grip:focus-visible::after, .pv.is-resizing .pv__grip::after { opacity: 1; transform: none; }
+
+  .pv__head      { flex: none; display: flex; align-items: center; gap: var(--space-12); padding: var(--space-12) var(--space-12) var(--space-12) var(--space-20); border-bottom: 1px solid var(--border-light); }
+  .pv__ico       { flex: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius-m); color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, var(--bg-tile)); }
+  .pv__ico > [data-icon] { width: 20px; height: 20px; }
+  .pv__titles    { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .pv__title     { margin: 0; overflow: hidden; font: var(--type-body-m-strong); color: var(--text-primary); white-space: nowrap; text-overflow: ellipsis; }
+  .pv__meta      { margin: 0; overflow: hidden; font: var(--type-body-xs); color: var(--text-secondary); white-space: nowrap; text-overflow: ellipsis; }
+  .pv__acts      { flex: none; display: flex; align-items: center; gap: var(--space-24); }
+  .pv__body      { flex: 1; min-height: 0; overflow-y: auto; padding: var(--space-24); background: var(--bg-page); }
+  .pv__body::-webkit-scrollbar { width: var(--space-8); }
+  .pv__body::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: var(--radius-m); }
+
+  /* ── Отрисованный Markdown ─────────────────────────────────────────────── */
+  .md            { max-width: 820px; margin: 0 auto; padding: var(--space-40) var(--space-48); font: var(--type-body-m); color: var(--text-primary); background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-xl); box-shadow: 0 2px 12px color-mix(in srgb, var(--text-primary) 5%, transparent); }
+  .md > *        { margin: 0; }
+  .md > * + *    { margin-top: var(--space-12); }
+  .md > p:first-child { font: var(--type-body-xs); letter-spacing: .08em; text-transform: uppercase; color: var(--primary-dark); }
+  .md h1         { margin-top: var(--space-6); font: var(--type-h3-strong); color: var(--text-primary); }
+  .md h1 + p     { color: var(--text-secondary); }
+  .md h2         { margin-top: var(--space-32); padding-bottom: var(--space-8); font: var(--type-h5-strong); color: var(--text-primary); border-bottom: 1px solid var(--border-light); }
+  .md h3         { margin-top: var(--space-24); font: var(--type-h6-strong); }
+  .md strong     { font-weight: 600; }
+  .md ul, .md ol { display: flex; flex-direction: column; gap: var(--space-10); padding-left: var(--space-20); }
+  .md li::marker { color: var(--primary); }
+  .md__table     { overflow-x: auto; border: 1px solid var(--border-light); border-radius: var(--radius-m); }
+  .md table      { width: 100%; border-collapse: collapse; font: var(--type-body-s); }
+  .md th         { padding: var(--space-10) var(--space-12); font: var(--type-body-s-strong); color: var(--text-secondary); text-align: left; white-space: nowrap; background: var(--bg-page); border-bottom: 1px solid var(--border-light); }
+  .md td         { padding: var(--space-10) var(--space-12); vertical-align: top; border-bottom: 1px solid var(--border-light); }
+  .md tr:last-child td { border-bottom: 0; }
+  .md tbody tr:hover td { background: var(--bgtable-row-hover); }
+  .md blockquote { padding: var(--space-16) var(--space-20); background: color-mix(in srgb, var(--primary) 6%, var(--bg-tile)); border-left: 3px solid var(--primary); border-radius: 0 var(--radius-m) var(--radius-m) 0; }
+  .md blockquote p { margin: 0; }
+  .md blockquote strong { color: var(--primary-dark); }
+  .md hr         { border: 0; border-top: 1px solid var(--border-light); }
+  /* `код` в материале — бейдж; оценки направлений получают цвет */
+  .md code       { display: inline-block; padding: var(--space-2) var(--space-8); font: var(--type-body-xs); font-weight: 600; letter-spacing: .04em; color: var(--text-secondary); white-space: nowrap; background: var(--bg-page); border-radius: var(--radius-full); }
+  .md code + code { margin-left: var(--space-4); }
+  .md code.is-yes   { color: var(--success-dark); background: var(--success-bg); }
+  .md code.is-maybe { color: var(--warning-dark); background: var(--warning-bg); }
+  .md code.is-no    { color: var(--error-dark); background: var(--error-bg); }
+  .md code.is-top   { color: var(--info-dark); background: var(--info-bg); }
+  @container pv (max-width: 520px) {
+    .pv__body { padding: var(--space-12); }
+    .md       { padding: var(--space-24) var(--space-20); }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+      <button class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item" href="index.html"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Origination</div>
+        <a class="nav__item nav__item--selected" href="RequestThread.html" aria-current="page"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="funds"></i></span><span class="nav__label">Фонды</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Pipeline</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-pipeline"></i></span><span class="nav__label">DCM Pipeline</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="payments-ib"></i></span><span class="nav__label">Реестр платежей IB</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Клиенты и задачи</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="factory-01"></i></span><span class="nav__label">Клиенты</span></a>
+        <a class="nav__item" href="#" aria-label="Задачи, 7"><span class="nav__ico"><i data-icon="tasks"></i></span><span class="nav__label">Задачи</span><span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">7</span></span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <a class="nav__user" href="../../index.html" aria-label="Хаб проектов">
+        <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Александров Пётр Константинович</span><span class="nav__user-role">Консультант-аналитик ДИД</span></span>
+      </a>
+      <button class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <!-- Панель истории и рабочая область — одна строка: панель занимает всю
+       высоту между меню и контентом, крошки живут внутри .screen и стоят
+       только над контентом. -->
+  <div class="app-shell">
+
+    <!-- ── Панель «Недавние запросы» (БТ-4.1) ────────────────────────────── -->
+    <aside class="hist" aria-label="Недавние запросы">
+      <div class="hist__acts">
+        <button class="btn btn--accent btn--m btn--fullwidth" data-act="new-report"><i data-icon="add"></i><span class="btn__label">Новый отчёт</span></button>
+      </div>
+      <div class="hist__head">
+        <div class="hist__label-row">
+          <span class="ds-label"><span class="ds-label__text">Недавние запросы</span></span>
+          <span class="hist__count" id="histCount" aria-live="polite"></span>
+        </div>
+        <div class="hsearch" role="search">
+          <span class="hsearch__ico" aria-hidden="true"><i data-icon="search"></i></span>
+          <input class="hsearch__control" id="histSearch" type="search" placeholder="Поиск по чатам" aria-label="Поиск по недавним запросам" autocomplete="off">
+          <button type="button" class="hsearch__clear" id="histSearchClear" aria-label="Очистить поиск" hidden><i data-icon="close"></i></button>
+        </div>
+      </div>
+      <div class="hist__body">
+        <div class="hist__list" id="histList" role="list"></div>
+        <div class="hist__empty" id="histEmpty" hidden>
+          <span class="hist__empty-ico" aria-hidden="true"><i data-icon="file-search"></i></span>
+          <span>Ничего не нашлось</span>
+          <button type="button" class="btn btn--transparent btn--xs" id="histEmptyReset"><span class="btn__label">Сбросить поиск</span></button>
+        </div>
+      </div>
+      <div class="hist__foot">
+        <a class="link link--accent link--s link--with-icon" href="RequestHistory.html">
+          <span class="link__icon"><i data-icon="history"></i></span>
+          Все запросы и материалы
+        </a>
+      </div>
+    </aside>
+
+    <div class="screen screen--app">
+
+      <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
+        <li class="crumbs__item"><a class="link link--muted" href="index.html">Главная</a></li>
+        <li class="crumbs__item"><a class="link link--muted" href="RequestThread.html">AI Pitcher</a></li>
+        <li class="crumbs__item crumbs__item--current">
+          <span class="crumbs__current" aria-current="page">Новый отчёт</span>
+        </li>
+      </nav>
+
+      <main class="screen__content">
+
+          <div class="phead">
+            <div class="phead__main">
+              <div class="phead__title-row">
+                <div class="phead__title-group">
+                  <h1 class="phead__title" id="hdTitle">Новый отчёт</h1>
+                </div>
+                <div class="phead__chips" id="hdChips"></div>
+              </div>
+              <!-- Параметры запроса: заполняются, когда нить принадлежит
+                   существующему запросу; у новой нити их ещё нет. -->
+              <div class="phead__subtitle" id="hdMeta"></div>
+            </div>
+            <!-- Кебаб с меню запроса (тем же, что у строки списка) —
+                 появляется, когда у нити есть запрос -->
+
+            <div class="phead__actions" id="hdActions"></div>
+          </div>
+
+          <div class="thr">
+
+            <div class="thr__scroll" id="thrScroll">
+
+              <!-- Стартовое состояние новой нити (БТ-3.1, БТ-4.2 шаг 1) -->
+              <div class="thr__start" id="thrStart">
+                <div class="es es--l">
+                  <span class="illu es__illu" data-illu="dcm-potentials" aria-hidden="true"></span>
+                  <div class="es__body">
+                    <p class="es__title">С чего начнём?</p>
+                    <p class="es__text">Спросите про компанию, группу или рынок — ответ будет в этом чате<br>с указанием источников. Нужен документ с продуктовыми идеями —<br>задайте направление или соберите запрос в конструкторе.</p>
+                  </div>
+                  <div class="es__actions">
+                    <button class="btn btn--outline btn--m" id="btnExample"><i data-icon="message-text"></i><span class="btn__label">Показать пример запроса</span></button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Сообщения нити рисует скрипт экрана -->
+              <div class="thr__col" id="thrMsgs"></div>
+
+            </div>
+
+            <!-- ── Композер с конструктором (БТ-3.2, БТ-3.4, БТ-5, БТ-6.1) ───── -->
+            <div class="thr__compose">
+              <div class="cmp" id="cmp">
+                <div class="cmp__main">
+                  <div class="chiplist cmp__files" id="cmpFiles" role="group" aria-label="Файлы, приложенные к сообщению"></div>
+                  <div class="cmp__field">
+                    <div class="cmp__mirror" id="cmpMirror" aria-hidden="true"></div>
+                    <textarea class="cmp__control" id="cmpInput" rows="2" placeholder="Задайте вопрос или опишите задачу…" aria-label="Текст запроса" aria-describedby="cmpHint"></textarea>
+                  </div>
+                  <div class="cmp__row">
+                    <button type="button" class="ibtn ibtn--neutral ibtn--m" id="btnAttach" aria-label="Приложить файлы. До 10 файлов на запрос, не более 30 МБ каждый: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX. Сканы распознаются автоматически." data-tooltip="До 10 файлов на запрос, не более 30 МБ каждый. PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX. Сканы распознаются автоматически." data-tooltip-multiline="yes"><i data-icon="attach"></i></button>
+                    <button type="button" class="btn btn--outline btn--s cmp__tgl" id="btnBuilder" aria-expanded="false" aria-controls="cmpDrawer">
+                      <span class="cmp__tgl-ico" aria-hidden="true"><i data-icon="ai-stars"></i><i data-icon="close"></i></span>
+                      <span class="btn__label">Конструктор</span>
+                    </button>
+                    <span class="cmp__spacer"></span>
+                    <button type="button" class="ibtn ibtn--neutral ibtn--m cmp__clear" id="btnClear" aria-label="Очистить поле" data-tooltip="Очистить поле" hidden><i data-icon="close"></i></button>
+                    <button type="button" class="btn btn--accent btn--s btn--icon-only" id="btnSend" aria-label="Отправить" data-tooltip="Отправить"><i data-icon="arrow-up"></i></button>
+                  </div>
+                </div>
+
+                <!-- Конструктор запроса: выезжает вниз внутри карточки. Пока закрыт —
+                     inert, чтобы Tab не заходил в невидимые контролы. -->
+                <div class="cmp__drawer" id="cmpDrawer" inert>
+                  <div class="cmp__drawer-in">
+                    <div class="bld" role="group" aria-labelledby="bldTitle">
+
+                                            <button type="button" class="brecent" id="bldRecent" style="--i:0">
+                        <span class="brecent__ico" aria-hidden="true"><i data-icon="clock-fast-forward"></i></span>
+                        <span class="brecent__txt">
+                          <span class="brecent__cap">Предыдущий запрос</span>
+                          <span class="brecent__q" id="bldRecentText"></span>
+                        </span>
+                        <span class="brecent__go">Подставить<i data-icon="arrow-narrow-right"></i></span>
+                      </button>
+
+                      <div class="bld__head" style="--i:1">
+                        <div class="bld__titles">
+                          <p class="bld__title" id="bldTitle">Конструктор запроса</p>
+                          <p class="bld__sub">Выбирайте варианты — фрагменты сразу встают в текст запроса и подсвечиваются. Текст остаётся редактируемым.</p>
+                        </div>
+                        <button type="button" class="btn btn--transparent btn--xs" id="bldReset" hidden><i data-icon="filter-reset"></i><span class="btn__label">Сбросить выбор</span></button>
+                      </div>
+
+                      <section class="bsec" data-sec="object" style="--i:2" aria-labelledby="bsecObject">
+                        <div class="bsec__label" id="bsecObject"><span class="bsec__num"><span class="bsec__n">1</span><i data-icon="check"></i></span>Объект анализа</div>
+                        <div class="bsec__ctl">
+                          <div class="bfind">
+                            <span class="bfind__ico" aria-hidden="true"><i data-icon="client-search"></i></span>
+                            <input class="bfind__control" id="bldFind" type="search" placeholder="Компания, группа, бенефициар или рынок" aria-label="Найти объект анализа" autocomplete="off">
+                          </div>
+                          <span class="bsec__hint" id="bldObjHint">Из ваших последних запросов</span>
+                          <div class="bopts" id="bldObjects" role="radiogroup" aria-labelledby="bsecObject bldObjHint"></div>
+                        </div>
+                      </section>
+
+                      <section class="bsec" data-sec="focus" style="--i:3" aria-labelledby="bsecFocus">
+                        <div class="bsec__label" id="bsecFocus"><span class="bsec__num"><span class="bsec__n">2</span><i data-icon="check"></i></span>Типовой фокус</div>
+                        <div class="bsec__ctl">
+                          <div class="bopts" id="bldFocus" role="group" aria-labelledby="bsecFocus"></div>
+                        </div>
+                      </section>
+
+                      <section class="bsec" data-sec="level" style="--i:4" aria-labelledby="bsecLevel">
+                        <div class="bsec__label" id="bsecLevel"><span class="bsec__num"><span class="bsec__n">3</span><i data-icon="check"></i></span><span class="bsec__titles"><span>Уровень проработки</span><span class="bsec__hint" id="bhintDir">Направление анализа</span></span></div>
+                        <div class="bsec__ctl">
+                          <div class="bradios" id="bldDirection" role="radiogroup" aria-labelledby="bsecLevel bhintDir"></div>
+                        </div>
+                      </section>
+
+                      <div class="bld__foot" style="--i:5">
+                        <span class="bld__foot-ico" aria-hidden="true"><i data-icon="clock-timer"></i></span>
+                        <span>Ожидаемое время подготовки — до 30 минут. Работа продолжится, даже если закрыть инструмент.</span>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="cmp__hint" id="cmpHint"><span><kbd>Enter</kbd> — отправить</span><span><kbd>Shift</kbd> + <kbd>Enter</kbd> — новая строка</span><span>К запросу можно приложить PDF, Word, PowerPoint и Excel</span></p>
+            </div>
+
+          </div>
+
+      </main>
+    </div>
+
+    <!-- ── Просмотр материала (БТ-1, БТ-4.6) ─────────────────────────────── -->
+    <aside class="pv" id="pv" aria-label="Просмотр материала" hidden>
+      <div class="pv__grip" id="pvGrip" role="separator" aria-orientation="vertical" aria-label="Ширина панели просмотра" aria-valuemin="360" tabindex="0"></div>
+      <header class="pv__head">
+        <span class="pv__ico" aria-hidden="true"><i data-icon="document-check"></i></span>
+        <div class="pv__titles">
+          <p class="pv__title" id="pvTitle">ООО «Друза» — бриф перед встречей</p>
+          <p class="pv__meta">Детальный материал · версия 2 · 12.09.2026, 09:05</p>
+        </div>
+        <div class="pv__acts">
+          <button type="button" class="btn btn--outline btn--s" aria-haspopup="menu" aria-expanded="false" data-menu="doc-menu"><i data-icon="download"></i><span class="btn__label">Скачать</span><i data-icon="chevron-down"></i></button>
+          <button type="button" class="ibtn ibtn--neutral ibtn--m" id="pvWide" data-act="pv-wide" aria-label="Развернуть" data-tooltip="Развернуть"><i data-icon="maximize"></i></button>
+          <button type="button" class="ibtn ibtn--neutral ibtn--m" data-act="pv-close" aria-label="Закрыть просмотр" data-tooltip="Закрыть просмотр"><i data-icon="close"></i></button>
+        </div>
+      </header>
+      <div class="pv__body" id="pvBody"><article class="md" id="pvDoc"></article></div>
+    </aside>
+  </div>
+</div>
+
+<!-- ── Кебаб-меню запроса (БТ-4.8) ───────────────────────────────── -->
+<!-- Одно меню на строки списка и шапку: рантайм находит его по id и ставит от
+     триггера. Без обёртки .menu-anchor — она inline-flex и прямым ребёнком body
+     давала строку текста, из-за чего страница прокручивалась на 20px. -->
+<div id="hist-menu" class="menu menu--floating" role="menu" hidden>
+  <div class="menu__label">Запрос</div>
+  <button type="button" class="menu__item" role="menuitem" data-modal="rename-scrim">
+    <span class="menu__item-icon"><i data-icon="edit"></i></span><span class="menu__item-label">Переименовать</span>
+  </button>
+  <button type="button" class="menu__item" role="menuitem" id="miDuplicate">
+    <span class="menu__item-icon"><i data-icon="copy"></i></span><span class="menu__item-label">Дублировать</span>
+  </button>
+  <button type="button" class="menu__item" role="menuitem" id="miRestart">
+    <span class="menu__item-icon"><i data-icon="refresh"></i></span><span class="menu__item-label">Перезапустить</span>
+  </button>
+  <hr class="menu__divider">
+  <button type="button" class="menu__item menu__item--danger" role="menuitem" data-modal="delete-scrim">
+    <span class="menu__item-icon"><i data-icon="trash"></i></span><span class="menu__item-label">Удалить</span>
+  </button>
+</div>
+
+<!-- ── Модалка переименования (БТ-4.8) ──────────────────────────────────── -->
+<div class="modal-scrim" id="rename-scrim" hidden data-modal-guarded>
+  <div class="modal modal--w4" role="dialog" aria-modal="true" aria-labelledby="rename-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="rename-title">Переименовать запрос</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div class="inp inp--m">
+        <label class="ds-label" for="renameField"><span class="ds-label__text">Название запроса</span></label>
+        <div class="inp__field">
+          <input class="inp__control" id="renameField" value="ГК «Северный агрохолдинг» — выход миноритария" aria-describedby="rename-help">
+        </div>
+        <span class="ds-helper ds-helper--left" id="rename-help">Название видно в истории запросов и в уведомлениях</span>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Сохранить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- ── Модалка удаления (БТ-4.8: удаление обратимо) ─────────────────────── -->
+<div class="modal-scrim" id="delete-scrim" hidden>
+  <div class="modal modal--w3" role="alertdialog" aria-modal="true" aria-labelledby="delete-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="delete-title">Удалить запрос?</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <p class="ds-body-m">Запрос, все его версии материала и приложенные файлы уйдут в корзину.</p>
+      <p class="ds-body-s">Восстановить запрос можно в течение 30 дней — из раздела «История и материалы».</p>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button class="btn btn--transparent btn--m" data-modal-close><span class="btn__label">Отмена</span></button>
+        <button class="btn btn--accent btn--m btn--danger" id="btnDelete" data-modal-close><span class="btn__label">Удалить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+
+<!-- ── Меню «Скачать» материала: форматы выгрузки ───────────────────────── -->
+<div id="doc-menu" class="menu menu--floating" role="menu" hidden>
+  <div class="menu__label">Скачать</div>
+  <button type="button" class="menu__item" role="menuitem" data-act="dl" data-fmt="Детальный материал, PDF">
+    <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Детальный — PDF</span>
+  </button>
+  <button type="button" class="menu__item" role="menuitem" data-act="dl" data-fmt="Детальный материал, Word">
+    <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Детальный — Word</span>
+  </button>
+  <button type="button" class="menu__item" role="menuitem" data-act="dl" data-fmt="Краткий материал, PDF" data-href="report-example-for-test.pdf">
+    <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Краткий — PDF</span>
+  </button>
+  <button type="button" class="menu__item" role="menuitem" data-act="dl" data-fmt="Материал, Markdown" data-href="report-example-for-test.md">
+    <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Markdown — .md</span>
+  </button>
+</div>
+
+<!-- Текст тестового материала для панели просмотра — копия
+     report-example-for-test.md. Страница открывается двойным кликом (file://),
+     а так браузер не даёт прочитать соседний файл; с сервера панель читает
+     сам .md, копия — запасной путь. Меняя материал, обновляйте обе. -->
+<script type="text/markdown" id="reportMd">
+Бриф перед встречей · ДИД
+
+# ООО «Друза»
+
+Добыча и переработка рудного золота · Невское месторождение и ГОК «Невский», Бодайбинский район Иркутской области · бенефициары — братья Слепневы (51% / 25% / 24%) через ООО «В.Н.В.» · директор Николай Игнатьев
+
+## Ключевые показатели
+
+| Показатель | Значение | Комментарий |
+|---|---|---|
+| Выручка (2025) | **11 102 млн ₽** | ▲ +21,8% г/г |
+| Чистая прибыль (2025) | **1 898 млн ₽** | ▲ +69,6% г/г |
+| Рентабельность продаж | **35,5%** | EBIT 3 943 млн ₽ |
+| Долговая нагрузка | **≈0,09** | заёмный / собственный капитал |
+| Добыча золота | **1,158 т** | 2023, последний раскрытый год |
+
+## Executive Summary
+
+Высокорентабельный семейный золотодобытчик Ленского района с почти нулевым долгом, растущий на ценовой конъюнктуре и входящий в капиталоёмкую инвестфазу. Ключевой проект — расширение ГОКа «Невский» с 1,3 до 4,4 млн т руды в год (ЗИФ-3) с выходом добычи до 3,7 т золота. Реальный масштаб бизнеса шире одного юрлица: холдинг Слепневых включает золотые «Ленсиб», «Сибирь», «Даксиб» и флюоритовые ГОКи в Бурятии, но консолидированной отчётности по группе нет.
+
+## Возможности ДИД
+
+| Направление | Оценка | Комментарий |
+|---|---|---|
+| Проектный мезонин под ЗИФ-3 | `ДА` `ПРИОРИТЕТ` | Капиталоёмкое расширение ГОКа при нулевом долге: ≥1 млрд ₽ на 5–7 лет, обеспечение на уровне проекта, контроль семьи сохраняется |
+| Кредитный мезонин / предпроектное | `УСЛОВНО` | 0,5–2 млрд ₽ под проектирование и закупку оборудования ЗИФ-3; варрант 2–7% семья воспримет настороженно |
+| M&A — покупка (buy-side) | `УСЛОВНО` | Группа — активный консолидатор; рекультивационные фонды выдавливают мелких россыпников, создавая поток дешёвых лицензий района |
+| M&A — продажа (sell-side) | `НЕТ` | Контроль сконцентрирован у семьи, Невское — ядро бизнеса; мотивации к выходу нет в горизонте 2–3 лет |
+| Рынки капитала (DCM/ECM) | `НЕТ` | Нет рейтингов, МСФО и публичной истории; возможна дорожная карта на 2–3 года под ЗИФ-3 после консолидации группы |
+
+## Инсайты
+
+- **Прибыльный актив с незадействованным долговым плечом.** При выручке 11,1 млрд ₽ и рентабельности продаж 35,5% компания финансирует развитие из собственного потока при соотношении заёмного и собственного капитала около 0,09 — редкий для отрасли профиль заёмщика с огромным запасом долговой ёмкости.
+- **Стоимость создаёт не объём, а цена и передел.** Физическая добыча стагнирует на уровне 1,1–1,2 т, но учётная цена ЦБ достигла 12 088,55 ₽/г 27.01.2026 — впервые за историю наблюдений с 1997 г. Дальнейший рост возможен только через ЗИФ-3, то есть через CAPEX.
+- **За юрлицом стоит скрытая группа.** Холдинг Слепневых объединяет золотые и флюоритовые активы в двух регионах с совокупной выручкой, кратно превышающей выручку «Друзы». Клиентское покрытие имеет смысл строить на уровне группы, а не одной компании.
+
+## Ключевые риски
+
+| Риск | Содержание и влияние на сделку |
+|---|---|
+| Непрозрачность группы | Консолидированной МСФО нет, операции переплетены с сестринскими компаниями под общим управлением. Оценить реальное кредитное качество без выгрузки из платных систем и прямого запроса отчётности невозможно. |
+| Ценовой и ресурсный | Прибыль полностью зависит от рублёвой цены золота при стагнации физической добычи. Укрепление рубля или коррекция цены на фоне надбавки к НДПИ 10,0% и налога на прибыль 25,0% быстро сжимает маржу. |
+| Экологический и регуляторный | Платёж за негативное воздействие 20,6 млн ₽ за 2024 г., 119 проверок с 2015 г., арбитражные споры. Готовящиеся рекультивационные фонды добавят отрасли 8–12 млрд ₽ нагрузки в год. |
+
+> **Позиция на встрече:** не предлагать вход в капитал — семья контроль не размывает. Заходить с проектным финансированием конкретного этапа ЗИФ-3 под обеспечение активами рудника и с сохранением 100% контроля собственников. Параллельно ставить задачу клиентского покрытия всей группы Слепневых, включая флюоритовый дивизион в Бурятии.
+</script>
+
+<script src="../../DS-IBP/scripts/ds.js"></script>
+<script>
+/* ============================================================================
+   Скрипт экрана «Новый отчёт» / нить запроса.
+
+   Рантаймы ДС дают всё штатное поведение компонентов (модалки, меню, тултипы,
+   панель навигации, чипы). Здесь — только то, чего в ДС нет и не может быть,
+   потому что это модель данных и сценарий продукта, а не компонент:
+
+   · панель истории запросов и её строки (БТ-4.1);
+   · последовательность сообщений нити и её перерисовка (БТ-3.1);
+   · постепенное появление ответа (БТ-3.8);
+   · индикатор «AI Pitcher думает» на время подготовки материала (БТ-7);
+   · панель просмотра материала с изменяемой шириной (БТ-1, БТ-4.6);
+   · развилка «ответить в диалоге / собрать новую версию» (БТ-6.3);
+   · конструктор запроса внутри поля ввода (БТ-5).
+
+   Состояние экрана задаётся параметром адреса:
+     без параметров — новая пустая нить (точка входа в раздел);
+     ?id=N          — открыт запрос N из истории;
+     ?run=1         — запуск подготовки по прежним вводным;
+     ?builder=1     — пустая нить с открытым конструктором.
+
+   После каждой перерисовки поддерева рантаймы связываются заново (урок Л93).
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  /* Корень ДС для рантайма иллюстраций (window.__DS_ROOT) задан тегом в начале
+     <head>: из этого скрипта значение приходило позже первого запроса файла. */
+
+  var USER = { name: 'Александров Пётр', initials: 'АП' };
+  var OBJECT = 'ГК «Северный агрохолдинг»';
+
+  /* ── История запросов: последние 10 (БТ-4.1) ──────────────────────────── */
+  var HIST = [
+    { id: 1,  title: 'ГК «Северный агрохолдинг» — выход миноритария',        kind: 'По клиенту · Группа · Детальный',      versions: 2, upd: '12 минут назад',  state: 'ready', files: 3 },
+    { id: 2,  title: 'ПАО «Волга-Агро» — оценка перед встречей',             kind: 'По клиенту · Компания · Детальный',    versions: 1, upd: '40 минут назад',  state: 'running', files: 1 },
+    { id: 4,  title: 'Логистика последней мили, Юг России',                  kind: 'По рынку · Регион',                    versions: 0, upd: 'вчера, 17:40',   state: 'answer', files: 0 },
+    { id: 5,  title: 'Бенефициар Токарев П. А. — активы и структура владения', kind: 'По клиенту · Бенефициар · Детальный', versions: 3, upd: '10.09.2026',     state: 'ready', files: 4 },
+    { id: 6,  title: 'АО «Метизный завод» — рефинансирование выпуска',       kind: 'По клиенту · Компания · Краткий',      versions: 1, upd: '09.09.2026',     state: 'ready', files: 2 },
+    { id: 7,  title: 'Рынок минеральных удобрений, СЗФО',                    kind: 'По рынку · Регион · Детальный',        versions: 0, upd: '08.09.2026',     state: 'error', files: 0 },
+    { id: 8,  title: 'ГК «Северный агрохолдинг» — долговой профиль',         kind: 'По клиенту · Группа · Краткий',        versions: 1, upd: '05.09.2026',     state: 'ready', files: 1 },
+    { id: 9,  title: 'Сравнение peers в агросекторе за 2025 год',            kind: 'По рынку · Отрасль',                   versions: 0, upd: '03.09.2026',     state: 'answer', files: 0 },
+    { id: 10, title: 'ООО «Каспий-Порт» — расширение терминала',             kind: 'По клиенту · Компания · Детальный',    versions: 2, upd: '28.08.2026',     state: 'ready', files: 2 }
+  ];
+  var HIST_CHIP = {
+    ready:   { cls: ' chip--success', label: 'Материал готов' },
+    running: { cls: ' chip--info',    label: 'Подготовка идёт' },
+    answer:  { cls: ' chip--info',    label: 'Ответ в диалоге' },
+    error:   { cls: ' chip--error',   label: 'Ошибка подготовки' }
+  };
+
+  /* ── Состояние нити ───────────────────────────────────────────────────── */
+  var S = {
+    msgs: [],
+    versions: [
+      { n: 1, date: '11.09.2026, 14:20', note: 'Исходный материал по параметрам конструктора' },
+      { n: 2, date: '12.09.2026, 09:05', note: 'Учтена презентация менеджмента: пересчитан peers-мультипликатор' }
+    ],
+    hasMaterial: false,
+    running: false,
+    files: [],
+    openId: null,
+    pristine: false,   /* новая пустая нить — адрес без параметров */
+    params: { direction: 'Прямые инвестиции', volume: 'Детальный' },
+    runTitle: null
+  };
+
+  /* ── Утилиты ──────────────────────────────────────────────────────────── */
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  /* Демо-время: дата фиксирована под «рыбу» нити, часы берутся реальные —
+     иначе новые сообщения выглядят старше уже лежащих в нити. */
+  function now() {
+    var d = new Date();
+    return '12.09.2026, ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+  function el(id) { return document.getElementById(id); }
+
+  /* Пересборка поддерева через innerHTML отвязывает рантаймы ДС —
+     связываем заново одной функцией из единственного места (урок Л93). */
+  function rebind(scope) {
+    if (window.dsIcons) window.dsIcons.apply(scope);
+    if (window.DSMenu) window.DSMenu.bindAll(scope);
+    if (window.DSModal) window.DSModal.bindAll(scope);
+    if (window.DSTile) window.DSTile.wireAll(scope);
+    if (window.DSTabs) window.DSTabs.wireAll(scope);
+    if (window.DSChip) window.DSChip.refresh(scope);
+  }
+
+  /* ── Панель истории ───────────────────────────────────────────────────── */
+  /* Подсветка совпадений поиска: каждое вхождение каждого слова запроса */
+  function hl(str, words) {
+    if (!words.length) return esc(str);
+    var low = str.toLowerCase(), on = [];
+    words.forEach(function (w) {
+      for (var i = low.indexOf(w); i !== -1; i = low.indexOf(w, i + 1)) {
+        for (var j = i; j < i + w.length; j++) on[j] = true;
+      }
+    });
+    var out = '', open = false;
+    for (var k = 0; k < str.length; k++) {
+      if (!!on[k] !== open) { out += open ? '</mark>' : '<mark class="hist__hl">'; open = !open; }
+      out += esc(str.charAt(k));
+    }
+    return out + (open ? '</mark>' : '');
+  }
+
+  function histHTML(h, words) {
+    var c = HIST_CHIP[h.state];
+    var versions = h.versions ? 'Версий: ' + h.versions : 'Без отчёта';
+    var selected = h.id === S.openId;
+    /* Ведущего элемента у строки истории нет: состояние несёт чип, а колонка
+       узкая — каждый лишний слот съедает ширину названия запроса.
+       Наведение и «текущая нить» — на обёртке .hist__item, а не на Entity:
+       состояние компонента задаёт только сам компонент. */
+    return '<div class="hist__item" role="listitem"' +
+      (selected ? ' aria-current="true"' : '') + ' tabindex="0" data-thread="' + h.id + '">' +
+      '<div class="entity entity--s">' +
+      '<div class="entity__main">' +
+        '<div class="entity__titles">' +
+          '<p class="entity__header">' + hl(h.kind, words) + '</p>' +
+          '<div class="entity__labelrow"><span class="entity__label entity__label--truncate">' + hl(h.title, words) + '</span></div>' +
+        '</div>' +
+        '<div class="entity__subs"><span class="entity__subs-list">' + versions + ' · обновлён ' + esc(h.upd) + '</span></div>' +
+        '<div class="entity__chips"><span class="chip chip--s' + c.cls + '"><span class="chip__label">' + c.label + '</span></span></div>' +
+      '</div>' +
+      '<div class="entity__actions">' +
+        '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Действия с запросом «' + esc(h.title) + '»" aria-haspopup="menu" data-menu="hist-menu"><i data-icon="more-dots"></i></button>' +
+      '</div></div></div>';
+  }
+
+  /* Поиск по чатам: все слова запроса должны встретиться в названии или типе */
+  function drawHist() {
+    var raw = el('histSearch').value;
+    var words = raw.toLowerCase().split(/\s+/).filter(Boolean);
+    var list = words.length
+      ? HIST.filter(function (h) {
+          var hay = (h.title + ' ' + h.kind).toLowerCase();
+          return words.every(function (w) { return hay.indexOf(w) !== -1; });
+        })
+      : HIST;
+    el('histList').innerHTML = list.map(function (h) { return histHTML(h, words); }).join('');
+    el('histEmpty').hidden = list.length > 0;
+    el('histCount').textContent = words.length ? list.length + ' из ' + HIST.length : '';
+    el('histSearchClear').hidden = !raw;
+    rebind(el('histList'));
+  }
+
+  /* ── Разметка сообщения ───────────────────────────────────────────────── */
+  function msgHTML(m) {
+    if (m.role === 'user') {
+      return '<article class="msg msg--user"><div class="msg__bubble">' + m.html + '</div>' +
+        '<time class="msg__time">' + esc(m.time) + '</time></article>';
+    }
+    return '<article class="msg"><div class="msg__meta">' +
+      '<span class="msg__ico" aria-hidden="true"><i data-icon="ai-stars"></i></span>' +
+      '<span class="msg__name">AI Pitcher</span><time class="msg__time">' + esc(m.time) + '</time></div>' +
+      '<div class="msg__body">' + m.html + (m.think ? thinkingCard() : '') + '</div></article>';
+  }
+
+  function render() {
+    var host = el('thrMsgs');
+    host.innerHTML = S.msgs.map(msgHTML).join('');
+    /* анимируется только что добавленное сообщение, а не перерисовка */
+    if (S.animateLast && host.lastElementChild) host.lastElementChild.classList.add('is-new');
+    S.animateLast = false;
+    el('thrStart').hidden = S.msgs.length > 0;
+    rebind(host);
+    var sc = el('thrScroll');
+    sc.scrollTop = sc.scrollHeight;
+  }
+
+  /* extra.think — под сообщением висит индикатор подготовки */
+  function push(role, html, extra) {
+    S.msgs.push({ role: role, html: html, time: now(), think: !!(extra && extra.think) });
+    S.animateLast = true;
+    render();
+    return S.msgs.length - 1;
+  }
+  function replace(i, html) { S.msgs[i].html = html; render(); }
+
+  /* Заголовок экрана: пока нить пуста — «Новый отчёт»; после первого сообщения —
+     суть запроса; у открытого запроса и при подготовке — имя запроса. */
+  /* Параметры запроса под заголовком — у открытого запроса и при подготовке;
+     у запроса из первого сообщения и у пустой нити их нет. */
+  function setMeta(h) {
+    var meta = el('hdMeta');
+    if (!h) { meta.innerHTML = ''; return; }
+    var versions = h.versions ? 'Версий материала: ' + h.versions : 'Отчёт ещё не собран';
+    meta.innerHTML =
+      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="target"></i></span>' + esc(h.kind) + '</span>' +
+      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="calendar"></i></span>Обновлён ' + esc(h.upd) + '</span>' +
+      '<span class="phead__meta"><span class="phead__meta-ico phead__meta-ico--ok"><i data-icon="check-circle"></i></span>' + versions + '</span>' +
+      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="attach"></i></span>Файлов: ' + (h.files || 0) + '</span>' +
+      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="lock"></i></span>Доступ: только вы</span>';
+    rebind(meta);
+  }
+
+  /* Кебаб справа в шапке — у любой нити с запросом, с тем же меню, что у
+     строки списка. У пустой нити его нет. «Новый отчёт» и «Конструктор
+     отчётов» — кнопки над списком в панели. */
+  function setActions(on) {
+    var acts = el('hdActions');
+    acts.innerHTML = on
+      ? '<button class="btn btn--outline btn--m btn--icon-only" aria-label="Действия с запросом" aria-haspopup="menu" aria-expanded="false" data-menu="hist-menu"><i data-icon="more-dots"></i></button>'
+      : '';
+    rebind(acts);
+  }
+
+  function setTitle(text, chip) {
+    el('hdTitle').textContent = text;
+    /* Крошки ведёт ds-breadcrumbs.js: он один раз запоминает пункты и на
+       каждое изменение ширины (открытие панели просмотра, ресайз окна)
+       перерисовывает трейл из этой копии. Текст, записанный прямо в
+       .crumbs__current, при этом стирается — меняем пункт в его api. */
+    var trail = document.querySelector('[data-breadcrumbs]');
+    var api = trail && trail.__dsBreadcrumbs;
+    if (api && api.items.length) {
+      api.items[api.items.length - 1].text = text;
+      api.refresh();
+    } else {
+      var crumb = document.querySelector('.crumbs__current');
+      if (crumb) crumb.textContent = text;
+    }
+    el('hdChips').innerHTML = chip
+      ? '<span class="chip chip--rounded chip--s' + chip.cls + '"><span class="chip__label">' + chip.label + '</span></span>'
+      : '';
+    rebind(el('hdChips'));
+  }
+
+  /* ── Новый запрос из первого сообщения ───────────────────────────────────────────────
+     Пока пользователь печатает, экран остаётся пустой нитью. С отправкой
+     первого сообщения запрос встаёт первой строкой в «Недавних запросах»,
+     заголовок и крошка показывают его суть — начало сообщения, справа
+     появляется кебаб. */
+  function requestTitle(q) {
+    var t = q.replace(/\s+/g, ' ').trim().replace(/[\s?!.,:;…]+$/, '');
+    if (!t) return 'Новый запрос';
+    if (t.length > 64) t = t.slice(0, 64).replace(/\s+\S*$/, '') + '…';
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
+  function createRequest(q) {
+    var h = { id: 'new', title: requestTitle(q), kind: 'Новый запрос', versions: 0, upd: 'только что', state: 'answer', files: 0 };
+    S.openId = h.id;
+    HIST.unshift(h);
+    if (HIST.length > 10) HIST.pop();
+    setTitle(h.title, { cls: HIST_CHIP[h.state].cls, label: HIST_CHIP[h.state].label });
+    setActions(true);
+    drawHist();
+  }
+
+  /* ── Текстовые блоки ──────────────────────────────────────────────────── */
+  function text(t) { return '<div class="thr__text"><p class="ds-body-m">' + t + '</p></div>'; }
+
+  function sources(list) {
+    return '<div class="thr__row"><span class="ds-body-xs">Источники:</span><div class="chiplist chiplist--s">' +
+      list.map(function (s) { return '<span class="chip chip--s"><span class="chip__label">' + esc(s) + '</span></span>'; }).join('') +
+      '</div></div>';
+  }
+
+  function answerActions(id) {
+    return '<div class="thr__row">' +
+      '<button class="btn btn--transparent btn--s" data-act="copy" data-i="' + id + '"><i data-icon="copy"></i><span class="btn__label">Копировать</span></button>' +
+      '<button class="btn btn--transparent btn--s" data-act="builder"><i data-icon="ai-stars"></i><span class="btn__label">Открыть конструктор</span></button>' +
+      '</div>';
+  }
+
+  /* ── Карточка готового материала (БТ-1, БТ-4.6) ───────────────────────── */
+  function docCard() {
+    var v = S.versions[S.versions.length - 1];
+    return '<div class="doc">' +
+      '<span class="doc__ico" aria-hidden="true"><i data-icon="document-check"></i></span>' +
+      '<div class="doc__main">' +
+        '<button type="button" class="doc__title" data-act="open">' + esc(OBJECT) + ' — материал с идеями</button>' +
+        '<span class="doc__meta">' + esc(S.params.volume) + ' · ' + esc(S.params.direction) + ' · версия ' + v.n + ' · ' + esc(v.date) + '</span>' +
+      '</div>' +
+      '<div class="doc__acts">' +
+        '<button type="button" class="btn btn--outline btn--s" data-act="open"><i data-icon="visibility-on"></i><span class="btn__label">Просмотр</span></button>' +
+        '<button type="button" class="btn btn--outline btn--s" aria-haspopup="menu" aria-expanded="false" data-menu="doc-menu"><i data-icon="download"></i><span class="btn__label">Скачать</span><i data-icon="chevron-down"></i></button>' +
+      '</div></div>';
+  }
+
+  /* ── Развилка уточнения (БТ-6.3) ──────────────────────────────────────── */
+  function forkCard() {
+    return text('Уточнение принято. Ответить в этой нити, не трогая документ, или пересобрать материал новой версией?') +
+      '<div class="thr__row">' +
+      '<button class="btn btn--outline btn--s" data-act="fork-answer"><i data-icon="message-text"></i><span class="btn__label">Ответить в диалоге</span></button>' +
+      '<button class="btn btn--outline btn--s" data-act="fork-version"><i data-icon="refresh"></i><span class="btn__label">Собрать новую версию</span></button>' +
+      '</div>';
+  }
+
+  /* ── AI Pitcher думает (БТ-7) ─────────────────────────────────────────────
+     Материал готовится на стороне агентной системы до 30 минут; пошагово
+     показать это продукт не может. В нити остаётся сообщение с индикатором:
+     фразы сменяются раз в три секунды, счётчик времени тикает каждую. Узлы
+     ищутся заново на каждом тике — нить перерисовывается целиком. */
+  var THINK = ['Собираю данные…', 'Смотрю отчётность…', 'Навожу справки…', 'Изучаю рынок и конкурентов…', 'Сверяю с данными Банка…', 'Подбираю продуктовые идеи…', 'Проверяю выводы…'];
+  var think = { i: 0, start: 0, timer: null };
+
+  function elapsed() {
+    var sec = Math.max(0, Math.floor((Date.now() - think.start) / 1000));
+    return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  }
+  function thinkingCard() {
+    return '<button type="button" class="think" data-act="finish" title="Прототип: нажмите, чтобы завершить подготовку" aria-label="AI Pitcher готовит материал. Прототип: нажмите, чтобы завершить подготовку">' +
+      '<span class="think__loader" aria-hidden="true"></span>' +
+      '<span class="think__text" data-think aria-hidden="true">' + THINK[think.i] + '</span>' +
+      '<span class="think__time" aria-hidden="true"><span data-think-time>' + elapsed() + '</span> · до 30 минут</span></button>';
+  }
+  function startThinking() {
+    if (think.timer) return;
+    var tick = 0;
+    think.timer = setInterval(function () {
+      each('[data-think-time]', function (n) { n.textContent = elapsed(); });
+      if (++tick % 3) return;
+      think.i = (think.i + 1) % THINK.length;
+      each('[data-think]', function (n) {
+        n.classList.add('is-out');
+        setTimeout(function () { n.textContent = THINK[think.i]; n.classList.remove('is-out'); }, 300);
+      });
+    }, 1000);
+  }
+
+  /* Завершение подготовки. Настоящий сигнал придёт от агентной системы;
+     в прототипе — клик по индикатору. Индикатор сменяется сообщением
+     с карточкой материала, приходит уведомление. */
+  function finishRun() {
+    if (!S.msgs.some(function (m) { return m.think; })) return;
+    S.msgs.forEach(function (m) { m.think = false; });
+    clearInterval(think.timer); think.timer = null;
+    S.running = false; S.hasMaterial = true;
+    setTitle(S.runTitle || el('hdTitle').textContent, { cls: ' chip--success', label: 'Материал готов' });
+    var h = HIST.filter(function (x) { return x.id === S.openId; })[0];
+    if (h) { h.state = 'ready'; h.versions = Math.max(1, h.versions); drawHist(); }
+    push('agent', text('Готово — материал по ' + esc(OBJECT) + ' собран: ключевые показатели, возможности для продуктов, инсайты, риски и позиция на встречу. Откройте просмотр или скачайте в нужном формате.') + docCard());
+    if (window.DSSnack) {
+      window.DSSnack.show({
+        tone: 'success',
+        title: 'Материал готов',
+        text: OBJECT + ' — материал с идеями. Уведомление отправлено на корпоративную почту.',
+        buttons: [{ label: 'Открыть просмотр', variant: 'outline', onClick: function () { openPreview(); } }]
+      });
+    }
+  }
+
+  /* p — параметры из конструктора: объект, направление, число файлов.
+     Без них (перезапуск, ?run=1) подготовка идёт по прежним вводным. */
+  function startRun(intro, p) {
+    p = p || {};
+    if (p.object) OBJECT = p.object.name;
+    if (p.direction) S.params.direction = p.direction.label;
+    S.running = true;
+    S.runTitle = p.title || (p.object ? OBJECT + ' — материал с идеями' : (S.runTitle || OBJECT + ' — выход миноритария'));
+    /* новый запуск разбирает прежний сбой: действия на его карточке не нужны */
+    S.msgs.forEach(function (m) { m.html = m.html.replace('class="err"', 'class="err is-resolved"'); });
+    var kind = (p.object && p.object.kind === 'Рынок' ? 'По рынку' : 'По клиенту') + ' · ' +
+      (p.object ? p.object.kind : 'Группа') + ' · ' + S.params.volume;
+    setTitle(S.runTitle, { cls: ' chip--info', label: 'Подготовка идёт' });
+    setMeta({ kind: kind, upd: 'только что', versions: S.versions.length, files: p.files != null ? p.files : 3 });
+    setActions(true);
+    /* запрос, созданный первым сообщением, получает имя и тип из параметров */
+    if (S.openId === 'new' && HIST[0] && HIST[0].id === 'new') {
+      HIST[0].title = S.runTitle; HIST[0].kind = kind; HIST[0].state = 'running';
+      drawHist();
+    }
+    if (window.DSToast) window.DSToast.show({ message: 'Подготовка материала запущена', kind: 'bar', duration: 3000 });
+    think.start = Date.now(); think.i = 0;
+    push('agent', text(intro + ' Это займёт до 30 минут — можно спокойно выпить кофе. Как будет готово, сообщу здесь и пришлю уведомление на корпоративную почту.'), { think: true });
+    startThinking();
+  }
+
+  /* ── Ответ на вопрос без отчёта (БТ-3.3, БТ-3.8) ──────────────────────── */
+  var ANSWER = 'Net Debt / EBITDA группы — 3,4x на конец 2025 года при EBITDA 9,1 млрд RUB и выручке 48,2 млрд RUB. ' +
+               'Пик погашений валютного долга приходится на 2027–2028 годы: 4,8 млрд RUB и 6,1 млрд RUB соответственно. ' +
+               'Ковенантный порог по действующим выпускам — 4,0x, запас по нему сокращается третий квартал подряд.';
+
+  function typeAnswer(i, full, tail) {
+    var pos = 0;
+    var iv = setInterval(function () {
+      pos = Math.min(full.length, pos + 4);
+      replace(i, text(esc(full.slice(0, pos))));
+      if (pos >= full.length) { clearInterval(iv); replace(i, text(esc(full)) + tail); }
+    }, 24);
+  }
+
+  /* ── Отправка сообщения ───────────────────────────────────────────────── */
+  function send() {
+    var q = field.value.trim();
+    if (!q) {
+      if (window.DSSnack) window.DSSnack.show({ tone: 'warning', title: 'Пустое сообщение', text: 'Введите вопрос или соберите запрос в конструкторе.' });
+      return;
+    }
+    /* параметры снимаются с конструктора до очистки поля */
+    var run = {
+      object: picked(allObjects(), 'object'),
+      direction: picked(DIRECTIONS, 'direction'),
+      files: S.files.length
+    };
+    /* первое сообщение новой нити создаёт запрос */
+    if (S.pristine && S.openId === null) createRequest(q);
+    B.last = q;
+    field.value = '';
+    B.frag = {}; B.fresh = null; B.custom = null;
+    el('bldFind').value = '';
+    paint(); syncControls();
+    setBuilder(false);
+
+    var body = '<p class="ds-body-m">' + esc(q) + '</p>';
+    if (S.files.length) {
+      body += '<div class="chiplist chiplist--s">' + S.files.map(function (f) {
+        return '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">' + esc(f) + '</span></span>';
+      }).join('') + '</div>';
+    }
+    push('user', body);
+    var hadFiles = S.files.length > 0;
+    S.files = []; drawFiles();
+
+    var reportish = /собер|материал|отчёт|отчет|подготов|пересобер/i.test(q);
+
+    /* запрос на материал с выбранным объектом — сразу к подготовке */
+    if (reportish && run.object) {
+      setTimeout(function () {
+        startRun('Принял, готовлю материал по ' + run.object.name + (hadFiles ? ' с учётом приложенных файлов' : '') + '.', run);
+      }, 500);
+      return;
+    }
+
+    if (reportish && !S.hasMaterial) {
+      var i1 = push('agent', text('<span class="ds-body-m">Уточняю параметры…</span>'));
+      setTimeout(function () {
+        replace(i1, text('Для материала нужен объект анализа. Откройте конструктор и выберите компанию, группу или рынок — запрос соберётся сам, а текст останется редактируемым.') +
+          '<div class="thr__row"><button class="btn btn--outline btn--s" data-act="builder"><i data-icon="ai-stars"></i><span class="btn__label">Открыть конструктор</span></button></div>');
+      }, 700);
+      return;
+    }
+
+    if (S.hasMaterial || hadFiles) {
+      setTimeout(function () { push('agent', forkCard()); }, 600);
+      return;
+    }
+
+    var i2 = push('agent', text('<span class="ds-body-m">Ищу данные…</span>'));
+    setTimeout(function () {
+      typeAnswer(i2, ANSWER, sources(['Отчётность МСФО 2025', 'Раскрытие эмитента', 'Данные Банка', 'Отраслевой обзор 2026']) + answerActions(i2));
+    }, 700);
+  }
+
+  /* ── Файлы композера (БТ-2.7) ─────────────────────────────────────────── */
+  function drawFiles() {
+    el('cmpFiles').innerHTML = S.files.map(function (f, i) {
+      return '<span class="chip chip--edit chip--s" tabindex="0"><span class="chip__icon"><i data-icon="file-basic"></i></span>' +
+        '<span class="chip__label">' + esc(f) + '</span>' +
+        '<span class="chip__remove" role="button" aria-label="Убрать файл ' + esc(f) + '" data-act="rmfile" data-i="' + i + '"><i data-icon="close"></i></span></span>';
+    }).join('');
+    rebind(el('cmpFiles'));
+  }
+
+  /* ── Делегирование действий ───────────────────────────────────────────── */
+  document.addEventListener('click', function (e) {
+    /* строка истории: клик мимо кебаба открывает запрос */
+    var row = e.target.closest('[data-thread]');
+    if (row && !e.target.closest('.entity__actions')) {
+      /* текущий запрос уже открыт — переходить некуда */
+      if (row.getAttribute('data-thread') !== String(S.openId)) location.href = 'RequestThread.html?id=' + row.getAttribute('data-thread');
+      return;
+    }
+
+    var t = e.target.closest('[data-act]');
+    if (!t) return;
+    var act = t.getAttribute('data-act');
+
+    if (act === 'fork-answer') {
+      push('agent', text('EBITDA-маржа группы — 18,9 % против 14–16 % у трёх ближайших конкурентов. Разрыв держится на вертикальной интеграции по кормам. Документ не изменялся.') +
+        sources(['Отчётность МСФО 2025', 'Презентация менеджмента']));
+    }
+    else if (act === 'fork-version') {
+      var n = S.versions.length + 1;
+      S.versions.push({ n: n, date: now(), note: 'Уточнение из нити: добавлен сценарий частичного выхода' });
+      startRun('Собираю версию ' + n + ' с учётом уточнения. Параметры и файлы взяты из запроса — предыдущие версии сохранены без изменений.');
+    }
+    else if (act === 'open') { openPreview(); }
+    else if (act === 'pv-close') { closePreview(); }
+    else if (act === 'pv-wide') { toggleWide(); }
+    else if (act === 'finish') { finishRun(); }
+    else if (act === 'fix-request') {
+      /* текст запроса — обратно в поле; фрагменты снова связаны с конструктором */
+      field.value = S.errorRequest || '';
+      detect();
+      B.fresh = '*';
+      paint(); syncControls();
+      fieldBox.scrollTop = 0;
+      field.focus();
+      field.setSelectionRange(field.value.length, field.value.length);
+      if (window.DSToast) window.DSToast.show({ message: 'Текст запроса вернулся в поле — поправьте и отправьте', kind: 'bar', duration: 3000 });
+    }
+    else if (act === 'restart-run') {
+      startRun('Перезапускаю подготовку по тем же вводным — найденные данные уже сохранены.', {
+        object: byId(OBJECTS, 'fert'), direction: byId(DIRECTIONS, 'full'), title: el('hdTitle').textContent
+      });
+    }
+    else if (act === 'new-report') { location.href = 'RequestThread.html'; }
+    else if (act === 'builder') { e.preventDefault(); setBuilder(true, true); }
+    else if (act === 'dl') {
+      /* у части форматов есть файл-пример — он и скачивается */
+      var href = t.getAttribute('data-href');
+      if (href) {
+        var a = document.createElement('a');
+        a.href = href; a.download = '';
+        document.body.appendChild(a); a.click(); a.remove();
+      }
+      if (window.DSToast) window.DSToast.show({ message: t.getAttribute('data-fmt') + ' — файл сформирован и промаркирован', kind: 'bar', tone: 'success', duration: 3000 });
+    }
+    else if (act === 'copy') {
+      if (window.DSSnack) window.DSSnack.show({ tone: 'success', title: 'Скопировано', text: 'Текст ответа скопирован в буфер обмена.' });
+    }
+    else if (act === 'rmfile') {
+      S.files.splice(Number(t.getAttribute('data-i')), 1); drawFiles();
+    }
+  });
+
+  /* строка истории с клавиатуры */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var row = e.target.closest && e.target.closest('[data-thread]');
+    if (!row || e.target.closest('.entity__actions')) return;
+    e.preventDefault();
+    if (row.getAttribute('data-thread') !== String(S.openId)) location.href = 'RequestThread.html?id=' + row.getAttribute('data-thread');
+  });
+
+  /* ── Конструктор запроса ──────────────────────────────────────────────────
+     Не отдельный экран, а панель, выезжающая внутри композера. Каждый выбор
+     дописывает в поле готовый фрагмент запроса, повторный клик убирает его.
+     Фрагменты живут в B.frag по ключу контрола и подсвечиваются зеркалом под
+     полем. Переписал пользователь фрагмент руками — связь рвётся: контрол
+     снимает выбор, текст остаётся как есть. Закрытие конструктора текст
+     не трогает. */
+  /* Объекты из последних запросов пользователя, от свежих к старым — до 10 */
+  var OBJECTS = [
+    { id: 'sah',   kind: 'Группа',     name: 'ГК «Северный агрохолдинг»' },
+    { id: 'volga', kind: 'Компания',   name: 'ПАО «Волга-Агро»' },
+    { id: 'logi',  kind: 'Рынок',      name: 'Логистика последней мили, Юг России' },
+    { id: 'tokar', kind: 'Бенефициар', name: 'Токарев П. А.' },
+    { id: 'metiz', kind: 'Компания',   name: 'АО «Метизный завод»' },
+    { id: 'fert',  kind: 'Рынок',      name: 'Минеральные удобрения, СЗФО' },
+    { id: 'agro',  kind: 'Рынок',      name: 'Агросектор РФ' },
+    { id: 'kaspi', kind: 'Компания',   name: 'ООО «Каспий-Порт»' },
+    { id: 'sahao', kind: 'Компания',   name: 'АО «Северный агрохолдинг»' }
+  ];
+  var OBJ_VISIBLE = 5;
+  var FOCUS = [
+    { id: 'debt',  label: 'Долговая нагрузка и ковенанты', text: 'Оцени долговую нагрузку и запас по ковенантам на горизонте трёх лет.' },
+    { id: 'mult',  label: 'Оценка по мультипликаторам',    text: 'Подбери сопоставимые компании и оцени бизнес по мультипликаторам.' },
+    { id: 'owner', label: 'Структура владения',            text: 'Проверь структуру владения и конечных бенефициаров.' },
+    { id: 'refi',  label: 'Рефинансирование',              text: 'Оцени потребность в рефинансировании и окно для выхода на рынок.' },
+    { id: 'bench', label: 'Отраслевые бенчмарки',          text: 'Сравни с отраслевыми бенчмарками по марже и оборачиваемости.' },
+    { id: 'ideas', label: 'Продуктовые идеи для встречи',  text: 'Предложи продуктовые идеи и тезисы для встречи с клиентом.' }
+  ];
+  var DIRECTIONS = [
+    { id: 'full', label: 'Полный анализ',     text: 'Направление — полный анализ, без сужения по продуктам.' },
+    { id: 'pe',   label: 'Прямые инвестиции', text: 'Направление — прямые инвестиции.' },
+    { id: 'mna',  label: 'M&A',               text: 'Направление — M&A.' },
+    { id: 'dcm',  label: 'Рынки капитала',    text: 'Направление — рынки капитала.' }
+  ];
+  var OBJ_PHRASE = { 'Группа': 'группе компаний ', 'Компания': 'компании ', 'Бенефициар': 'бенефициару ', 'Рынок': 'рынку ', 'Объект': '' };
+
+  function objFrag(o) {
+    return 'Собери отчёт по ' + OBJ_PHRASE[o.kind] + (o.kind === 'Рынок' ? '«' + o.name + '»' : o.name) + '.';
+  }
+  /* порядок фрагментов в тексте: объект, фокус, направление */
+  var ORDER = ['object'].concat(FOCUS.map(function (f) { return 'focus:' + f.id; }), ['direction']);
+
+  var field = el('cmpInput');
+  var fieldBox = document.querySelector('.cmp__field');
+  var B = {
+    open: false,
+    frag: {},        /* ключ контрола → фрагмент в тексте */
+    fresh: null,     /* только что добавленный фрагмент — вспыхивает; '*' — все */
+    custom: null,    /* объект, введённый вручную и не найденный в реестре */
+    more: false,     /* раскрыты объекты сверх первых пяти */
+    last: objFrag(OBJECTS[0]) + ' ' + FOCUS[0].text + ' ' + DIRECTIONS[1].text
+  };
+
+  function each(sel, fn, root) { Array.prototype.forEach.call((root || document).querySelectorAll(sel), fn); }
+  function byId(list, id) { return list.filter(function (x) { return x.id === id; })[0]; }
+  function allObjects() { return B.custom ? OBJECTS.concat([B.custom]) : OBJECTS; }
+  function fragOf(x) { return x.name ? objFrag(x) : x.text; }
+  function picked(list, key) { return list.filter(function (x) { return B.frag[key] === fragOf(x); })[0] || null; }
+  function plural(n, one, few, many) {
+    var m10 = n % 10, m100 = n % 100;
+    return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many;
+  }
+  function tidy(v) {
+    return v.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').replace(/[ \t]{2,}/g, ' ').replace(/^\s+|\s+$/g, '');
+  }
+
+  /* Поставить, заменить или убрать фрагмент контрола. Новый фрагмент встаёт
+     перед ближайшим следующим по порядку; объект — в начало запроса. */
+  function setFrag(key, next) {
+    var v = field.value, prev = B.frag[key];
+    var at = prev ? v.indexOf(prev) : -1;
+    if (at !== -1) {
+      v = v.slice(0, at) + (next || '') + v.slice(at + prev.length);
+    } else if (next) {
+      var pos = -1;
+      for (var k = ORDER.indexOf(key) + 1; k < ORDER.length && pos === -1; k++) {
+        if (B.frag[ORDER[k]]) pos = v.indexOf(B.frag[ORDER[k]]);
+      }
+      if (pos === -1 && key === 'object') pos = 0;
+      v = pos === -1 ? v.replace(/\s+$/, '') + (v.trim() ? ' ' : '') + next : v.slice(0, pos) + next + ' ' + v.slice(pos);
+    }
+    if (next) B.frag[key] = next; else delete B.frag[key];
+    B.fresh = next || null;
+    field.value = tidy(v);
+    paint();
+    syncControls();
+    /* поле прокручивается к вспыхнувшему фрагменту */
+    var mark = el('cmpMirror').querySelector('.is-new');
+    if (mark) fieldBox.scrollTop = Math.max(0, mark.offsetTop - 8);
+  }
+
+  /* Зеркало поля: тот же текст, фрагменты конструктора — в <mark> */
+  function paint() {
+    var v = field.value, ranges = [];
+    Object.keys(B.frag).forEach(function (k) {
+      var i = v.indexOf(B.frag[k]);
+      if (i !== -1) ranges.push({ a: i, b: i + B.frag[k].length, fresh: B.fresh === '*' || B.frag[k] === B.fresh });
+    });
+    ranges.sort(function (x, y) { return x.a - y.a; });
+    var html = '', pos = 0;
+    ranges.forEach(function (r) {
+      if (r.a < pos) return;
+      html += esc(v.slice(pos, r.a)) + '<mark class="cmp__mark' + (r.fresh ? ' is-new' : '') + '">' + esc(v.slice(r.a, r.b)) + '</mark>';
+      pos = r.b;
+    });
+    /* символ нулевой ширины держит последнюю пустую строку в зеркале */
+    el('cmpMirror').innerHTML = html + esc(v.slice(pos)) + '​';
+    el('btnClear').hidden = !v;
+  }
+
+  /* Найти в тексте известные фрагменты и отметить их контролы */
+  function detect() {
+    var v = field.value;
+    B.frag = {};
+    ORDER.forEach(function (key) {
+      var list = key === 'object' ? allObjects()
+        : key === 'direction' ? DIRECTIONS
+        : [byId(FOCUS, key.slice(6))];
+      list.some(function (x) {
+        if (v.indexOf(fragOf(x)) === -1) return false;
+        B.frag[key] = fragOf(x);
+        return true;
+      });
+    });
+  }
+
+  function syncControls() {
+    var obj = picked(allObjects(), 'object');
+    each('[data-obj]', function (n) { n.setAttribute('aria-checked', String(!!obj && obj.id === n.getAttribute('data-obj'))); }, el('bldObjects'));
+    each('[data-focus]', function (n) { var f = byId(FOCUS, n.getAttribute('data-focus')); n.setAttribute('aria-pressed', String(B.frag['focus:' + f.id] === f.text)); });
+    each('[data-dir]', function (n) { n.setAttribute('aria-checked', String(B.frag.direction === byId(DIRECTIONS, n.getAttribute('data-dir')).text)); });
+
+    var keys = Object.keys(B.frag);
+    document.querySelector('[data-sec="object"]').classList.toggle('is-done', !!B.frag.object);
+    document.querySelector('[data-sec="focus"]').classList.toggle('is-done', keys.some(function (k) { return k.indexOf('focus:') === 0; }));
+    document.querySelector('[data-sec="level"]').classList.toggle('is-done', !!B.frag.direction);
+    el('bldReset').hidden = !keys.length;
+
+  }
+
+  /* Варианты объекта — последние объекты из истории запросов: видны пять,
+     остальные под «Показать ещё». При вводе — все совпадения сразу.
+     Выбранный объект виден всегда; не нашлось точного совпадения —
+     пилюля «Использовать как есть». */
+  function drawObjects() {
+    var raw = el('bldFind').value.trim(), q = raw.toLowerCase();
+    var sel = picked(allObjects(), 'object');
+    var list = OBJECTS.filter(function (o) { return !q || (o.name + ' ' + o.kind).toLowerCase().indexOf(q) !== -1; });
+    if (sel && list.indexOf(sel) === -1) list.unshift(sel);
+    var total = list.length, collapsible = !q && total > OBJ_VISIBLE;
+    if (collapsible && !B.more) {
+      var head = list.slice(0, OBJ_VISIBLE);
+      if (sel && head.indexOf(sel) === -1) head[OBJ_VISIBLE - 1] = sel;
+      list = head;
+    }
+    var html = list.map(function (o, i) {
+      var extra = collapsible && B.more && i >= OBJ_VISIBLE;
+      return '<button type="button" class="bopt' + (extra ? ' is-extra" style="--i:' + (i - OBJ_VISIBLE) : '') + '" role="radio" aria-checked="false" data-obj="' + o.id + '">' +
+        '<span class="bopt__tag">' + esc(o.kind) + '</span>' +
+        '<span class="bopt__label">' + esc(o.name) + '</span>' +
+        '<span class="bopt__check" aria-hidden="true"><i data-icon="check"></i></span></button>';
+    }).join('');
+    if (collapsible) {
+      html += '<button type="button" class="bmore" data-more aria-expanded="' + B.more + '">' +
+        (B.more ? 'Свернуть' : 'Показать ещё (' + (total - OBJ_VISIBLE) + ')') + '<i data-icon="chevron-down"></i></button>';
+    }
+    if (q && !OBJECTS.some(function (o) { return o.name.toLowerCase() === q; })) {
+      html += '<button type="button" class="bopt bopt--custom" data-custom><i data-icon="add"></i>' +
+        '<span class="bopt__label">Использовать «' + esc(raw) + '»</span></button>';
+    }
+    el('bldObjHint').textContent = q ? 'Совпадения по вашим запросам' : 'Из ваших последних запросов';
+    el('bldObjects').innerHTML = html;
+    rebind(el('bldObjects'));
+    syncControls();
+  }
+
+  function buildControls() {
+    el('bldFocus').innerHTML = FOCUS.map(function (f) {
+      return '<button type="button" class="bchip" aria-pressed="false" data-focus="' + f.id + '" title="' + esc(f.text) + '">' +
+        '<span class="bchip__ico" aria-hidden="true"><i data-icon="add"></i><i data-icon="check"></i></span>' +
+        '<span>' + esc(f.label) + '</span></button>';
+    }).join('');
+    el('bldDirection').innerHTML = DIRECTIONS.map(function (d) {
+      return '<button type="button" class="bradio" role="radio" aria-checked="false" data-dir="' + d.id + '">' +
+        '<span class="bradio__dot" aria-hidden="true"></span>' + esc(d.label) + '</button>';
+    }).join('');
+    rebind(el('cmpDrawer'));
+  }
+
+  function resetBuilder() {
+    Object.keys(B.frag).forEach(function (k) { setFrag(k, null); });
+    B.custom = null;
+    el('bldFind').value = '';
+    drawObjects();
+  }
+
+  /* Пока карточка растёт или сжимается, нить остаётся прижатой к композеру */
+  function stickThread(ms) {
+    var sc = el('thrScroll');
+    if (sc.scrollHeight - sc.scrollTop - sc.clientHeight > 24) return;
+    var end = performance.now() + ms;
+    (function tick() {
+      sc.scrollTop = sc.scrollHeight;
+      if (performance.now() < end) requestAnimationFrame(tick);
+    })();
+  }
+
+  function setBuilder(open, focusFind) {
+    var drawer = el('cmpDrawer'), btn = el('btnBuilder');
+    if (B.open === open) {
+      if (open && focusFind) el('bldFind').focus();
+      return;
+    }
+    B.open = open;
+    if (open) {
+      drawObjects();
+      el('bldRecentText').textContent = B.last;
+      el('bldRecent').hidden = !B.last;
+      drawer.removeAttribute('inert');
+    } else {
+      if (drawer.contains(document.activeElement)) field.focus();
+      drawer.setAttribute('inert', '');
+    }
+    drawer.classList.toggle('is-open', open);
+    el('cmp').classList.toggle('is-building', open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.querySelector('.btn__label').textContent = open ? 'Закрыть конструктор' : 'Конструктор';
+    if (window.DSTooltip) window.DSTooltip.hideAll();
+    stickThread(600);
+    if (open && focusFind) setTimeout(function () { el('bldFind').focus({ preventScroll: true }); }, 320);
+  }
+
+  buildControls();
+
+  el('btnBuilder').addEventListener('click', function () { setBuilder(!B.open, false); });
+
+  el('cmpDrawer').addEventListener('click', function (e) {
+    var n;
+    if ((n = e.target.closest('[data-obj]'))) {
+      var of = objFrag(byId(allObjects(), n.getAttribute('data-obj')));
+      setFrag('object', B.frag.object === of ? null : of);
+    } else if ((n = e.target.closest('[data-custom]'))) {
+      B.custom = { id: 'custom', kind: 'Объект', name: el('bldFind').value.trim() };
+      el('bldFind').value = '';
+      setFrag('object', objFrag(B.custom));
+      drawObjects();
+    } else if ((n = e.target.closest('[data-focus]'))) {
+      var f = byId(FOCUS, n.getAttribute('data-focus'));
+      setFrag('focus:' + f.id, B.frag['focus:' + f.id] ? null : f.text);
+    } else if ((n = e.target.closest('[data-dir]'))) {
+      var d = byId(DIRECTIONS, n.getAttribute('data-dir'));
+      setFrag('direction', B.frag.direction === d.text ? null : d.text);
+    } else if ((n = e.target.closest('[data-more]'))) {
+      B.more = !B.more;
+      drawObjects();
+      /* кнопка пересоздана — с клавиатуры фокус возвращается на неё */
+      var more = el('bldObjects').querySelector('[data-more]');
+      if (more && e.detail === 0) more.focus();
+    }
+  });
+
+  el('bldFind').addEventListener('input', drawObjects);
+  el('bldFind').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      var first = el('bldObjects').querySelector('.bopt');
+      if (first) first.click();
+    } else if (e.key === 'Escape' && el('bldFind').value) {
+      e.preventDefault(); e.stopPropagation();
+      el('bldFind').value = ''; drawObjects();
+    }
+  });
+  el('bldReset').addEventListener('click', resetBuilder);
+
+  /* Быстрый ввод предыдущего запроса: текст целиком, известные фрагменты
+     снова связываются с контролами и вспыхивают */
+  el('bldRecent').addEventListener('click', function () {
+    field.value = B.last;
+    detect();
+    B.fresh = '*';
+    paint(); syncControls(); drawObjects();
+    fieldBox.scrollTop = 0;
+    field.focus();
+    field.setSelectionRange(field.value.length, field.value.length);
+  });
+
+  /* Правка руками: фрагмент, которого больше нет в тексте, отпускает контрол */
+  field.addEventListener('input', function () {
+    B.fresh = null;
+    Object.keys(B.frag).forEach(function (k) { if (field.value.indexOf(B.frag[k]) === -1) delete B.frag[k]; });
+    paint(); syncControls();
+    if (field.selectionEnd === field.value.length) fieldBox.scrollTop = fieldBox.scrollHeight;
+  });
+
+  /* Esc внутри композера закрывает конструктор */
+  el('cmp').addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && B.open) { e.preventDefault(); setBuilder(false); field.focus(); }
+  });
+
+  /* ── Кнопки экрана ────────────────────────────────────────────────────── */
+  /* Скрепка открывает системный выбор файлов; в прототипе выбор сразу
+     считается сделанным — к запросу приложены два файла-примера */
+  function attachFiles() {
+    S.files = ['Презентация_менеджмента_2026.pptx', 'График_погашений_2028.pdf'];
+    drawFiles();
+    if (window.DSTooltip) window.DSTooltip.hideAll();
+  }
+  function sendOnEnter(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  }
+
+  el('btnSend').addEventListener('click', send);
+  el('btnClear').addEventListener('click', function () {
+    field.value = '';
+    B.frag = {}; B.fresh = null;
+    paint(); syncControls();
+    if (window.DSTooltip) window.DSTooltip.hideAll();
+    field.focus();
+  });
+  field.addEventListener('keydown', sendOnEnter);
+  el('btnAttach').addEventListener('click', attachFiles);
+  el('btnExample').addEventListener('click', function () {
+    field.value = 'Какая долговая нагрузка у ГК «Северный агрохолдинг» и когда пик погашений?';
+    B.frag = {}; B.fresh = null;
+    paint(); syncControls();
+    field.focus();
+  });
+
+  /* ── Просмотр материала (БТ-1, БТ-4.6) ────────────────────────────────────
+     Материал открывается панелью справа от нити, а не модальным окном.
+     Ширина меняется перетаскиванием левого края или стрелками с клавиатуры;
+     двойной клик по краю и кнопка «Развернуть» переключают обычную и
+     максимальную ширину. Ширина запоминается в браузере (хранилище может
+     быть недоступно — тогда не запоминается). Документ — Markdown,
+     отрисованный мини-рендером: заголовки, абзацы, списки, таблицы, цитата,
+     полужирный, курсив и `бейджи` оценок. */
+  var PV_KEY = 'ibp.requestThread.previewWidth', PV_DEFAULT = 560, PV_MIN = 360;
+  var pv = el('pv'), pvGrip = el('pvGrip'), pvLoaded = false, pvWide = null;
+  var MD_BADGE = { 'ДА': 'is-yes', 'УСЛОВНО': 'is-maybe', 'НЕТ': 'is-no', 'ПРИОРИТЕТ': 'is-top' };
+
+  function mdInline(str) {
+    return esc(str)
+      .replace(/`([^`]+)`/g, function (_, c) {
+        var cls = MD_BADGE[c.trim().toUpperCase()];
+        return '<code' + (cls ? ' class="' + cls + '"' : '') + '>' + c + '</code>';
+      })
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>');
+  }
+
+  function renderMd(src) {
+    var lines = src.replace(/\r/g, '').split('\n'), out = [], i = 0;
+    var BLOCK = /^(#{1,3}\s|>|[-*]\s|\d+\.\s|\||-{3,}\s*$)/;
+    function cells(row) { return row.trim().replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); }); }
+    while (i < lines.length) {
+      var line = lines[i], m;
+      if (!line.trim()) { i++; continue; }
+      if ((m = /^(#{1,3})\s+(.*)$/.exec(line))) {
+        out.push('<h' + m[1].length + '>' + mdInline(m[2]) + '</h' + m[1].length + '>'); i++; continue;
+      }
+      if (/^-{3,}\s*$/.test(line)) { out.push('<hr>'); i++; continue; }
+      if (/^>/.test(line)) {
+        var quote = [];
+        while (i < lines.length && /^>/.test(lines[i])) quote.push(lines[i++].replace(/^>\s?/, ''));
+        out.push('<blockquote><p>' + mdInline(quote.join(' ')) + '</p></blockquote>'); continue;
+      }
+      if (/^\|/.test(line)) {
+        var rows = [];
+        while (i < lines.length && /^\|/.test(lines[i])) rows.push(lines[i++]);
+        var head = cells(rows[0]), body = rows.slice(2).map(cells);
+        out.push('<div class="md__table"><table><thead><tr>' +
+          head.map(function (c) { return '<th>' + mdInline(c) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+          body.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + mdInline(c) + '</td>'; }).join('') + '</tr>'; }).join('') +
+          '</tbody></table></div>');
+        continue;
+      }
+      if ((m = /^([-*]|\d+\.)\s/.exec(line))) {
+        var tag = /\d/.test(m[1]) ? 'ol' : 'ul', items = [];
+        while (i < lines.length && /^([-*]|\d+\.)\s/.test(lines[i])) items.push(lines[i++].replace(/^([-*]|\d+\.)\s+/, ''));
+        out.push('<' + tag + '>' + items.map(function (it) { return '<li>' + mdInline(it) + '</li>'; }).join('') + '</' + tag + '>');
+        continue;
+      }
+      var para = [lines[i++]];
+      while (i < lines.length && lines[i].trim() && !BLOCK.test(lines[i])) para.push(lines[i++]);
+      out.push('<p>' + mdInline(para.join(' ')) + '</p>');
+    }
+    return out.join('');
+  }
+
+  function loadDoc() {
+    if (pvLoaded) return;
+    var draw = function (src) { el('pvDoc').innerHTML = renderMd(src); pvLoaded = true; };
+    var fallback = el('reportMd').textContent;
+    if (location.protocol === 'file:' || !window.fetch) { draw(fallback); return; }
+    fetch('report-example-for-test.md')
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
+      .then(draw, function () { draw(fallback); });
+  }
+
+  /* нити с панелью истории остаётся не меньше 440px */
+  function pvMax() {
+    var shell = document.querySelector('.app-shell').clientWidth;
+    var hist = document.querySelector('.hist');
+    return Math.max(PV_MIN, shell - (hist ? hist.offsetWidth : 0) - 440);
+  }
+
+  function setPvWidth(w, save) {
+    var max = pvMax();
+    w = Math.round(Math.min(max, Math.max(PV_MIN, w)));
+    pv.style.setProperty('--pv-w', w + 'px');
+    pvGrip.setAttribute('aria-valuenow', String(w));
+    pvGrip.setAttribute('aria-valuemax', String(max));
+    var wide = w >= max - 4;
+    if (wide !== pvWide) {
+      pvWide = wide;
+      var label = wide ? 'Обычная ширина' : 'Развернуть';
+      var btn = el('pvWide');
+      btn.setAttribute('aria-label', label);
+      btn.setAttribute('data-tooltip', label);
+      btn.innerHTML = '<i data-icon="' + (wide ? 'minimize' : 'maximize') + '"></i>';
+      rebind(btn);
+    }
+    if (save) { try { localStorage.setItem(PV_KEY, String(w)); } catch (err) { /* ширина не запоминается */ } }
+  }
+
+  function openPreview() {
+    var saved = PV_DEFAULT;
+    try { saved = Number(localStorage.getItem(PV_KEY)) || PV_DEFAULT; } catch (err) { /* хранилище недоступно */ }
+    var wasHidden = pv.hidden;
+    pv.hidden = false;
+    setPvWidth(wasHidden ? saved : pv.offsetWidth, false);
+    loadDoc();
+    if (wasHidden) el('pvBody').scrollTop = 0;
+  }
+  function closePreview() {
+    if (window.DSTooltip) window.DSTooltip.hideAll();
+    pv.hidden = true;
+  }
+  function toggleWide() { setPvWidth(pv.offsetWidth >= pvMax() - 4 ? PV_DEFAULT : pvMax(), true); }
+
+  pvGrip.addEventListener('pointerdown', function (e) {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    var startX = e.clientX, startW = pv.offsetWidth;
+    try { pvGrip.setPointerCapture(e.pointerId); } catch (err) { /* захват недоступен — хватит событий на ручке */ }
+    pv.classList.add('is-resizing');
+    document.documentElement.classList.add('is-col-resizing');
+    function move(ev) { setPvWidth(startW + (startX - ev.clientX), false); }
+    function up() {
+      pvGrip.removeEventListener('pointermove', move);
+      pvGrip.removeEventListener('pointerup', up);
+      pvGrip.removeEventListener('pointercancel', up);
+      pv.classList.remove('is-resizing');
+      document.documentElement.classList.remove('is-col-resizing');
+      setPvWidth(pv.offsetWidth, true);
+    }
+    pvGrip.addEventListener('pointermove', move);
+    pvGrip.addEventListener('pointerup', up);
+    pvGrip.addEventListener('pointercancel', up);
+  });
+  pvGrip.addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    setPvWidth(pv.offsetWidth + (e.key === 'ArrowLeft' ? 32 : -32), true);
+  });
+  pvGrip.addEventListener('dblclick', toggleWide);
+  pv.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePreview(); });
+  window.addEventListener('resize', function () { if (!pv.hidden) setPvWidth(pv.offsetWidth, false); });
+
+  /* ── Поиск по чатам ───────────────────────────────────────────────────── */
+  function clearHistSearch() { el('histSearch').value = ''; drawHist(); el('histSearch').focus(); }
+  el('histSearch').addEventListener('input', drawHist);
+  el('histSearch').addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && el('histSearch').value) { e.preventDefault(); clearHistSearch(); }
+  });
+  el('histSearchClear').addEventListener('click', clearHistSearch);
+  el('histEmptyReset').addEventListener('click', clearHistSearch);
+  el('miRestart').addEventListener('click', function () {
+    /* у запроса без готового материала перезапускать нечего */
+    if (!S.hasMaterial) {
+      if (window.DSSnack) window.DSSnack.show({ tone: 'info', title: 'Перезапускать пока нечего', text: 'Материал по этому запросу ещё не подготовлен.' });
+      return;
+    }
+    startRun('Перезапуск по прежним вводным для актуализации данных. Предыдущие версии материала сохранены.');
+  });
+  el('miDuplicate').addEventListener('click', function () {
+    if (window.DSSnack) window.DSSnack.show({ tone: 'success', title: 'Запрос дублирован', text: 'Создана копия запроса с теми же вводными и файлами.' });
+  });
+  el('btnDelete').addEventListener('click', function () {
+    if (window.DSSnack) window.DSSnack.show({
+      tone: 'info', title: 'Запрос удалён', text: 'Восстановить можно в течение 30 дней.',
+      buttons: [{ label: 'Отменить удаление', variant: 'outline' }]
+    });
+  });
+
+  /* ── Состояние экрана по адресу ───────────────────────────────────────── */
+  /* Чаты «Ответ в диалоге»: короткий вопрос и ответ без подготовки материала */
+  var DIALOGS = {
+    4: {
+      time: '11.09.2026, 17:40',
+      q: 'Кто лидирует в логистике последней мили на Юге России и есть ли там свободные ниши?',
+      a: 'Рынок доставки последней мили в ЮФО — около 38 млрд ₽ за 2025 год, рост 24% г/г. Половина объёма у трёх федеральных операторов, остальное — региональные курьерские службы. Свободная ниша — доставка и фулфилмент для продуктовых и агросетей в малых городах Краснодарского края и Ростовской области: своей складской сети там нет ни у одного крупного игрока.',
+      src: ['Отраслевой обзор 2026', 'Данные Росстата', 'Раскрытие эмитентов']
+    },
+    9: {
+      time: '03.09.2026, 10:15',
+      q: 'Сравни маржу ГК «Северный агрохолдинг» с ближайшими конкурентами за 2025 год.',
+      a: 'EBITDA-маржа группы — 18,9% против 14–16% у трёх ближайших конкурентов. Разрыв держится на вертикальной интеграции по кормам и собственной переработке. По оборачиваемости запасов группа на уровне рынка: 94 дня против 90–105 у peers.',
+      src: ['Отчётность МСФО 2025', 'Раскрытие эмитентов', 'Отраслевой обзор 2026']
+    }
+  };
+
+  /* Чат «Ошибка подготовки»: запрос из конструктора, принятие и карточка сбоя.
+     Текст запроса собран из фрагментов конструктора — «Исправить запрос»
+     возвращает его в поле, и контролы конструктора снова с ним связаны. */
+  function errorCard() {
+    return '<div class="err" role="alert">' +
+      '<div class="err__head">' +
+        '<span class="err__ico" aria-hidden="true"><i data-icon="alert-circle"></i></span>' +
+        '<div class="err__titles">' +
+          '<p class="err__title">Не удалось подготовить материал</p>' +
+          '<p class="err__text">Запрос получился слишком широким: по рынку удобрений в СЗФО нашлось больше 400 источников, и сборка не уложилась в 30 минут. Найденные данные сохранены — повторно их собирать не придётся.</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="err__fix">' +
+        '<p class="err__cap">Что поможет</p>' +
+        '<ul class="err__list">' +
+          '<li>Сузьте рынок: укажите вид удобрений — азотные, калийные или фосфорные.</li>' +
+          '<li>Назовите 3–5 производителей, с которыми нужно сравнить.</li>' +
+          '<li>Вместо полного анализа выберите одно направление в конструкторе.</li>' +
+        '</ul>' +
+      '</div>' +
+      '<div class="err__acts">' +
+        '<button type="button" class="btn btn--accent btn--s" data-act="fix-request"><i data-icon="edit"></i><span class="btn__label">Исправить запрос</span></button>' +
+        '<button type="button" class="btn btn--outline btn--s" data-act="restart-run"><i data-icon="refresh"></i><span class="btn__label">Перезапустить</span></button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function seedError() {
+    S.errorRequest = objFrag(byId(OBJECTS, 'fert')) + ' ' + byId(FOCUS, 'bench').text + ' ' + byId(DIRECTIONS, 'full').text;
+    S.msgs = [
+      { role: 'user', time: '08.09.2026, 10:20', html: '<p class="ds-body-m">' + esc(S.errorRequest) + '</p>' },
+      { role: 'agent', time: '08.09.2026, 10:20', html: text('Принял, готовлю материал по рынку «Минеральные удобрения, СЗФО». Это займёт до 30 минут.') },
+      { role: 'agent', time: '08.09.2026, 10:52', html: errorCard() }
+    ];
+    render();
+  }
+
+  function seedOpened(h) {
+    S.openId = h.id;
+    S.hasMaterial = h.state === 'ready';
+    setTitle(h.title, { cls: HIST_CHIP[h.state].cls, label: HIST_CHIP[h.state].label });
+    setMeta(h);
+    setActions(true);
+    if (h.state === 'error') { seedError(); return; }
+    var d = DIALOGS[h.id];
+    if (d) {
+      S.msgs = [
+        { role: 'user', time: d.time, html: '<p class="ds-body-m">' + esc(d.q) + '</p>' },
+        { role: 'agent', time: d.time, html: text(esc(d.a)) + sources(d.src) + answerActions(1) }
+      ];
+      render();
+      return;
+    }
+    S.msgs = [
+      { role: 'user', time: '11.09.2026, 14:02', html:
+        '<div class="thr__text"><p class="ds-body-m">Запрос из конструктора: ' + esc(OBJECT) + ', детальный материал, направление «Прямые инвестиции». Собственник рассматривает частичный выход. Интересует применимость мезонина, оценка через мультипликаторы peers и график погашений валютного долга до 2028 года.</p></div>' +
+        '<div class="chiplist chiplist--s">' +
+        '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">Отчётность_МСФО_2025.pdf</span></span>' +
+        '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">Teaser_group.pptx</span></span>' +
+        '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">Презентация_менеджмента_2026.pptx</span></span>' +
+        '</div>' },
+      { role: 'agent', time: '11.09.2026, 14:02', html:
+        text('Принял. Параметры зафиксированы, файлы переданы на извлечение. Ожидаемое время подготовки — до 30 минут, уведомление придёт, даже если вы закроете инструмент.') }
+    ];
+    if (h.state === 'ready') {
+      S.msgs.push({ role: 'agent', time: '12.09.2026, 09:05', html:
+        text('Материал готов: ключевые показатели, возможности для продуктов, инсайты, риски и позиция на встречу.') + docCard() });
+    }
+    if (h.state === 'running') {
+      think.start = Date.now() - 7 * 60 * 1000;
+      S.running = true;
+      S.msgs.push({ role: 'agent', time: '12.09.2026, 11:40', think: true, html:
+        text('Готовлю материал по параметрам запроса. Это займёт до 30 минут — можно спокойно выпить кофе. Как будет готово, сообщу здесь и пришлю уведомление на корпоративную почту.') });
+      startThinking();
+    }
+    render();
+  }
+
+  /* ── Полосы прокрутки: видны только во время прокрутки ───────────────── */
+  function autoHideScrollbar(node) {
+    var timer = null;
+    node.addEventListener('scroll', function () {
+      node.classList.add('is-scrolling');
+      clearTimeout(timer);
+      timer = setTimeout(function () { node.classList.remove('is-scrolling'); }, 1000);
+    }, { passive: true });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.hist__body, .thr__scroll'), autoHideScrollbar);
+
+  /* Шапка панели закреплена над списком: пока список прокручен, под ней линия */
+  var histBody = document.querySelector('.hist__body'), histHead = document.querySelector('.hist__head');
+  histBody.addEventListener('scroll', function () {
+    histHead.classList.toggle('is-scrolled', histBody.scrollTop > 0);
+  }, { passive: true });
+
+  var params = new URLSearchParams(location.search);
+  drawFiles();
+  paint();
+  /* ?builder=1 — вход «Открыть черновик в конструкторе» из реестра */
+  if (params.get('builder')) setBuilder(true, false);
+
+  if (params.get('run')) {
+    S.openId = 1;
+    drawHist();
+    push('user', '<p class="ds-body-m">Запрос из конструктора: ' + esc(OBJECT) + ' · детальный материал · направление «Прямые инвестиции».</p>');
+    startRun('Принял. Параметры зафиксированы, файлы переданы на извлечение.');
+  } else if (params.get('id')) {
+    var opened = HIST.filter(function (h) { return String(h.id) === params.get('id'); })[0];
+    if (opened) seedOpened(opened); else render();
+    drawHist();
+  } else {
+    S.pristine = true;
+    drawHist();
+    render();
+  }
+})();
+</script>
+</body>
+</html>
