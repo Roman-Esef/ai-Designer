@@ -1,7 +1,7 @@
 ---
 screen: mainPage
 title: Главная страница
-file: Projects/post/operations-did/mainPage/index.html
+file: Projects/post/mainPage/index.html
 source: DS-IBP/uploads/1920_Dashboard_Финансист ДИД.png (референс), решение пользователя 01.09.2026 (роли, состав)
 version: "1.004"
 created: "01.09.2026"
@@ -36,7 +36,7 @@ components: [Layout, NavPanel, Breadcrumbs, NavTile, Illustrations, Modal, Badge
 (по `item.id` каталога). Сейчас один реальный переход — «Текущий портфель»
 (`current-portfolio`): пункт меню и тайл ведут на
 `../Portfolio-did/Portfolio.html` (страница портфеля; путь от `mainPage/`
-поднимается в `operations-did/`, где лежат обе папки). Пункты без собранной
+поднимается в `post/`, где лежат обе папки). Пункты без собранной
 страницы остаются `href="#"`. Каталог `ibp-home.js` при этом не меняется:
 пути к экранам знает только экран (общий каталог ДС не должен знать про
 файлы Projects).
