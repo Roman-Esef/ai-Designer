@@ -7,6 +7,12 @@
      bind(bodyEl) · bindAll(root)          — тень липкой шапки .dtable (--scrolled)
      wire(tblEl, opts) → api               — интерактив строк и ячеек
      wireAll(root)                         — обойти [data-table]
+     adoptRow(tblEl, rowEl)                — привести строку, дописанную
+                                             экраном, к текущей форме шапки
+                                             (порядок колонок, треки, скрытые
+                                             колонки); хук — data-col на .th
+                                             и .tc. Зовётся сам на вставку
+                                             строки, вручную не нужен
      chipOverflow(tblEl)                   — пересчитать свёртку чипов «+N»
                                              (нужен, только если потребитель
                                              перерисовал ячейки мимо api)
@@ -42,6 +48,13 @@
                     чекбокс шапки выделяет все (с промежуточным состоянием);
                     событие 'rowselect' с { selected: [id…] }
       фокус строки  — клик по строке ставит .tbl__row--focus (снимается кликом вне)
+      состав строк  — строку дописывает экран (реестр создал сделку); рантайм
+                     ловит вставку наблюдателем и приводит строку к форме
+                     шапки (adoptRow): порядок колонок после переноса, треки
+                     после ресайза, ячейки скрытых колонок — на склад строки.
+                     Хук — ключ колонки data-col на .th и .tc; без ключей
+                     адаптация не делается (позиционная разметка верна, пока
+                     состав колонок не трогали)
       усечение      — .tc__text--truncate и .th__label получают тултип с полным
                      текстом, показываемый только при реальном усечении.
                      Реализация — общий DSTooltip.truncated() (см. регистрацию
@@ -101,6 +114,65 @@
       tbl.querySelectorAll('.tbl__row'),
       function (r) { return !isHeadRow(r); }
     );
+  }
+
+  /* ---------- строка, дописанная экраном, принимает форму шапки ---------- */
+  /* Экран рендерит строку по ИСХОДНОЙ разметке колонок, а к моменту вставки
+     колонки могли переехать (tbl-reorder), сменить ширину (tbl-resize) или
+     скрыться (ds-table-settings): все три рантайма переписывают только те
+     строки, что уже стоят в таблице. Ключ колонки — data-col на .th и на .tc:
+     по нему ячейка новой строки находит свою колонку. Колонки без ключа
+     (разделители, служебные — выбор, действие) сопоставляются по порядку.
+     Ключей в шапке нет вовсе (демо-страницы ДС, статические таблицы) —
+     функция не делает ничего: позиционная разметка верна, пока состав колонок
+     не трогали, а выдумывать соответствие не на чем. */
+  function adoptRow(tbl, row) {
+    if (!tbl || !row || isHeadRow(row)) return false;
+    var headerRow = tbl.querySelector('.tbl__row');
+    if (!headerRow || headerRow === row) return false;
+
+    var hKeys = [], hPlain = 0, i, cell, key;
+    for (i = 0; i < headerRow.children.length; i++) {
+      key = headerRow.children[i].dataset.col || '';
+      hKeys.push(key);
+      if (!key) hPlain++;
+    }
+    if (!hKeys.some(function (k) { return !!k; })) return false;
+
+    var byKey = {}, plain = [];
+    for (i = 0; i < row.children.length; i++) {
+      cell = row.children[i];
+      key = cell.dataset.col || '';
+      if (key) byKey[key] = cell; else plain.push(cell);
+    }
+    /* колонка шапки без ячейки в строке — разметка строки разошлась с шапкой.
+       Достроить ячейку значило бы выдумать значение, вставить пустую — сдвинуть
+       все колонки правее на трек, поэтому строку не трогаем вовсе: расхождение
+       видно глазом и чинится в экране (диагностика — specs/TableCell.md) */
+    for (i = 0; i < hKeys.length; i++) if (hKeys[i] && !byKey[hKeys[i]]) return false;
+    if (plain.length !== hPlain) return false;
+
+    /* ячейки колонок, скрытых настройкой таблицы (ключа в шапке нет), ждут на
+       самой строке — «показать колонку» вернёт их через ds-table-settings */
+    if (!row.__dsColCells) row.__dsColCells = {};
+    Object.keys(byKey).forEach(function (k) {
+      if (hKeys.indexOf(k) < 0) {
+        row.__dsColCells[k] = byKey[k];
+        if (byKey[k].parentNode === row) row.removeChild(byKey[k]);
+      }
+    });
+
+    /* перекладка в порядке шапки: appendChild переносит существующий узел */
+    var pi = 0;
+    hKeys.forEach(function (k) { row.appendChild(k ? byKey[k] : plain[pi++]); });
+
+    /* треки: ресайз и перенос колонок пишут их инлайном каждой строке, у новой
+       стоит исходная константа экрана. Инлайна у шапки нет (ширины из CSS) —
+       строку не трогаем */
+    if (headerRow.style.gridTemplateColumns) {
+      row.style.gridTemplateColumns = headerRow.style.gridTemplateColumns;
+    }
+    return true;
   }
 
   /* глиф кнопки сортировки — переставляем имя в data-icon и просим ds-icons
@@ -311,6 +383,33 @@
     });
     /* исходный порядок строк — к нему возвращает третий клик (dir = none) */
     tbl.__dsRowOrder = dataRows(tbl);
+
+    /* Строки разметки уже в форме шапки — помечаем их, чтобы наблюдатель ниже
+       не гонял adoptRow по всей таблице после каждой сортировки: sortRows
+       переносит строки фрагментом, и для childList это добавление. */
+    tbl.__dsRowOrder.forEach(function (r) { r.__dsAdopted = true; });
+
+    /* Новую строку дописывает ЭКРАН (реестр создал сделку) по исходной
+       разметке колонок — рантайм узнаёт об этом наблюдателем, а не
+       договорённостью о вызове rowsChanged(): вызов легко забыть, а дефект
+       молчаливый — строка выглядит правильной ровно до того, как колонку
+       подвинут, сузят или скроют. childList без subtree: строки — прямые дети
+       .tbl, а с subtree наблюдатель дёргался бы на каждую вставку SVG из
+       ds-icons и обёртку .tip-anchor из ds-tooltip. */
+    if (window.MutationObserver) {
+      var rowMO = new MutationObserver(function (recs) {
+        recs.forEach(function (rec) {
+          Array.prototype.forEach.call(rec.addedNodes, function (n) {
+            if (n.nodeType !== 1 || !n.classList.contains('tbl__row')) return;
+            if (n.__dsAdopted) return;
+            n.__dsAdopted = true;
+            adoptRow(tbl, n);
+          });
+        });
+      });
+      rowMO.observe(tbl, { childList: true });
+      tbl.__dsTableRowMO = rowMO;
+    }
 
     tbl.addEventListener('click', function (e) {
       var t = e.target;
@@ -569,5 +668,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', registerTrunc);
   else registerTrunc();
 
-  window.DSTable = { bind: bind, bindAll: bindAll, wire: wire, wireAll: wireAll, chipOverflow: chipOverflow };
+  window.DSTable = { bind: bind, bindAll: bindAll, wire: wire, wireAll: wireAll, chipOverflow: chipOverflow, adoptRow: adoptRow };
 })();

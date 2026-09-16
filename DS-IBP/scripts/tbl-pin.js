@@ -36,9 +36,11 @@
    4. Строка обязана быть ШИРЕ скроллпорта, иначе прокручивать нечего и sticky
       не даёт ничего. Резерв полной ширины строки — `.tbl__row { min-width:
       max-content }` (table-cell.css), только у .tbl--scroll / .dtable__body.
-   5. Пересчёт инсетов: 'columnpin', 'columnreorder', resize окна и
+   5. Пересчёт инсетов: 'columnpin', 'columnreorder', resize окна,
       ResizeObserver по ячейкам шапки (ресайз колонки из tbl-resize.js своего
-      события не шлёт — ловим наблюдателем).
+      события не шлёт — ловим наблюдателем) и MutationObserver по составу строк
+      .tbl — строку в реестр дописывает экран, и новой строке нужны те же
+      инсеты, что и остальным (см. wirePin).
 
    Экспорт: window.DSTablePin = { bind(tbl), bindAll(root), apply(tbl) }.
    Автоподключение: любой .tbl на странице (делегирование, как tbl-reorder).
@@ -141,6 +143,13 @@
   function applyPin(tbl) {
     var headerRow = tbl.querySelector('.tbl__row');
     if (!headerRow) return;
+    /* таблица вне потока (tbl.hidden — экран показывает EmptyState по пустому
+       результату фильтра; свёрнутая вкладка): getBoundingClientRect вернёт нули,
+       и пересчёт записал бы ВСЕМ закреплённым колонкам left: 0px — вместо
+       лесенки они склеились бы в стопку у левого края. Прежние инсеты скрытие
+       переживают и остаются верными, а возврат таблицы в поток ловит
+       ResizeObserver ячеек шапки и пересчитывает по реальным ширинам. */
+    if (!headerRow.getBoundingClientRect().width) return;
     var rows = tbl.querySelectorAll('.tbl__row');
 
     var A = analyze(headerRow);
@@ -216,6 +225,26 @@
       var ro = new ResizeObserver(schedule);
       Array.prototype.forEach.call(headerRow.children, function (c) { ro.observe(c); });
       tbl.__dsTblPinRO = ro;
+    }
+
+    /* Состав строк меняет ПОТРЕБИТЕЛЬ (реестр дописал сделку, удалил строку) —
+       рантайм узнаёт об этом наблюдателем, а не договорённостью о вызове хука:
+       ячейки новой строки уже sticky по CSS (.tc--pinned), но без инсетов
+       left/right стоят на auto и уезжают при скролле, пока все старые строки
+       держатся. Договорённость тут и не сработала бы: строки дописывают и
+       экраны без data-table, которым звать нечего.
+       childList без subtree: строки — прямые дети .tbl (сетка задана на самой
+       строке), а с subtree наблюдатель дёргался бы на каждую вставку SVG из
+       ds-icons и на каждую обёртку .tip-anchor из ds-tooltip — записей много,
+       нового знания ноль.
+       Цикла нет: applyPin пишет инсеты и data-pin-side ЯЧЕЙКАМ, состав детей
+       .tbl не трогает. Единственный посторонний прямой ребёнок — .tbl__guide
+       (tbl-resize/tbl-reorder), он создаётся один раз на таблицу и стоит ровно
+       одного холостого прохода. */
+    if (window.MutationObserver) {
+      var mo = new MutationObserver(schedule);
+      mo.observe(tbl, { childList: true });
+      tbl.__dsTblPinMO = mo;
     }
 
     applyPin(tbl);
