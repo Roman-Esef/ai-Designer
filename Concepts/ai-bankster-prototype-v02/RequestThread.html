@@ -105,6 +105,8 @@
 
   /* Нить — скролл-колонка (flex:1; min-height:0; overflow-y:auto — обязательная
      форма скролл-контейнера, чек-лист К3) и закреплённый под ней композер. */
+  /* У пустой нити шапки нет: заголовок появляется с первым запросом */
+  .phead[hidden] { display: none; }
   .thr           { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-16); }
   .thr__scroll   { flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; display: flex; flex-direction: column; }
   /* Нить идёт сверху вниз, как в современных AI-чатах: короткий диалог
@@ -301,6 +303,23 @@
   .cmp__hint     { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-4) var(--space-16); font: var(--type-body-xs); color: var(--text-secondary); }
   .cmp__hint kbd { display: inline-block; min-width: 18px; padding: 0 var(--space-4); font: inherit; text-align: center; color: var(--text-secondary); background: var(--bg-tile); border: 1px solid var(--border-light); border-bottom-width: 2px; border-radius: var(--radius-s); }
 
+  /* ── Контекст из материала ────────────────────────────────────────────────
+     Фрагменты, отправленные из панели просмотра кнопкой «Доработать в чате»:
+     чипы над полем, как приложенные файлы. Текстовый фрагмент раскрывается
+     целиком по клику на чип; график приходит тегом — агенту указание, что
+     смотреть в материале. */
+  .cmp__ctx:empty { display: none; }
+  .cmp-ctx[data-kind="text"] { cursor: pointer; }
+  .cmp-ctx[aria-expanded="true"] { border-color: var(--primary); }
+  .cmp-quote     { display: flex; flex-direction: column; gap: var(--space-4); max-height: 180px; overflow-y: auto; padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12); background: color-mix(in srgb, var(--primary) 6%, var(--bg-tile)); border-left: 3px solid var(--primary); border-radius: 0 var(--radius-m) var(--radius-m) 0; animation: quoteIn .25s ease both; }
+  .cmp-quote[hidden] { display: none; }
+  @keyframes quoteIn { from { opacity: 0; transform: translateY(-4px); } }
+  .cmp-quote__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+  .cmp-quote__src { font: var(--type-body-xs); color: var(--text-secondary); }
+  .cmp-quote__text { margin: 0; font: var(--type-body-s); color: var(--text-primary); }
+  .cmp.is-ctx-new { animation: ctxPulse .9s ease; }
+  @keyframes ctxPulse { 30% { box-shadow: 0 0 0 4px var(--cmp-ring), var(--cmp-shadow); } }
+
   /* ── Конструктор: выезжающая панель ─────────────────────────────────────
      Высота анимируется через grid-template-rows 0fr → 1fr: панель выезжает
      вниз на собственную высоту без замера скриптом. Содержимое догоняет
@@ -329,20 +348,6 @@
   .bld__title    { margin: 0; font: var(--type-body-m-strong); color: var(--text-primary); }
   .bld__sub      { margin: 0; font: var(--type-body-s); color: var(--text-secondary); }
 
-  /* Быстрый ввод предыдущего запроса */
-  .brecent       { display: flex; align-items: center; gap: var(--space-12); width: 100%; padding: var(--space-8) var(--space-16) var(--space-8) var(--space-8); font: inherit; color: inherit; text-align: left; cursor: pointer; border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent); border-radius: var(--radius-xl); background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 8%, transparent), color-mix(in srgb, var(--primary) 1%, transparent)); transition: border-color .15s ease, transform .15s ease; }
-  .brecent[hidden] { display: none; }
-  .brecent:hover { border-color: color-mix(in srgb, var(--primary) 42%, transparent); }
-  .brecent:active { transform: scale(.995); }
-  .brecent:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-  .brecent__ico  { flex: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--bg-tile); color: var(--primary); box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent); }
-  .brecent__ico > [data-icon] { width: 18px; height: 18px; }
-  .brecent__txt  { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .brecent__cap  { font: var(--type-body-xs); color: var(--text-secondary); }
-  .brecent__q    { font: var(--type-body-s); color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .brecent__go   { flex: none; display: flex; align-items: center; gap: var(--space-4); font: var(--type-body-s-strong); color: var(--primary-dark); }
-  .brecent__go > [data-icon] { width: 18px; height: 18px; transition: transform .25s var(--cmp-ease); }
-  .brecent:hover .brecent__go > [data-icon] { transform: translateX(4px); }
 
   /* Секция конструктора: номер шага и подпись слева, контролы справа */
   .bsec          { display: grid; grid-template-columns: 184px minmax(0, 1fr); gap: var(--space-8) var(--space-16); align-items: start; padding-top: var(--space-12); border-top: 1px dashed var(--border-light); }
@@ -356,8 +361,6 @@
   .bsec__ctl     { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
   .bsec__titles  { display: flex; flex-direction: column; min-width: 0; }
   .bsec__hint    { font: var(--type-body-xs); color: var(--text-secondary); }
-  /* подпись относится к чипам, а не к полю: ближе к ним, дальше от поля */
-  .bfind + .bsec__hint { margin: var(--space-4) 0 calc(-1 * var(--space-4)); }
 
   /* Поиск объекта */
   .bfind         { display: flex; align-items: center; gap: var(--space-8); height: var(--space-40); padding: 0 var(--space-12); border: 1px solid var(--border-light); border-radius: var(--radius-m); background: var(--bg-page); transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease; }
@@ -372,6 +375,7 @@
 
   /* Варианты объекта — пилюли с типом */
   .bopts         { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+  .bopts:empty   { display: none; }
   .bopt          { display: inline-flex; align-items: center; gap: var(--space-8); max-width: 100%; min-height: 32px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-4); font: var(--type-body-s); color: var(--text-primary); cursor: pointer; background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-full); transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease; }
   .bopt:hover    { border-color: var(--primary-light); background: color-mix(in srgb, var(--primary) 4%, var(--bg-tile)); }
   .bopt:active   { transform: scale(.97); }
@@ -383,13 +387,6 @@
   .bopt[aria-checked="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--bg-tile)); color: var(--primary-dark); }
   .bopt[aria-checked="true"] .bopt__tag { background: var(--primary); color: var(--text-on-dark); }
   .bopt[aria-checked="true"] .bopt__check { width: 16px; opacity: 1; }
-  .bopt.is-extra { animation: bldIn .45s var(--cmp-ease) both; animation-delay: calc(var(--i, 0) * 40ms); }
-  /* «Показать ещё» — остальные объекты из истории запросов */
-  .bmore         { display: inline-flex; align-items: center; gap: var(--space-4); min-height: 32px; padding: var(--space-4) var(--space-12); font: var(--type-body-s-strong); color: var(--primary-dark); cursor: pointer; background: transparent; border: 0; border-radius: var(--radius-full); transition: background-color .15s ease; }
-  .bmore:hover   { background: color-mix(in srgb, var(--primary) 8%, transparent); }
-  .bmore:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-  .bmore > [data-icon] { width: 16px; height: 16px; transition: transform .3s var(--cmp-ease); }
-  .bmore[aria-expanded="true"] > [data-icon] { transform: rotate(180deg); }
   .bopt--custom  { padding-left: var(--space-8); border-style: dashed; color: var(--primary-dark); }
   .bopt--custom > [data-icon] { flex: none; width: 16px; height: 16px; }
 
@@ -476,7 +473,7 @@
   /* ── Просмотр материала — локальный компонент направления ────────────────
      Панель справа от нити вместо модального окна: диалог остаётся перед
      глазами. Ширина — переменная --pv-w, меняется перетаскиванием левого
-     края. Документ — отрисованный Markdown на «листе» поверх фона страницы. */
+     края. Документ — страница материала MaterialReport.html во фрейме. */
   .pv            { --pv-w: 560px; position: relative; flex: 0 0 var(--pv-w); width: var(--pv-w); min-width: 0; display: flex; flex-direction: column; background: var(--bg-tile); border-left: 1px solid var(--border-light); container: pv / inline-size; animation: pvIn .45s cubic-bezier(.22, 1, .36, 1) both; }
   .pv[hidden]    { display: none; }
   @keyframes pvIn { from { opacity: 0; transform: translateX(32px); } }
@@ -496,43 +493,11 @@
   .pv__title     { margin: 0; overflow: hidden; font: var(--type-body-m-strong); color: var(--text-primary); white-space: nowrap; text-overflow: ellipsis; }
   .pv__meta      { margin: 0; overflow: hidden; font: var(--type-body-xs); color: var(--text-secondary); white-space: nowrap; text-overflow: ellipsis; }
   .pv__acts      { flex: none; display: flex; align-items: center; gap: var(--space-24); }
-  .pv__body      { flex: 1; min-height: 0; overflow-y: auto; padding: var(--space-24); background: var(--bg-page); }
-  .pv__body::-webkit-scrollbar { width: var(--space-8); }
-  .pv__body::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: var(--radius-m); }
+  .pv__body      { flex: 1; min-height: 0; display: flex; background: var(--bg-page); }
+  .pv__frame     { display: block; flex: 1; width: 100%; height: 100%; border: 0; background: var(--bg-page); }
+  /* фрейм не перехватывает указатель, пока тянут край панели */
+  .pv.is-resizing .pv__frame { pointer-events: none; }
 
-  /* ── Отрисованный Markdown ─────────────────────────────────────────────── */
-  .md            { max-width: 820px; margin: 0 auto; padding: var(--space-40) var(--space-48); font: var(--type-body-m); color: var(--text-primary); background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-xl); box-shadow: 0 2px 12px color-mix(in srgb, var(--text-primary) 5%, transparent); }
-  .md > *        { margin: 0; }
-  .md > * + *    { margin-top: var(--space-12); }
-  .md > p:first-child { font: var(--type-body-xs); letter-spacing: .08em; text-transform: uppercase; color: var(--primary-dark); }
-  .md h1         { margin-top: var(--space-6); font: var(--type-h3-strong); color: var(--text-primary); }
-  .md h1 + p     { color: var(--text-secondary); }
-  .md h2         { margin-top: var(--space-32); padding-bottom: var(--space-8); font: var(--type-h5-strong); color: var(--text-primary); border-bottom: 1px solid var(--border-light); }
-  .md h3         { margin-top: var(--space-24); font: var(--type-h6-strong); }
-  .md strong     { font-weight: 600; }
-  .md ul, .md ol { display: flex; flex-direction: column; gap: var(--space-10); padding-left: var(--space-20); }
-  .md li::marker { color: var(--primary); }
-  .md__table     { overflow-x: auto; border: 1px solid var(--border-light); border-radius: var(--radius-m); }
-  .md table      { width: 100%; border-collapse: collapse; font: var(--type-body-s); }
-  .md th         { padding: var(--space-10) var(--space-12); font: var(--type-body-s-strong); color: var(--text-secondary); text-align: left; white-space: nowrap; background: var(--bg-page); border-bottom: 1px solid var(--border-light); }
-  .md td         { padding: var(--space-10) var(--space-12); vertical-align: top; border-bottom: 1px solid var(--border-light); }
-  .md tr:last-child td { border-bottom: 0; }
-  .md tbody tr:hover td { background: var(--bgtable-row-hover); }
-  .md blockquote { padding: var(--space-16) var(--space-20); background: color-mix(in srgb, var(--primary) 6%, var(--bg-tile)); border-left: 3px solid var(--primary); border-radius: 0 var(--radius-m) var(--radius-m) 0; }
-  .md blockquote p { margin: 0; }
-  .md blockquote strong { color: var(--primary-dark); }
-  .md hr         { border: 0; border-top: 1px solid var(--border-light); }
-  /* `код` в материале — бейдж; оценки направлений получают цвет */
-  .md code       { display: inline-block; padding: var(--space-2) var(--space-8); font: var(--type-body-xs); font-weight: 600; letter-spacing: .04em; color: var(--text-secondary); white-space: nowrap; background: var(--bg-page); border-radius: var(--radius-full); }
-  .md code + code { margin-left: var(--space-4); }
-  .md code.is-yes   { color: var(--success-dark); background: var(--success-bg); }
-  .md code.is-maybe { color: var(--warning-dark); background: var(--warning-bg); }
-  .md code.is-no    { color: var(--error-dark); background: var(--error-bg); }
-  .md code.is-top   { color: var(--info-dark); background: var(--info-bg); }
-  @container pv (max-width: 520px) {
-    .pv__body { padding: var(--space-12); }
-    .md       { padding: var(--space-24) var(--space-20); }
-  }
 </style>
 </head>
 <body>
@@ -669,6 +634,14 @@
               <div class="cmp" id="cmp">
                 <div class="cmp__main">
                   <div class="chiplist cmp__files" id="cmpFiles" role="group" aria-label="Файлы, приложенные к сообщению"></div>
+                  <div class="chiplist cmp__ctx" id="cmpCtx" role="group" aria-label="Фрагменты материала в запросе"></div>
+                  <div class="cmp-quote" id="cmpQuote" hidden>
+                    <div class="cmp-quote__head">
+                      <span class="cmp-quote__src" id="cmpQuoteSrc"></span>
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" data-act="ctx-collapse" aria-label="Свернуть фрагмент" data-tooltip="Свернуть"><i data-icon="chevron-up"></i></button>
+                    </div>
+                    <p class="cmp-quote__text" id="cmpQuoteText"></p>
+                  </div>
                   <div class="cmp__field">
                     <div class="cmp__mirror" id="cmpMirror" aria-hidden="true"></div>
                     <textarea class="cmp__control" id="cmpInput" rows="2" placeholder="Задайте вопрос или опишите задачу…" aria-label="Текст запроса" aria-describedby="cmpHint"></textarea>
@@ -691,15 +664,6 @@
                   <div class="cmp__drawer-in">
                     <div class="bld" role="group" aria-labelledby="bldTitle">
 
-                                            <button type="button" class="brecent" id="bldRecent" style="--i:0">
-                        <span class="brecent__ico" aria-hidden="true"><i data-icon="clock-fast-forward"></i></span>
-                        <span class="brecent__txt">
-                          <span class="brecent__cap">Предыдущий запрос</span>
-                          <span class="brecent__q" id="bldRecentText"></span>
-                        </span>
-                        <span class="brecent__go">Подставить<i data-icon="arrow-narrow-right"></i></span>
-                      </button>
-
                       <div class="bld__head" style="--i:1">
                         <div class="bld__titles">
                           <p class="bld__title" id="bldTitle">Конструктор запроса</p>
@@ -715,8 +679,7 @@
                             <span class="bfind__ico" aria-hidden="true"><i data-icon="client-search"></i></span>
                             <input class="bfind__control" id="bldFind" type="search" placeholder="Компания, группа, бенефициар или рынок" aria-label="Найти объект анализа" autocomplete="off">
                           </div>
-                          <span class="bsec__hint" id="bldObjHint">Из ваших последних запросов</span>
-                          <div class="bopts" id="bldObjects" role="radiogroup" aria-labelledby="bsecObject bldObjHint"></div>
+                          <div class="bopts" id="bldObjects" role="radiogroup" aria-labelledby="bsecObject"></div>
                         </div>
                       </section>
 
@@ -736,7 +699,7 @@
 
                       <div class="bld__foot" style="--i:5">
                         <span class="bld__foot-ico" aria-hidden="true"><i data-icon="clock-timer"></i></span>
-                        <span>Ожидаемое время подготовки — до 30 минут. Работа продолжится, даже если закрыть инструмент.</span>
+                        <span>Подготовка отчета обычно занимает до 30 минут. Работа продолжится, даже если закрыть инструмент.</span>
                       </div>
 
                     </div>
@@ -766,7 +729,7 @@
           <button type="button" class="ibtn ibtn--neutral ibtn--m" data-act="pv-close" aria-label="Закрыть просмотр" data-tooltip="Закрыть просмотр"><i data-icon="close"></i></button>
         </div>
       </header>
-      <div class="pv__body" id="pvBody"><article class="md" id="pvDoc"></article></div>
+      <div class="pv__body" id="pvBody"><iframe class="pv__frame" id="pvFrame" title="ООО «Друза» — бриф перед встречей"></iframe></div>
     </aside>
   </div>
 </div>
@@ -850,62 +813,8 @@
   <button type="button" class="menu__item" role="menuitem" data-act="dl" data-fmt="Краткий материал, PDF" data-href="report-example-for-test.pdf">
     <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Краткий — PDF</span>
   </button>
-  <button type="button" class="menu__item" role="menuitem" data-act="dl" data-fmt="Материал, Markdown" data-href="report-example-for-test.md">
-    <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Markdown — .md</span>
-  </button>
 </div>
 
-<!-- Текст тестового материала для панели просмотра — копия
-     report-example-for-test.md. Страница открывается двойным кликом (file://),
-     а так браузер не даёт прочитать соседний файл; с сервера панель читает
-     сам .md, копия — запасной путь. Меняя материал, обновляйте обе. -->
-<script type="text/markdown" id="reportMd">
-Бриф перед встречей · ДИД
-
-# ООО «Друза»
-
-Добыча и переработка рудного золота · Невское месторождение и ГОК «Невский», Бодайбинский район Иркутской области · бенефициары — братья Слепневы (51% / 25% / 24%) через ООО «В.Н.В.» · директор Николай Игнатьев
-
-## Ключевые показатели
-
-| Показатель | Значение | Комментарий |
-|---|---|---|
-| Выручка (2025) | **11 102 млн ₽** | ▲ +21,8% г/г |
-| Чистая прибыль (2025) | **1 898 млн ₽** | ▲ +69,6% г/г |
-| Рентабельность продаж | **35,5%** | EBIT 3 943 млн ₽ |
-| Долговая нагрузка | **≈0,09** | заёмный / собственный капитал |
-| Добыча золота | **1,158 т** | 2023, последний раскрытый год |
-
-## Executive Summary
-
-Высокорентабельный семейный золотодобытчик Ленского района с почти нулевым долгом, растущий на ценовой конъюнктуре и входящий в капиталоёмкую инвестфазу. Ключевой проект — расширение ГОКа «Невский» с 1,3 до 4,4 млн т руды в год (ЗИФ-3) с выходом добычи до 3,7 т золота. Реальный масштаб бизнеса шире одного юрлица: холдинг Слепневых включает золотые «Ленсиб», «Сибирь», «Даксиб» и флюоритовые ГОКи в Бурятии, но консолидированной отчётности по группе нет.
-
-## Возможности ДИД
-
-| Направление | Оценка | Комментарий |
-|---|---|---|
-| Проектный мезонин под ЗИФ-3 | `ДА` `ПРИОРИТЕТ` | Капиталоёмкое расширение ГОКа при нулевом долге: ≥1 млрд ₽ на 5–7 лет, обеспечение на уровне проекта, контроль семьи сохраняется |
-| Кредитный мезонин / предпроектное | `УСЛОВНО` | 0,5–2 млрд ₽ под проектирование и закупку оборудования ЗИФ-3; варрант 2–7% семья воспримет настороженно |
-| M&A — покупка (buy-side) | `УСЛОВНО` | Группа — активный консолидатор; рекультивационные фонды выдавливают мелких россыпников, создавая поток дешёвых лицензий района |
-| M&A — продажа (sell-side) | `НЕТ` | Контроль сконцентрирован у семьи, Невское — ядро бизнеса; мотивации к выходу нет в горизонте 2–3 лет |
-| Рынки капитала (DCM/ECM) | `НЕТ` | Нет рейтингов, МСФО и публичной истории; возможна дорожная карта на 2–3 года под ЗИФ-3 после консолидации группы |
-
-## Инсайты
-
-- **Прибыльный актив с незадействованным долговым плечом.** При выручке 11,1 млрд ₽ и рентабельности продаж 35,5% компания финансирует развитие из собственного потока при соотношении заёмного и собственного капитала около 0,09 — редкий для отрасли профиль заёмщика с огромным запасом долговой ёмкости.
-- **Стоимость создаёт не объём, а цена и передел.** Физическая добыча стагнирует на уровне 1,1–1,2 т, но учётная цена ЦБ достигла 12 088,55 ₽/г 27.01.2026 — впервые за историю наблюдений с 1997 г. Дальнейший рост возможен только через ЗИФ-3, то есть через CAPEX.
-- **За юрлицом стоит скрытая группа.** Холдинг Слепневых объединяет золотые и флюоритовые активы в двух регионах с совокупной выручкой, кратно превышающей выручку «Друзы». Клиентское покрытие имеет смысл строить на уровне группы, а не одной компании.
-
-## Ключевые риски
-
-| Риск | Содержание и влияние на сделку |
-|---|---|
-| Непрозрачность группы | Консолидированной МСФО нет, операции переплетены с сестринскими компаниями под общим управлением. Оценить реальное кредитное качество без выгрузки из платных систем и прямого запроса отчётности невозможно. |
-| Ценовой и ресурсный | Прибыль полностью зависит от рублёвой цены золота при стагнации физической добычи. Укрепление рубля или коррекция цены на фоне надбавки к НДПИ 10,0% и налога на прибыль 25,0% быстро сжимает маржу. |
-| Экологический и регуляторный | Платёж за негативное воздействие 20,6 млн ₽ за 2024 г., 119 проверок с 2015 г., арбитражные споры. Готовящиеся рекультивационные фонды добавят отрасли 8–12 млрд ₽ нагрузки в год. |
-
-> **Позиция на встрече:** не предлагать вход в капитал — семья контроль не размывает. Заходить с проектным финансированием конкретного этапа ЗИФ-3 под обеспечение активами рудника и с сохранением 100% контроля собственников. Параллельно ставить задачу клиентского покрытия всей группы Слепневых, включая флюоритовый дивизион в Бурятии.
-</script>
 
 <script src="../../DS-IBP/scripts/ds.js"></script>
 <script>
@@ -970,6 +879,8 @@
     hasMaterial: false,
     running: false,
     files: [],
+    ctx: [],           /* фрагменты материала для следующего запроса */
+    ctxOpen: null,     /* раскрытый текстовый фрагмент */
     openId: null,
     pristine: false,   /* новая пустая нить — адрес без параметров */
     params: { direction: 'Прямые инвестиции', volume: 'Детальный' },
@@ -1122,6 +1033,7 @@
   }
 
   function setTitle(text, chip) {
+    el('hdTitle').closest('.phead').hidden = false;
     el('hdTitle').textContent = text;
     /* Крошки ведёт ds-breadcrumbs.js: он один раз запоминает пункты и на
        каждое изменение ширины (открытие панели просмотра, ресайз окна)
@@ -1176,7 +1088,6 @@
   function answerActions(id) {
     return '<div class="thr__row">' +
       '<button class="btn btn--transparent btn--s" data-act="copy" data-i="' + id + '"><i data-icon="copy"></i><span class="btn__label">Копировать</span></button>' +
-      '<button class="btn btn--transparent btn--s" data-act="builder"><i data-icon="ai-stars"></i><span class="btn__label">Открыть конструктор</span></button>' +
       '</div>';
   }
 
@@ -1196,8 +1107,10 @@
   }
 
   /* ── Развилка уточнения (БТ-6.3) ──────────────────────────────────────── */
-  function forkCard() {
-    return text('Уточнение принято. Ответить в этой нити, не трогая документ, или пересобрать материал новой версией?') +
+  function forkCard(fromMaterial) {
+    return text(fromMaterial
+      ? 'Учёл выделенное в материале. Ответить в этой нити, не трогая документ, или пересобрать материал новой версией с этой правкой?'
+      : 'Уточнение принято. Ответить в этой нити, не трогая документ, или пересобрать материал новой версией?') +
       '<div class="thr__row">' +
       '<button class="btn btn--outline btn--s" data-act="fork-answer"><i data-icon="message-text"></i><span class="btn__label">Ответить в диалоге</span></button>' +
       '<button class="btn btn--outline btn--s" data-act="fork-version"><i data-icon="refresh"></i><span class="btn__label">Собрать новую версию</span></button>' +
@@ -1220,7 +1133,7 @@
     return '<button type="button" class="think" data-act="finish" title="Прототип: нажмите, чтобы завершить подготовку" aria-label="AI Pitcher готовит материал. Прототип: нажмите, чтобы завершить подготовку">' +
       '<span class="think__loader" aria-hidden="true"></span>' +
       '<span class="think__text" data-think aria-hidden="true">' + THINK[think.i] + '</span>' +
-      '<span class="think__time" aria-hidden="true"><span data-think-time>' + elapsed() + '</span> · до 30 минут</span></button>';
+      '<span class="think__time" aria-hidden="true"><span data-think-time>' + elapsed() + '</span></span></button>';
   }
   function startThinking() {
     if (think.timer) return;
@@ -1313,7 +1226,6 @@
     };
     /* первое сообщение новой нити создаёт запрос */
     if (S.pristine && S.openId === null) createRequest(q);
-    B.last = q;
     field.value = '';
     B.frag = {}; B.fresh = null; B.custom = null;
     el('bldFind').value = '';
@@ -1326,9 +1238,14 @@
         return '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">' + esc(f) + '</span></span>';
       }).join('') + '</div>';
     }
+    if (S.ctx.length) {
+      body = '<div class="chiplist chiplist--s">' + S.ctx.map(function (c) { return ctxChip(c, false); }).join('') + '</div>' + body;
+    }
     push('user', body);
     var hadFiles = S.files.length > 0;
     S.files = []; drawFiles();
+    var hadCtx = S.ctx.length > 0;
+    S.ctx = []; S.ctxOpen = null; drawCtx();
 
     var reportish = /собер|материал|отчёт|отчет|подготов|пересобер/i.test(q);
 
@@ -1349,8 +1266,8 @@
       return;
     }
 
-    if (S.hasMaterial || hadFiles) {
-      setTimeout(function () { push('agent', forkCard()); }, 600);
+    if (hadCtx || S.hasMaterial || hadFiles) {
+      setTimeout(function () { push('agent', forkCard(hadCtx)); }, 600);
       return;
     }
 
@@ -1370,6 +1287,90 @@
     rebind(el('cmpFiles'));
   }
 
+  /* ── Контекст из материала («Доработать в чате») ──────────────────────────
+     Материал во фрейме панели просмотра присылает сообщение с фрагментами:
+     текст целиком или график тегом. Сообщение принимается только от своего
+     фрейма. */
+  var ctxSeq = 0;
+
+  function ctxLabel(c) {
+    if (c.kind === 'chart') return 'График «' + c.title + '»';
+    var cut = c.text.length > 42 ? c.text.slice(0, 42).replace(/\s+\S*$/, '') + '…' : c.text;
+    return '«' + cut + '»';
+  }
+
+  /* editable — чип в поле ввода (раскрыть, убрать); иначе — в сообщении */
+  function ctxChip(c, editable) {
+    var icon = c.kind === 'chart' ? 'bar-chart' : 'message-text';
+    var lead = '<span class="chip__icon"><i data-icon="' + icon + '"></i></span><span class="chip__label">' + esc(ctxLabel(c)) + '</span>';
+    if (!editable) return '<span class="chip chip--s">' + lead + '</span>';
+    return '<span class="chip chip--edit chip--s cmp-ctx" tabindex="0" data-ctx="' + c.id + '" data-kind="' + c.kind + '"' +
+      (c.kind === 'text' ? ' aria-expanded="' + (S.ctxOpen === c.id) + '" aria-controls="cmpQuote" aria-label="Фрагмент ' + esc(ctxLabel(c)) + ', показать целиком"' : '') + '>' +
+      lead + '<span class="chip__remove" role="button" aria-label="Убрать из запроса" data-act="rmctx" data-id="' + c.id + '"><i data-icon="close"></i></span></span>';
+  }
+
+  function drawCtx() {
+    el('cmpCtx').innerHTML = S.ctx.map(function (c) { return ctxChip(c, true); }).join('');
+    var open = S.ctx.filter(function (c) { return c.id === S.ctxOpen; })[0];
+    el('cmpQuote').hidden = !open;
+    if (open) {
+      el('cmpQuoteSrc').textContent = 'Фрагмент материала' + (open.section ? ' · ' + open.section : '');
+      el('cmpQuoteText').textContent = open.text;
+    }
+    rebind(el('cmpCtx'));
+  }
+
+  function addCtx(items) {
+    var added = 0;
+    items.forEach(function (it) {
+      var kind = it.kind === 'chart' ? 'chart' : 'text';
+      var item = { kind: kind, text: String(it.text || ''), title: String(it.title || ''), section: String(it.section || '') };
+      var dup = S.ctx.some(function (c) { return c.kind === kind && (kind === 'chart' ? c.title === item.title : c.text === item.text); });
+      if (dup || (kind === 'text' && !item.text) || (kind === 'chart' && !item.title)) return;
+      item.id = 'c' + (++ctxSeq);
+      S.ctx.push(item);
+      added++;
+    });
+    if (!added) return;
+    drawCtx();
+    var cmp = el('cmp');
+    cmp.classList.remove('is-ctx-new'); void cmp.offsetWidth; cmp.classList.add('is-ctx-new');
+    field.focus();
+    if (window.DSToast) window.DSToast.show({ message: added > 1 ? 'Фрагменты добавлены в запрос' : 'Фрагмент добавлен в запрос', kind: 'bar', duration: 2500 });
+  }
+
+  function toggleCtx(id) {
+    var c = S.ctx.filter(function (x) { return x.id === id; })[0];
+    if (!c || c.kind !== 'text') return;
+    S.ctxOpen = S.ctxOpen === id ? null : id;
+    drawCtx();
+  }
+
+  function removeCtx(id) {
+    S.ctx = S.ctx.filter(function (c) { return c.id !== id; });
+    if (S.ctxOpen === id) S.ctxOpen = null;
+    drawCtx();
+    field.focus();
+  }
+
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (!d || d.source !== 'ai-pitcher-material' || d.type !== 'context' || !Array.isArray(d.items)) return;
+    var frame = el('pvFrame');
+    if (!frame || e.source !== frame.contentWindow) return;
+    addCtx(d.items.slice(0, 10));
+  });
+
+  /* чип фрагмента с клавиатуры: Enter и пробел раскрывают, Backspace и Delete
+     убирают. Перехват на погружении — раньше штатного удаления чипа ДС,
+     которое сняло бы узел, не трогая состояние. */
+  document.addEventListener('keydown', function (e) {
+    var chip = e.target.closest && e.target.closest('[data-ctx]');
+    if (!chip) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCtx(chip.getAttribute('data-ctx')); }
+    else if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); e.stopPropagation(); removeCtx(chip.getAttribute('data-ctx')); }
+  }, true);
+
   /* ── Делегирование действий ───────────────────────────────────────────── */
   document.addEventListener('click', function (e) {
     /* строка истории: клик мимо кебаба открывает запрос */
@@ -1379,6 +1380,10 @@
       if (row.getAttribute('data-thread') !== String(S.openId)) location.href = 'RequestThread.html?id=' + row.getAttribute('data-thread');
       return;
     }
+
+    /* чип фрагмента материала: клик мимо крестика раскрывает текст целиком */
+    var ctxEl = e.target.closest('[data-ctx]');
+    if (ctxEl && !e.target.closest('.chip__remove')) { toggleCtx(ctxEl.getAttribute('data-ctx')); return; }
 
     var t = e.target.closest('[data-act]');
     if (!t) return;
@@ -1397,6 +1402,8 @@
     else if (act === 'pv-close') { closePreview(); }
     else if (act === 'pv-wide') { toggleWide(); }
     else if (act === 'finish') { finishRun(); }
+    else if (act === 'rmctx') { removeCtx(t.getAttribute('data-id')); }
+    else if (act === 'ctx-collapse') { S.ctxOpen = null; drawCtx(); field.focus(); }
     else if (act === 'fix-request') {
       /* текст запроса — обратно в поле; фрагменты снова связаны с конструктором */
       field.value = S.errorRequest || '';
@@ -1449,7 +1456,7 @@
      полем. Переписал пользователь фрагмент руками — связь рвётся: контрол
      снимает выбор, текст остаётся как есть. Закрытие конструктора текст
      не трогает. */
-  /* Объекты из последних запросов пользователя, от свежих к старым — до 10 */
+  /* Реестр объектов для поиска в конструкторе */
   var OBJECTS = [
     { id: 'sah',   kind: 'Группа',     name: 'ГК «Северный агрохолдинг»' },
     { id: 'volga', kind: 'Компания',   name: 'ПАО «Волга-Агро»' },
@@ -1461,7 +1468,6 @@
     { id: 'kaspi', kind: 'Компания',   name: 'ООО «Каспий-Порт»' },
     { id: 'sahao', kind: 'Компания',   name: 'АО «Северный агрохолдинг»' }
   ];
-  var OBJ_VISIBLE = 5;
   var FOCUS = [
     { id: 'debt',  label: 'Долговая нагрузка и ковенанты', text: 'Оцени долговую нагрузку и запас по ковенантам на горизонте трёх лет.' },
     { id: 'mult',  label: 'Оценка по мультипликаторам',    text: 'Подбери сопоставимые компании и оцени бизнес по мультипликаторам.' },
@@ -1490,9 +1496,7 @@
     open: false,
     frag: {},        /* ключ контрола → фрагмент в тексте */
     fresh: null,     /* только что добавленный фрагмент — вспыхивает; '*' — все */
-    custom: null,    /* объект, введённый вручную и не найденный в реестре */
-    more: false,     /* раскрыты объекты сверх первых пяти */
-    last: objFrag(OBJECTS[0]) + ' ' + FOCUS[0].text + ' ' + DIRECTIONS[1].text
+    custom: null    /* объект, введённый вручную и не найденный в реестре */
   };
 
   function each(sel, fn, root) { Array.prototype.forEach.call((root || document).querySelectorAll(sel), fn); }
@@ -1582,37 +1586,24 @@
 
   }
 
-  /* Варианты объекта — последние объекты из истории запросов: видны пять,
-     остальные под «Показать ещё». При вводе — все совпадения сразу.
-     Выбранный объект виден всегда; не нашлось точного совпадения —
-     пилюля «Использовать как есть». */
+  /* Варианты объекта появляются по вводу: совпадения по реестру объектов.
+     Выбранный объект виден всегда; точного совпадения нет — пилюля
+     «Использовать как есть». */
   function drawObjects() {
     var raw = el('bldFind').value.trim(), q = raw.toLowerCase();
     var sel = picked(allObjects(), 'object');
-    var list = OBJECTS.filter(function (o) { return !q || (o.name + ' ' + o.kind).toLowerCase().indexOf(q) !== -1; });
+    var list = q ? OBJECTS.filter(function (o) { return (o.name + ' ' + o.kind).toLowerCase().indexOf(q) !== -1; }) : [];
     if (sel && list.indexOf(sel) === -1) list.unshift(sel);
-    var total = list.length, collapsible = !q && total > OBJ_VISIBLE;
-    if (collapsible && !B.more) {
-      var head = list.slice(0, OBJ_VISIBLE);
-      if (sel && head.indexOf(sel) === -1) head[OBJ_VISIBLE - 1] = sel;
-      list = head;
-    }
-    var html = list.map(function (o, i) {
-      var extra = collapsible && B.more && i >= OBJ_VISIBLE;
-      return '<button type="button" class="bopt' + (extra ? ' is-extra" style="--i:' + (i - OBJ_VISIBLE) : '') + '" role="radio" aria-checked="false" data-obj="' + o.id + '">' +
+    var html = list.map(function (o) {
+      return '<button type="button" class="bopt" role="radio" aria-checked="false" data-obj="' + o.id + '">' +
         '<span class="bopt__tag">' + esc(o.kind) + '</span>' +
         '<span class="bopt__label">' + esc(o.name) + '</span>' +
         '<span class="bopt__check" aria-hidden="true"><i data-icon="check"></i></span></button>';
     }).join('');
-    if (collapsible) {
-      html += '<button type="button" class="bmore" data-more aria-expanded="' + B.more + '">' +
-        (B.more ? 'Свернуть' : 'Показать ещё (' + (total - OBJ_VISIBLE) + ')') + '<i data-icon="chevron-down"></i></button>';
-    }
     if (q && !OBJECTS.some(function (o) { return o.name.toLowerCase() === q; })) {
       html += '<button type="button" class="bopt bopt--custom" data-custom><i data-icon="add"></i>' +
         '<span class="bopt__label">Использовать «' + esc(raw) + '»</span></button>';
     }
-    el('bldObjHint').textContent = q ? 'Совпадения по вашим запросам' : 'Из ваших последних запросов';
     el('bldObjects').innerHTML = html;
     rebind(el('bldObjects'));
     syncControls();
@@ -1658,8 +1649,6 @@
     B.open = open;
     if (open) {
       drawObjects();
-      el('bldRecentText').textContent = B.last;
-      el('bldRecent').hidden = !B.last;
       drawer.removeAttribute('inert');
     } else {
       if (drawer.contains(document.activeElement)) field.focus();
@@ -1694,12 +1683,6 @@
     } else if ((n = e.target.closest('[data-dir]'))) {
       var d = byId(DIRECTIONS, n.getAttribute('data-dir'));
       setFrag('direction', B.frag.direction === d.text ? null : d.text);
-    } else if ((n = e.target.closest('[data-more]'))) {
-      B.more = !B.more;
-      drawObjects();
-      /* кнопка пересоздана — с клавиатуры фокус возвращается на неё */
-      var more = el('bldObjects').querySelector('[data-more]');
-      if (more && e.detail === 0) more.focus();
     }
   });
 
@@ -1716,17 +1699,6 @@
   });
   el('bldReset').addEventListener('click', resetBuilder);
 
-  /* Быстрый ввод предыдущего запроса: текст целиком, известные фрагменты
-     снова связываются с контролами и вспыхивают */
-  el('bldRecent').addEventListener('click', function () {
-    field.value = B.last;
-    detect();
-    B.fresh = '*';
-    paint(); syncControls(); drawObjects();
-    fieldBox.scrollTop = 0;
-    field.focus();
-    field.setSelectionRange(field.value.length, field.value.length);
-  });
 
   /* Правка руками: фрагмент, которого больше нет в тексте, отпускает контрол */
   field.addEventListener('input', function () {
@@ -1775,70 +1747,14 @@
      Ширина меняется перетаскиванием левого края или стрелками с клавиатуры;
      двойной клик по краю и кнопка «Развернуть» переключают обычную и
      максимальную ширину. Ширина запоминается в браузере (хранилище может
-     быть недоступно — тогда не запоминается). Документ — Markdown,
-     отрисованный мини-рендером: заголовки, абзацы, списки, таблицы, цитата,
-     полужирный, курсив и `бейджи` оценок. */
+     быть недоступно — тогда не запоминается). Документ — страница материала MaterialReport.html во фрейме панели. */
   var PV_KEY = 'ibp.requestThread.previewWidth', PV_DEFAULT = 560, PV_MIN = 360;
   var pv = el('pv'), pvGrip = el('pvGrip'), pvLoaded = false, pvWide = null;
-  var MD_BADGE = { 'ДА': 'is-yes', 'УСЛОВНО': 'is-maybe', 'НЕТ': 'is-no', 'ПРИОРИТЕТ': 'is-top' };
-
-  function mdInline(str) {
-    return esc(str)
-      .replace(/`([^`]+)`/g, function (_, c) {
-        var cls = MD_BADGE[c.trim().toUpperCase()];
-        return '<code' + (cls ? ' class="' + cls + '"' : '') + '>' + c + '</code>';
-      })
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>');
-  }
-
-  function renderMd(src) {
-    var lines = src.replace(/\r/g, '').split('\n'), out = [], i = 0;
-    var BLOCK = /^(#{1,3}\s|>|[-*]\s|\d+\.\s|\||-{3,}\s*$)/;
-    function cells(row) { return row.trim().replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); }); }
-    while (i < lines.length) {
-      var line = lines[i], m;
-      if (!line.trim()) { i++; continue; }
-      if ((m = /^(#{1,3})\s+(.*)$/.exec(line))) {
-        out.push('<h' + m[1].length + '>' + mdInline(m[2]) + '</h' + m[1].length + '>'); i++; continue;
-      }
-      if (/^-{3,}\s*$/.test(line)) { out.push('<hr>'); i++; continue; }
-      if (/^>/.test(line)) {
-        var quote = [];
-        while (i < lines.length && /^>/.test(lines[i])) quote.push(lines[i++].replace(/^>\s?/, ''));
-        out.push('<blockquote><p>' + mdInline(quote.join(' ')) + '</p></blockquote>'); continue;
-      }
-      if (/^\|/.test(line)) {
-        var rows = [];
-        while (i < lines.length && /^\|/.test(lines[i])) rows.push(lines[i++]);
-        var head = cells(rows[0]), body = rows.slice(2).map(cells);
-        out.push('<div class="md__table"><table><thead><tr>' +
-          head.map(function (c) { return '<th>' + mdInline(c) + '</th>'; }).join('') + '</tr></thead><tbody>' +
-          body.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + mdInline(c) + '</td>'; }).join('') + '</tr>'; }).join('') +
-          '</tbody></table></div>');
-        continue;
-      }
-      if ((m = /^([-*]|\d+\.)\s/.exec(line))) {
-        var tag = /\d/.test(m[1]) ? 'ol' : 'ul', items = [];
-        while (i < lines.length && /^([-*]|\d+\.)\s/.test(lines[i])) items.push(lines[i++].replace(/^([-*]|\d+\.)\s+/, ''));
-        out.push('<' + tag + '>' + items.map(function (it) { return '<li>' + mdInline(it) + '</li>'; }).join('') + '</' + tag + '>');
-        continue;
-      }
-      var para = [lines[i++]];
-      while (i < lines.length && lines[i].trim() && !BLOCK.test(lines[i])) para.push(lines[i++]);
-      out.push('<p>' + mdInline(para.join(' ')) + '</p>');
-    }
-    return out.join('');
-  }
-
+  /* Материал грузится во фрейм при первом открытии панели */
   function loadDoc() {
     if (pvLoaded) return;
-    var draw = function (src) { el('pvDoc').innerHTML = renderMd(src); pvLoaded = true; };
-    var fallback = el('reportMd').textContent;
-    if (location.protocol === 'file:' || !window.fetch) { draw(fallback); return; }
-    fetch('report-example-for-test.md')
-      .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
-      .then(draw, function () { draw(fallback); });
+    el('pvFrame').src = 'MaterialReport.html';
+    pvLoaded = true;
   }
 
   /* нити с панелью истории остаётся не меньше 440px */
@@ -1874,7 +1790,8 @@
     pv.hidden = false;
     setPvWidth(wasHidden ? saved : pv.offsetWidth, false);
     loadDoc();
-    if (wasHidden) el('pvBody').scrollTop = 0;
+    /* каждое открытие показывает материал с начала */
+    if (wasHidden) { try { el('pvFrame').contentWindow.scrollTo(0, 0); } catch (err) { /* фрейм ещё грузится */ } }
   }
   function closePreview() {
     if (window.DSTooltip) window.DSTooltip.hideAll();
@@ -2066,6 +1983,7 @@
     drawHist();
   } else {
     S.pristine = true;
+    el('hdTitle').closest('.phead').hidden = true;
     drawHist();
     render();
   }
