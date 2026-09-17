@@ -303,6 +303,23 @@
   .cmp__hint     { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-4) var(--space-16); font: var(--type-body-xs); color: var(--text-secondary); }
   .cmp__hint kbd { display: inline-block; min-width: 18px; padding: 0 var(--space-4); font: inherit; text-align: center; color: var(--text-secondary); background: var(--bg-tile); border: 1px solid var(--border-light); border-bottom-width: 2px; border-radius: var(--radius-s); }
 
+  /* ── Контекст из материала ────────────────────────────────────────────────
+     Фрагменты, отправленные из панели просмотра кнопкой «Доработать в чате»:
+     чипы над полем, как приложенные файлы. Текстовый фрагмент раскрывается
+     целиком по клику на чип; график приходит тегом — агенту указание, что
+     смотреть в материале. */
+  .cmp__ctx:empty { display: none; }
+  .cmp-ctx[data-kind="text"] { cursor: pointer; }
+  .cmp-ctx[aria-expanded="true"] { border-color: var(--primary); }
+  .cmp-quote     { display: flex; flex-direction: column; gap: var(--space-4); max-height: 180px; overflow-y: auto; padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12); background: color-mix(in srgb, var(--primary) 6%, var(--bg-tile)); border-left: 3px solid var(--primary); border-radius: 0 var(--radius-m) var(--radius-m) 0; animation: quoteIn .25s ease both; }
+  .cmp-quote[hidden] { display: none; }
+  @keyframes quoteIn { from { opacity: 0; transform: translateY(-4px); } }
+  .cmp-quote__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+  .cmp-quote__src { font: var(--type-body-xs); color: var(--text-secondary); }
+  .cmp-quote__text { margin: 0; font: var(--type-body-s); color: var(--text-primary); }
+  .cmp.is-ctx-new { animation: ctxPulse .9s ease; }
+  @keyframes ctxPulse { 30% { box-shadow: 0 0 0 4px var(--cmp-ring), var(--cmp-shadow); } }
+
   /* ── Конструктор: выезжающая панель ─────────────────────────────────────
      Высота анимируется через grid-template-rows 0fr → 1fr: панель выезжает
      вниз на собственную высоту без замера скриптом. Содержимое догоняет
@@ -617,6 +634,14 @@
               <div class="cmp" id="cmp">
                 <div class="cmp__main">
                   <div class="chiplist cmp__files" id="cmpFiles" role="group" aria-label="Файлы, приложенные к сообщению"></div>
+                  <div class="chiplist cmp__ctx" id="cmpCtx" role="group" aria-label="Фрагменты материала в запросе"></div>
+                  <div class="cmp-quote" id="cmpQuote" hidden>
+                    <div class="cmp-quote__head">
+                      <span class="cmp-quote__src" id="cmpQuoteSrc"></span>
+                      <button type="button" class="ibtn ibtn--neutral ibtn--s" data-act="ctx-collapse" aria-label="Свернуть фрагмент" data-tooltip="Свернуть"><i data-icon="chevron-up"></i></button>
+                    </div>
+                    <p class="cmp-quote__text" id="cmpQuoteText"></p>
+                  </div>
                   <div class="cmp__field">
                     <div class="cmp__mirror" id="cmpMirror" aria-hidden="true"></div>
                     <textarea class="cmp__control" id="cmpInput" rows="2" placeholder="Задайте вопрос или опишите задачу…" aria-label="Текст запроса" aria-describedby="cmpHint"></textarea>
@@ -854,6 +879,8 @@
     hasMaterial: false,
     running: false,
     files: [],
+    ctx: [],           /* фрагменты материала для следующего запроса */
+    ctxOpen: null,     /* раскрытый текстовый фрагмент */
     openId: null,
     pristine: false,   /* новая пустая нить — адрес без параметров */
     params: { direction: 'Прямые инвестиции', volume: 'Детальный' },
@@ -1080,8 +1107,10 @@
   }
 
   /* ── Развилка уточнения (БТ-6.3) ──────────────────────────────────────── */
-  function forkCard() {
-    return text('Уточнение принято. Ответить в этой нити, не трогая документ, или пересобрать материал новой версией?') +
+  function forkCard(fromMaterial) {
+    return text(fromMaterial
+      ? 'Учёл выделенное в материале. Ответить в этой нити, не трогая документ, или пересобрать материал новой версией с этой правкой?'
+      : 'Уточнение принято. Ответить в этой нити, не трогая документ, или пересобрать материал новой версией?') +
       '<div class="thr__row">' +
       '<button class="btn btn--outline btn--s" data-act="fork-answer"><i data-icon="message-text"></i><span class="btn__label">Ответить в диалоге</span></button>' +
       '<button class="btn btn--outline btn--s" data-act="fork-version"><i data-icon="refresh"></i><span class="btn__label">Собрать новую версию</span></button>' +
@@ -1209,9 +1238,14 @@
         return '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">' + esc(f) + '</span></span>';
       }).join('') + '</div>';
     }
+    if (S.ctx.length) {
+      body = '<div class="chiplist chiplist--s">' + S.ctx.map(function (c) { return ctxChip(c, false); }).join('') + '</div>' + body;
+    }
     push('user', body);
     var hadFiles = S.files.length > 0;
     S.files = []; drawFiles();
+    var hadCtx = S.ctx.length > 0;
+    S.ctx = []; S.ctxOpen = null; drawCtx();
 
     var reportish = /собер|материал|отчёт|отчет|подготов|пересобер/i.test(q);
 
@@ -1232,8 +1266,8 @@
       return;
     }
 
-    if (S.hasMaterial || hadFiles) {
-      setTimeout(function () { push('agent', forkCard()); }, 600);
+    if (hadCtx || S.hasMaterial || hadFiles) {
+      setTimeout(function () { push('agent', forkCard(hadCtx)); }, 600);
       return;
     }
 
@@ -1253,6 +1287,90 @@
     rebind(el('cmpFiles'));
   }
 
+  /* ── Контекст из материала («Доработать в чате») ──────────────────────────
+     Материал во фрейме панели просмотра присылает сообщение с фрагментами:
+     текст целиком или график тегом. Сообщение принимается только от своего
+     фрейма. */
+  var ctxSeq = 0;
+
+  function ctxLabel(c) {
+    if (c.kind === 'chart') return 'График «' + c.title + '»';
+    var cut = c.text.length > 42 ? c.text.slice(0, 42).replace(/\s+\S*$/, '') + '…' : c.text;
+    return '«' + cut + '»';
+  }
+
+  /* editable — чип в поле ввода (раскрыть, убрать); иначе — в сообщении */
+  function ctxChip(c, editable) {
+    var icon = c.kind === 'chart' ? 'bar-chart' : 'message-text';
+    var lead = '<span class="chip__icon"><i data-icon="' + icon + '"></i></span><span class="chip__label">' + esc(ctxLabel(c)) + '</span>';
+    if (!editable) return '<span class="chip chip--s">' + lead + '</span>';
+    return '<span class="chip chip--edit chip--s cmp-ctx" tabindex="0" data-ctx="' + c.id + '" data-kind="' + c.kind + '"' +
+      (c.kind === 'text' ? ' aria-expanded="' + (S.ctxOpen === c.id) + '" aria-controls="cmpQuote" aria-label="Фрагмент ' + esc(ctxLabel(c)) + ', показать целиком"' : '') + '>' +
+      lead + '<span class="chip__remove" role="button" aria-label="Убрать из запроса" data-act="rmctx" data-id="' + c.id + '"><i data-icon="close"></i></span></span>';
+  }
+
+  function drawCtx() {
+    el('cmpCtx').innerHTML = S.ctx.map(function (c) { return ctxChip(c, true); }).join('');
+    var open = S.ctx.filter(function (c) { return c.id === S.ctxOpen; })[0];
+    el('cmpQuote').hidden = !open;
+    if (open) {
+      el('cmpQuoteSrc').textContent = 'Фрагмент материала' + (open.section ? ' · ' + open.section : '');
+      el('cmpQuoteText').textContent = open.text;
+    }
+    rebind(el('cmpCtx'));
+  }
+
+  function addCtx(items) {
+    var added = 0;
+    items.forEach(function (it) {
+      var kind = it.kind === 'chart' ? 'chart' : 'text';
+      var item = { kind: kind, text: String(it.text || ''), title: String(it.title || ''), section: String(it.section || '') };
+      var dup = S.ctx.some(function (c) { return c.kind === kind && (kind === 'chart' ? c.title === item.title : c.text === item.text); });
+      if (dup || (kind === 'text' && !item.text) || (kind === 'chart' && !item.title)) return;
+      item.id = 'c' + (++ctxSeq);
+      S.ctx.push(item);
+      added++;
+    });
+    if (!added) return;
+    drawCtx();
+    var cmp = el('cmp');
+    cmp.classList.remove('is-ctx-new'); void cmp.offsetWidth; cmp.classList.add('is-ctx-new');
+    field.focus();
+    if (window.DSToast) window.DSToast.show({ message: added > 1 ? 'Фрагменты добавлены в запрос' : 'Фрагмент добавлен в запрос', kind: 'bar', duration: 2500 });
+  }
+
+  function toggleCtx(id) {
+    var c = S.ctx.filter(function (x) { return x.id === id; })[0];
+    if (!c || c.kind !== 'text') return;
+    S.ctxOpen = S.ctxOpen === id ? null : id;
+    drawCtx();
+  }
+
+  function removeCtx(id) {
+    S.ctx = S.ctx.filter(function (c) { return c.id !== id; });
+    if (S.ctxOpen === id) S.ctxOpen = null;
+    drawCtx();
+    field.focus();
+  }
+
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (!d || d.source !== 'ai-pitcher-material' || d.type !== 'context' || !Array.isArray(d.items)) return;
+    var frame = el('pvFrame');
+    if (!frame || e.source !== frame.contentWindow) return;
+    addCtx(d.items.slice(0, 10));
+  });
+
+  /* чип фрагмента с клавиатуры: Enter и пробел раскрывают, Backspace и Delete
+     убирают. Перехват на погружении — раньше штатного удаления чипа ДС,
+     которое сняло бы узел, не трогая состояние. */
+  document.addEventListener('keydown', function (e) {
+    var chip = e.target.closest && e.target.closest('[data-ctx]');
+    if (!chip) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCtx(chip.getAttribute('data-ctx')); }
+    else if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); e.stopPropagation(); removeCtx(chip.getAttribute('data-ctx')); }
+  }, true);
+
   /* ── Делегирование действий ───────────────────────────────────────────── */
   document.addEventListener('click', function (e) {
     /* строка истории: клик мимо кебаба открывает запрос */
@@ -1262,6 +1380,10 @@
       if (row.getAttribute('data-thread') !== String(S.openId)) location.href = 'RequestThread.html?id=' + row.getAttribute('data-thread');
       return;
     }
+
+    /* чип фрагмента материала: клик мимо крестика раскрывает текст целиком */
+    var ctxEl = e.target.closest('[data-ctx]');
+    if (ctxEl && !e.target.closest('.chip__remove')) { toggleCtx(ctxEl.getAttribute('data-ctx')); return; }
 
     var t = e.target.closest('[data-act]');
     if (!t) return;
@@ -1280,6 +1402,8 @@
     else if (act === 'pv-close') { closePreview(); }
     else if (act === 'pv-wide') { toggleWide(); }
     else if (act === 'finish') { finishRun(); }
+    else if (act === 'rmctx') { removeCtx(t.getAttribute('data-id')); }
+    else if (act === 'ctx-collapse') { S.ctxOpen = null; drawCtx(); field.focus(); }
     else if (act === 'fix-request') {
       /* текст запроса — обратно в поле; фрагменты снова связаны с конструктором */
       field.value = S.errorRequest || '';
