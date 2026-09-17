@@ -74,6 +74,22 @@
   .rep__call     { display: flex; flex-direction: column; gap: var(--space-6); padding: var(--space-16) var(--space-20); background: color-mix(in srgb, var(--primary) 6%, var(--bg-tile)); border-left: 3px solid var(--primary); border-radius: 0 var(--radius-m) var(--radius-m) 0; }
   .rep__call-title { margin: 0; font: var(--type-body-m-strong); color: var(--primary-dark); }
 
+  /* ── «Доработать в чате» ──────────────────────────────────────────────────
+     Работает, когда материал открыт в панели просмотра экрана «Новый отчёт»:
+     над выделенным текстом всплывает кнопка, у графика она появляется при
+     наведении. Фрагмент уходит в поле ввода контекстом следующего запроса. */
+  .rep__chart    { position: relative; }
+  .rep__chart.is-sent { box-shadow: 0 0 0 2px var(--primary); transition: box-shadow .2s ease; }
+  .rep__chart-ask { position: absolute; top: var(--space-12); right: var(--space-12); z-index: 2; opacity: 0; transition: opacity .15s ease; }
+  .rep__chart:hover .rep__chart-ask, .rep__chart:focus-within .rep__chart-ask { opacity: 1; }
+  .quote-fab     { position: absolute; z-index: 20; display: flex; padding: var(--space-4); background: var(--bg-tile); border-radius: var(--radius-l); box-shadow: 0 8px 24px color-mix(in srgb, var(--text-primary) 18%, transparent); transform: translate(-50%, calc(-100% - var(--space-8))); animation: fabIn .18s ease both; }
+  .quote-fab[hidden] { display: none; }
+  /* Появление без прозрачности: браузер приостанавливает анимации во фрейме
+     вне видимой области, и кнопка, начинавшая с opacity 0, оставалась
+     невидимой. Сдвиг и лёгкий масштаб видны и без анимации. */
+  @keyframes fabIn { from { transform: translate(-50%, calc(-100% - var(--space-2))) scale(.96); } }
+  @media (prefers-reduced-motion: reduce) { .quote-fab, .rep__chart-ask { animation: none; transition: none; } }
+
   .rep__foot     { display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-20) var(--space-40); background: var(--bg-page); border-top: 1px solid var(--border-light); }
 
   @media (max-width: 720px) {
@@ -215,6 +231,11 @@
   </article>
 </main>
 
+<!-- Всплывающая кнопка над выделенным текстом -->
+<div class="quote-fab" id="quoteFab" hidden>
+  <button type="button" class="btn btn--accent btn--s" id="quoteAsk"><i data-icon="ai-stars"></i><span class="btn__label">Доработать в чате</span></button>
+</div>
+
 <script src="../../DS-IBP/scripts/ds.js"></script>
 <script>
 /* Графики материала — компонент Chart ДС. Ряды — демо-данные прототипа,
@@ -265,6 +286,89 @@
     categories: ['Бенефициар 1', 'Бенефициар 2', 'Бенефициар 3'],
     series: [{ id: 'own', name: 'Доля, %', data: [51, 25, 24] }],
     centerLabel: '100%', centerSub: '3 бенефициара'
+  });
+})();
+
+/* «Доработать в чате»: фрагмент материала — в контекст следующего запроса.
+   Материал живёт во фрейме панели просмотра; экран «Новый отчёт» получает
+   фрагмент сообщением (postMessage) — так работает и при открытии файла
+   двойным кликом, где доступ к документу фрейма закрыт. Текст уходит целиком,
+   график — тегом с названием: агенту это указание, что смотреть в материале. */
+(function () {
+  'use strict';
+  if (!window.parent || window.parent === window) return;
+
+  var fab = document.getElementById('quoteFab');
+  var sheet = document.querySelector('.rep__sheet');
+  var pending = null;
+
+  function elOf(node) { return node && (node.nodeType === 1 ? node : node.parentElement); }
+  function sectionOf(node) {
+    var el = elOf(node);
+    var sec = el && el.closest('.rep__sec');
+    if (sec) { var h = sec.querySelector('.rep__h'); return h ? h.textContent.trim() : ''; }
+    return el && el.closest('.rep__cover') ? 'Обложка' : '';
+  }
+  function chartTitle(box) { var t = box.querySelector('.chart__title'); return t ? t.textContent.trim() : 'График'; }
+  function send(items) { window.parent.postMessage({ source: 'ai-pitcher-material', type: 'context', items: items }, '*'); }
+  function hide() { fab.hidden = true; pending = null; }
+  function clean(s) { return s.replace(/\s+/g, ' ').trim(); }
+
+  /* текст выделения без подписей графиков, между блоками — пробел */
+  function selectedText(range) {
+    var frag = range.cloneContents();
+    Array.prototype.forEach.call(frag.querySelectorAll('.rep__chart, .quote-fab, button'), function (n) { n.remove(); });
+    Array.prototype.forEach.call(frag.querySelectorAll('p, li, h1, h2, span, div'), function (n) { n.appendChild(document.createTextNode(' ')); });
+    return clean(frag.textContent);
+  }
+
+  function onSelection() {
+    var sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) { hide(); return; }
+    var range = sel.getRangeAt(0);
+    if (!sheet.contains(range.commonAncestorContainer)) { hide(); return; }
+    var charts = Array.prototype.filter.call(document.querySelectorAll('.rep__chart'), function (c) { return range.intersectsNode(c); });
+    var insideChart = charts.length === 1 && charts[0].contains(range.commonAncestorContainer);
+    var items = [];
+    var txt = insideChart ? '' : (charts.length ? selectedText(range) : clean(sel.toString()));
+    if (txt.length >= 3) items.push({ kind: 'text', text: txt, section: sectionOf(range.startContainer) });
+    charts.forEach(function (c) { items.push({ kind: 'chart', title: chartTitle(c), section: sectionOf(c) }); });
+    if (!items.length) { hide(); return; }
+    pending = items;
+    var rect = range.getBoundingClientRect();
+    var x = Math.min(Math.max(rect.left + rect.width / 2, 110), document.documentElement.clientWidth - 110);
+    fab.style.left = (x + window.scrollX) + 'px';
+    fab.style.top = (Math.max(rect.top, 56) + window.scrollY) + 'px';
+    fab.hidden = false;
+  }
+
+  document.addEventListener('mouseup', function (e) { if (!fab.contains(e.target)) setTimeout(onSelection, 0); });
+  document.addEventListener('keyup', function (e) { if (e.shiftKey || e.key === 'Shift') onSelection(); });
+  document.addEventListener('selectionchange', function () { var s = window.getSelection(); if (!s || s.isCollapsed) hide(); });
+  window.addEventListener('resize', hide);
+  /* клик по кнопке не должен снимать выделение до отправки */
+  fab.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  document.getElementById('quoteAsk').addEventListener('click', function () {
+    if (!pending) return;
+    send(pending);
+    window.getSelection().removeAllRanges();
+    hide();
+  });
+
+  /* у каждого графика — своя кнопка: график не выделяется как текст */
+  Array.prototype.forEach.call(document.querySelectorAll('.rep__chart'), function (box) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn--outline btn--xs rep__chart-ask';
+    btn.innerHTML = '<i data-icon="ai-stars"></i><span class="btn__label">Доработать в чате</span>';
+    btn.setAttribute('aria-label', 'Доработать в чате: график «' + chartTitle(box) + '»');
+    box.appendChild(btn);
+    if (window.dsIcons) window.dsIcons.apply(btn);
+    btn.addEventListener('click', function () {
+      send([{ kind: 'chart', title: chartTitle(box), section: sectionOf(box) }]);
+      box.classList.add('is-sent');
+      setTimeout(function () { box.classList.remove('is-sent'); }, 900);
+    });
   });
 })();
 </script>
