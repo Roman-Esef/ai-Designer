@@ -42,7 +42,7 @@
   .search input::placeholder { color: var(--text-inactive); }
   .search input:focus-visible { outline:2px solid var(--primary); outline-offset:1px; }
   .search .clear { position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:transparent; cursor:pointer; color:var(--text-inactive); width:24px; height:24px; display:none; align-items:center; justify-content:center; border-radius:6px; }
-  .search .clear:hover { color: var(--text-secondary); background: var(--bgtable-row-hover); }
+  .search .clear:hover { color: var(--text-secondary); background: var(--bg-table-default-hover); }
   .search.has-val .clear { display:flex; }
 
   .seg { display:inline-flex; background: var(--tertiary); border-radius:10px; padding:3px; gap:3px; }
@@ -74,8 +74,8 @@
     text-align:left; cursor:pointer; width:100%; font:inherit; color:inherit;
     transition: background .12s ease;
   }
-  .icell:hover { background: var(--bgtable-row-hover); }
-  .icell:active { background: var(--bgtable-row-focus); }
+  .icell:hover { background: var(--bg-table-default-hover); }
+  .icell:active { background: var(--bg-table-default-focus); }
   .icell .iwrap { display:flex; align-items:center; justify-content:center; width:34px; height:34px; color: var(--ic); transition: color .12s ease; }
   .icell:hover .iwrap { color: var(--primary); }
   .icell .iwrap svg { width: var(--isz, 24px); height: var(--isz, 24px); display:block; }
@@ -91,7 +91,7 @@
     padding:12px 14px; border:none; border-radius:10px; background:transparent;
     text-align:left; cursor:pointer; width:100%; font:inherit; color:inherit; transition: background .12s ease;
   }
-  .mcell:hover { background: var(--bgtable-row-hover); }
+  .mcell:hover { background: var(--bg-table-default-hover); }
   .mcell .iwrap { display:flex; align-items:center; justify-content:center; width:34px; height:34px; color: var(--ic); transition: color .12s ease; }
   .mcell:hover .iwrap { color: var(--primary); }
   .mcell .iwrap svg { width: var(--isz, 24px); height: var(--isz, 24px); display:block; }

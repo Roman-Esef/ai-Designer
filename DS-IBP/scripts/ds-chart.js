@@ -11,9 +11,9 @@
 'use strict';
 
 var PALETTE = [
-  '--chart-blue', '--chart-turquoise', '--chart-indigo', '--chart-orange',
-  '--chart-pastel-green', '--chart-purple', '--chart-light-blue', '--chart-yellow',
-  '--chart-shiny-green', '--chart-pink-purple', '--chart-red', '--chart-pale-purple'
+  '--ch-blue', '--ch-turquoise', '--ch-indigo', '--ch-orange',
+  '--ch-pastel-green', '--ch-purple', '--ch-light-blue', '--ch-yellow',
+  '--ch-shiny-green', '--ch-pink-purple', '--ch-red', '--ch-pale-purple'
 ];
 var NS = 'http://www.w3.org/2000/svg';
 var CAT_TYPES = { bar: 1, hbar: 1, grouped: 1, stacked: 1, stacked100: 1, line: 1, area: 1, combo: 1, waterfall: 1 };

@@ -48,7 +48,7 @@ status: curated
 - **Состояния** — Default/Hover/Focus/Error/ErrorFocus/Warning/WarningFocus/Disabled (поле-триггер). ПРАВИЛО: текст ошибки/предупреждения по умолчанию НЕ в хелпере — только в тултипе при *Focus; тултип не смещает хелпер (position:absolute, z-index выше поля). Состояния опций — на странице DropdownList.
 - **Доступность** — поле `role="combobox"` + `aria-expanded`/`aria-controls`; список `role="listbox"` (+ `aria-multiselectable`); опции `role="option"` + `aria-selected`/`aria-checked`; `aria-activedescendant`; чипы и шеврон озвучены.
 - **Типографика** — ввод/сводка SB Sans Text (M — Body M, S — Body S); чипы по своим токенам (S/XS); опции Body M, helper/группа Body XS.
-- **Цвета** — поле = токены InputText (иконки шеврон/крестик — Active · `--secondary`, hover → `--secondary-dark`); список: фон `--bg-popup`, hover `--tertiary-light`, выбранная строка `--bgtable-row-focus`, подсветка `--primary`.
+- **Цвета** — поле = токены InputText (иконки шеврон/крестик — Active · `--secondary`, hover → `--secondary-dark`); список: фон `--bg-popup`, hover `--tertiary-light`, выбранная строка `--bg-table-default-focus`, подсветка `--primary`.
 
 ## Для разработчиков (выжимка)
 

@@ -41,7 +41,7 @@
 .albar__name{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .albar__pct{min-width:64px;text-align:right;color:var(--text-secondary)}
 .albar__val{min-width:96px;text-align:right;color:var(--text-primary)}
-.albar__row:hover{background:var(--bgtable-row-hover)}
+.albar__row:hover{background:var(--bg-table-default-hover)}
 .albar__more{align-self:flex-start;margin-top:4px}
 
 /* двунаправленная связь строка ↔ сегмент */
@@ -56,14 +56,14 @@
 .albar__foot .alert{width:100%}
 
 /* скелетон загрузки */
-.albar__sk{background:linear-gradient(90deg,var(--c-cgrey-100) 0%,var(--c-cgrey-50) 50%,var(--c-cgrey-100) 100%);background-size:200% 100%;border-radius:var(--radius-xs);animation:albar-shimmer 1.4s linear infinite}
+.albar__sk{background:linear-gradient(90deg,var(--cgrey-100) 0%,var(--cgrey-50) 50%,var(--cgrey-100) 100%);background-size:200% 100%;border-radius:var(--radius-xs);animation:albar-shimmer 1.4s linear infinite}
 @keyframes albar-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .albar__sk--total{width:96px;height:16px}
 .albar__sk--bar{height:8px;border-radius:var(--radius-pill)}
 .albar__sk--name{height:12px;width:56%}
 .albar__sk--num{height:12px;width:96px;justify-self:end}
 .albar__row--sk{grid-template-columns:8px 1fr auto;pointer-events:none}
-.albar__dot--sk{background:var(--c-cgrey-100)}
+.albar__dot--sk{background:var(--cgrey-100)}
 @media (prefers-reduced-motion:reduce){.albar__sk{animation:none}.albar__seg{transition:none}}
 
 /* ---------- контейнерные запросы ---------- */

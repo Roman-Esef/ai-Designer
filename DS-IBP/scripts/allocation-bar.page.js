@@ -10,9 +10,9 @@
 
 /* Палитра — порядок назначения совпадает с порядком в colors.css */
 var PALETTE = [
-  '--chart-red', '--chart-orange', '--chart-yellow', '--chart-shiny-green',
-  '--chart-pastel-green', '--chart-turquoise', '--chart-light-blue', '--chart-blue',
-  '--chart-indigo', '--chart-purple', '--chart-pale-purple', '--chart-pink-purple'
+  '--ch-red', '--ch-orange', '--ch-yellow', '--ch-shiny-green',
+  '--ch-pastel-green', '--ch-turquoise', '--ch-light-blue', '--ch-blue',
+  '--ch-indigo', '--ch-purple', '--ch-pale-purple', '--ch-pink-purple'
 ];
 
 /* ---------- форматирование чисел (ru-RU) ---------- */
@@ -281,16 +281,16 @@ var LABEL = 'ВБС по сделке на 25.02.2026, RUB';
 
 /* доменный маппинг из продукта: позиция → токен палитры */
 var DOMAIN = {
-  'Кредит': '--chart-indigo',
-  'Фондирующий кредит': '--chart-pastel-green',
-  'Внутригрупповой кредит': '--chart-blue',
-  'РЕПО': '--chart-light-blue',
-  'Акции': '--chart-shiny-green',
-  'Облигации': '--chart-turquoise',
-  'Корп. контроль': '--chart-red',
-  'Доп. доходность': '--chart-orange',
-  'Комиссия': '--chart-yellow',
-  'Дебиторская задолженность': '--chart-purple'
+  'Кредит': '--ch-indigo',
+  'Фондирующий кредит': '--ch-pastel-green',
+  'Внутригрупповой кредит': '--ch-blue',
+  'РЕПО': '--ch-light-blue',
+  'Акции': '--ch-shiny-green',
+  'Облигации': '--ch-turquoise',
+  'Корп. контроль': '--ch-red',
+  'Доп. доходность': '--ch-orange',
+  'Комиссия': '--ch-yellow',
+  'Дебиторская задолженность': '--ch-purple'
 };
 function di(label, value, percent) {
   return { id: label, label: label, value: value, percent: percent, color: DOMAIN[label] };

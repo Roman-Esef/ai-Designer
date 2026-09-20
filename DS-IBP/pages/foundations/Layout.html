@@ -37,7 +37,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .lay-frame .screen__content{min-width:1080px}
 /* панель повторяет поведение NavPanel: не скроллится вместе со страницей
    (в проде position:fixed, height:100vh), а внутренний список имеет свой скролл */
-.lay-nav{flex:none;width:56px;align-self:stretch;z-index:4;background:var(--bg-mainmenu);border-right:1px solid var(--border-light);display:flex;flex-direction:column;overflow:hidden}
+.lay-nav{flex:none;width:56px;align-self:stretch;z-index:4;background:var(--bg-main-menu);border-right:1px solid var(--border-light);display:flex;flex-direction:column;overflow:hidden}
 .lay-nav__top,.lay-nav__foot{flex:none;display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 0}
 .lay-nav__foot{border-top:1px solid var(--border-light)}
 .lay-nav__list{flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:thin;display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 0}
@@ -45,7 +45,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .lay-nav__list::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:999px}
 .lay-nav-fixed .lay-nav__top,.lay-nav-fixed .lay-nav__foot,.lay-nav-fixed .lay-nav__list{align-items:stretch;padding:12px}
 .lay-nav-fixed{width:320px}
-.lay-nav__dot{width:24px;height:24px;border-radius:var(--radius-xs);background:var(--c-cgrey-200);flex:none}
+.lay-nav__dot{width:24px;height:24px;border-radius:var(--radius-xs);background:var(--cgrey-200);flex:none}
 .lay-nav__dot--wide{width:100%;height:32px;border-radius:var(--radius-s)}
 .lay-nav-fixed .lay-nav__dot{width:100%;height:32px;border-radius:var(--radius-s)}
 .lay-nav-fixed .lay-nav__top .lay-nav__dot,.lay-nav-fixed .lay-nav__foot .lay-nav__dot{width:100%}
@@ -55,7 +55,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .lay-phead span{font:var(--type-h4-strong);color:var(--text-primary)}
 .lay-rows{display:flex;flex-direction:column}
 .lay-rows div{height:36px;border-bottom:1px solid var(--border-light)}
-.lay-rows div:first-child{background:var(--bgtable-row-focus)}
+.lay-rows div:first-child{background:var(--bg-table-default-focus)}
 /* ---- режим «стартовая страница»: превью повторяет каркас главной ---- */
 /* пороги перестроения демонстрируются слайдером ширины, поэтому нижнюю границу
    контента снимаем: с min-width:1080px слайдер до 900px просто не доехал бы */
@@ -84,12 +84,12 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .lay-toolbar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;height:32px}
 .lay-toolbar__l{display:flex;align-items:center;gap:4px;min-width:0}  /* зазор .tfilter — 4px */
 .lay-pill{height:32px;display:inline-flex;align-items:center;padding:0 12px;border:1px solid var(--border-light);border-radius:var(--radius-control);background:var(--bg-tile);font:var(--type-body-s);color:var(--text-secondary);white-space:nowrap}
-.lay-pill--chip{background:var(--bgtable-row-focus)}
-.lay-sq{width:32px;height:32px;border-radius:var(--radius-control);background:var(--c-cgrey-200);flex:none}
+.lay-pill--chip{background:var(--bg-table-default-focus)}
+.lay-sq{width:32px;height:32px;border-radius:var(--radius-control);background:var(--cgrey-200);flex:none}
 .lay-tbl{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-xl);overflow:hidden}
 .lay-tbl__body{flex:1 1 auto;min-height:0;overflow:auto}
 .lay-tbl__head{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:16px;height:44px;padding:0 16px;background:var(--bg-tile);border-bottom:1px solid var(--border-light)}
-.lay-tbl__head i{height:12px;border-radius:var(--radius-xs);background:var(--c-cgrey-200);flex:none}
+.lay-tbl__head i{height:12px;border-radius:var(--radius-xs);background:var(--cgrey-200);flex:none}
 .lay-tbl__foot{flex:none;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px;border-top:1px solid var(--border-light);font:var(--type-body-s);color:var(--text-secondary)}
 /* подсветка зон — как на разборе макета */
 .is-zones .crumbs{background:color-mix(in srgb, var(--error) 12%, transparent)}
@@ -100,7 +100,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .zone-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font:var(--type-body-s);color:var(--text-secondary)}
 .zone-legend span{display:inline-flex;align-items:center;gap:8px}
 .zone-legend i{width:14px;height:14px;border-radius:4px;flex:none}
-.dev-code{position:relative;background:var(--bgtable-row-focus);border:1px solid var(--border-light);border-radius:var(--radius-m);padding:16px;overflow:auto}
+.dev-code{position:relative;background:var(--bg-table-default-focus);border:1px solid var(--border-light);border-radius:var(--radius-m);padding:16px;overflow:auto}
 .dev-code pre{margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:20px;color:var(--text-primary)}
 .dev-copy{position:absolute;top:10px;right:10px;font:var(--type-body-xs);color:var(--text-secondary);background:var(--bg-tile);border:1px solid var(--border-light);border-radius:var(--radius-xs);padding:4px 12px;cursor:pointer}
 .dev-copy:hover{color:var(--primary);border-color:var(--border-primary)}
@@ -133,7 +133,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
         <div class="zone-legend">
           <span><i style="background:color-mix(in srgb, var(--error) 30%, transparent)"></i>зона крошек — 44 px</span>
           <span><i style="background:color-mix(in srgb, var(--info) 40%, transparent)"></i>поля контентной области — 24 px</span>
-          <span><i style="background:var(--bg-mainmenu);border:1px solid var(--border-light)"></i>панель навигации — не скроллится со страницей, список внутри имеет свой скролл</span>
+          <span><i style="background:var(--bg-main-menu);border:1px solid var(--border-light)"></i>панель навигации — не скроллится со страницей, список внутри имеет свой скролл</span>
         </div>
       </div>
       </div>

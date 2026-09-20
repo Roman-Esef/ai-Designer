@@ -65,9 +65,9 @@
      только сам компонент, а у Entity выбор рассчитан на 6 % от --primary и
      на такой подложке не читается. */
   .hist__item    { padding: var(--space-8) var(--space-12); border-radius: var(--radius-m); cursor: pointer; transition: background-color .15s ease; }
-  .hist__item:hover { background: var(--bgtable-row-hover); }
+  .hist__item:hover { background: var(--bg-table-default-hover); }
   .hist__item:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
-  .hist__item[aria-current="true"] { background: var(--bgtable-row-focus); }
+  .hist__item[aria-current="true"] { background: var(--bg-table-default-focus); }
 
   /* Нить — скролл-колонка (flex:1; min-height:0; overflow-y:auto — обязательная
      форма скролл-контейнера, чек-лист К3) и закреплённый под ней композер. */
@@ -192,9 +192,9 @@
      скругление и состояния, выбранная версия — фон строки таблицы в фокусе. */
   .prv__vers  { display: flex; flex-direction: column; gap: var(--space-4); }
   .prv__ver   { padding: var(--space-8) var(--space-12); border-radius: var(--radius-m); cursor: pointer; transition: background-color .15s ease; }
-  .prv__ver:hover { background: var(--bgtable-row-hover); }
+  .prv__ver:hover { background: var(--bg-table-default-hover); }
   .prv__ver:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
-  .prv__ver[aria-checked="true"] { background: var(--bgtable-row-focus); }
+  .prv__ver[aria-checked="true"] { background: var(--bg-table-default-focus); }
 
   /* узкое окно: одна колонка, выгрузка и версии — над документом;
      прокручивается тело окна, у просмотрщика своя высота */

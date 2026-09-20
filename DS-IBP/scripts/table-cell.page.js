@@ -849,7 +849,7 @@
       slot.appendChild(window.DSChart.make({
         type: 'spark', spark: 'line',
         tone: r[3] === 'auto' ? 'auto' : null,
-        series: [{ id: 'k', data: r[2], color: '--chart-blue' }],
+        series: [{ id: 'k', data: r[2], color: '--ch-blue' }],
         ariaLabel: 'Динамика: ' + r[0]
       }));
     });

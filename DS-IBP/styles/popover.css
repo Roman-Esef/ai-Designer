@@ -69,7 +69,7 @@
   --pop-bg:      var(--bg-popup);       /* #FFFFFF */
   --pop-shadow:  var(--elevation-5);    /* внешнего бордера нет намеренно */
   --pop-head-h:  48px;                  /* фиксированная высота шапки, контент — по центру */
-  --pop-zone-bg: var(--bgtable-pinned); /* фон шапки и подвала — Pinned Default #F5F7F7 */
+  --pop-zone-bg: var(--bg-table-pinned); /* фон шапки и подвала — Pinned Default #F5F7F7 */
 
   /* z-index — тот же слой, что Menu/DropdownList; ниже Toast/Nav и Modal */
   --pop-z: 40; /* @kind other */

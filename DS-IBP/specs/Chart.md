@@ -94,7 +94,7 @@ status: curated
     </div>
     <div class="chart__legend">
       <button class="chart__legend-item" aria-pressed="true">
-        <span class="chart__marker" style="--chart-c:var(--chart-blue)"></span>
+        <span class="chart__marker" style="--chart-c:var(--ch-blue)"></span>
         <span class="chart__legend-name">Поступления</span>
         <span class="chart__legend-val">810 млн</span>
       </button>
@@ -102,7 +102,7 @@ status: curated
     <div class="chart__plot">
       <svg class="chart__svg" role="img" aria-label="Столбчатый график: Поступления от 420 млн (Янв) до 760 млн (Дек)">
         <g class="chart__grid"><line/></g>
-        <g class="chart__ser" data-id="in" style="--chart-c:var(--chart-blue)"><rect class="chart__bar"/></g>
+        <g class="chart__ser" data-id="in" style="--chart-c:var(--ch-blue)"><rect class="chart__bar"/></g>
         <g class="chart__axis"><text/><line/></g>
         <g><line class="chart__ref"/><text class="chart__ref-label"/><text class="chart__vlabel"/></g>
         <g><rect class="chart__band" data-i="0"/></g>

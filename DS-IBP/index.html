@@ -81,7 +81,7 @@
   .card__desc { font: var(--type-body-m); color: var(--text-secondary); margin:0; text-wrap:pretty; flex:1; }
   .card__meta { display:flex; gap:10px; margin-top:6px; flex-wrap:wrap; }
   .tag { font: var(--type-button-xs); letter-spacing:.04em; color: var(--text-primary); background: var(--tertiary); padding:5px 10px; border-radius:999px; }
-  .tag.file { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; text-transform:none; letter-spacing:0; color: var(--text-secondary); background: var(--bgtable-row-focus); }
+  .tag.file { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; text-transform:none; letter-spacing:0; color: var(--text-secondary); background: var(--bg-table-default-focus); }
   .card__go { display:inline-flex; align-items:center; gap:7px; font: var(--type-body-m-strong); color: var(--primary); margin-top:10px; }
   .card__go svg { width:18px; height:18px; transition: transform .15s ease; }
   .card:hover .card__go svg { transform: translateX(3px); }
@@ -188,7 +188,7 @@
       <a class="card" href="pages/foundations/Layout.html">
         <div class="card__preview">
           <div style="display:flex;width:100%;max-width:280px;height:96px;border:1px solid var(--border-light);border-radius:8px;overflow:hidden;background:var(--bg-page)">
-            <div style="width:22px;background:var(--bg-mainmenu);border-right:1px solid var(--border-light)"></div>
+            <div style="width:22px;background:var(--bg-main-menu);border-right:1px solid var(--border-light)"></div>
             <div style="flex:1;display:flex;flex-direction:column">
               <div style="height:22px;background:color-mix(in srgb, var(--error) 12%, transparent);border-bottom:1px solid var(--border-light)"></div>
               <div style="flex:1;display:flex;gap:6px;padding:8px 10px">
@@ -828,14 +828,14 @@
               <span style="font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">1 000 000 000,00</span>
             </div>
             <div style="display:flex; gap:2px; height:8px; border-radius:999px; overflow:hidden;">
-              <span style="flex:35; background:var(--chart-indigo,#8D87F9);"></span>
-              <span style="flex:35; background:var(--chart-shiny-green,#8CCB5E);"></span>
-              <span style="flex:30; background:var(--chart-light-blue,#7DCAFA);"></span>
+              <span style="flex:35; background:var(--ch-indigo,#8D87F9);"></span>
+              <span style="flex:35; background:var(--ch-shiny-green,#8CCB5E);"></span>
+              <span style="flex:30; background:var(--ch-light-blue,#7DCAFA);"></span>
             </div>
             <div style="display:grid; grid-template-columns:8px 1fr auto; gap:8px; align-items:center; font:400 12px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">
-              <span style="width:8px; height:8px; border-radius:50%; background:var(--chart-indigo,#8D87F9);"></span><span>Кредит</span><span style="color:var(--text-secondary,#617C7C);">35,00%</span>
-              <span style="width:8px; height:8px; border-radius:50%; background:var(--chart-shiny-green,#8CCB5E);"></span><span>Акции</span><span style="color:var(--text-secondary,#617C7C);">35,00%</span>
-              <span style="width:8px; height:8px; border-radius:50%; background:var(--chart-light-blue,#7DCAFA);"></span><span>РЕПО</span><span style="color:var(--text-secondary,#617C7C);">30,00%</span>
+              <span style="width:8px; height:8px; border-radius:50%; background:var(--ch-indigo,#8D87F9);"></span><span>Кредит</span><span style="color:var(--text-secondary,#617C7C);">35,00%</span>
+              <span style="width:8px; height:8px; border-radius:50%; background:var(--ch-shiny-green,#8CCB5E);"></span><span>Акции</span><span style="color:var(--text-secondary,#617C7C);">35,00%</span>
+              <span style="width:8px; height:8px; border-radius:50%; background:var(--ch-light-blue,#7DCAFA);"></span><span>РЕПО</span><span style="color:var(--text-secondary,#617C7C);">30,00%</span>
             </div>
           </div>
         </div>
@@ -851,17 +851,17 @@
         <div class="card__preview">
           <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:260px;">
             <div style="display:flex; align-items:flex-end; gap:6px; height:74px;">
-              <span style="flex:1; height:42%; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>
-              <span style="flex:1; height:64%; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>
-              <span style="flex:1; height:52%; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>
-              <span style="flex:1; height:80%; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>
-              <span style="flex:1; height:70%; border-radius:2px; background:var(--chart-turquoise,#3FBFB0);"></span>
-              <span style="flex:1; height:96%; border-radius:2px; background:var(--chart-turquoise,#3FBFB0);"></span>
-              <span style="flex:1; height:86%; border-radius:2px; background:var(--chart-turquoise,#3FBFB0);"></span>
+              <span style="flex:1; height:42%; border-radius:2px; background:var(--ch-blue,#5B8DEF);"></span>
+              <span style="flex:1; height:64%; border-radius:2px; background:var(--ch-blue,#5B8DEF);"></span>
+              <span style="flex:1; height:52%; border-radius:2px; background:var(--ch-blue,#5B8DEF);"></span>
+              <span style="flex:1; height:80%; border-radius:2px; background:var(--ch-blue,#5B8DEF);"></span>
+              <span style="flex:1; height:70%; border-radius:2px; background:var(--ch-turquoise,#3FBFB0);"></span>
+              <span style="flex:1; height:96%; border-radius:2px; background:var(--ch-turquoise,#3FBFB0);"></span>
+              <span style="flex:1; height:86%; border-radius:2px; background:var(--ch-turquoise,#3FBFB0);"></span>
             </div>
             <div style="display:flex; gap:14px; font:400 12px/1.3 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">
-              <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:2px; background:var(--chart-blue,#5B8DEF);"></span>Поступления</span>
-              <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:2px; background:var(--chart-turquoise,#3FBFB0);"></span>Прогноз</span>
+              <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:2px; background:var(--ch-blue,#5B8DEF);"></span>Поступления</span>
+              <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:2px; background:var(--ch-turquoise,#3FBFB0);"></span>Прогноз</span>
             </div>
           </div>
         </div>
@@ -877,15 +877,15 @@
         <div class="card__preview">
           <div style="display:flex; gap:6px; width:100%; max-width:260px; height:96px;">
             <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
-              <span style="height:18px; border-radius:6px; background:var(--c-swamp-100,#E1EDE7);"></span>
-              <span style="height:18px; border-radius:6px; background:var(--c-swamp-100,#E1EDE7);"></span>
-              <span style="height:18px; border-radius:6px; background:var(--c-swamp-100,#E1EDE7);"></span>
+              <span style="height:18px; border-radius:6px; background:var(--swamp-100,#E1EDE7);"></span>
+              <span style="height:18px; border-radius:6px; background:var(--swamp-100,#E1EDE7);"></span>
+              <span style="height:18px; border-radius:6px; background:var(--swamp-100,#E1EDE7);"></span>
             </div>
             <div style="flex:0 0 108px; border:1px solid var(--border-light,#D9E0E0); border-radius:8px 0 0 8px; background:var(--bg-popup,#FFF); padding:8px; display:flex; flex-direction:column; gap:6px;">
               <span style="font:400 9px/1.2 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Заведение › D-1042</span>
               <span style="font:600 11px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">ООО ЮгСтрой</span>
-              <span style="height:8px; border-radius:4px; background:var(--c-swamp-100,#E1EDE7);"></span>
-              <span style="height:8px; width:70%; border-radius:4px; background:var(--c-swamp-100,#E1EDE7);"></span>
+              <span style="height:8px; border-radius:4px; background:var(--swamp-100,#E1EDE7);"></span>
+              <span style="height:8px; width:70%; border-radius:4px; background:var(--swamp-100,#E1EDE7);"></span>
             </div>
           </div>
         </div>
@@ -900,7 +900,7 @@
       <a class="card" href="pages/organisms/Entity.html">
         <div class="card__preview">
           <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
-            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9h0M9 12h0M9 15h0"/></svg></span>
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9h0M9 12h0M9 15h0"/></svg></span>
             <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Контрагент</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ООО ЮгСтройИнвест</span><span style="display:block; font:400 12px/1.3 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">ИНН 7701234567</span></span>
           </div>
         </div>
@@ -915,7 +915,7 @@
       <a class="card" href="pages/organisms/Kanban.html">
         <div class="card__preview">
           <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
-            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></svg></span>
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></svg></span>
             <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Доска · колонка · Card</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">Сделки по этапам</span></span>
           </div>
         </div>
@@ -941,12 +941,12 @@
 
       <a class="card" href="pages/organisms/NavPanel.html">
         <div class="card__preview">
-          <div style="display:flex; height:150px; border:1px solid var(--border-light,#DCE6E6); border-radius:10px; overflow:hidden; background:var(--bg-mainmenu,#fefefe);">
+          <div style="display:flex; height:150px; border:1px solid var(--border-light,#DCE6E6); border-radius:10px; overflow:hidden; background:var(--bg-main-menu,#fefefe);">
             <div style="width:40px; display:flex; flex-direction:column; align-items:center; gap:12px; padding:12px 0; color:var(--text-secondary,#617C7C); border-right:1px solid var(--border-light,#DCE6E6);">
               <i data-icon="left-menu"></i><i data-icon="main-page"></i><i data-icon="pipeline"></i><i data-icon="funds"></i>
             </div>
             <div style="width:150px; display:flex; flex-direction:column; gap:6px; padding:12px 10px; color:var(--text-secondary,#617C7C); font:14px/1 var(--font-text,sans-serif);">
-              <span style="display:flex; align-items:center; gap:10px; height:26px; padding:0 8px; border-radius:6px; background:var(--bgtable-row-focus,#eef3f3); color:var(--text-primary,#2f3b3b);"><i data-icon="main-page" style="width:18px;height:18px;"></i>Главная</span>
+              <span style="display:flex; align-items:center; gap:10px; height:26px; padding:0 8px; border-radius:6px; background:var(--bg-table-default-focus,#eef3f3); color:var(--text-primary,#2f3b3b);"><i data-icon="main-page" style="width:18px;height:18px;"></i>Главная</span>
               <span style="display:flex; align-items:center; gap:10px; padding:0 8px;"><i data-icon="pipeline" style="width:18px;height:18px;"></i>Pipeline</span>
               <span style="display:flex; align-items:center; gap:10px; padding:0 8px;"><i data-icon="funds" style="width:18px;height:18px;"></i>Фонды</span>
             </div>
@@ -966,7 +966,7 @@
             <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;">
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font:600 15px/1.2 var(--font-display,sans-serif); color:var(--text-primary,#333F48); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">D-007. ПАО «Газпром»</span>
-                <span style="flex:none; height:14px; padding:0 6px; border-radius:999px; background:var(--c-swamp-a100,#EEF4F4); font:500 8px/14px var(--font-text,sans-serif); color:var(--text-secondary,#5C6870);">Черновик</span>
+                <span style="flex:none; height:14px; padding:0 6px; border-radius:999px; background:var(--swamp-A100,#EEF4F4); font:500 8px/14px var(--font-text,sans-serif); color:var(--text-secondary,#5C6870);">Черновик</span>
               </div>
               <span style="font:400 9px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9AA5AC);">7 · Версия 12 (07.02.2021)</span>
             </div>
@@ -1060,7 +1060,7 @@
       <a class="card" href="pages/organisms/TableCell.html">
         <div class="card__preview">
           <div style="display:flex; flex-direction:column; width:100%; max-width:280px; border:1px solid var(--border-light,#E1EDE7); border-radius:10px; overflow:hidden; font:400 13px/1 var(--font-text,sans-serif);">
-            <div style="display:grid; grid-template-columns:1.4fr 1fr; background:var(--c-mgrey-50,#fff); border-bottom:1px solid var(--border-primary,#B8CCCC);"><span style="padding:9px 12px; font:600 12px/1.2 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">Контрагент</span><span style="padding:9px 12px; text-align:right; font:600 12px/1.2 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">Сумма ▾</span></div>
+            <div style="display:grid; grid-template-columns:1.4fr 1fr; background:var(--mgrey-50,#fff); border-bottom:1px solid var(--border-primary,#B8CCCC);"><span style="padding:9px 12px; font:600 12px/1.2 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">Контрагент</span><span style="padding:9px 12px; text-align:right; font:600 12px/1.2 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">Сумма ▾</span></div>
             <div style="display:grid; grid-template-columns:1.4fr 1fr; border-bottom:1px solid var(--border-light,#E1EDE7);"><span style="padding:9px 12px; color:var(--text-primary,#1F2D2A); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ООО ЮгСтрой</span><span style="padding:9px 12px; text-align:right; font-variant-numeric:tabular-nums; color:var(--text-primary,#1F2D2A);">1 240 500</span></div>
             <div style="display:grid; grid-template-columns:1.4fr 1fr; background:var(--primary-bg,#F0FAF8);"><span style="padding:9px 12px; color:var(--text-primary,#1F2D2A);">ПАО Ростелеком</span><span style="padding:9px 12px; text-align:right; font-variant-numeric:tabular-nums; color:var(--text-primary,#1F2D2A);">986 300</span></div>
           </div>
@@ -1076,7 +1076,7 @@
       <a class="card" href="pages/organisms/TableFilter.html">
         <div class="card__preview">
           <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; width:100%; max-width:300px; font:400 13px/1 var(--font-text,sans-serif);">
-            <span style="display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border:1px solid var(--border-primary,#B8CCCC); border-radius:8px; background:var(--c-mgrey-50,#fff); color:var(--text-primary,#1F2D2A);"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--primary,#12A594)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg>Фильтр</span>
+            <span style="display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border:1px solid var(--border-primary,#B8CCCC); border-radius:8px; background:var(--mgrey-50,#fff); color:var(--text-primary,#1F2D2A);"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--primary,#12A594)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg>Фильтр</span>
             <span style="display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 8px; border:1px solid var(--st-system-midlight,#CBD9D9); border-radius:8px; background:var(--st-system-light,#EEF3F3); color:var(--text-primary,#1F2D2A);">ТБ: ЦА, МБ ✕</span>
             <span style="display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 8px; border:1px solid var(--st-system-midlight,#CBD9D9); border-radius:8px; background:var(--st-system-light,#EEF3F3); color:var(--text-primary,#1F2D2A);">Дески: RE ✕</span>
             <span style="color:var(--text-inactive,#8A9E9E);">+3</span>
@@ -1092,7 +1092,7 @@
 
       <a class="card" href="pages/organisms/Tile.html">
         <div class="card__preview">
-          <div style="display:flex; flex-direction:column; width:100%; max-width:280px; background:var(--c-mgrey-50,#fff); border:1px solid var(--border-light,#E1EDE7); border-radius:8px; overflow:hidden; font:400 13px/1 var(--font-text,sans-serif);">
+          <div style="display:flex; flex-direction:column; width:100%; max-width:280px; background:var(--mgrey-50,#fff); border:1px solid var(--border-light,#E1EDE7); border-radius:8px; overflow:hidden; font:400 13px/1 var(--font-text,sans-serif);">
             <div style="display:flex; align-items:flex-start; gap:10px; padding:14px 16px 0;"><div style="flex:1;"><div style="font:600 15px/1.2 var(--font-display,sans-serif); color:var(--text-primary,#1F2D2A);">Проектное финансирование</div><div style="margin-top:6px; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-secondary,#617C7C);">Нерезидент</div></div><span style="color:var(--text-inactive,#9DB1B1);">✎</span></div>
             <div style="padding:12px 16px 16px; display:grid; grid-template-columns:1fr 1fr; gap:14px;"><div><div style="font:400 10px/1.2 var(--font-text,sans-serif); color:var(--text-inactive,#9DB1B1);">Объём, млн ед.</div><div style="margin-top:2px; font:600 14px/1.2 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">17 560</div></div><div><div style="font:400 10px/1.2 var(--font-text,sans-serif); color:var(--text-inactive,#9DB1B1);">Маржа, %</div><div style="margin-top:2px; font:600 14px/1.2 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">3</div></div></div>
           </div>
@@ -1116,7 +1116,7 @@
       <a class="card" href="pages/patterns/LocalComponents.html">
         <div class="card__preview">
           <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
-            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/></svg></span>
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/></svg></span>
             <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Правила · продукт</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">Паспорт и состояния</span></span>
           </div>
         </div>
@@ -1130,7 +1130,7 @@
       <a class="card" href="pages/patterns/HomeRoles.html">
         <div class="card__preview">
           <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
-            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
             <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Правила · продукт</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">Роли · тайлы · меню</span></span>
           </div>
         </div>
@@ -1144,7 +1144,7 @@
       <a class="card" href="pages/patterns/Redpolicy.html">
         <div class="card__preview">
           <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
-            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span>
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span>
             <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Правила · контент</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">Валюта · числа · названия</span></span>
           </div>
         </div>
@@ -1166,7 +1166,7 @@
       <a class="card" href="pages/rnd/Backlog.html">
         <div class="card__preview">
           <div style="display:flex; align-items:center; gap:12px; width:100%; max-width:260px;">
-            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--c-swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6M9 16h6"/></svg></span>
+            <span style="flex:none; width:40px; height:40px; border-radius:12px; background:var(--swamp-100,#E1EDE7); color:var(--text-primary,#6E8A82); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6M9 16h6"/></svg></span>
             <span style="min-width:0;"><span style="display:block; font:400 11px/1.3 var(--font-text,sans-serif); color:var(--text-inactive,#9DB2AC);">Рабочая память</span><span style="display:block; font:600 15px/1.3 var(--font-text,sans-serif); color:var(--text-primary,#1F2D2A);">Задачи</span></span>
           </div>
         </div>
@@ -1423,7 +1423,7 @@
     nav.style.cssText='display:flex; align-items:center; justify-content:center; gap:2px;';
     function btn(html, current){
       const b=document.createElement('span');
-      b.style.cssText='width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; font:13px/1 var(--font-text,sans-serif); color:'+(current?'var(--text-primary)':'var(--text-secondary)')+'; background:'+(current?'var(--bgtable-row-focus)':'transparent')+';';
+      b.style.cssText='width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; font:13px/1 var(--font-text,sans-serif); color:'+(current?'var(--text-primary)':'var(--text-secondary)')+'; background:'+(current?'var(--bg-table-default-focus)':'transparent')+';';
       if (typeof html === 'string' && html.length <= 2) b.textContent = html; else b.innerHTML = html;
       if (typeof html !== 'string' || html.length > 2) { b.querySelector('svg').style.cssText='width:16px;height:16px;'; }
       return b;

@@ -246,7 +246,7 @@
       ['1fr', '1.1fr', '0.5fr'], ['Часть', 'Токен', 'Образец'],
       [
         ['Рабочая область и зона крошек', tok('--bg-page'), '<span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid var(--border-light);background:var(--bg-page)"></span>'],
-        ['Панель навигации', tok('--bg-mainmenu'), '<span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid var(--border-light);background:var(--bg-mainmenu)"></span>'],
+        ['Панель навигации', tok('--bg-main-menu'), '<span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid var(--border-light);background:var(--bg-main-menu)"></span>'],
         ['Поверхности контента (тайлы, таблицы)', tok('--bg-tile'), '<span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid var(--border-light);background:var(--bg-tile)"></span>'],
         ['Границы блоков и шов панели', tok('--border-light'), '<span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);background:var(--border-light)"></span>']
       ]);

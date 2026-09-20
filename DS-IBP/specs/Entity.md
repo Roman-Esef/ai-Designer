@@ -59,7 +59,7 @@ status: manual
 - Вложенные подкомпоненты (EntityTextMaster, EntitySubtitleGroup, EntityIconButtonGroup, EntityActions) — только в ДС дизайнеров, отдельно не публикуются.
 
 ## Состояния
-- `.entity--interactive` — кликабельный тайл: hover-фон `--bgtable-row-hover`, фокус-обводка. Подложка выносится наружу на 8/10px — несколько строк подряд собираются в `.entity-list`.
+- `.entity--interactive` — кликабельный тайл: hover-фон `--bg-table-default-hover`, фокус-обводка. Подложка выносится наружу на 8/10px — несколько строк подряд собираются в `.entity-list`.
 - `.entity--selected` — выбран, фон `--primary-bg`; CSS реагирует и на `[aria-selected="true"]` напрямую — класс нужен только для форс-состояния витрины (RulesAudit W1, 12.08.2026).
 - `.entity--selectable` — реальный чекбокс в `.entity__lead` (множественный выбор).
 - `.entity--skeleton` — загрузка: ведущая иконка получает `.sk-surface` (сохраняет размер/радиус), строки — `.sk-line`; общий компонент Skeleton (styles/skeleton.css), `aria-busy`; шиммер замедляется при reduced-motion.
@@ -73,8 +73,8 @@ status: manual
 
 ## Токены (цвета)
 - Label `--text-primary` · счётчик +N `--text-primary` · Subheaders `--text-secondary` · Header/постфикс/«—» `--text-inactive`.
-- Иконка (default): фон `--c-swamp-100`, глиф `--text-primary`. Тон accent: `--primary` 14% / `--primary-dark`. Тон neutral: `--c-cgrey-100` / `--text-secondary`.
-- Интерактив: hover `--bgtable-row-hover`, selected `--primary-bg`, закладка active/фокус `--primary`.
+- Иконка (default): фон `--swamp-100`, глиф `--text-primary`. Тон accent: `--primary` 14% / `--primary-dark`. Тон neutral: `--cgrey-100` / `--text-secondary`.
+- Интерактив: hover `--bg-table-default-hover`, selected `--primary-bg`, закладка active/фокус `--primary`.
 - Ошибка: фон иконки `--error-bg-light`, иконка/Header `--error`.
 
 - **Размеры · Радиус скругления** — Скругление относится к ведущему элементу и растёт вместе с ним. S (32px) — 10px (--radius-l) · M (40px) — 12px (--e-lead-radius = --radius-xl) · L (96px) — 28px (--radius-5xl) · фокус закладки — 4px (--radius-xs).

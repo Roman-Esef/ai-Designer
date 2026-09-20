@@ -27,7 +27,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--bg-mainmenu);
+  background: var(--bg-main-menu);
   font-family: var(--font-text), system-ui, sans-serif;
   overflow: hidden;
 }
@@ -169,7 +169,7 @@
 .nav__badge { flex: none; margin-left: auto; }
 
 /* ---------- состояния пункта ---------------------------------------------- */
-.nav__item:hover { background: var(--bgtable-row-hover); color: var(--text-primary); }
+.nav__item:hover { background: var(--bg-table-default-hover); color: var(--text-primary); }
 .nav__item:hover .nav__ico,
 .nav__item:focus-visible .nav__ico { color: var(--secondary-dark); }
 .nav__item:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
@@ -179,7 +179,7 @@
 .nav__item--selected,
 .nav__item--selected:hover,
 .nav__item[aria-current]:not([aria-current="false"]),
-.nav__item[aria-current]:not([aria-current="false"]):hover { background: var(--bgtable-row-focus); color: var(--text-primary); }
+.nav__item[aria-current]:not([aria-current="false"]):hover { background: var(--bg-table-default-focus); color: var(--text-primary); }
 .nav__item--selected .nav__label,
 .nav__item[aria-current]:not([aria-current="false"]) .nav__label { font: var(--type-body-m-strong); }
 .nav__item--selected .nav__ico,
@@ -264,7 +264,7 @@
   border-top: 1px solid var(--border-light);
   transition: background-color .12s ease;
 }
-.nav__footer:hover { background: var(--bgtable-row-hover); }
+.nav__footer:hover { background: var(--bg-table-default-hover); }
 .nav--rail .nav__footer { justify-content: center; padding: 12px 0; }
 .nav--rail .nav__user { flex: none; justify-content: center; }
 

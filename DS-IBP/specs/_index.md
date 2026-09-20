@@ -16,7 +16,7 @@ purpose: Манифест спек компонентов. Читай нужну
 | Chart | specs/Chart.md | styles/chart.css | tooltip, alert, skeleton, segment-control, icon-button, button, table-cell | 1.002 |
 | Checkbox | specs/Checkbox.md | styles/checkbox.css | label-helper | 1.007 |
 | Chip | specs/Chip.md | styles/chip.css | label-helper, spinner | 1.018 |
-| Colors | specs/Colors.md | — | — | 1.003 |
+| Colors | specs/Colors.md | — | — | 1.004 |
 | ContextMenu | specs/ContextMenu.md | styles/context-menu.css | button | 1.009 |
 | DatePicker | specs/DatePicker.md | styles/datepicker.css | icon-button, button | 1.008 |
 | Divider | specs/Divider.md | styles/divider.css | button | 2.001 |

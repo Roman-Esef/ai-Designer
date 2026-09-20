@@ -472,8 +472,8 @@
           <div class="tc tc--separator"></div>
           <div class="tc"><span class="tc__row"><span class="tc__text">Подложка</span></span></div>
           <div class="tc"><span class="tc__row"><span class="tc__text">Нейтральная (по умолчанию)</span></span></div>
-          <div class="tc"><code class="tok">--c-swamp-100</code></div>
-          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-swamp-100)"></span></div>
+          <div class="tc"><code class="tok">--swamp-100</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--swamp-100)"></span></div>
           <div class="tc"><span class="tc__row"><span class="tc__text">#E5ECEB</span></span></div>
           <div class="tc tc--separator"></div>
         </div>
@@ -508,8 +508,8 @@
           <div class="tc tc--separator"></div>
           <div class="tc"><span class="tc__row"><span class="tc__text">Группа</span></span></div>
           <div class="tc"><span class="tc__row"><span class="tc__text">Чип «+N» — фон</span></span></div>
-          <div class="tc"><code class="tok">--c-cgrey-100</code></div>
-          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-100)"></span></div>
+          <div class="tc"><code class="tok">--cgrey-100</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--cgrey-100)"></span></div>
           <div class="tc"><span class="tc__row"><span class="tc__text">#E8EDED</span></span></div>
           <div class="tc tc--separator"></div>
         </div>
@@ -553,8 +553,8 @@
           <div class="tc tc--separator"></div>
           <div class="tc"><span class="tc__row"><span class="tc__text">Статус (Dot)</span></span></div>
           <div class="tc"><span class="tc__row"><span class="tc__text">Не в сети</span></span></div>
-          <div class="tc"><code class="tok">--c-cgrey-100</code></div>
-          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--c-cgrey-100)"></span></div>
+          <div class="tc"><code class="tok">--cgrey-100</code></div>
+          <div class="tc"><span style="display:inline-block;width:22px;height:22px;border-radius:var(--radius-xs);border:1px solid rgba(40,50,55,.12);vertical-align:middle;background:var(--cgrey-100)"></span></div>
           <div class="tc"><span class="tc__row"><span class="tc__text">#E8EDED</span></span></div>
           <div class="tc tc--separator"></div>
         </div>
@@ -1053,20 +1053,20 @@ function makeGroup({ size='m', shape='circular', items=[], more=0 }) {
   }
   const groups = [
     { name:'Подложка', rows:[
-      ['Нейтральная (по умолчанию)', '--c-swamp-100'],
+      ['Нейтральная (по умолчанию)', '--swamp-100'],
       ['Инициалы / иконка', '--text-primary'],
       ['Акцентная (Entity)', '--primary'],
     ]},
     { name:'Группа', rows:[
       ['Кольцо-разделитель', '--bg-tile'],
-      ['Чип «+N» — фон', '--c-cgrey-100'],
+      ['Чип «+N» — фон', '--cgrey-100'],
       ['Чип «+N» — текст', '--text-secondary'],
     ]},
     { name:'Статус (Dot)', rows:[
       ['В сети', '--success'],
       ['Нет на месте', '--warning'],
       ['Не беспокоить', '--error'],
-      ['Не в сети', '--c-cgrey-100'],
+      ['Не в сети', '--cgrey-100'],
     ]},
     { name:'Интерактив', rows:[
       ['Фокус', '--primary'],
@@ -1248,7 +1248,7 @@ function makeAvatar(o) {
   border-radius: var(--radius-circle);                 /* circular by default */
   overflow: hidden;
   border: none;
-  background: var(--c-swamp-100);
+  background: var(--swamp-100);
   color: var(--text-primary);
   font-family: var(--font-text), system-ui, sans-serif;
   font-weight: var(--weight-semibold);
@@ -1289,7 +1289,7 @@ function makeAvatar(o) {
 .av image-slot { width: 100%; height: 100%; display: block; }
 
 /* ---------- tone (entity / accent fill) ----------------------------------- */
-.av--accent  { background: color-mix(in srgb, var(--primary) 14%, var(--c-mgrey-50)); color: var(--primary-dark); }
+.av--accent  { background: color-mix(in srgb, var(--primary) 14%, var(--mgrey-50)); color: var(--primary-dark); }
 .av--accent .av__icon { color: var(--primary-dark); }
 
 /* ---------- interactive (links to a profile) ------------------------------ */
@@ -1349,7 +1349,7 @@ function makeAvatar(o) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--c-cgrey-100);
+  background: var(--cgrey-100);
   color: var(--text-secondary);
   font-family: var(--font-text), system-ui, sans-serif;
   font-weight: var(--weight-semibold);
