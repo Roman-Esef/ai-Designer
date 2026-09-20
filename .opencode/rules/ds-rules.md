@@ -19,7 +19,7 @@ HTML/CSS, без React и без сборщика.** Экран — это од�
 
 | Путь | Что там |
 |---|---|
-| `DS-IBP/styles/` | CSS компонентов и фундамента, по файлу на компонент. Токены — `DS-IBP/styles/colors.css` (базовые цветовые рампы), `DS-IBP/styles/palette.css` (примитивы `--c-*` + семантика цвета), `DS-IBP/styles/typography.css`, `DS-IBP/styles/spacing.css`, `DS-IBP/styles/radius.css`, `DS-IBP/styles/shadow.css` |
+| `DS-IBP/styles/` | CSS компонентов и фундамента, по файлу на компонент. Токены — `DS-IBP/styles/colors.css` (базовые цветовые рампы, только там hex), `DS-IBP/styles/palette.css` (семантика цвета, ссылается на базовые), `DS-IBP/styles/typography.css`, `DS-IBP/styles/spacing.css`, `DS-IBP/styles/radius.css`, `DS-IBP/styles/shadow.css` |
 | `DS-IBP/ds.css` | Единая точка подключения ДС для экранов (импортирует все `DS-IBP/styles/*`) |
 | `DS-IBP/scripts/ds.js` | Единая точка подключения рантаймов (сам догружает иконки, табы, модалки, таблицы и т.д.) |
 | `DS-IBP/specs/_index.md` | Манифест: компонент → спека → CSS → зависимости → версия |

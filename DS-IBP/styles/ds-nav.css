@@ -82,7 +82,7 @@ body.ds-has-nav { padding-left: var(--ds-nav-w); }
   cursor: pointer; transition: background .12s ease, color .12s ease;
   position: relative;
 }
-.ds-nav__link:hover { background: var(--bgtable-row-hover); color: var(--text-primary); }
+.ds-nav__link:hover { background: var(--bg-table-default-hover); color: var(--text-primary); }
 
 .ds-nav__dot { width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--border-primary); transition: background .12s ease; }
 .ds-nav__link:hover .ds-nav__dot { background: var(--text-secondary); }

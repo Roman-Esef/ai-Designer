@@ -301,7 +301,7 @@
 
     const rows = [
       ['Default', () => sample(1), [
-        ['Track заливка', 'color-mix(in srgb, var(--c-swamp-400) 16%, transparent)', 'Swamp_400, 16%', 'полупрозрачная'],
+        ['Track заливка', 'color-mix(in srgb, var(--swamp-400) 16%, transparent)', 'Swamp_400, 16%', 'полупрозрачная'],
         ['Текст (unselected)', '--text-secondary', 'Text_Secondary', 'CGrey_500'],
         ['Индикатор (thumb)', '--bg-tile', 'BG_Tile', '#FFFFFF + shadow'],
         ['Текст (selected)', '--primary', 'Primary', 'Emerald_500'],
@@ -406,7 +406,7 @@
     }
     const groups = [
       { name: 'Track / индикатор', rows: [
-        ['Track заливка', 'color-mix(in srgb, var(--c-swamp-400) 16%, transparent)'], ['Индикатор (thumb)', '--bg-tile'], ['Разделитель', '--border-primary'],
+        ['Track заливка', 'color-mix(in srgb, var(--swamp-400) 16%, transparent)'], ['Индикатор (thumb)', '--bg-tile'], ['Разделитель', '--border-primary'],
       ] },
       { name: 'Текст', rows: [
         ['Unselected', '--text-secondary'], ['Hover', '--text-primary'], ['Selected', '--primary'],

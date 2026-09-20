@@ -214,7 +214,7 @@
   background: var(--st-grey);
 }
 .kbcol--green   .kbcol__marker { background: var(--st-green); }
-.kbcol--lblue   .kbcol__marker { background: var(--st-lblue); }
+.kbcol--lblue   .kbcol__marker { background: var(--st-blue); }
 .kbcol--orange  .kbcol__marker { background: var(--st-orange); }
 .kbcol--dpurple .kbcol__marker { background: var(--st-dpurple); }
 .kbcol--primary .kbcol__marker { background: var(--st-primary); }
@@ -452,7 +452,7 @@
    Ghost — место схваченной карточки: геометрия сохранена, поэтому
    список не схлопывается и соседи не прыгают. */
 .kbcard--ghost {
-  background: var(--bgtable-row-focus);
+  background: var(--bg-table-default-focus);
   border-style: dashed;
   border-color: var(--border-primary);
   box-shadow: none;

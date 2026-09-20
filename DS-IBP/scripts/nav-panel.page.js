@@ -413,7 +413,7 @@
     if (!wrap) return;
     var groups = [
       ['Панель', [
-        ['Фон панели', '--bg-mainmenu'],
+        ['Фон панели', '--bg-main-menu'],
         ['Шов Fixed / разделители', '--border-light'],
         ['Тень Drawer', '--shadow-modal-form']
       ]],
@@ -422,8 +422,8 @@
         ['Текст подписи Hover · Selected', '--text-primary'],
         ['Иконка Default', '--secondary'],
         ['Иконка Hover · Selected', '--secondary-dark'],
-        ['Заливка Hover', '--bgtable-row-hover'],
-        ['Заливка Selected', '--bgtable-row-focus'],
+        ['Заливка Hover', '--bg-table-default-hover'],
+        ['Заливка Selected', '--bg-table-default-focus'],
         ['Текст / иконка Disabled', '--text-inactive']
       ]],
       ['Служебное', [

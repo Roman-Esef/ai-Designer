@@ -602,7 +602,7 @@ function setSummary(field, n) {
       ['Текст', '--text-primary'],
       ['Helper', '--text-inactive'],
       ['Фон · hover / focus', '--tertiary-light'],
-      ['Фон · выбранная', '--bgtable-row-focus'],
+      ['Фон · выбранная', '--bg-table-default-focus'],
     ]},
     { name: 'Выбор', rows: [
       ['Чекбокс · заливка', '--primary'],

@@ -44,7 +44,7 @@
   white-space: nowrap;
   user-select: none;
   /* neutral tone by default */
-  background: var(--c-cgrey-100);
+  background: var(--cgrey-100);
   color: var(--text-primary);
   transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
 }
@@ -70,7 +70,7 @@
 .badge--dot.badge--dot-l { width: 10px; height: 10px; min-width: 10px; }
 
 /* ---------- tone ---------------------------------------------------------- */
-.badge--neutral { background: var(--c-cgrey-100); color: var(--text-primary); }
+.badge--neutral { background: var(--cgrey-100); color: var(--text-primary); }
 .badge--accent  { background: var(--primary);     color: var(--text-on-dark); }
 .badge--success { background: var(--success);     color: var(--text-on-dark); }
 .badge--info    { background: var(--info);        color: var(--text-on-dark); }

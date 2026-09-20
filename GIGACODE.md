@@ -71,7 +71,7 @@ HTML + markdown-спеку экрана, проверить и сдать.
 | `DS-IBP/specs/_cheatsheet.md` | Чит-шит: по блоку на каждый компонент. **Большой — читать только точечно** |
 | `DS-IBP/specs/<Имя>.md` | Полная спека компонента |
 | `DS-IBP/specs/Icons.md` | Все имена глифов (вставляются как `<i data-icon="имя">`) |
-| `DS-IBP/styles/colors.css` (базовые цветовые рампы), `palette.css` (примитивы + семантика цвета), `typography.css`, `spacing.css`, `radius.css`, `shadow.css` | Токены фундамента |
+| `DS-IBP/styles/colors.css` (базовые цветовые рампы), `palette.css` (семантика цвета), `typography.css`, `spacing.css`, `radius.css`, `shadow.css` | Токены фундамента |
 | `DS-IBP/templates/screen/Screen.html` | Стартовый шаблон экрана |
 | `DS-IBP/pages/` | Документация компонентов (не читать целиком) |
 

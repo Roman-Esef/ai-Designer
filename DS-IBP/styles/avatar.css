@@ -40,7 +40,7 @@
   border-radius: var(--radius-circle);                 /* circular by default */
   overflow: hidden;
   border: none;
-  background: var(--c-swamp-100);
+  background: var(--swamp-100);
   color: var(--text-primary);
   font-family: var(--font-text), system-ui, sans-serif;
   font-weight: var(--weight-semibold);
@@ -81,7 +81,7 @@
 .av image-slot { width: 100%; height: 100%; display: block; }
 
 /* ---------- tone (entity / accent fill) ----------------------------------- */
-.av--accent  { background: color-mix(in srgb, var(--primary) 14%, var(--c-mgrey-50)); color: var(--primary-dark); }
+.av--accent  { background: color-mix(in srgb, var(--primary) 14%, var(--mgrey-50)); color: var(--primary-dark); }
 .av--accent .av__icon { color: var(--primary-dark); }
 
 /* ---------- interactive (links to a profile) ------------------------------ */
@@ -141,7 +141,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--c-cgrey-100);
+  background: var(--cgrey-100);
   color: var(--text-secondary);
   font-family: var(--font-text), system-ui, sans-serif;
   font-weight: var(--weight-semibold);

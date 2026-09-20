@@ -20,7 +20,7 @@
   padding: 6px 16px;
   font: var(--type-body-s);
   color: var(--text-primary);
-  background: var(--bgtable);
+  background: var(--bg-table-default);
   border-bottom: 1px solid var(--border-light);
   transition: background-color .12s ease;
 }
@@ -30,8 +30,8 @@
 .tc--center { justify-content: center;    text-align: center; } /* служебное: checkbox/iconbuttons/кнопки; не выбирается для текста в конструкторе */
 
 /* --- фоновые тона (колонки) --- */
-.tc--accent { background: var(--bgtable-accent); }
-.tc--pinned { background: var(--bgtable-pinned); }
+.tc--accent { background: var(--bg-table-accent); }
+.tc--pinned { background: var(--bg-table-pinned); }
 
 /* --- интерактивные состояния — свойство СТРОКИ, не ячейки ---------------- */
 /* Hover/focus/selected красят ВСЕ ячейки строки, включая ячейки-разделители:
@@ -40,24 +40,24 @@
    реальная строка несёт aria-selected="true" (RulesAudit W1). */
 .tbl__row:hover > .tc,
 .tbl__row--hover > .tc,
-.tc--hover                    { background: var(--bgtable-row-hover); }
+.tc--hover                    { background: var(--bg-table-default-hover); }
 .tbl__row:hover > .tc--accent,
 .tbl__row--hover > .tc--accent,
-.tc--accent.tc--hover         { background: var(--bgtable-accent-hover); }
+.tc--accent.tc--hover         { background: var(--bg-table-accent-hover); }
 .tbl__row:hover > .tc--pinned,
 .tbl__row--hover > .tc--pinned,
-.tc--pinned.tc--hover         { background: var(--bgtable-pinned-hover); }
+.tc--pinned.tc--hover         { background: var(--bg-table-pinned-hover); }
 
 .tbl__row:focus-within > .tc,
 .tbl__row--focus > .tc,
 .tc--focus,
-.tc:focus-within              { background: var(--bgtable-row-focus); }
+.tc:focus-within              { background: var(--bg-table-default-focus); }
 .tbl__row:focus-within > .tc--accent,
 .tbl__row--focus > .tc--accent,
-.tc--accent.tc--focus         { background: var(--bgtable-accent-focus); }
+.tc--accent.tc--focus         { background: var(--bg-table-accent-focus); }
 .tbl__row:focus-within > .tc--pinned,
 .tbl__row--focus > .tc--pinned,
-.tc--pinned.tc--focus         { background: var(--bgtable-pinned-focus); }
+.tc--pinned.tc--focus         { background: var(--bg-table-pinned-focus); }
 
 /* фокус клавиатурой на самой ячейке — обводка-инсет */
 .tc:focus-visible {
@@ -69,11 +69,11 @@
 .tbl__row[aria-selected="true"] > .tc,
 .tc--selected                 { background: var(--primary-bg); }
 /* форс-состояние строки сильнее наведения: строка в фокусе остаётся в фокусе */
-.tbl__row--focus:hover > .tc  { background: var(--bgtable-row-focus); }
+.tbl__row--focus:hover > .tc  { background: var(--bg-table-default-focus); }
 .tbl__row--selected:hover > .tc,
 .tbl__row--selected.tbl__row--hover > .tc,
 .tbl__row[aria-selected="true"]:hover > .tc,
-.tc--selected.tc--hover       { background: color-mix(in srgb, var(--c-emerald-500) 10%, transparent); }
+.tc--selected.tc--hover       { background: color-mix(in srgb, var(--emerald-500) 10%, transparent); }
 
 /* --- error --- */
 /* Состояния disabled у таблицы нет: строку/ячейку недоступной не делаем. */
@@ -187,7 +187,7 @@
   cursor: pointer;
   transition: background-color .12s ease, transform .15s ease;
 }
-.tc__twisty:hover { background: var(--c-swamp-100); color: var(--text-primary); }
+.tc__twisty:hover { background: var(--swamp-100); color: var(--text-primary); }
 .tc__twisty:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 .tc__twisty :is(svg,[data-icon]){ display: block; width: 16px; height: 16px; }.tc__twisty[aria-expanded="true"] { transform: rotate(90deg); }
 /* лист дерева без раскрытия — резервируем место под твисти */
@@ -234,28 +234,28 @@
   padding: 0;
   gap: 0;
   /* явная заливка как у обычной ячейки: базовый .tc/.th уже даёт
-     var(--bgtable), но цвет совпадает с фоном .tbl (--bg-tile = mgrey-50),
+     var(--bg-table-default), но цвет совпадает с фоном .tbl (--bg-tile = mgrey-50),
      поэтому сепаратор выглядел «пустым»; фиксируем фон явно */
-  background: var(--bgtable);
+  background: var(--bg-table-default);
 }
 /* прилипший к закреплённой колонке сепаратор красится как закреплённая ячейка
-   (var(--bgtable-pinned)) — сливается с колонкой в сплошную полосу. Только фон,
+   (var(--bg-table-pinned)) — сливается с колонкой в сплошную полосу. Только фон,
    БЕЗ box-shadow: тень-разделитель принадлежит примыкающей закреплённой колонке */
 .tc--separator[data-pin-side],
 .th--separator[data-pin-side] {
-  background: var(--bgtable-pinned);
+  background: var(--bg-table-pinned);
 }
 /* прилипший сепаратор наследует интерактивные состояния закреплённой колонки.
    Без этих правил общий `.tbl__row:hover > .tc` (0,3,0) перебивал базовую заливку
-   (0,2,0) и красил сепаратор в --bgtable-row-hover (≈ белый) вместо
-   --bgtable-pinned-hover — ховер «не срабатывал», а при наведении сепаратор
+   (0,2,0) и красил сепаратор в --bg-table-default-hover (≈ белый) вместо
+   --bg-table-pinned-hover — ховер «не срабатывал», а при наведении сепаратор
    выглядел прозрачным рядом с затемнившейся колонкой */
 .tbl__row:hover > .tc--separator[data-pin-side],
 .tbl__row--hover > .tc--separator[data-pin-side],
-.tc--separator.tc--hover[data-pin-side] { background: var(--bgtable-pinned-hover); }
+.tc--separator.tc--hover[data-pin-side] { background: var(--bg-table-pinned-hover); }
 .tbl__row:focus-within > .tc--separator[data-pin-side],
 .tbl__row--focus > .tc--separator[data-pin-side],
-.tc--separator.tc--focus[data-pin-side] { background: var(--bgtable-pinned-focus); }
+.tc--separator.tc--focus[data-pin-side] { background: var(--bg-table-pinned-focus); }
 .tbl__row--selected > .tc--separator[data-pin-side],
 .tbl__row[aria-selected="true"] > .tc--separator[data-pin-side],
 .tc--separator.tc--selected[data-pin-side] { background: var(--primary-bg); }
@@ -312,7 +312,7 @@
   width: 0; height: 0;
   border-style: solid;
   border-width: 0 7px 7px 0;
-  border-color: transparent var(--chart-orange) transparent transparent;
+  border-color: transparent var(--ch-orange) transparent transparent;
   pointer-events: none;
 }
 
@@ -338,7 +338,7 @@
 .th--right  { justify-content: flex-end;  text-align: right;  }
 /* закреплённая колонка — фон Pinned и у шапки (без hover-затемнения:
    фон закреплённой колонки стабилен, чтобы отличать её от скроллящегося контента) */
-.th--pinned { background: var(--bgtable-pinned); }
+.th--pinned { background: var(--bg-table-pinned); }
 .th--center { justify-content: center; }
 .th__label {
   min-width: 0;

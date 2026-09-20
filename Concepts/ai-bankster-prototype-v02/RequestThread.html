@@ -78,7 +78,7 @@
   .hsearch__control::placeholder { color: var(--text-inactive); opacity: 1; }
   .hsearch__control::-webkit-search-cancel-button { display: none; }
   .hsearch__clear { flex: none; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: var(--radius-s); background: transparent; color: var(--text-secondary); cursor: pointer; }
-  .hsearch__clear:hover { background: var(--bgtable-row-hover); color: var(--text-primary); }
+  .hsearch__clear:hover { background: var(--bg-table-default-hover); color: var(--text-primary); }
   .hsearch__clear[hidden] { display: none; }
   .hsearch__clear > [data-icon] { width: 16px; height: 16px; }
   .hist__hl      { color: inherit; background: color-mix(in srgb, var(--primary) 18%, transparent); border-radius: var(--radius-2xs); box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent); }
@@ -92,16 +92,16 @@
      только сам компонент, а у Entity выбор рассчитан на 6 % от --primary и
      на такой подложке не читается. */
   /* Наведение — как у пункта бокового меню, но на тон темнее. В меню это
-     --bgtable-row-hover на белом; на фоне панели (--bg-page) он не виден.
+     --bg-table-default-hover на белом; на фоне панели (--bg-page) он не виден.
      Локальный токен --hist-row-hover — смесь цвета текущей нити
-     (--bgtable-row-focus) с фоном панели: тот же зелёно-серый оттенок,
+     (--bg-table-default-focus) с фоном панели: тот же зелёно-серый оттенок,
      заметно светлее выбранной строки. Кандидат в ДС: подсветка строки
      на фоне страницы. */
-  .hist          { --hist-row-hover: color-mix(in srgb, var(--bgtable-row-focus) 45%, var(--bg-page)); }
+  .hist          { --hist-row-hover: color-mix(in srgb, var(--bg-table-default-focus) 45%, var(--bg-page)); }
   .hist__item    { padding: var(--space-8) var(--space-12); border-radius: var(--radius-m); cursor: pointer; transition: background-color .15s ease; }
   .hist__item:hover { background: var(--hist-row-hover); }
   .hist__item:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
-  .hist__item[aria-current="true"] { background: var(--bgtable-row-focus); }
+  .hist__item[aria-current="true"] { background: var(--bg-table-default-focus); }
 
   /* Нить — скролл-колонка (flex:1; min-height:0; overflow-y:auto — обязательная
      форма скролл-контейнера, чек-лист К3) и закреплённый под ней композер. */

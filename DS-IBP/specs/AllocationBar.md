@@ -34,7 +34,7 @@ status: curated
 | Максимальная ширина | 600px (`--albar-max-w`); в резиновой сетке — `.albar--stretch` |
 | Позиций | 1–12; свыше `maxVisibleItems` (по умолчанию 5) — кнопка «Показать ещё N», внутреннего скролла нет |
 | Палитра | только 12 токенов `--chart-*` по индексу позиции, без цикла; с 13-й — виртуальная «Прочее» |
-| Явный цвет | `items[].color` = имя токена (`--chart-indigo`), не hex |
+| Явный цвет | `items[].color` = имя токена (`--ch-indigo`), не hex |
 | Высота бара | всегда 8px на любом брейкпоинте |
 | Мин. ширина сегмента | 2px, добивается через ResizeObserver, остаток делится пропорционально |
 | Нулевая позиция | строка есть, сегмента нет; все значения = 0 → состояние Empty |
@@ -79,12 +79,12 @@ status: curated
       <div class="albar__total"><span>1 000 000 000,00</span><span class="albar__unit">RUB</span></div>
     </div>
     <div class="albar__bar" role="img" aria-label="Распределение: Кредит 35,00%, …">
-      <div class="albar__seg" data-id="kr" style="background:var(--chart-indigo);flex-grow:35"></div>
+      <div class="albar__seg" data-id="kr" style="background:var(--ch-indigo);flex-grow:35"></div>
       <div class="albar__seg albar__seg--rest" style="flex-grow:5"></div>
     </div>
     <div class="albar__list">
       <div class="albar__row" data-id="kr">
-        <span class="albar__dot" style="background:var(--chart-indigo)"></span>
+        <span class="albar__dot" style="background:var(--ch-indigo)"></span>
         <span class="albar__name">Кредит</span>
         <span class="albar__pct">35,00%</span>
         <span class="albar__val">350 000 000,00</span>

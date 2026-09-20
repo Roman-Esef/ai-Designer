@@ -42,7 +42,7 @@ status: curated
 - **Состояния** — на уровне ячейки дня: default · hover (заливка кружка) · today (обводка --primary) · selected / концы диапазона (заливка --primary, белое число) · in-range (полоса --primary-bg) · disabled (приглушено, не реагирует) · outside (сосед. месяц, приглушено).
 - **Доступность** — root `role="dialog"` + `aria-modal="false"` + `aria-label="Выбор даты"`; сетка `role="grid"`, ячейки `role="gridcell"` + полный `aria-label`. Выбор/недоступность ячейки дня красятся и по `[aria-selected="true"]`/`[aria-disabled="true"]` напрямую — классы `.dpk__day--selected`/`--disabled` нужны только для форс-состояний витрины (RulesAudit W1, 12.08.2026).даты + `aria-selected`; недоступные `aria-disabled="true"`. Клавиатура: ←→ день, ↑↓ неделя, PageUp/Down месяц, Home/End неделя, Enter/Space выбрать, Esc закрыть.
 - **Типографика** — заголовок Body S Strong; числа и ячейки месяца/года Body S (табличные цифры); дни недели Body XS.
-- **Цвета** — поверхность --bg-popup + --elevation-5; выбор/концы диапазона --primary (число --text-on-dark); полоса диапазона --primary-bg; сегодня — обводка --primary; дни недели/сосед. месяц --text-inactive; ховер --bgtable-row-hover; недоступно --st-disabled; радиус --radius-m.
+- **Цвета** — поверхность --bg-popup + --elevation-5; выбор/концы диапазона --primary (число --text-on-dark); полоса диапазона --primary-bg; сегодня — обводка --primary; дни недели/сосед. месяц --text-inactive; ховер --bg-table-default-hover; недоступно --st-disabled; радиус --radius-m.
 
 ## Для разработчиков (выжимка)
 
