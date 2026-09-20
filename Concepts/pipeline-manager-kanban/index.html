@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!-- Главная страница IBP — стартовый экран прототипа Pipeline Management.
+     Раскладка стартовой страницы — по правилу Layout: шапки страницы нет,
+     крошка одна, контент — сетка групп .grid12 (.col-3 / .colw-6), внутри
+     группы заголовок H5 Strong и тайлы NavTile, фон — background-illustration.
+     Новое в прототипе — тайл «Pipeline Management» в группе Pipeline:
+     ведёт на PipelineManagement.html.
+     Контекст для правки: DS-IBP/specs/_cheatsheet.md. CSS компонентов не читать. -->
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Главная — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; scrollbar-gutter: stable; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ── Раскладка этого экрана ──────────────────────────────────────────────
+     Только раскладка на токенах. Сетку групп даёт штатная .grid12 из ДС,
+     ширину группы — пара .col-3 / .colw-6; экран своей сетки не строит.
+     Фоновая иллюстрация — признак стартовой страницы (Layout): cover, opacity .6. */
+  .home-wrap { position: relative; min-height: calc(100vh - var(--layout-crumbs-h)); }
+  .home-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("../../DS-IBP/assets/illustrations/background-illustration.svg") center/cover no-repeat;
+    opacity: .6;
+    pointer-events: none;
+  }
+  .home-groups { position: relative; }
+  .home-group { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; }
+  .home-group .ntile { width: auto; min-width: 0; }
+  .home-group__head { font: var(--type-h5-strong); color: var(--text-primary); margin: 0; }
+
+  /* Перестроение 4 → 2 → 1. Первый шаг — штатная пара .col-N / .colw-N.
+     Второй парой не выражается и пишется экраном, но обязан иметь ту же
+     специфичность (0,2,0) и стоять ниже правила пары. */
+  @container screen (max-width: 1700px) { .grid12 > [class*="colw-"] { grid-column: span var(--colw); } }
+  @container screen (max-width: 900px)  { .grid12 > .home-group { grid-column: span 12; } }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <nav class="nav nav--rail" aria-label="Главное меню">
+    <div class="nav__top">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Развернуть меню"><i data-icon="left-menu"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list">
+      <a class="nav__item nav__item--selected" href="index.html" aria-current="page"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
+      <div class="nav__block">
+        <div class="nav__block-label">Origination</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="file-check"></i></span><span class="nav__label">Обязательные сделки</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="deals-possible-deals"></i></span><span class="nav__label">Возможные сделки</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="file-basic"></i></span><span class="nav__label">Лиды</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="important-leads"></i></span><span class="nav__label">Обязательные лиды</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="possible-leads"></i></span><span class="nav__label">Возможные лиды</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Pipeline</div>
+        <a class="nav__item" href="PipelineManagement.html"><span class="nav__ico"><i data-icon="layout-grid-01"></i></span><span class="nav__label">Pipeline Management</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="pipeline"></i></span><span class="nav__label">Pipeline</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="ckp-pipeline"></i></span><span class="nav__label">Pipeline ЦКП</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="mna-pipeline"></i></span><span class="nav__label">M&amp;A Pipeline</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="kpki-cal"></i></span><span class="nav__label">Календарь КПКИ</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Текущий портфель</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="current-depo"></i></span><span class="nav__label">Текущий портфель ДИД</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="cash-flow"></i></span><span class="nav__label">CF СБИ</span></a>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="corporate-transactions"></i></span><span class="nav__label">Корпоративные запросы</span></a>
+      </div>
+      <div class="nav__block">
+        <div class="nav__block-label">Отчёты</div>
+        <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="rwa"></i></span><span class="nav__label">RWA</span></a>
+      </div>
+    </div>
+    <div class="nav__footer">
+      <a class="nav__user" href="../../index.html" aria-label="Хаб проектов">
+        <span class="av av--circular av--m"><span class="av__text">АП</span></span>
+        <span class="nav__user-text"><span class="nav__user-name">Александров Пётр Константинович</span><span class="nav__user-role">Руководитель деска</span></span>
+      </a>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>
+    </div>
+  </nav>
+
+  <div class="screen">
+
+    <nav class="crumbs" aria-label="Хлебные крошки">
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Главная</span>
+      </li>
+    </nav>
+
+    <main class="screen__content">
+      <div class="home-wrap">
+        <div class="grid12 home-groups">
+
+          <section class="home-group col-3 colw-6">
+            <h2 class="home-group__head">Origination</h2>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="important-deals" aria-hidden="true"></span>
+              <h3 class="ntile__title">Обязательные сделки</h3>
+              <p class="ntile__desc">Сделки с продуктами ДИД и/или А-риском</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="possible-deals" aria-hidden="true"></span>
+              <h3 class="ntile__title">Возможные сделки</h3>
+              <p class="ntile__desc">Прочие сделки в Банке от 500 млн RUB</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="booked-deals" aria-hidden="true"></span>
+              <h3 class="ntile__title">Лиды</h3>
+              <p class="ntile__desc">Драфты будущих сделок ДИД, в т.ч. лиды для КМ</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="important-leads" aria-hidden="true"></span>
+              <h3 class="ntile__title">Обязательные лиды</h3>
+              <p class="ntile__desc">Компании роста, Топ-клиенты, продукты ДИД и ИК/ПФ от 5 млрд RUB</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="possible-leads" aria-hidden="true"></span>
+              <h3 class="ntile__title">Возможные лиды</h3>
+              <p class="ntile__desc">ИК/ПФ от 1 до 3 млрд RUB</p>
+            </a>
+          </section>
+
+          <section class="home-group col-3 colw-6">
+            <h2 class="home-group__head">Pipeline</h2>
+            <!-- Новый тайл прототипа. Своей иллюстрации «Pipeline Management» в ДС
+                 пока нет — стоит ближайшая из набора (ecm-pipeline), см. спеку. -->
+            <a class="ntile" href="PipelineManagement.html">
+              <span class="illu ntile__illu" data-illu="ecm-pipeline" aria-hidden="true"></span>
+              <h3 class="ntile__title">Pipeline Management</h3>
+              <p class="ntile__desc">Pipeline по дескам и статусам</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="pipeline" aria-hidden="true"></span>
+              <h3 class="ntile__title">Pipeline</h3>
+              <p class="ntile__desc">Все сделки моего деска</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="ckp-pipeline" aria-hidden="true"></span>
+              <h3 class="ntile__title">Pipeline ЦКП</h3>
+              <p class="ntile__desc">Все сделки моего деска ЦКП</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="mna-pipeline" aria-hidden="true"></span>
+              <h3 class="ntile__title">M&amp;A Pipeline</h3>
+              <p class="ntile__desc">Все сделки M&amp;A</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="kpki-cal" aria-hidden="true"></span>
+              <h3 class="ntile__title">Календарь КПКИ</h3>
+              <p class="ntile__desc">Перечень сделок, обсуждаемых на Комитете</p>
+            </a>
+          </section>
+
+          <section class="home-group col-3 colw-6">
+            <h2 class="home-group__head">Текущий портфель</h2>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="current-depo" aria-hidden="true"></span>
+              <h3 class="ntile__title">Текущий портфель ДИД</h3>
+              <p class="ntile__desc">Все активные сделки ДИД</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="cash-flow" aria-hidden="true"></span>
+              <h3 class="ntile__title">CF СБИ</h3>
+              <p class="ntile__desc">Плановые платежи по сделкам ГК СБИ</p>
+            </a>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="corporate-transactions" aria-hidden="true"></span>
+              <h3 class="ntile__title">Корпоративные запросы</h3>
+              <p class="ntile__desc">Реестр корпоративных запросов</p>
+            </a>
+          </section>
+
+          <section class="home-group col-3 colw-6">
+            <h2 class="home-group__head">Отчёты</h2>
+            <a class="ntile" href="#">
+              <span class="illu ntile__illu" data-illu="rwa" aria-hidden="true"></span>
+              <h3 class="ntile__title">RWA</h3>
+              <p class="ntile__desc">RWA: Коды и отправка в КАП</p>
+            </a>
+          </section>
+
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="../../DS-IBP/scripts/ds.js"></script>
+</body>
+</html>
