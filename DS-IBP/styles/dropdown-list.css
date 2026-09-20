@@ -48,8 +48,8 @@
   --ddl-item-gap:           10px;
   --ddl-icon:               20px;
   --ddl-item-hover:         var(--tertiary-light);        /* #EEF2F1 — нейтральный серый */
-  --ddl-item-selected:      var(--bgtable-row-focus);     /* #DEEDEC — «выбранная строка»*/
-  --ddl-item-selected-hover: color-mix(in srgb, var(--c-swamp-300) 30%, var(--bg-popup));
+  --ddl-item-selected:      var(--bg-table-default-focus);     /* #DEEDEC — «выбранная строка»*/
+  --ddl-item-selected-hover: color-mix(in srgb, var(--swamp-300) 30%, var(--bg-popup));
   --ddl-shadow:             var(--elevation-2);           /* тень выпадашки — Elevation_2 из shadow.css */
 
   box-sizing: border-box;
@@ -185,7 +185,7 @@
 }
 
 .ddl__item:active,
-.ddl__item.is-active { background: color-mix(in srgb, var(--c-swamp-500) 12%, var(--bg-popup)); }
+.ddl__item.is-active { background: color-mix(in srgb, var(--swamp-500) 12%, var(--bg-popup)); }
 
 /* selected — заливка «выбранной строки» + усиленная подпись */
 .ddl__item[aria-selected="true"],

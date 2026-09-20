@@ -22,7 +22,7 @@
     background:
       linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
       repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
-  .pg__stage.is-dark { background: var(--c-cgrey-800); }
+  .pg__stage.is-dark { background: var(--cgrey-800); }
   .pg__stagebox { width:100%; max-width:380px; display:flex; align-items:center; justify-content:center; }
 
   .ctl { display:flex; flex-direction:column; gap:10px; }
@@ -51,7 +51,7 @@
   .compo-row + .compo-row, .matrix-row + .matrix-row { padding-top:22px; border-top:1px solid var(--border-light); }
   .matrix-wrap { overflow-x:auto; }
   .matrix-cell { display:flex; align-items:center; min-height:32px; }
-  .matrix-cell.dark { background: var(--c-cgrey-800); border-radius: var(--radius-xl); padding:14px 18px; max-width:fit-content; }
+  .matrix-cell.dark { background: var(--cgrey-800); border-radius: var(--radius-xl); padding:14px 18px; max-width:fit-content; }
 
   /* ---------- tone scale ---------- */
   .tone-grid { display:flex; flex-direction:column; gap:0; }
@@ -59,7 +59,7 @@
   .tone-row:first-child { border-top:none; padding-top:0; }
   .tone-row .tn { font: var(--type-body-m-strong); color: var(--text-primary); }
   .tone-row .td2 { font: var(--type-body-s); color: var(--text-secondary); margin-top:2px; }
-  .tone-row.dark { background: var(--c-cgrey-800); border-radius: var(--radius-xl); padding:16px 18px; border-top:none; }
+  .tone-row.dark { background: var(--cgrey-800); border-radius: var(--radius-xl); padding:16px 18px; border-top:none; }
   .tone-row.dark .tn { color: var(--text-on-dark); }
   .tone-row.dark .td2 { color: rgba(255,255,255,.6); }
 
@@ -75,7 +75,7 @@
   .ref-table code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.85em; }
 
   /* ---------- developer handoff ---------- */
-  .badge-proposal { display:inline-block; font: var(--type-button-xs); letter-spacing:.06em; text-transform:uppercase; color: var(--text-secondary); background: var(--c-cgrey-100); border:1px solid var(--border-light); padding:3px 9px; border-radius:999px; margin-left:12px; vertical-align:middle; }
+  .badge-proposal { display:inline-block; font: var(--type-button-xs); letter-spacing:.06em; text-transform:uppercase; color: var(--text-secondary); background: var(--cgrey-100); border:1px solid var(--border-light); padding:3px 9px; border-radius:999px; margin-left:12px; vertical-align:middle; }
   .subhead { font: var(--type-body-m-strong); color: var(--text-primary); margin:0 0 16px; }
   .subhead2 { font: var(--type-body-m-strong); color: var(--text-primary); margin:34px 0 16px; }
   .code-panel__name { color: rgba(255,255,255,.72); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; letter-spacing:.02em; font-weight:600; }
@@ -588,7 +588,7 @@ function makeOverlayCard(spinOpts) {
     ['Индикатор — тон', 'Success', '--st-green'],
     ['Индикатор — тон', 'Warning', '--st-orange'],
     ['Индикатор — тон', 'Error', '--st-red'],
-    ['Индикатор — тон', 'Info', '--st-lblue'],
+    ['Индикатор — тон', 'Info', '--st-blue'],
     ['Индикатор — тон', 'System', '--st-system'],
     ['Индикатор — тон', 'Inverse', '--text-on-dark'],
     ['Текст', 'Подпись', '--text-secondary'],
@@ -725,7 +725,7 @@ function makeOverlayCard(o) { /* оверлей с карточкой состо
 .spin--success{border-top-color:var(--st-green)}
 .spin--warning{border-top-color:var(--st-orange)}
 .spin--error{border-top-color:var(--st-red)}
-.spin--info{border-top-color:var(--st-lblue)}
+.spin--info{border-top-color:var(--st-blue)}
 .spin--system{border-top-color:var(--st-system)}
 .spin--inverse{border-color:color-mix(in srgb, var(--text-on-dark) 28%, transparent);border-top-color:var(--text-on-dark)}
 @keyframes spin-rotate{to{transform:rotate(360deg)}}

@@ -62,7 +62,7 @@ body.ds-has-toc { padding-right: var(--ds-toc-w); }
 }
 .ds-toc__link:hover {
   color: var(--text-primary);
-  background: var(--bgtable-row-hover);
+  background: var(--bg-table-default-hover);
 }
 .ds-toc__link.is-active {
   border-left-color: var(--primary);

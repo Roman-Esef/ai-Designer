@@ -250,9 +250,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const groups = [
       { name: 'Зоны — светлая заливка (Зелёная / Watchlist)', rows: [['Зеленая — фон', '--st-green-light'], ['Зеленая — текст', '--st-green-dark'], ['Watchlist — фон', '--st-orange-light'], ['Watchlist — текст', '--st-orange-dark']] },
-      { name: 'Зоны — solid-заливка (Красная / Чёрная)', rows: [['Красная — фон', '--st-red'], ['Чёрная — фон', '--st-grey'], ['Текст и иконка (обе)', '--c-mgrey-50']] },
+      { name: 'Зоны — solid-заливка (Красная / Чёрная)', rows: [['Красная — фон', '--st-red'], ['Чёрная — фон', '--st-grey'], ['Текст и иконка (обе)', '--mgrey-50']] },
       { name: 'Нет зоны (Outline)', rows: [['Border', '--st-system-mid'], ['Текст', '--st-system-dark'], ['Иконка', '--st-system']] },
-      { name: 'Popover — поверхность и блок подкачки', rows: [['Фон поповера', '--bg-popup'], ['Фон блока', '--c-cgrey-50'], ['Граница', '--border-light'], ['Радиус', '--radius-popup']] },
+      { name: 'Popover — поверхность и блок подкачки', rows: [['Фон поповера', '--bg-popup'], ['Фон блока', '--cgrey-50'], ['Граница', '--border-light'], ['Радиус', '--radius-popup']] },
     ];
     root.innerHTML = groups.map(g => `
       <section class="cref-group">

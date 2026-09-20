@@ -6,7 +6,7 @@
             ×  default · hover · focus · pressed · disabled · loading
    Label: Body M (SB Sans Text) · Helper: общий компонент подкачки (Body XS),
    рендерится классом .ds-helper — см. label-helper.css.
-   Off:  track --c-cgrey-100, white thumb (left).
+   Off:  track --cgrey-100, white thumb (left).
    On:   track --secondary-light (pale teal), --primary thumb (right).
    Requires: typography.css, colors.css, label-helper.css
    ========================================================================= */
@@ -52,7 +52,7 @@
   width: 36px;
   height: 20px;
   border-radius: var(--radius-pill);
-  background: var(--c-cgrey-100);
+  background: var(--cgrey-100);
   transition: background-color .15s ease, box-shadow .15s ease;
 }
 
@@ -64,7 +64,7 @@
   width: 16px;
   height: 16px;
   border-radius: var(--radius-circle);
-  background: var(--c-mgrey-50);
+  background: var(--mgrey-50);
   box-shadow: 0 1px 2px rgba(40, 50, 55, .28);
   display: flex;
   align-items: center;
@@ -92,7 +92,7 @@
   box-shadow: 0 1px 2px rgba(40, 50, 55, .28), 0 0 0 5px var(--primary-bg-light);
 }
 .sw:hover .sw__control,
-.sw--hover .sw__control { background: var(--c-cgrey-200); }
+.sw--hover .sw__control { background: var(--cgrey-200); }
 .sw:hover.sw--on .sw__control,
 .sw--hover.sw--on .sw__control,
 .sw:hover:has(.sw__input:checked) .sw__control { background: var(--secondary); }
@@ -149,7 +149,7 @@
 .sw__input:disabled ~ .sw__control { background: var(--disabled-bg); box-shadow: none; }
 .sw--disabled .sw__thumb,
 .sw__input:disabled ~ .sw__control .sw__thumb {
-  background: var(--c-mgrey-50);
+  background: var(--mgrey-50);
   box-shadow: 0 1px 1px rgba(40, 50, 55, .12);
 }
 .sw--disabled.sw--on .sw__control,

@@ -48,7 +48,7 @@
 a{color:var(--link);} a:hover{color:var(--link-dark);}
 .section>p.desc{font:var(--type-body-m);color:var(--text-secondary);margin:0 0 28px;max-width:82ch;text-wrap:pretty;}
 .subhead{font:var(--type-body-m-strong);color:var(--text-primary);margin:32px 0 14px;}
-.tk{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text-secondary);background:var(--bgtable-row-focus);padding:var(--space-2) var(--space-6);border-radius:var(--radius-s);display:inline-block;}
+.tk{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text-secondary);background:var(--bg-table-default-focus);padding:var(--space-2) var(--space-6);border-radius:var(--radius-s);display:inline-block;}
 .crit{margin:0 0 28px;padding-left:22px;font:var(--type-body-m);color:var(--text-secondary);max-width:82ch;}
 .crit li{margin-bottom:8px;text-wrap:pretty;}
 
@@ -217,7 +217,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
       <li><b>Оба скролла — у вьюпорта, и только у него.</b> Горизонтальный и вертикальный принадлежат <span class="tk">.kanban__viewport</span>. Третьего быть не должно: страница под доской не скроллится, колонка сама не скроллится тоже.</li>
       <li><b>Ряд колонок — отдельный элемент внутри вьюпорта.</b> <span class="tk">.kanban__track</span> имеет высоту <span class="tk">auto</span>, поэтому <span class="tk">stretch</span> тянет все колонки по самой длинной, а не по видимой области. Если свести обе роли в один элемент, колонка окажется ровно высотой с экран: карточки, которые не влезли, будут торчать за её коробкой, а липкая шапка отвалится на первом же экране прокрутки — держать её внутри колонки станет негде.</li>
       <li><b>Доске нужна определённая высота — это хост-контракт.</b> Она должна быть flex-элементом (<span class="tk">flex: 1; min-height: 0</span>) в колоночном родителе с заданной высотой. Иначе вьюпорту нечего ограничивать: скролл уезжает на страницу, и залипания шапок не будет.</li>
-      <li><b>Липкая шапка обязана быть непрозрачной.</b> Под ней едут карточки. Тона состояний в ДС полупрозрачные (<span class="tk">--primary-bg</span> — color-mix с transparent, <span class="tk">--bgtable-row-hover</span> — swamp a400), поэтому кладутся слоем поверх непрозрачной базы, а не вместо неё.</li>
+      <li><b>Липкая шапка обязана быть непрозрачной.</b> Под ней едут карточки. Тона состояний в ДС полупрозрачные (<span class="tk">--primary-bg</span> — color-mix с transparent, <span class="tk">--bg-table-default-hover</span> — swamp a400), поэтому кладутся слоем поверх непрозрачной базы, а не вместо неё.</li>
       <li><b>Ширина колонки — переменная <span class="tk">--kb-col-w</span>, а не класс экрана.</b> Свои классы ширины экран не заводит — то же правило, что у Tile.</li>
       <li><b>Высота колонок не выравнивается</b> (<span class="tk">align-items:flex-start</span>): колонка с двумя карточками не растягивается до высоты самой длинной.</li>
     </ul>
@@ -755,7 +755,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
   <div class="panel" style="padding:0;overflow:hidden;">
     <div class="tbl" id="color-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
   </div>
-  <p class="desc" style="margin-top:20px"><b>Почему тона состояний нельзя класть на липкую шапку напрямую.</b> <span class="tk">--primary-bg</span> — это <span class="tk">color-mix</span> с <span class="tk">transparent</span>, <span class="tk">--bgtable-row-hover</span> — альфа-тон свомпа. Под шапкой колонки при скролле едут карточки, и полупрозрачная заливка пропустит их насквозь. Поэтому шапка получает непрозрачную базу <span class="tk">--bg-page</span>, а тон состояния кладётся слоем поверх через <span class="tk">background-image</span> — тот же цвет, но без просвета.</p>
+  <p class="desc" style="margin-top:20px"><b>Почему тона состояний нельзя класть на липкую шапку напрямую.</b> <span class="tk">--primary-bg</span> — это <span class="tk">color-mix</span> с <span class="tk">transparent</span>, <span class="tk">--bg-table-default-hover</span> — альфа-тон свомпа. Под шапкой колонки при скролле едут карточки, и полупрозрачная заливка пропустит их насквозь. Поэтому шапка получает непрозрачную базу <span class="tk">--bg-page</span>, а тон состояния кладётся слоем поверх через <span class="tk">background-image</span> — тот же цвет, но без просвета.</p>
 </section>
 
 <!-- 12. ДЛЯ РАЗРАБОТЧИКОВ -->
@@ -1378,7 +1378,7 @@ window.DS_SPLIT_SWITCH_LABELS = {
   background: var(--st-grey);
 }
 .kbcol--green   .kbcol__marker { background: var(--st-green); }
-.kbcol--lblue   .kbcol__marker { background: var(--st-lblue); }
+.kbcol--lblue   .kbcol__marker { background: var(--st-blue); }
 .kbcol--orange  .kbcol__marker { background: var(--st-orange); }
 .kbcol--dpurple .kbcol__marker { background: var(--st-dpurple); }
 .kbcol--primary .kbcol__marker { background: var(--st-primary); }
@@ -1616,7 +1616,7 @@ window.DS_SPLIT_SWITCH_LABELS = {
    Ghost — место схваченной карточки: геометрия сохранена, поэтому
    список не схлопывается и соседи не прыгают. */
 .kbcard--ghost {
-  background: var(--bgtable-row-focus);
+  background: var(--bg-table-default-focus);
   border-style: dashed;
   border-color: var(--border-primary);
   box-shadow: none;

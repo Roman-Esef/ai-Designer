@@ -63,20 +63,20 @@
 .demo-cell { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; min-width: 0; }
 .demo-cell > .th { font: var(--type-body-s-strong); color: var(--text-secondary); }
 .demo-cell > .sub { font: var(--type-body-xs); color: var(--text-inactive); margin: 0; max-width: 40ch; text-wrap: pretty; }
-.size-badge { font: var(--type-body-xs); color: var(--text-inactive); font-variant-numeric: tabular-nums; background: var(--bgtable-row-focus); padding: 2px 9px; border-radius: 999px; }
+.size-badge { font: var(--type-body-xs); color: var(--text-inactive); font-variant-numeric: tabular-nums; background: var(--bg-table-default-focus); padding: 2px 9px; border-radius: 999px; }
 
 /* table edit demo */
 .tbl-demo { border: 1px solid var(--border-light); border-radius: 12px; overflow: hidden; width: 100%; }
 .tbl-demo__row { display: grid; grid-template-columns: 8px 1.2fr 1fr 8px; align-items: center; min-height: 48px; border-bottom: 1px solid var(--border-light); background: var(--bg-tile); }
 .tbl-demo__row:last-child { border-bottom: none; }
-.tbl-demo__row--head { background: var(--bgtable-pinned, var(--tertiary-light)); font: var(--type-body-s); color: var(--text-secondary); }
+.tbl-demo__row--head { background: var(--bg-table-pinned, var(--tertiary-light)); font: var(--type-body-s); color: var(--text-secondary); }
 .tbl-demo__cell { padding: 6px 8px; min-width: 0; }
 
 /* reference tables */
 
 .ref-table th, .ref-table td { text-align: left; padding: 16px 16px; border-bottom: 1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align: middle; }
 
-kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--text-primary); background: var(--bgtable-row-focus); border: 1px solid var(--border-primary); border-bottom-width: 2px; border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--text-primary); background: var(--bg-table-default-focus); border: 1px solid var(--border-primary); border-bottom-width: 2px; border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
 
 /* colors */
 

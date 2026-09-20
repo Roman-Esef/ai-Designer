@@ -1,32 +1,36 @@
 ---
 component: Colors
 title: "Цвета"
-version: "1.003"
-updated: "19.09.2026"
+version: "1.004"
+updated: "20.09.2026"
 page: pages/foundations/Colors.html
 css: styles/colors.css, styles/palette.css
 status: curated
 ---
 
-> Значения токенов — в styles/colors.css (базовые, 7 KB) и styles/palette.css (палитра, 10 KB). Ниже — имена, чтобы grep-ать точечно.
+> Значения — только в styles/colors.css (базовые токены). styles/palette.css держит семантику и состоит из ссылок на них. Ниже — имена и карта связи, чтобы grep-ать точечно.
 
 ## Структура
 
-Два слоя, два файла. Страница показывает их двумя вкладками.
+Два слоя, два файла.
 
 | Слой | Файл | Что внутри |
 |---|---|---|
-| Базовые токены | `styles/colors.css` | 20 полных цветовых рамп из образцов: `--amber-500`, `--deep-orange-700`, `--swamp-A100`. Ступени 50…900 + A100/A200/A400/A700 (где есть) |
-| Палитра | `styles/palette.css` | примитивы `--c-*` + семантика в 4 группах: Static (фоны/текст/бордеры/таблицы), Active (primary/secondary/tertiary интерактив), Situative (error/warning/success/info/link/disabled), Local (статусные рампы, rate-чипы, палитра графиков). Полупрозрачные — через color-mix |
+| Базовые токены | `styles/colors.css` | 20 полных цветовых рамп из образцов: `--amber-500`, `--deep-orange-700`, `--swamp-A100`. Ступени 50…900 + A100/A200/A400/A700 (где есть). **Единственное место в ДС, где встречается hex** |
+| Семантика | `styles/palette.css` | 119 токенов в 5 группах: Static, Active, Situative, Status, Chart. Значение — всегда `var(--<базовый>)` или `color-mix()` поверх него |
 
-**Связь между слоями ещё не проведена.** Семантика берёт значения из `--c-*`, прописанных
-hex-ами, а не из базовых токенов. Целевая схема — `--primary: var(--emerald-500)`: правка
-базового токена меняет все семантические, которые на него ссылаются. См. «Переход на
-базовые токены».
+**Правило слоя.** В `palette.css` не бывает hex: правка базового токена обязана менять все
+семантические, которые на него ссылаются, — ради этого слой и разведён. Исключение одно —
+группа **Chart**: в спеке у всех двенадцати её строк колонка базового токена пустая, это
+собственная палитра графиков, а не рампа общего назначения.
+
+**В экранах и компонентах применяется семантика, а не базовые токены.** Цвет выбирается по
+назначению: `var(--text-primary)`, а не `var(--cgrey-600)`. Базовый токен в разметке экрана —
+это захардкоженный цвет с лишним шагом.
 
 Имена базовых токенов — как в образцах `Uploads/Colors/*.png`: `палитра-ступень`,
-A-ступени **заглавной** буквой (`--swamp-A100`, не `--swamp-a100`; примитивы `--c-*` пишут
-её строчной — не путать). Образец CGrey подписан токеном `sgrey-*`, записан как `--cgrey-*`.
+A-ступени **заглавной** буквой (`--swamp-A100`). Образец CGrey подписан токеном `sgrey-*`,
+записан как `--cgrey-*`. Имена семантических — из `Uploads/DS _ Swap _ Palette`.
 
 ## Базовые токены (styles/colors.css)
 
@@ -51,58 +55,187 @@ A-ступени **заглавной** буквой (`--swamp-A100`, не `--sw
 **Swamp**: `--swamp-50` `--swamp-100` `--swamp-200` `--swamp-300` `--swamp-400` `--swamp-500` `--swamp-600` `--swamp-A100` `--swamp-A200` `--swamp-A400` `--swamp-A700` 
 **Yellow**: `--yellow-50` `--yellow-100` `--yellow-200` `--yellow-300` `--yellow-400` `--yellow-500` `--yellow-600` `--yellow-700` `--yellow-800` `--yellow-900` `--yellow-A100` `--yellow-A200` `--yellow-A400` `--yellow-A700` 
 
-## Токены палитры (styles/palette.css)
+## Карта: семантика → базовые (styles/palette.css)
 
-**Mono / Greys**: `--c-mgrey-50` `--c-mgrey-100` `--c-cgrey-50` `--c-cgrey-100` `--c-cgrey-200` `--c-cgrey-300` `--c-cgrey-500` `--c-cgrey-600` `--c-cgrey-700` `--c-cgrey-800` `--c-cgrey-900` 
-**Swamp (cool grey-green)**: `--c-swamp-50` `--c-swamp-100` `--c-swamp-200` `--c-swamp-300` `--c-swamp-400` `--c-swamp-500` `--c-swamp-600` `--c-swamp-a100` `--c-swamp-a400` `--c-swamp-a700` 
-**Emerald (brand teal)**: `--c-emerald-100` `--c-emerald-200` `--c-emerald-300` `--c-emerald-500` `--c-emerald-600` `--c-emerald-700` `--c-emerald-900` 
-**Red**: `--c-red-200` `--c-red-300` `--c-red-400` `--c-red-700` `--c-red-a100` `--c-red-a200` `--c-red-a400` 
-**Amber**: `--c-amber-50` `--c-amber-400` `--c-amber-600` `--c-amber-700` `--c-amber-800` `--c-amber-900` `--c-amber-a100` `--c-amber-a200` 
-**Greens**: `--c-lightgreen-50` `--c-lightgreen-200` `--c-lightgreen-400` `--c-lightgreen-600` `--c-lightgreen-800` `--c-green-50` `--c-green-500` `--c-green-800` 
-**Blues**: `--c-lightblue-50` `--c-lightblue-400` `--c-lightblue-500` `--c-lightblue-600` `--c-lightblue-800` `--c-lightblue-900` `--c-blue-200` 
-**Purples**: `--c-deeppurple-50` `--c-deeppurple-200` `--c-deeppurple-400` `--c-deeppurple-900` 
-**Orange**: `--c-orange-50` `--c-orange-200` 
-**BG**: `--bg-popup` `--bg-tile` `--bg-mainmenu` `--bg-hint` `--bg-page` 
-**Border**: `--border-primary` `--border-light` `--border-dark` 
-**Text**: `--text-primary` `--text-secondary` `--text-inactive` `--text-primary` `--text-primary` `--text-on-dark` 
-**BGTable**: `--bgtable` `--bgtable-row-hover` `--bgtable-row-focus` `--bgtable-row-focus-hover` `--bgtable-pinned` `--bgtable-pinned-hover` `--bgtable-pinned-focus` `--bgtable-accent` `--bgtable-accent-hover` `--bgtable-accent-focus` 
-**Primary**: `--primary` `--primary-dark` `--primary-light` `--primary-bg` `--primary-bg-light` `--primary-bg-semitransparent` 
-**Secondary**: `--secondary` `--secondary-dark` `--secondary-light` `--secondary-bg` `--secondary-bg-light` 
-**Tertiary**: `--tertiary` `--tertiary-dark` `--tertiary-light` 
-**Error**: `--error` `--error-dark` `--error-light` `--error-bg-light` `--error-bg` `--error-bg-dark` 
-**Warning**: `--warning` `--warning-dark` `--warning-light` `--warning-bg` 
-**Success**: `--success` `--success-dark` `--success-light` `--success-bg` 
-**Info**: `--info` `--info-dark` `--info-light` `--info-bg` 
-**Link**: `--link` `--link-dark` `--link-light` 
-**Disabled**: `--disabled` `--disabled-bg` `--disabled-bg-semitransparent` `--disabled-border` 
-**Status — base + opacity ramp (Dark / base / Mid 56% / MidLight 32% / Light 16%)**: `--st-green-dark` `--st-green` `--st-green-mid` `--st-green-midlight` `--st-green-light` `--st-lblue-dark` `--st-lblue` `--st-lblue-mid` `--st-lblue-midlight` `--st-lblue-light` `--st-orange-dark` `--st-orange` `--st-orange-mid` `--st-orange-midlight` `--st-orange-light` `--st-red-dark` `--st-red` `--st-red-mid` `--st-red-midlight` `--st-red-light` `--st-dpurple-dark` `--st-dpurple` `--st-dpurple-mid` `--st-dpurple-midlight` `--st-dpurple-light` `--st-grey-dark` `--st-grey` `--st-grey-mid` `--st-grey-midlight` `--st-grey-light` `--st-system-dark` `--st-system` `--st-system-mid` `--st-system-midlight` `--st-system-light` `--st-disabled-dark` `--st-disabled` `--st-disabled-mid` `--st-disabled-midlight` `--st-disabled-light` `--st-primary-dark` `--st-primary` `--st-primary-mid` `--st-primary-midlight` `--st-primary-light` 
-**Rate**: `--rate-green` `--rate-light-green` `--rate-blue` `--rate-light-blue` `--rate-purple` `--rate-light-purple` `--rate-orange` `--rate-light-orange` 
-**Chart**: `--chart-red` `--chart-orange` `--chart-yellow` `--chart-shiny-green` `--chart-pastel-green` `--chart-turquoise` `--chart-light-blue` `--chart-blue` `--chart-indigo` `--chart-purple` `--chart-pale-purple` `--chart-pink-purple` 
+### Static
 
-## Переход на базовые токены
+**BG**  
+`--bg-popup` → `--mgrey-50`  
+`--bg-tile` → `--mgrey-50`  
+`--bg-main-menu` → `--mgrey-100`  
+`--bg-hint` → `--cgrey-800`  
+`--bg-page` → `--swamp-A100`  
+**BGTable**  
+`--bg-table-default` → `--mgrey-50`  
+`--bg-table-default-hover` → `--swamp-A400`  
+`--bg-table-default-focus` → `--swamp-A700`  
+`--bg-table-accent` → `--amber-50`  
+`--bg-table-accent-hover` → `--amber-A100`  
+`--bg-table-accent-focus` → `--amber-A200`  
+`--bg-table-pinned` → `--swamp-A100`  
+`--bg-table-pinned-hover` → `--swamp-50`  
+`--bg-table-pinned-focus` → `--swamp-A700`  
+**Border**  
+`--border-primary` → `--swamp-300`  
+`--border-light` → `--swamp-200`  
+`--border-dark` → `--swamp-600`  
+`--disabled-border` → `--cgrey-100`  
+**Text**  
+`--text-primary` → `--cgrey-600`  
+`--text-secondary` → `--cgrey-500`  
+`--text-inactive` → `--cgrey-300`  
+`--text-on-dark` → `--mgrey-50`  
 
-Заготовка для следующей правки: семантика переводится с hex-ов `--c-*` на `var(--<базовый>)`,
-после чего слой `--c-*` исчезает. Сверка сделана 19.09.2026, ничего ещё не менялось.
+### Active
 
-Из 64 примитивов `--c-*` **57 совпадают** с базовым токеном один в один и переводятся
-механически (`--c-swamp-a100` → `--swamp-A100`, `--c-lightgreen-600` → `--light-green-600`).
-Расходятся семь — каждый требует решения человека:
+**Primary**  
+`--primary` → `--emerald-500`  
+`--primary-dark` → `--emerald-700`  
+`--primary-light` → `--emerald-300`  
+`--primary-bg` → `--emerald-500` 8%  
+`--primary-bg-light` → `--emerald-500` 4%  
+`--primary-bg-semy-transparent` → `--mgrey-50` 50%  
+**Secondary**  
+`--secondary` → `--emerald-200`  
+`--secondary-dark` → `--emerald-600`  
+`--secondary-light` → `--emerald-100`  
+`--secondary-bg` → `--emerald-200` 32%  
+`--secondary-bg-light` → `--emerald-200` 16%  
+**Tertiary**  
+`--tertiary` → `--swamp-100`  
+`--tertiary-dark` → `--swamp-400`  
+`--tertiary-light` → `--swamp-50`  
+`--tertiary-bg` → `--swamp-500` 8%  
+`--tertiary-bg-light` → `--swamp-500` 4%  
 
-| `--c-*` | Сейчас | Базовый токен | В рампе | Кто использует |
-|---|---|---|---|---|
-| `--c-emerald-300` | `#58DCCC` | `--emerald-300` | `#82CDC6` | `--primary-light` |
-| `--c-emerald-700` | `#007A6D` | `--emerald-700` | `#0A7D6D` | `--primary-dark`, `--link-dark` |
-| `--c-emerald-900` | `#00635A` | `--emerald-900` | `#055143` | `--st-primary-dark` |
-| `--c-amber-400` | `#FFE54C` | `--amber-400` | `#FFCA28` | `--warning-light` |
-| `--c-amber-800` | `#C68400` | `--amber-800` | `#FF8F00` | `--warning-dark` |
-| `--c-lightblue-600` | `#1E88E5` | `--light-blue-600` | `#039BE5` | `--info` |
-| `--c-lightblue-800` | `#01579B` | `--light-blue-800` | `#0277BD` | `--info-dark` |
+### Situative
 
-Два последних объясняются просто: `#1E88E5` — это `--blue-600`, а `#01579B` —
-`--light-blue-900`. Семантика `--info*` собрана из двух синих рамп, и при переводе надо
-решить, на какую она садится.
+**Error**  
+`--error` → `--red-300`  
+`--error-light` → `--red-200`  
+`--error-dark` → `--red-700`  
+`--error-bg` → `--red-A200`  
+`--error-bg-light` → `--red-A100`  
+`--error-bg-dark` → `--red-A400`  
+**Warning**  
+`--warning` → `--amber-600`  
+`--warning-light` → `--amber-400`  
+`--warning-dark` → `--amber-800`  
+`--warning-bg` → `--amber-50`  
+**Success**  
+`--success` → `--light-green-600`  
+`--success-light` → `--light-green-400`  
+`--success-dark` → `--light-green-800`  
+`--success-bg` → `--light-green-50`  
+**Info**  
+`--info` → `--light-blue-600`  
+`--info-light` → `--light-blue-400`  
+`--info-dark` → `--light-blue-900`  
+`--info-bg` → `--light-blue-50`  
+**Link**  
+`--link` → `--emerald-500`  
+`--link-light` → `--emerald-300`  
+`--link-dark` → `--emerald-700`  
+**Disabled**  
+`--disabled` → `--cgrey-200`  
+`--disabled-bg` → `--cgrey-50`  
+`--disabled-bg-semy-transparent` → `--mgrey-50` 56%  
 
-Два хвоста вне таблицы:
-- `--bg-page: #F5F7F7` прописан hex-ом мимо `--c-*`; значение совпадает с `--swamp-A100`.
-- 12 токенов `--chart-*` — hex без примитивов, эквивалентов в базовых рампах нет. Либо
-  остаются собственной палитрой графиков, либо им нужны свои базовые токены.
+### Status
+
+**Green**  
+`--st-green-dark` → `--green-800`  
+`--st-green` → `--green-500`  
+`--st-green-mid` → `--green-500` 56%  
+`--st-green-midlight` → `--green-500` 32%  
+`--st-green-light` → `--green-500` 16%  
+**Blue**  
+`--st-blue-dark` → `--light-blue-900`  
+`--st-blue` → `--light-blue-500`  
+`--st-blue-mid` → `--light-blue-500` 56%  
+`--st-blue-midlight` → `--light-blue-500` 32%  
+`--st-blue-light` → `--light-blue-500` 16%  
+**Orange**  
+`--st-orange-dark` → `--amber-900`  
+`--st-orange` → `--amber-700`  
+`--st-orange-mid` → `--amber-700` 56%  
+`--st-orange-midlight` → `--amber-700` 32%  
+`--st-orange-light` → `--amber-700` 16%  
+**Red**  
+`--st-red-dark` → `--red-700`  
+`--st-red` → `--red-400`  
+`--st-red-mid` → `--red-400` 56%  
+`--st-red-midlight` → `--red-400` 32%  
+`--st-red-light` → `--red-400` 16%  
+**Purple**  
+`--st-dpurple-dark` → `--deep-purple-900`  
+`--st-dpurple` → `--deep-purple-400`  
+`--st-dpurple-mid` → `--deep-purple-400` 56%  
+`--st-dpurple-midlight` → `--deep-purple-400` 32%  
+`--st-dpurple-light` → `--deep-purple-400` 16%  
+**Grey**  
+`--st-grey-dark` → `--cgrey-900`  
+`--st-grey` → `--cgrey-700`  
+`--st-grey-mid` → `--cgrey-700` 56%  
+`--st-grey-midlight` → `--cgrey-700` 32%  
+`--st-grey-light` → `--cgrey-700` 16%  
+**System**  
+`--st-system-dark` → `--cgrey-600`  
+`--st-system` → `--swamp-400`  
+`--st-system-mid` → `--swamp-400` 56%  
+`--st-system-midlight` → `--swamp-400` 32%  
+`--st-system-light` → `--swamp-400` 16%  
+**Disabled**  
+`--st-disabled-dark` → `--cgrey-600` 40%  
+`--st-disabled` → `--cgrey-600` 24%  
+`--st-disabled-mid` → `--cgrey-600` 16%  
+`--st-disabled-midlight` → `--cgrey-600` 8%  
+`--st-disabled-light` → `--cgrey-600` 4%  
+**Primary**  
+`--st-primary-dark` → `--emerald-900`  
+`--st-primary` → `--emerald-500`  
+`--st-primary-mid` → `--emerald-500` 56%  
+`--st-primary-midlight` → `--emerald-500` 32%  
+`--st-primary-light` → `--emerald-500` 16%  
+
+### Chart
+
+`--ch-red` → #F99290 (без базового токена)  
+`--ch-orange` → #F9A580 (без базового токена)  
+`--ch-yellow` → #FFD081 (без базового токена)  
+`--ch-shiny-green` → #8CCB5E (без базового токена)  
+`--ch-pastel-green` → #76E385 (без базового токена)  
+`--ch-turquoise` → #31D4A8 (без базового токена)  
+`--ch-light-blue` → #7DCAFA (без базового токена)  
+`--ch-blue` → #5B9CFA (без базового токена)  
+`--ch-indigo` → #8D87F9 (без базового токена)  
+`--ch-purple` → #CB88F8 (без базового токена)  
+`--ch-pale-purple` → #F58BD8 (без базового токена)  
+`--ch-pink-purple` → #EC7390 (без базового токена)  
+
+## История значений
+
+При переводе семантики на базовые токены (20.09.2026) изменился цвет восьми токенов и
+прозрачность пяти — это следствие того, что актуальные рампы отличаются от старых
+примитивов `--c-*`, а спека уточнила проценты.
+
+| Токен | Было | Стало | Базовый |
+|---|---|---|---|
+| `--primary-light` | `#58DCCC` | `#82CDC6` | `--emerald-300` |
+| `--primary-dark` | `#007A6D` | `#0A7D6D` | `--emerald-700` |
+| `--link-dark` | `#007A6D` | `#0A7D6D` | `--emerald-700` |
+| `--link-light` | `#B8D6D3` | `#82CDC6` | `--emerald-300` |
+| `--st-primary-dark` | `#00635A` | `#055143` | `--emerald-900` |
+| `--warning-light` | `#FFE54C` | `#FFCA28` | `--amber-400` |
+| `--warning-dark` | `#C68400` | `#FF8F00` | `--amber-800` |
+| `--info` | `#1E88E5` | `#039BE5` | `--light-blue-600` |
+| `--primary-bg` | 6% | 8% | `--emerald-500` |
+| `--primary-bg-light` | 3% | 4% | `--emerald-500` |
+| `--secondary-bg` | 30% | 32% | `--emerald-200` |
+| `--secondary-bg-light` | 15% | 16% | `--emerald-200` |
+| `--disabled-bg-semy-transparent` | 50% | 56% | `--mgrey-50` |
+
+Тогда же переименованы `--bgtable*` → `--bg-table-*`, `--chart-*` → `--ch-*`,
+`--st-lblue-*` → `--st-blue-*`, `--bg-mainmenu` → `--bg-main-menu`,
+`*-semitransparent` → `*-semy-transparent`; удалены `--bgtable-row-focus-hover` и группа
+`--rate-*` (в актуальной спеке их нет); добавлены `--tertiary-bg` и `--tertiary-bg-light`.

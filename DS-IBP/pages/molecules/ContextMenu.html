@@ -102,7 +102,7 @@
   .vp { position:relative; height:340px; border:1px dashed var(--border-primary); border-radius:14px; overflow:hidden;
     background:
       linear-gradient(var(--tertiary-light),var(--tertiary-light)) padding-box,
-      repeating-conic-gradient(var(--c-cgrey-50) 0% 25%, var(--bg-tile) 0% 50%) 0 / 20px 20px; }
+      repeating-conic-gradient(var(--cgrey-50) 0% 25%, var(--bg-tile) 0% 50%) 0 / 20px 20px; }
   .vp .tgt { position:absolute; display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:8px; cursor:grab; touch-action:none; background: var(--primary); border:1px solid var(--primary-dark); color:#fff; }
   .vp .tgt:active { cursor:grabbing; }
   .vp .tgt svg { width:22px; height:22px; }
@@ -118,7 +118,7 @@
 
   /* ---------- reference tables ---------- */
   .ref-table th, .ref-table td { text-align:left; padding:16px 16px; border-bottom:1px solid var(--border-light); font: var(--type-body-m); color: var(--text-primary); vertical-align:middle; }
-  kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; color: var(--text-primary); background: var(--bgtable-row-focus); border:1px solid var(--border-primary); border-bottom-width:2px; border-radius:6px; padding:2px 8px; white-space:nowrap; }
+  kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px; color: var(--text-primary); background: var(--bg-table-default-focus); border:1px solid var(--border-primary); border-bottom-width:2px; border-radius:6px; padding:2px 8px; white-space:nowrap; }
 
   @media (max-width:760px){ .color-ref { grid-template-columns:1fr; } }
   
@@ -602,7 +602,7 @@ function makeMenu(items, o) { /* o: { floating, pinned, scroll, maxH } → .menu
   --menu-item-gap:    10px;
   --menu-icon:        20px;
   --menu-item-hover:  var(--tertiary);                                       /* #E5ECEB — нейтральный серый */
-  --menu-item-active: color-mix(in srgb, var(--c-swamp-500) 16%, var(--bg-popup));  /* нейтральный, чуть темнее hover */
+  --menu-item-active: color-mix(in srgb, var(--swamp-500) 16%, var(--bg-popup));  /* нейтральный, чуть темнее hover */
   --menu-shadow:      0 10px 30px rgba(40, 50, 55, .16);
 
   box-sizing: border-box;

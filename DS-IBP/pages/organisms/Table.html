@@ -252,7 +252,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
 
   <div class="subsec" data-screen-label="StickyScroll">
     <h3>Липкая шапка при скролле</h3>
-    <p class="desc">Тело — <code class="tok">overflow: auto</code>; липкость несёт <b>строка</b> шапки — <code class="tok">.tbl__row--head</code> с <code class="tok">position: sticky; top: 0</code> и непрозрачным фоном (наследует <code class="tok">--bgtable</code> из TableCell), поэтому строки не проступают сквозь неё. Класс на строке шапки внутри <code class="tok">.dtable__body</code> обязателен: на самой ячейке <code class="tok">.th</code> sticky по вертикали бесполезен — ячейка это grid-элемент строки, её блок-контейнер и есть строка, двигаться внутри неё некуда (по горизонтали закрепление колонок работает только потому, что строка шире скроллпорта). Когда тело реально проскроллено вниз (<code class="tok">scrollTop &gt; 0</code>), под шапкой появляется тонкая тень-разделитель — иначе липкая шапка визуально слипается со строками.</p>
+    <p class="desc">Тело — <code class="tok">overflow: auto</code>; липкость несёт <b>строка</b> шапки — <code class="tok">.tbl__row--head</code> с <code class="tok">position: sticky; top: 0</code> и непрозрачным фоном (наследует <code class="tok">--bg-table-default</code> из TableCell), поэтому строки не проступают сквозь неё. Класс на строке шапки внутри <code class="tok">.dtable__body</code> обязателен: на самой ячейке <code class="tok">.th</code> sticky по вертикали бесполезен — ячейка это grid-элемент строки, её блок-контейнер и есть строка, двигаться внутри неё некуда (по горизонтали закрепление колонок работает только потому, что строка шире скроллпорта). Когда тело реально проскроллено вниз (<code class="tok">scrollTop &gt; 0</code>), под шапкой появляется тонкая тень-разделитель — иначе липкая шапка визуально слипается со строками.</p>
   </div>
   <div class="subsec" data-screen-label="BulkToggle">
     <h3>Переключение в режим массового действия</h3>
@@ -303,7 +303,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
 <!-- 11. ЦВЕТА -->
 <section class="section" id="colors" data-screen-label="Цвета">
   <h2>Цвета</h2>
-  <p class="desc">Строки и ячейки — токены <a class="inl" href="../organisms/TableCell.html">TableCell</a> (<code class="tok">--bgtable*</code>, <code class="tok">--text-*</code>); фон ряда массового действия — токены Pagination. Ниже — токены, которые задаёт сам контейнер Table.</p>
+  <p class="desc">Строки и ячейки — токены <a class="inl" href="../organisms/TableCell.html">TableCell</a> (<code class="tok">--bg-table-default*</code>, <code class="tok">--text-*</code>); фон ряда массового действия — токены Pagination. Ниже — токены, которые задаёт сам контейнер Table.</p>
   <div class="panel" style="padding:0;overflow:hidden;">
     <div class="tbl" id="color-table" style="grid-template-columns:none;border:none;border-radius:0;"></div>
   </div>
