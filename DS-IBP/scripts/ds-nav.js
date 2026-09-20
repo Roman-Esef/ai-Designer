@@ -100,12 +100,6 @@
       ],
     },
     {
-      cat: 'Примеры экранов',
-      items: [
-        { label: 'Карточка сделки', href: 'pages/screens/DealCard.html' }
-      ]
-    },
-    {
       cat: 'RND',
       items: [
         { label: 'Общий бэклог',            href: 'pages/rnd/Backlog.html' }

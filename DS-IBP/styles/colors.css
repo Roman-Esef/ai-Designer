@@ -1,280 +1,322 @@
 /* =========================================================================
-   Design System — Color Foundation
-   Categories: Static · Active · Situative · Local
-   Opacity variants are expressed with color-mix() over transparent so they
-   composite correctly on any background.
+   Design System — Base Color Tokens
+   БАЗОВЫЕ ТОКЕНЫ — цветовые рампы из образцов (Uploads/Colors).
+
+   Источник значений для семантических токенов: правка базового токена обязана
+   менять все семантические, которые на него ссылаются. Пока НИ К ЧЕМУ
+   НЕ ПРИВЯЗАНЫ — семантика ДС ещё живёт на примитивах --c-* в
+   styles/palette.css; перевод семантики на базовые — следующей правкой.
+
+   Имена — как в образцах: палитра-ступень, A-ступени заглавной буквой
+   (--swamp-A100). Палитры по алфавиту. Расхождения источника оставлены как
+   есть: --pink-A100 и --pink-A400 совпадают; --mgrey-700 выпадает из серой
+   рампы (равен --cgrey-700). Образец CGrey подписан токеном sgrey-* —
+   записан как --cgrey-* (решение 19.09.2026).
    ========================================================================= */
 
 :root {
-  /* ---------------------------------------------------------------------
-     1. RAW PALETTE  (primitive ramps — do not use directly in product UI)
-     --------------------------------------------------------------------- */
-
-  /* Mono / Greys */
-  --c-mgrey-50:   #FFFFFF;
-  --c-mgrey-100:  #FEFEFE;
-  --c-cgrey-50:   #FBFBFB;
-  --c-cgrey-100:  #E8EDED;
-  --c-cgrey-200:  #BEC5C8;
-  --c-cgrey-300:  #AAB2B1;
-  --c-cgrey-500:  #6C8080;
-  --c-cgrey-600:  #324844;
-  --c-cgrey-700:  #333F48;
-  --c-cgrey-800:  #283237;
-  --c-cgrey-900:  #131618;
-
-  /* Swamp (cool grey-green) */
-  --c-swamp-50:   #EEF2F1;
-  --c-swamp-100:  #E5ECEB;
-  --c-swamp-200:  #E1EDE7;
-  --c-swamp-300:  #B8CCCC;
-  --c-swamp-400:  #7A9994;
-  --c-swamp-500:  #617C7C;
-  --c-swamp-600:  #6C8080;
-  --c-swamp-a100: #F5F7F7;
-  --c-swamp-a400: #F6FAFA;
-  --c-swamp-a700: #DEEDEC;
-
-  /* Emerald (brand teal) */
-  --c-emerald-100: #CDE2E0;
-  --c-emerald-200: #B8D6D3;
-  --c-emerald-300: #58DCCC;
-  --c-emerald-500: #00AA9B;
-  --c-emerald-600: #639994;
-  --c-emerald-700: #007A6D;
-  --c-emerald-900: #00635A;
-
-  /* Red */
-  --c-red-200:  #E57373;
-  --c-red-300:  #E5625C;
-  --c-red-400:  #EF5350;
-  --c-red-700:  #D32F2F;
-  --c-red-a100: #FCF1F1;
-  --c-red-a200: #FBECEB;
-  --c-red-a400: #F6D8D7;
-
   /* Amber */
-  --c-amber-50:   #FFF8E1;
-  --c-amber-400:  #FFE54C;
-  --c-amber-600:  #FFB300;
-  --c-amber-700:  #FFA000;
-  --c-amber-800:  #C68400;
-  --c-amber-900:  #FF6F00;
-  --c-amber-a100: #FEF0C2;
-  --c-amber-a200: #FCE9AE;
+  --amber-50:   #FFF8E1;
+  --amber-100:  #FFECB3;
+  --amber-200:  #FFE082;
+  --amber-300:  #FFD54F;
+  --amber-400:  #FFCA28;
+  --amber-500:  #FFC107;
+  --amber-600:  #FFB300;
+  --amber-700:  #FFA000;
+  --amber-800:  #FF8F00;
+  --amber-900:  #FF6F00;
+  --amber-A100: #FEF0C2;
+  --amber-A200: #FCE9AE;
+  --amber-A400: #FFC400;
+  --amber-A700: #FFAB00;
 
-  /* Greens */
-  --c-lightgreen-50:  #E9F6DA;
-  --c-lightgreen-200: #C5E1A5;
-  --c-lightgreen-400: #9CCC65;
-  --c-lightgreen-600: #7CB342;
-  --c-lightgreen-800: #558B2F;
-  --c-green-50:  #E8F5E9;
-  --c-green-500: #4CAF50;
-  --c-green-800: #2E7D32;
+  /* Blue */
+  --blue-50:   #E3F2FD;
+  --blue-100:  #BBDEFB;
+  --blue-200:  #90CAF9;
+  --blue-300:  #64B5F6;
+  --blue-400:  #42A5F5;
+  --blue-500:  #2196F3;
+  --blue-600:  #1E88E5;
+  --blue-700:  #1976D2;
+  --blue-800:  #1565C0;
+  --blue-900:  #0D47A1;
+  --blue-A100: #82B1FF;
+  --blue-A200: #448AFF;
+  --blue-A400: #2979FF;
+  --blue-A700: #2962FF;
 
-  /* Blues */
-  --c-lightblue-50:  #EAF8FE;
-  --c-lightblue-400: #29B6F6;
-  --c-lightblue-500: #03A9F4;
-  --c-lightblue-600: #1E88E5;
-  --c-lightblue-800: #01579B;
-  --c-lightblue-900: #01579B;
-  --c-blue-200: #90CAF9;
+  /* Brown */
+  --brown-50:  #EFEBE9;
+  --brown-100: #D7CCC8;
+  --brown-200: #BCAAA4;
+  --brown-300: #A1887F;
+  --brown-400: #8D6E63;
+  --brown-500: #795548;
+  --brown-600: #6D4C41;
+  --brown-700: #5D4037;
+  --brown-800: #4E342E;
+  --brown-900: #3E2723;
 
-  /* Purples */
-  --c-deeppurple-50:  #EDE7F6;
-  --c-deeppurple-200: #B39DDB;
-  --c-deeppurple-400: #7E57C2;
-  --c-deeppurple-900: #311B92;
+  /* CGrey */
+  --cgrey-50:  #FBFBFB;
+  --cgrey-100: #E8EDED;
+  --cgrey-200: #BEC5C8;
+  --cgrey-300: #AAB2B1;
+  --cgrey-400: #A0A8B0;
+  --cgrey-500: #6C8080;
+  --cgrey-600: #324844;
+  --cgrey-700: #333F48;
+  --cgrey-800: #283237;
+  --cgrey-900: #131618;
+
+  /* Cyan */
+  --cyan-50:   #E0F7FA;
+  --cyan-100:  #B2EBF2;
+  --cyan-200:  #80DEEA;
+  --cyan-300:  #4DD0E1;
+  --cyan-400:  #26C6DA;
+  --cyan-500:  #00BCD4;
+  --cyan-600:  #00ACC1;
+  --cyan-700:  #0097A7;
+  --cyan-800:  #00838F;
+  --cyan-900:  #006064;
+  --cyan-A100: #84FFFF;
+  --cyan-A200: #18FFFF;
+  --cyan-A400: #00E5FF;
+  --cyan-A700: #00B8D4;
+
+  /* DeepOrange */
+  --deep-orange-50:   #FBE9E7;
+  --deep-orange-100:  #FFCCBC;
+  --deep-orange-200:  #FFAB91;
+  --deep-orange-300:  #FF8A65;
+  --deep-orange-400:  #FF7043;
+  --deep-orange-500:  #FF5722;
+  --deep-orange-600:  #F4511E;
+  --deep-orange-700:  #E64A19;
+  --deep-orange-800:  #D84315;
+  --deep-orange-900:  #BF360C;
+  --deep-orange-A100: #FF9E80;
+  --deep-orange-A200: #FF6E40;
+  --deep-orange-A400: #FF3D00;
+  --deep-orange-A700: #DD2C00;
+
+  /* DeepPurple */
+  --deep-purple-50:   #EDE7F6;
+  --deep-purple-100:  #D1C4E9;
+  --deep-purple-200:  #B39DDB;
+  --deep-purple-300:  #9575CD;
+  --deep-purple-400:  #7E57C2;
+  --deep-purple-500:  #673AB7;
+  --deep-purple-600:  #5E35B1;
+  --deep-purple-700:  #512DA8;
+  --deep-purple-800:  #4527A0;
+  --deep-purple-900:  #311B92;
+  --deep-purple-A100: #B388FF;
+  --deep-purple-A200: #7C4DFF;
+  --deep-purple-A400: #651FFF;
+  --deep-purple-A700: #6200EA;
+
+  /* Emerald */
+  --emerald-50:   #E0F3F1;
+  --emerald-100:  #CDE2E0;
+  --emerald-200:  #B8D6D3;
+  --emerald-300:  #82CDC6;
+  --emerald-400:  #2BAA9D;
+  --emerald-500:  #00AA9B;
+  --emerald-600:  #639994;
+  --emerald-700:  #0A7D6D;
+  --emerald-800:  #086D5F;
+  --emerald-900:  #055143;
+  --emerald-A100: #A7FFEB;
+  --emerald-A200: #64FFDA;
+  --emerald-A400: #1DE9B6;
+  --emerald-A700: #00BFA5;
+
+  /* Green */
+  --green-50:   #E8F5E9;
+  --green-100:  #C8E6C9;
+  --green-200:  #A5D6A7;
+  --green-300:  #81C784;
+  --green-400:  #66BB6A;
+  --green-500:  #4CAF50;
+  --green-600:  #43A047;
+  --green-700:  #388E3C;
+  --green-800:  #2E7D32;
+  --green-900:  #1B5E20;
+  --green-A100: #B9F6CA;
+  --green-A200: #69F0AE;
+  --green-A400: #00E676;
+  --green-A700: #00C853;
+
+  /* Indigo */
+  --indigo-50:   #E8EAF6;
+  --indigo-100:  #C5CAE9;
+  --indigo-200:  #9FA8DA;
+  --indigo-300:  #7986CB;
+  --indigo-400:  #5C6BC0;
+  --indigo-500:  #3F51B5;
+  --indigo-600:  #3949AB;
+  --indigo-700:  #303F9F;
+  --indigo-800:  #283593;
+  --indigo-900:  #1A237E;
+  --indigo-A100: #8C9EFF;
+  --indigo-A200: #536DFE;
+  --indigo-A400: #3D5AFE;
+  --indigo-A700: #304FFE;
+
+  /* LightBlue */
+  --light-blue-50:   #EAF8FE;
+  --light-blue-100:  #B3E5FC;
+  --light-blue-200:  #81D4FA;
+  --light-blue-300:  #4FC3F7;
+  --light-blue-400:  #29B6F6;
+  --light-blue-500:  #03A9F4;
+  --light-blue-600:  #039BE5;
+  --light-blue-700:  #0288D1;
+  --light-blue-800:  #0277BD;
+  --light-blue-900:  #01579B;
+  --light-blue-A100: #80D8FF;
+  --light-blue-A200: #40C4FF;
+  --light-blue-A400: #00B0FF;
+  --light-blue-A700: #0091EA;
+
+  /* LightGreen */
+  --light-green-50:   #E9F6DA;
+  --light-green-100:  #DCEDC8;
+  --light-green-200:  #C5E1A5;
+  --light-green-300:  #AED581;
+  --light-green-400:  #9CCC65;
+  --light-green-500:  #8BC34A;
+  --light-green-600:  #7CB342;
+  --light-green-700:  #689F38;
+  --light-green-800:  #558B2F;
+  --light-green-900:  #33691E;
+  --light-green-A100: #CCFF90;
+  --light-green-A200: #B2FF59;
+  --light-green-A400: #76FF03;
+  --light-green-A700: #64DD17;
+
+  /* Lime */
+  --lime-50:   #F9FBE7;
+  --lime-100:  #F0F4C3;
+  --lime-200:  #E6EE9C;
+  --lime-300:  #DCE775;
+  --lime-400:  #D4E157;
+  --lime-500:  #CDDC39;
+  --lime-600:  #C0CA33;
+  --lime-700:  #AFB42B;
+  --lime-800:  #9E9D24;
+  --lime-900:  #827717;
+  --lime-A100: #F4FF81;
+  --lime-A200: #EEFF41;
+  --lime-A400: #C6FF00;
+  --lime-A700: #AEEA00;
+
+  /* MGrey */
+  --mgrey-50:  #FFFFFF;
+  --mgrey-100: #FEFEFE;
+  --mgrey-200: #E0E0E0;
+  --mgrey-300: #CACACA;
+  --mgrey-400: #B3B3B3;
+  --mgrey-500: #979797;
+  --mgrey-600: #797979;
+  --mgrey-700: #333F48;
+  --mgrey-800: #515151;
+  --mgrey-900: #080808;
 
   /* Orange */
-  --c-orange-50:  #FFF3E0;
-  --c-orange-200: #FFCC80;
+  --orange-50:   #FFF3E0;
+  --orange-100:  #FFE0B2;
+  --orange-200:  #FFCC80;
+  --orange-300:  #FFB74D;
+  --orange-400:  #FFA726;
+  --orange-500:  #FF9800;
+  --orange-600:  #FB8C00;
+  --orange-700:  #F57C00;
+  --orange-800:  #EF6C00;
+  --orange-900:  #E65100;
+  --orange-A100: #FFD180;
+  --orange-A200: #FFAB40;
+  --orange-A400: #FF9100;
+  --orange-A700: #FF6D00;
 
+  /* Pink */
+  --pink-50:   #FCE4EC;
+  --pink-100:  #F8BBD0;
+  --pink-200:  #F48FB1;
+  --pink-300:  #F06292;
+  --pink-400:  #EC407A;
+  --pink-500:  #E91E63;
+  --pink-600:  #D81B60;
+  --pink-700:  #C2185B;
+  --pink-800:  #AD1457;
+  --pink-900:  #880E4F;
+  --pink-A100: #F50057;
+  --pink-A200: #FF4081;
+  --pink-A400: #F50057;
+  --pink-A700: #C51162;
 
-  /* ---------------------------------------------------------------------
-     2. STATIC  — фоновые цвета и отображение информации
-     --------------------------------------------------------------------- */
+  /* Purple */
+  --purple-50:   #F3E5F5;
+  --purple-100:  #E1BEE7;
+  --purple-200:  #CE93D8;
+  --purple-300:  #BA68C8;
+  --purple-400:  #AB47BC;
+  --purple-500:  #9C27B0;
+  --purple-600:  #8E24AA;
+  --purple-700:  #7B1FA2;
+  --purple-800:  #6A1B9A;
+  --purple-900:  #4A148C;
+  --purple-A100: #EA80FC;
+  --purple-A200: #E040FB;
+  --purple-A400: #D500F9;
+  --purple-A700: #AA00FF;
 
-  /* BG */
-  --bg-popup:    var(--c-mgrey-50);
-  --bg-tile:     var(--c-mgrey-50);
-  --bg-mainmenu: var(--c-mgrey-100);
-  --bg-hint:     var(--c-cgrey-800);
-  --bg-page:     #F5F7F7;
+  /* Red */
+  --red-50:   #FEEBEE;
+  --red-100:  #FECDD2;
+  --red-200:  #E57373;
+  --red-300:  #E5625C;
+  --red-400:  #EF5350;
+  --red-500:  #F44336;
+  --red-600:  #E53935;
+  --red-700:  #D32F2F;
+  --red-800:  #C62828;
+  --red-900:  #B71C1C;
+  --red-A100: #FCF1F1;
+  --red-A200: #FBECEB;
+  --red-A400: #F6D8D7;
+  --red-A700: #D50000;
 
-  /* Border */
-  --border-primary: var(--c-swamp-300);
-  --border-light:   var(--c-swamp-200);
-  --border-dark:    var(--c-swamp-600);
+  /* Swamp */
+  --swamp-50:   #EEF2F1;
+  --swamp-100:  #E5ECEB;
+  --swamp-200:  #E1EDE7;
+  --swamp-300:  #B8CCCC;
+  --swamp-400:  #7A9994;
+  --swamp-500:  #617C7C;
+  --swamp-600:  #6C8080;
+  --swamp-A100: #F5F7F7;
+  --swamp-A200: #F2F7F7;
+  --swamp-A400: #F6FAFA;
+  --swamp-A700: #DEEDEC;
 
-  /* Text */
-  --text-primary:     var(--c-cgrey-600);
-  --text-secondary:   var(--c-cgrey-500);
-  --text-inactive:    var(--c-cgrey-300);
-  --text-on-dark:     var(--c-mgrey-50);
-
-  /* BGTable */
-  --bgtable:                 var(--c-mgrey-50);
-  --bgtable-row-hover:       var(--c-swamp-a400);
-  --bgtable-row-focus:       var(--c-swamp-a700);
-  --bgtable-row-focus-hover: var(--c-swamp-a700);
-  --bgtable-pinned:          var(--c-swamp-a100);
-  --bgtable-pinned-hover:    var(--c-swamp-50);
-  --bgtable-pinned-focus:    var(--c-swamp-a700);
-  --bgtable-accent:          var(--c-amber-50);
-  --bgtable-accent-hover:    var(--c-amber-a100);
-  --bgtable-accent-focus:    var(--c-amber-a200);
-
-
-  /* ---------------------------------------------------------------------
-     3. ACTIVE  — для интерактивных элементов
-     --------------------------------------------------------------------- */
-
-  /* Primary */
-  --primary:                  var(--c-emerald-500);
-  --primary-dark:             var(--c-emerald-700);
-  --primary-light:            var(--c-emerald-300);
-  --primary-bg:               color-mix(in srgb, var(--c-emerald-500) 6%, transparent);
-  --primary-bg-light:         color-mix(in srgb, var(--c-emerald-500) 3%, transparent);
-  --primary-bg-semitransparent: color-mix(in srgb, var(--c-mgrey-50) 50%, transparent);
-
-  /* Secondary */
-  --secondary:        var(--c-emerald-200);
-  --secondary-dark:   var(--c-emerald-600);
-  --secondary-light:  var(--c-emerald-100);
-  --secondary-bg:       color-mix(in srgb, var(--c-emerald-200) 30%, transparent);
-  --secondary-bg-light: color-mix(in srgb, var(--c-emerald-200) 15%, transparent);
-
-  /* Tertiary */
-  --tertiary:       var(--c-swamp-100);
-  --tertiary-dark:  var(--c-swamp-400);
-  --tertiary-light: var(--c-swamp-50);
-
-
-  /* ---------------------------------------------------------------------
-     4. SITUATIVE  — для ситуаций успеха/неуспеха
-     --------------------------------------------------------------------- */
-
-  /* Error */
-  --error:          var(--c-red-300);
-  --error-dark:     var(--c-red-700);
-  --error-light:    var(--c-red-200);
-  --error-bg-light: var(--c-red-a100);
-  --error-bg:       var(--c-red-a200);
-  --error-bg-dark:  var(--c-red-a400);
-
-  /* Warning */
-  --warning:       var(--c-amber-600);
-  --warning-dark:  var(--c-amber-800);
-  --warning-light: var(--c-amber-400);
-  --warning-bg:    var(--c-amber-50);
-
-  /* Success */
-  --success:       var(--c-lightgreen-600);
-  --success-dark:  var(--c-lightgreen-800);
-  --success-light: var(--c-lightgreen-400);
-  --success-bg:    var(--c-lightgreen-50);
-
-  /* Info */
-  --info:       var(--c-lightblue-600);
-  --info-dark:  var(--c-lightblue-800);
-  --info-light: var(--c-lightblue-400);
-  --info-bg:    var(--c-lightblue-50);
-
-  /* Link */
-  --link:       var(--c-emerald-500);
-  --link-dark:  var(--c-emerald-700);
-  --link-light: var(--c-emerald-200);
-
-  /* Disabled */
-  --disabled:                  var(--c-cgrey-200);
-  --disabled-bg:               var(--c-cgrey-50);
-  --disabled-bg-semitransparent: color-mix(in srgb, var(--c-mgrey-50) 50%, transparent);
-  --disabled-border:           var(--c-cgrey-100);
-
-
-  /* ---------------------------------------------------------------------
-     5. LOCAL  — для применения в отдельных компонентах
-     --------------------------------------------------------------------- */
-
-  /* Status — base + opacity ramp (Dark / base / Mid 56% / MidLight 32% / Light 16%) */
-  --st-green-dark:      var(--c-green-800);
-  --st-green:           var(--c-green-500);
-  --st-green-mid:       color-mix(in srgb, var(--c-green-500) 56%, transparent);
-  --st-green-midlight:  color-mix(in srgb, var(--c-green-500) 32%, transparent);
-  --st-green-light:     color-mix(in srgb, var(--c-green-500) 16%, transparent);
-
-  --st-lblue-dark:      var(--c-lightblue-900);
-  --st-lblue:           var(--c-lightblue-500);
-  --st-lblue-mid:       color-mix(in srgb, var(--c-lightblue-500) 56%, transparent);
-  --st-lblue-midlight:  color-mix(in srgb, var(--c-lightblue-500) 32%, transparent);
-  --st-lblue-light:     color-mix(in srgb, var(--c-lightblue-500) 16%, transparent);
-
-  --st-orange-dark:     var(--c-amber-900);
-  --st-orange:          var(--c-amber-700);
-  --st-orange-mid:      color-mix(in srgb, var(--c-amber-700) 56%, transparent);
-  --st-orange-midlight: color-mix(in srgb, var(--c-amber-700) 32%, transparent);
-  --st-orange-light:    color-mix(in srgb, var(--c-amber-700) 16%, transparent);
-
-  --st-red-dark:        var(--c-red-700);
-  --st-red:             var(--c-red-400);
-  --st-red-mid:         color-mix(in srgb, var(--c-red-400) 56%, transparent);
-  --st-red-midlight:    color-mix(in srgb, var(--c-red-400) 32%, transparent);
-  --st-red-light:       color-mix(in srgb, var(--c-red-400) 16%, transparent);
-
-  --st-dpurple-dark:     var(--c-deeppurple-900);
-  --st-dpurple:          var(--c-deeppurple-400);
-  --st-dpurple-mid:      color-mix(in srgb, var(--c-deeppurple-400) 56%, transparent);
-  --st-dpurple-midlight: color-mix(in srgb, var(--c-deeppurple-400) 32%, transparent);
-  --st-dpurple-light:    color-mix(in srgb, var(--c-deeppurple-400) 16%, transparent);
-
-  --st-grey-dark:       var(--c-cgrey-900);
-  --st-grey:            var(--c-cgrey-700);
-  --st-grey-mid:        color-mix(in srgb, var(--c-cgrey-700) 56%, transparent);
-  --st-grey-midlight:   color-mix(in srgb, var(--c-cgrey-700) 32%, transparent);
-  --st-grey-light:      color-mix(in srgb, var(--c-cgrey-700) 16%, transparent);
-
-  --st-system-dark:     var(--c-cgrey-600);
-  --st-system:          var(--c-swamp-400);
-  --st-system-mid:      color-mix(in srgb, var(--c-swamp-400) 56%, transparent);
-  --st-system-midlight: color-mix(in srgb, var(--c-swamp-400) 32%, transparent);
-  --st-system-light:    color-mix(in srgb, var(--c-swamp-400) 16%, transparent);
-
-  --st-disabled-dark:     color-mix(in srgb, var(--c-cgrey-600) 40%, transparent);
-  --st-disabled:          color-mix(in srgb, var(--c-cgrey-600) 24%, transparent);
-  --st-disabled-mid:      color-mix(in srgb, var(--c-cgrey-600) 16%, transparent);
-  --st-disabled-midlight: color-mix(in srgb, var(--c-cgrey-600) 8%, transparent);
-  --st-disabled-light:    color-mix(in srgb, var(--c-cgrey-600) 4%, transparent);
-
-  --st-primary-dark:     var(--c-emerald-900);
-  --st-primary:          var(--c-emerald-500);
-  --st-primary-mid:      color-mix(in srgb, var(--c-emerald-500) 56%, transparent);
-  --st-primary-midlight: color-mix(in srgb, var(--c-emerald-500) 32%, transparent);
-  --st-primary-light:    color-mix(in srgb, var(--c-emerald-500) 16%, transparent);
-
-  /* Rate */
-  --rate-green:        var(--c-lightgreen-200);
-  --rate-light-green:  var(--c-green-50);
-  --rate-blue:         var(--c-blue-200);
-  --rate-light-blue:   var(--c-lightblue-50);
-  --rate-purple:       var(--c-deeppurple-200);
-  --rate-light-purple: var(--c-deeppurple-50);
-  --rate-orange:       var(--c-orange-200);
-  --rate-light-orange: var(--c-orange-50);
-
-  /* Chart */
-  --chart-red:          #F99290;
-  --chart-orange:       #F9A580;
-  --chart-yellow:       #FFD081;
-  --chart-shiny-green:  #8CCB5E;
-  --chart-pastel-green: #76E385;
-  --chart-turquoise:    #31D4A8;
-  --chart-light-blue:   #7DCAFA;
-  --chart-blue:         #5B9CFA;
-  --chart-indigo:       #8D87F9;
-  --chart-purple:       #CB88F8;
-  --chart-pale-purple:  #F58BD8;
-  --chart-pink-purple:  #EC7390;
+  /* Yellow */
+  --yellow-50:   #FFFDE7;
+  --yellow-100:  #FFF9C4;
+  --yellow-200:  #FFF59D;
+  --yellow-300:  #FFF176;
+  --yellow-400:  #FFEE58;
+  --yellow-500:  #FFEB3B;
+  --yellow-600:  #FDD835;
+  --yellow-700:  #FBC02D;
+  --yellow-800:  #F9A825;
+  --yellow-900:  #F57F17;
+  --yellow-A100: #FFFF8D;
+  --yellow-A200: #FFFF00;
+  --yellow-A400: #FFEA00;
+  --yellow-A700: #FFD600;
 }

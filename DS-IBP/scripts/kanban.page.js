@@ -375,6 +375,15 @@
         '<div class="kanban"><div class="kanban__viewport"><div class="kanban__track">' +
         column(COLS[1], opt({}), { mod: 'kbcol--collapsed' }) + '</div></div></div>', '120px'));
 
+    paint(document.getElementById('content-col-name'),
+      sample('Короткое имя',
+        '<div class="kanban"><section class="kbcol kbcol--lblue">' +
+        colHead({ name: 'Заведение' }, 12) + '</section></div>', COL_SAMPLE_W) +
+      sample('Длинное — две строки, дальше эллипс',
+        '<div class="kanban"><section class="kbcol kbcol--orange">' +
+        colHead({ name: 'Согласование и подписание договора поставки' }, 7) +
+        '</section></div>', COL_SAMPLE_W));
+
     paint(document.getElementById('var-card-density'),
       sample('Базовая', card(CARDS.draft[0], opt({}))) +
       sample('Компактная — в той же высоте помещается две',

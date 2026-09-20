@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<!--
+  ИСТОЧНИК страницы сделки. Двойным кликом открывают НЕ этот файл, а собранный
+  Deal.preview.html: тайлы здесь стоят метками <ds-include>, а рантайм-инклуд
+  ДС тянет фрагменты через fetch, который по file:// не работает.
+
+    node Projects/post/assemble.mjs        — пересобрать после правки любого модуля
+
+  Страница держит только перечень тайлов и их место в сетке. Разметка тайла и
+  его паспорт живут в своей папке: Projects/post/post_local_components/<Имя>/.
+  Правка, касающаяся содержимого тайла, делается в модуле, а не здесь.
+-->
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сделка — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../../DS-IBP/ds.css">
+<!-- @lc-css --><!-- сюда ассемблер вставляет CSS подключённых локальных компонентов -->
+<style>
+  /* ---------- только раскладка экрана, на токенах ДС ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    margin: 0;
+    font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-page);
+  }
+
+  /* ---------- Секция «Общая информация» ----------
+     Сворачиваемого заголовка раздела в ДС нет: Tile-аккордеон живёт только
+     внутри .tile (ds-tile.js ищет closest('.tile')), а здесь заголовок стоит
+     на фоне страницы. Секция собрана из атомов ДС — IconButton + токен
+     типографики; переключение делает экранный скрипт. Находка «нет компонента
+     SectionAccordion» записана в Deal.screen.md, §6. */
+  .gen { display: flex; flex-direction: column; gap: var(--space-12); }
+  .gen__head { display: flex; align-items: center; gap: var(--space-8); }
+  .gen__title { margin: 0; font: var(--type-h5-strong); color: var(--text-primary); }
+  .gen__chevron { transition: transform .15s ease; }
+  .gen__toggle[aria-expanded="false"] .gen__chevron { transform: rotate(180deg); }
+  @media (prefers-reduced-motion: reduce) { .gen__chevron { transition: none; } }
+
+  /* Две колонки блока: слева сетка тайлов, справа тайл фиксированной ширины.
+     Парное [hidden] — соглашение ДС: правило display у класса (0,1,0) иначе
+     перебивает UA-правило [hidden] (0,0,0) и сворачивание молча ломается. */
+  .gen__body { display: flex; align-items: stretch; gap: var(--space-16); }
+  .gen__body[hidden] { display: none; }
+  .gen__main { flex: 1; min-width: 0; }
+  /* display:grid — единственный ребёнок (тайл) тянется на всю высоту колонки
+     сам, без правил экрана на .tile */
+  .gen__side { flex: 0 0 320px; min-height: 400px; display: grid; }
+
+  /* ---------- Перестроение ----------
+     Настоящий механизм («адаптивно, а не по брейкпоинтам») ещё не описан — см.
+     Deal.screen.md, §6. До него — штатная пара .col-N/.colw-N из Spacing и
+     пороги по ширине РАБОЧЕЙ ОБЛАСТИ (контейнер screen из Layout): закрепление
+     боковой панели сужает контент, не меняя окна. Сами пороги — выбор этого
+     экрана, а не правило ДС: общих брейкпоинтов в ДС нет, порог задаёт экран. */
+  @container screen (max-width: 1560px) {
+    .gen__body { flex-direction: column; }
+    .gen__side { flex: 0 0 auto; }
+  }
+  @container screen (max-width: 1240px) {
+    .tile-row > [class*="colw-"] { grid-column: span var(--colw); }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-layout">
+
+  <!-- Боковое меню строится экранным скриптом из ibp-home.js по роли -->
+  <nav class="nav nav--rail" id="nav" aria-label="Главное меню"></nav>
+
+  <div class="screen">
+    <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
+      <li class="crumbs__item"><a class="link link--muted" href="../mainPage/index.html">Главная</a></li>
+      <li class="crumbs__item"><a class="link link--muted" href="../Portfolio-did/Portfolio.html">Текущий портфель ДИД</a></li>
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page" id="deal-crumb">Сделка</span>
+      </li>
+    </nav>
+
+    <main class="screen__content">
+
+      <!-- ── Шапка страницы ─────────────────────────────────────────────── -->
+      <div class="phead">
+        <div class="phead__main">
+          <div class="phead__title-row">
+            <div class="phead__title-group">
+              <h1 class="phead__title" id="deal-title">Сделка</h1>
+              <!-- Модалка редактирования номера и наименования — та же, что при
+                   создании сделки в реестре. Не собрана: скрима deal-rename-scrim
+                   на странице пока нет, хук ждёт его (Deal.screen.md, §6). -->
+              <button type="button" class="ibtn ibtn--neutral ibtn--s phead__edit"
+                      aria-label="Редактировать номер и наименование сделки"><i data-icon="edit"></i></button>
+            </div>
+            <!-- Чипы статусов заполняет экранный скрипт из DealsStore:
+                 сделка · Operations · ЦУП. Мониторинг на странице сделки не показывается. -->
+            <div class="phead__chips" id="deal-chips"></div>
+          </div>
+        </div>
+        <div class="phead__actions" data-actions-overflow>
+          <button type="button" class="btn btn--outline btn--m">
+            <i data-icon="calc"></i><span class="btn__label">Расчет задолженности</span></button>
+          <button type="button" class="btn btn--outline btn--m">
+            <span class="btn__label">Плановые платежи</span><i data-icon="arrow-right"></i></button>
+          <button type="button" class="btn btn--outline btn--m">
+            <span class="btn__label">Чек-листы</span><i data-icon="arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- ── Общая информация ───────────────────────────────────────────── -->
+      <section class="gen">
+        <div class="gen__head">
+          <button type="button" class="ibtn ibtn--neutral ibtn--m gen__toggle"
+                  aria-expanded="true" aria-controls="gen-body" aria-label="Свернуть">
+            <i data-icon="chevron-up" class="gen__chevron"></i>
+          </button>
+          <h2 class="gen__title">Общая информация</h2>
+        </div>
+
+        <div class="gen__body" id="gen-body">
+
+          <!-- Левая секция: 12 колонок, зазоры между рядами держит .tile-group -->
+          <div class="gen__main tile-group">
+
+            <div class="tile-row">
+              <!-- Локальный компонент «КНР» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile col-3 colw-6">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">КНР</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+              <!-- Локальный компонент «Сроки сделки» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile col-3 colw-6">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Сроки сделки</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+              <!-- Локальный компонент «Команда сделки» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Команда сделки</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+            </div>
+
+            <div class="tile-row">
+              <!-- Локальный компонент «Описание сделки» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Описание сделки</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+              <!-- Локальный компонент «Финансовые метрики сделки» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Финансовые метрики сделки</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Развернуть"><i data-icon="maximize"></i></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+            </div>
+
+            <!-- Третий ряд опционален: показывается только у сделок, где есть
+                 сведения о проекте. Условие не согласовано (Deal.screen.md, §6),
+                 в макете ряд показан. -->
+            <div class="tile-row">
+              <!-- Локальный компонент «Сведения о проекте» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile col-12">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Сведения о проекте</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+            </div>
+
+          </div>
+
+          <!-- Правая колонка: ширина 320 и минимальная высота 400 — из ТЗ, вне
+               12-колоночной сетки, поэтому помечена data-off-grid (Spacing). -->
+          <div class="gen__side" data-off-grid="Заведение сделки — фиксированные 320px по ТЗ">
+            <!-- Локальный компонент «Заведение сделки» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section class="tile" data-state="empty" data-mode="view">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Заведение сделки</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── Табы разделов сделки ───────────────────────────────────────── -->
+      <div class="tabs tabs--horiz" role="tablist" id="deal-tabs" data-tabs>
+        <button type="button" class="tab tab--m tab--selected" role="tab" id="tab-fin"
+                aria-selected="true" aria-controls="panel-fin" tabindex="0">
+          <span class="tab__label">Финансовые данные</span>
+        </button>
+        <button type="button" class="tab tab--m" role="tab" id="tab-cpt"
+                aria-selected="false" aria-controls="panel-cpt" tabindex="-1">
+          <span class="tab__label">Контрагенты</span><span class="tab__badge">9</span>
+        </button>
+        <button type="button" class="tab tab--m" role="tab" id="tab-col"
+                aria-selected="false" aria-controls="panel-col" tabindex="-1">
+          <span class="tab__label">Обеспечения</span><span class="tab__badge">9</span>
+        </button>
+      </div>
+
+      <!-- Финансовые данные -->
+      <div class="tile-group" id="panel-fin" role="tabpanel" aria-labelledby="tab-fin" data-tabpanel>
+        <!-- Первый ряд: высота каждого тайла по своему контенту, а не по соседу.
+             Способ из спеки Tile: тайл лежит в .tile-stack — у flex-колонки
+             align-self:stretch тянет ширину, не высоту. -->
+        <div class="tile-row">
+          <div class="tile-stack col-6 colw-12">
+            <!-- Локальный компонент «Продукты сделки» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section class="tile" data-state="empty" data-mode="view">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Продукты сделки</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="btn btn--outline btn--xs"><i data-icon="add"></i><span class="btn__label">Продукт ДИД</span></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+          </div>
+          <div class="tile-stack col-6 colw-12">
+            <!-- Локальный компонент «Финансовые инструменты» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section class="tile" data-state="empty" data-mode="view">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Финансовые инструменты</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="btn btn--outline btn--xs"><i data-icon="add"></i><span class="btn__label">Фин. инструмент</span></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Действия"><i data-icon="more-dots"></i></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+          </div>
+        </div>
+        <!-- Второй ряд: обычный ряд — высоты выравниваются по самому высокому -->
+        <div class="tile-row">
+          <!-- Локальный компонент «Влияние на ЭПС/ВБС» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Влияние на ЭПС/ВБС</h3></div>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+          <!-- Локальный компонент «Финансовые метрики» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Финансовые метрики</h3></div>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+        </div>
+      </div>
+
+      <!-- Контрагенты -->
+      <div class="tile-group" id="panel-cpt" role="tabpanel" aria-labelledby="tab-cpt" data-tabpanel hidden>
+        <div class="tile-row">
+          <!-- Локальный компонент «Контрагенты сделки» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     По снимку текущей системы это таблица на всю ширину панели, без шапки-тайла,
+     поэтому корень — TileHeadless: он даёт только подложку и отступы.
+     Сейчас компонент в состоянии empty: состав колонок не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile tile--headless col-12">
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Контрагенты ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+        </div>
+      </div>
+
+      <!-- Обеспечения -->
+      <div class="tile-group" id="panel-col" role="tabpanel" aria-labelledby="tab-col" data-tabpanel hidden>
+        <div class="tile-row">
+          <!-- Локальный компонент «Связанные обеспечения» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section data-state="empty" data-mode="view" class="tile col-12">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Связанные обеспечения</h3></div>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="../data/mock-deals.js"></script>
+<script src="../data/deals-store.js"></script>
+<script src="../../../DS-IBP/scripts/ds.js"></script>
+<script src="../../../DS-IBP/scripts/ibp-home.js"></script>
+<script>
+/* Экранный скрипт. Делает только то, чего рантаймы ДС не делают:
+   меню по каталогу ролей, данные сделки, переключение панелей табов и
+   сворачивание секции (компонента «заголовок-аккордеон» в ДС нет).
+   Скрипт синхронный и стоит после ds.js — поэтому его DSTabs.tabs(...) успевает
+   раньше автопривязки wireAll (она на DOMContentLoaded), и onChange не теряется. */
+(function () {
+  'use strict';
+  var role = window.IBPHome.defaultRole;
+  var SELECTED_ID = 'current-portfolio';
+  /* строка пользователя в футере меню ведёт на хаб проектов (корневой index.html).
+     Футер отдаёт IBPHome.footerHTML с зашитым href="#" — подменяем ссылку
+     здесь, каталог ДС не трогаем. Проверяет сторож projects-hub.mjs. */
+  var USER_LINK_FROM = ' href="#" aria-label="Открыть личный кабинет"';
+  var USER_LINK_TO = ' href="../../../index.html" aria-label="Хаб проектов"';
+
+  function ic(name) { return '<i data-icon=\'' + name + '\'></i>'; }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function itemHTML(it) {
+    /* пункт с тайлом-со-ссылками — аккордеон-родитель (под-пункты = ссылки тайла) */
+    if (it.tile && it.tile.links && it.tile.links.length) {
+      var sub = '<div class="nav__sub" id="nav-sub-' + it.id + '"><div class="nav__sub-in">'
+        + it.tile.links.map(function (l) { return '<a class="nav__item" href="#"><span class="nav__label">' + l + '</span></a>'; }).join('')
+        + '</div></div>';
+      return '<a class="nav__item nav__item--acc" href="#" aria-expanded="false" aria-controls="nav-sub-' + it.id + '">'
+        + '<span class="nav__ico">' + ic(it.icon) + '</span>'
+        + '<span class="nav__label">' + it.label + '</span>'
+        + '<span class="nav__caret">' + ic('chevron-down') + '</span></a>' + sub;
+    }
+    var badge = it.badge
+      ? '<span class="nav__badge"><span class="badge badge--xs badge--accent" aria-hidden="true">' + it.badge + '</span></span>'
+      : '';
+    /* пункт «Текущий портфель» ведёт на реестр: со страницы сделки он остаётся
+       рабочим переходом на уровень выше, а не мёртвой ссылкой */
+    var href = (it.id === SELECTED_ID) ? '../Portfolio-did/Portfolio.html' : '#';
+    var sel = (it.id === SELECTED_ID) ? ' nav__item--selected" aria-current="page' : '';
+    return '<a class="nav__item' + sel + '" href="' + href + '"><span class="nav__ico">' + ic(it.icon) + '</span>'
+      + '<span class="nav__label">' + it.label + '</span>' + badge + '</a>';
+  }
+
+  function buildNav() {
+    var nav = document.getElementById('nav');
+    var s = '<div class="nav__top">'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Свернуть меню">' + ic('left-menu') + '</button>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель">' + ic('pin-menu') + '</button>'
+      + '</div>';
+    s += '<div class="nav__list">';
+    s += '<a class="nav__item" href="../mainPage/index.html"><span class="nav__ico">' + ic('main-page') + '</span><span class="nav__label">Главная</span></a>';
+    IBPHome.itemsFor(role).forEach(function (g, i) {
+      s += '<div class="nav__block' + (i === 0 ? ' nav__block--first' : '') + '">';
+      s += '<div class="nav__block-label">' + g.label + '</div>';
+      g.items.forEach(function (it) { s += itemHTML(it); });
+      s += '</div>';
+    });
+    s += '</div>';
+    s += (window.IBPHome && window.IBPHome.footerHTML)
+      ? window.IBPHome.footerHTML(role).replace(USER_LINK_FROM, USER_LINK_TO)
+      : '<div class="nav__footer">'
+        + '<a class="nav__user" href="../../../index.html" aria-label="Хаб проектов">'
+        + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
+        + '<span class="nav__user-text">'
+        + '<span class="nav__user-name">Александров Петр Константинович</span>'
+        + '<span class="nav__user-role">' + role + '</span>'
+        + '</span></a>'
+        + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти">' + ic('logout') + '</button>'
+        + '</div>';
+    nav.innerHTML = s;
+    if (window.DSNavPanel) window.DSNavPanel.bind(nav);
+  }
+
+  /* Сделка, которую открыли: номер приходит параметром ?id= — его ставит реестр
+     текущего портфеля при двойном клике по строке. Данные читаются из общего
+     DealsStore (той же базы, что рисует таблицу портфеля), поэтому наименование
+     и номер на обоих экранах совпадают по построению. Открытие файла без
+     параметра — просмотр каркаса: берётся первая сделка списка. */
+  function currentDeal() {
+    var id = null;
+    try { id = new URLSearchParams(window.location.search).get('id'); } catch (e) { id = null; }
+    var deal = (id != null && id !== '') ? window.DealsStore.byId(id) : null;
+    return deal || window.DealsStore.list()[0] || null;
+  }
+
+  /* Три чипа-статуса: сделка · Operations · ЦУП. Статус мониторинга на странице
+     сделки не показывается (ТЗ 19.09.2026). Тон берётся из DealsStore.statusTone —
+     того же словаря, что красит колонки статусов в реестре портфеля: словарь
+     один, поэтому чип в таблице и чип в шапке не могут разойтись. */
+  function fillChips(deal) {
+    var box = document.getElementById('deal-chips');
+    if (!box) return;
+    var rows = [
+      { value: deal.status, letter: '' },
+      { value: deal.statusOps, letter: 'О' },
+      { value: deal.statusTsup, letter: 'Ц' }
+    ];
+    box.innerHTML = rows.map(function (r) {
+      if (!r.value) return '';
+      var av = r.letter
+        ? '<span class="chip__avatar av av--circular"><span class="av__text">' + esc(r.letter) + '</span></span>'
+        : '';
+      return '<span class="chip chip--rounded chip--s ' + window.DealsStore.statusTone(r.value) + '">'
+        + av + '<span class="chip__label">' + esc(r.value) + '</span></span>';
+    }).join('');
+  }
+
+  function fillDeal() {
+    var deal = currentDeal();
+    if (!deal) return;
+    var num = 'Сделка № ' + deal.id;
+    document.getElementById('deal-title').textContent = deal.id + '. ' + (deal.name || '');
+    document.getElementById('deal-crumb').textContent = num;
+    document.title = num + ' — IBP';
+    fillChips(deal);
+  }
+
+  /* Сворачивание блока «Общая информация». Рантайм ds-tile.js сюда не подходит:
+     он ищет closest('.tile'), а заголовок раздела стоит на фоне страницы. */
+  function bindSection() {
+    var toggle = document.querySelector('.gen__toggle');
+    var body = document.getElementById('gen-body');
+    if (!toggle || !body) return;
+    toggle.addEventListener('click', function () {
+      var open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      toggle.setAttribute('aria-label', open ? 'Развернуть' : 'Свернуть');
+      body.hidden = open;
+    });
+  }
+
+  /* Табы: roving tabindex, стрелки и переполнение даёт рантайм ДС, а показ
+     нужной панели — модель данных экрана, рантайма для неё в ДС нет
+     (screen-assembly/references/runtime-hooks.md, «Чего рантаймы не делают»). */
+  function bindTabs() {
+    var bar = document.getElementById('deal-tabs');
+    if (!bar || !window.DSTabs) return;
+    var panels = Array.prototype.slice.call(document.querySelectorAll('[data-tabpanel]'));
+    window.DSTabs.tabs(bar, {
+      onChange: function (index) {
+        panels.forEach(function (p, i) { p.hidden = (i !== index); });
+      }
+    });
+  }
+
+  function paintAll() {
+    if (window.dsIcons) window.dsIcons.apply(document);
+  }
+
+  buildNav(); fillDeal(); bindSection(); bindTabs(); paintAll();
+})();
+</script>
+
+</body>
+</html>

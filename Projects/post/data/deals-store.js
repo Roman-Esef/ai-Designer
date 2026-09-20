@@ -8,6 +8,8 @@
      exists({ id, name }) → boolean       — уникальность номера/наименования,
                                              сверка регистронезависимая и по
                                              обрезанным пробелам
+     statusTone(value[, scope]) → класс   — тон статусного чипа; scope 'mon' —
+                                             словарь статусов мониторинга
      create(partial) → запись             — новая сделка (см. ниже)
      update(id, patch) → запись|null
      on(type, fn) → off()                 — подписка на 'change'
@@ -29,6 +31,44 @@
   }
 
   function norm(s) { return String(s == null ? '' : s).trim().toLowerCase(); }
+
+  /* Тон статусного чипа. Словарь живёт здесь, а не на экране: статусы одной
+     сделки показывают и реестр портфеля (колонки таблицы), и страница сделки
+     (чипы шапки) — две копии словаря разошлись бы на первой же новой строке.
+     scope: 'general' — общий, ЦУП и Operations; 'mon' — мониторинг (у него свой
+     набор значений). Незнакомое значение — нейтральный chip--dark, а не пусто:
+     чип без тона визуально неотличим от отсутствия статуса. */
+  var TONE_GENERAL = {
+    'Черновик': 'chip--dark',
+    'Ожидает подтверждения': 'chip--warning',
+    'Подтверждение изменений': 'chip--warning',
+    'Ожидает назначения ответственного': 'chip--warning',
+    'Корректировка': 'chip--info',
+    'Ввод изменений': 'chip--info',
+    'Корректировка изменений': 'chip--info',
+    'Активная': 'chip--success',
+    'Утверждена': 'chip--success',
+    'На сопровождении': 'chip--success',
+    'Погашена': 'chip--dpurple'
+  };
+  var TONE_MON = {
+    'На утверждении': 'chip--dark',
+    'Утверждена': 'chip--dark',
+    'Ожидает передачи на мониторинг': 'chip--warning',
+    'Направлена на передачу': 'chip--warning',
+    'Передана': 'chip--warning',
+    'Изменения ожидают передачи на мониторинг': 'chip--warning',
+    'Изменения направлены на передачу': 'chip--warning',
+    'Передача изменений': 'chip--warning',
+    'На мониторинге ГК СБИ': 'chip--success',
+    'На мониторинге ПАО Сбербанк': 'chip--success',
+    'Погашена': 'chip--dpurple'
+  };
+
+  function statusTone(value, scope) {
+    var map = (scope === 'mon') ? TONE_MON : TONE_GENERAL;
+    return map[value] || 'chip--dark';
+  }
 
   function byId(id) {
     var key = String(id);
@@ -91,6 +131,7 @@
     exists: exists,
     create: create,
     update: update,
+    statusTone: statusTone,
     on: on,
   };
 })();

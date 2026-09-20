@@ -182,7 +182,12 @@
   top: 0;
   z-index: 2;
   display: flex;
-  align-items: center;
+  /* Имя занимает до двух строк, всё остальное стоит на ПЕРВОЙ. Полоса первой
+     строки — 24px, высота счётчика .badge--s (самый высокий элемент шапки);
+     маркер, имя и кнопки доводятся до её центра собственным margin-top, и
+     центры всех четырёх сходятся на 12px от верха контент-бокса. Поэтому
+     однострочная шапка выглядит ровно так же, как до появления второй строки. */
+  align-items: flex-start;
   gap: var(--space-8);
   min-width: 0;
   /* тянется на всю ширину колонки, но содержимое стоит по кромке карточек */
@@ -202,6 +207,7 @@
 .kbcol__acts .ibtn { cursor: pointer; }
 .kbcol__marker {
   flex: none;
+  margin-top: var(--space-8);   /* (24 - 8) / 2 — центр полосы первой строки */
   width: 8px;
   height: 8px;
   border-radius: var(--radius-circle);
@@ -213,16 +219,30 @@
 .kbcol--dpurple .kbcol__marker { background: var(--st-dpurple); }
 .kbcol--primary .kbcol__marker { background: var(--st-primary); }
 
+/* Имя переносится на вторую строку и только потом уходит в эллипс: ширины
+   288px хватает на два слова, а «Согласование и подписание договора» в одну
+   строку не живёт. Клэмп — идиома .tile__title (tile.css), своей не заводим. */
 .kbcol__name {
   min-width: 0;
+  margin-top: var(--space-4);   /* (24 - 16) / 2 — первая строка по центру полосы */
   font: var(--type-body-s-strong);
   color: var(--text-primary);
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  /* Место под ДВЕ строки резервируется всегда, даже под однословным именем:
+     шапки всех колонок обязаны быть равной высоты, иначе карточки соседних
+     колонок начинаются с разной. Две декларации — не дубль: браузер без
+     единицы lh отбрасывает вторую и остаётся на px. */
+  min-height: 32px;             /* 2 строки --type-body-s-strong (14px/16px) */
+  min-height: 2lh;              /* где есть lh — высота следует за токеном */
 }
 /* Три действия: добавить · перейти на страницу колонки · меню */
 .kbcol__acts {
+  margin-top: var(--space-4);   /* (24 - 16) / 2 — центр полосы первой строки */
   margin-left: auto;
   flex: none;
   display: flex;
@@ -308,7 +328,15 @@
   gap: var(--space-12);
   border-radius: var(--radius-m);
 }
-.kbcol--collapsed .kbcol__acts { margin-left: 0; flex-direction: column; }
+/* Действия поднимаются над именем: в свёрнутой колонке они — единственное
+   управление, а имя длиной до 320px уводило их к нижней кромке. Переставляет
+   order, а не разметка: DOM один на оба состояния, и в развёрнутой шапке
+   действия обязаны идти последними — их прижимает margin-left: auto.
+   Порядок фокуса цел: кнопки — единственные фокусируемые узлы внутри шапки,
+   их взаимный порядок не менялся. */
+.kbcol--collapsed .kbcol__acts { order: -1; margin-top: 0; margin-left: 0; flex-direction: column; }
+/* Полосы первой строки в свёрнутой колонке нет — шапка идёт столбиком */
+.kbcol--collapsed .kbcol__marker { margin-top: 0; }
 /* Имя читается СНИЗУ ВВЕРХ: vertical-rl даёт сверху вниз,
    поворот на 180° разворачивает и направление письма, и порядок строк. */
 .kbcol__vname {

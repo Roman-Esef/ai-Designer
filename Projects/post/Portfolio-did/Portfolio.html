@@ -834,32 +834,10 @@
 
   var GRID = '8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 150px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr)';
 
-  var TONE_GENERAL = {
-    'Черновик': 'chip--dark',
-    'Ожидает подтверждения': 'chip--warning',
-    'Подтверждение изменений': 'chip--warning',
-    'Ожидает назначения ответственного': 'chip--warning',
-    'Корректировка': 'chip--info',
-    'Ввод изменений': 'chip--info',
-    'Корректировка изменений': 'chip--info',
-    'Активная': 'chip--success',
-    'Утверждена': 'chip--success',
-    'На сопровождении': 'chip--success',
-    'Погашена': 'chip--dpurple'
-  };
-  var TONE_MON = {
-    'На утверждении': 'chip--dark',
-    'Утверждена': 'chip--dark',
-    'Ожидает передачи на мониторинг': 'chip--warning',
-    'Направлена на передачу': 'chip--warning',
-    'Передана': 'chip--warning',
-    'Изменения ожидают передачи на мониторинг': 'chip--warning',
-    'Изменения направлены на передачу': 'chip--warning',
-    'Передача изменений': 'chip--warning',
-    'На мониторинге ГК СБИ': 'chip--success',
-    'На мониторинге ПАО Сбербанк': 'chip--success',
-    'Погашена': 'chip--dpurple'
-  };
+  /* Тон статусного чипа — общий словарь DealsStore.statusTone: те же статусы
+     показывает страница сделки чипами шапки, и копия словаря на экране
+     разошлась бы с ней на первом же новом значении. */
+  var statusTone = window.DealsStore.statusTone;
 
   function esc(v) {
     var d = document.createElement('div');
@@ -906,10 +884,10 @@
     cells.push('<div class="tc tc--separator"></div>');
     cells.push(textCell('id', deal.id, 'tc--pinned'));
     cells.push(textCell('name', deal.name, 'tc--pinned'));
-    cells.push(statusChip('status', TONE_GENERAL[deal.status] || 'chip--dark', deal.status));
-    cells.push(statusChip('statusTsup', TONE_GENERAL[deal.statusTsup] || 'chip--dark', deal.statusTsup, 'Ц'));
-    cells.push(statusChip('statusOps', TONE_GENERAL[deal.statusOps] || 'chip--dark', deal.statusOps, 'O'));
-    cells.push(statusChip('statusMon', TONE_MON[deal.statusMon] || 'chip--dark', deal.statusMon, 'М'));
+    cells.push(statusChip('status', statusTone(deal.status), deal.status));
+    cells.push(statusChip('statusTsup', statusTone(deal.statusTsup), deal.statusTsup, 'Ц'));
+    cells.push(statusChip('statusOps', statusTone(deal.statusOps), deal.statusOps, 'O'));
+    cells.push(statusChip('statusMon', statusTone(deal.statusMon, 'mon'), deal.statusMon, 'М'));
     cells.push(textCell('restricted', deal.restricted));
     cells.push(textCell('desk', deal.desk));
     cells.push(joinedCell('balances', deal.balances));
@@ -971,7 +949,10 @@
     if (e.target.closest('a, button, input, label')) return;
     var row = e.target.closest('.tbl__row[data-row]');
     if (!row) return;
-    window.location.href = '../deal_post/Deal.html?id=' + encodeURIComponent(row.getAttribute('data-row'));
+    /* Deal.preview.html, а не Deal.html: страница сделки модульная — тайлы
+       вшивает ассемблер (Projects/post/assemble.mjs), а сам Deal.html только
+       источник с метками ds-include. */
+    window.location.href = '../deal_post/Deal.preview.html?id=' + encodeURIComponent(row.getAttribute('data-row'));
   });
 
   /* ---------- пагинация: реальные total/страницы, окно по DOM-порядку ---------- */

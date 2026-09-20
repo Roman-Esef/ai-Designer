@@ -1,0 +1,21 @@
+<!-- Локальный компонент «Влияние на ЭПС/ВБС» — фрагмент страницы сделки.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
+     Здесь только разметка: внешние отступы и место в колонках задаёт экран.
+     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-mode  — режим прав:       edit | view | locked
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+<section class="tile" data-state="empty" data-mode="view">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">Влияние на ЭПС/ВБС</h3></div>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="es es--m">
+      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
+      <div class="es__body">
+        <p class="es__title">Данные ещё не заведены</p>
+      </div>
+    </div>
+  </div>
+</section>
