@@ -126,7 +126,8 @@ grep -o "^[^#].*" DS-IBP/specs/Icons.md | tail -1 | tr '·' '\n' | grep -i "arro
 
 | Что нужно | Где смотреть |
 |---|---|
-| Цвета | `grep -n "^  --" DS-IBP/styles/colors.css` |
+| Цвета — семантика | `grep -n "^  --" DS-IBP/styles/palette.css` |
+| Цвета — базовые токены | `grep -n "^  --" DS-IBP/styles/colors.css` |
 | Типографика (`--type-*`, классы `.ds-*`) | `sed -n '/^## Ключевые/,/^## /p' DS-IBP/specs/Typography.md` |
 | Отступы, шкала `--space-*`, сетка `.grid12`/`.col-N` | `sed -n '/^## Spacing/,/^## /p' DS-IBP/specs/_cheatsheet.md` |
 | Радиусы | `grep -n "radius" DS-IBP/styles/radius.css` |

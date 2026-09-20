@@ -143,7 +143,7 @@ function isLiteralAttr(v) {
 
 /* все тайлы (класс-токен ровно «tile»); opts: inRange, fullText, baseOffset, stackRanges */
 function extractTiles(html, opts = {}) {
-  const { inRange, fullText, baseOffset = 0, stackRanges = [] } = opts;
+  const { inRange, fullText, baseOffset = 0, stackRanges = [], offGridRanges = [] } = opts;
   const tiles = [];
   const tagRe = /<([a-z]+)\s[^>]*class="([^"]*)"[^>]*>/g;
   let m;
@@ -156,12 +156,47 @@ function extractTiles(html, opts = {}) {
     if (inRange && !inRange(m.index)) continue;
     const absIdx = baseOffset + m.index;
     const inStack = stackRanges.some((r) => absIdx >= r.idx && absIdx < r.idx + r.html.length);
-    tiles.push(analyzeTile(el, lineOf(fullText || html, absIdx), inStack));
+    const offGrid = offGridRanges.some((r) => absIdx >= r.idx && absIdx < r.idx + r.html.length);
+    tiles.push(analyzeTile(el, lineOf(fullText || html, absIdx), inStack, offGrid));
   }
   return tiles;
 }
 
+/* Открывающие теги с их диапазонами — для зон, внутри которых ширина тайла
+   читается не с самого тайла: стопки и внесеточные блоки. */
+function tagRanges(html, re, tag) {
+  const out = [];
+  let m;
+  while ((m = re.exec(html))) {
+    const idx = m.index;
+    const el = sliceTag(html, idx, tag);
+    if (!el) continue;
+    out.push({ html: el, idx, open: m[0] });
+  }
+  return out;
+}
+
+function spanOfClassAttr(openTag) {
+  const cls = (openTag.match(/class="([^"]*)"/) || [])[1] || '';
+  const style = (openTag.match(/style="([^"]*)"/) || [])[1] || '';
+  const sp = style.match(/grid-column\s*:\s*span\s*(\d+)/);
+  if (sp) return parseInt(sp[1], 10);
+  const c = cls.match(/\bcol-(\d+)\b/) || cls.match(/\bcolw-(\d+)\b/);
+  return c ? parseInt(c[1], 10) : null;
+}
+
 function parseTiles(html) {
+  /* Стопки считаются ДО рядов: по спеке Tile `.tile-stack` живёт внутри
+     `.tile-row` (колонка тайлов, каждый со своей высотой). Раньше ряды
+     разбирались с пустым stackRanges — тайлы в стопке теряли признак inStack,
+     их span читался с самого тайла (его там нет by design) и ряд давал
+     ложный Б7 «= 0 ≠ 12». */
+  const stackRanges = tagRanges(html, /<div class="tile-stack[^"]*"/g, 'div');
+  /* Внесеточные блоки: ширина задана не колонками, а причиной в data-off-grid
+     (санкционированное исключение из Spacing — «кастомный фиксированный размер
+     … помеченный data-off-grid»). Тайл внутри такого блока колонок не имеет. */
+  const offGridRanges = tagRanges(html, /<div\s[^>]*data-off-grid="[^"]*"[^>]*>/g, 'div');
+
   const rows = [];
   const rowRe = /<div class="tile-row[^"]*"/g;
   let m;
@@ -169,30 +204,26 @@ function parseTiles(html) {
     const idx = m.index;
     const rowHtml = sliceTag(html, idx, 'div');
     if (!rowHtml) continue;
+    /* стопки этого ряда — они и есть элементы сетки: их span идёт в сумму Б7 */
+    const stacks = stackRanges
+      .filter((s) => s.idx > idx && s.idx < idx + rowHtml.length)
+      .map((s) => ({ span: spanOfClassAttr(s.open), line: lineOf(html, s.idx) }));
     rows.push({
-      html: rowHtml, idx, line: lineOf(html, idx),
-      tiles: extractTiles(rowHtml, { fullText: html, baseOffset: idx, stackRanges: [] }),
+      html: rowHtml, idx, line: lineOf(html, idx), stacks,
+      tiles: extractTiles(rowHtml, { fullText: html, baseOffset: idx, stackRanges, offGridRanges }),
     });
-  }
-  /* стопки (kanban): ширина тайла задаётся стопкой, не самим тайлом */
-  const stackRanges = [];
-  const stackRe = /<div class="tile-stack[^"]*"/g;
-  while ((m = stackRe.exec(html))) {
-    const idx = m.index;
-    const st = sliceTag(html, idx, 'div');
-    if (!st) continue;
-    stackRanges.push({ html: st, idx });
   }
   const standalone = extractTiles(html, {
     inRange: (i) => !rows.some((r) => i >= r.idx && i < r.idx + r.html.length),
     fullText: html,
     baseOffset: 0,
     stackRanges,
+    offGridRanges,
   });
   return { rows, standalone, stackRanges };
 }
 
-function analyzeTile(el, line, inStack = false) {
+function analyzeTile(el, line, inStack = false, offGrid = false) {
   const open = el.match(/^<[a-z]+\s[^>]*class="([^"]*)"/);
   const cls = open ? open[1] : '';
   const styleM = el.match(/<[a-z]+\s[^>]*style="([^"]*)"/);
@@ -246,7 +277,7 @@ function analyzeTile(el, line, inStack = false) {
   /* прямые тяжёлые вставки в сетке (pbar вне .rof) */
   const directPbars = (body.match(/class="pbar\b/g) || []).length;
 
-  return { el, line, span, title, cols, fields, directPbars, inStack };
+  return { el, line, span, title, cols, fields, directPbars, inStack, offGrid };
 }
 
 /* Содержимое строковых литералов внутри <script>, позиция в позицию: код,
@@ -1095,6 +1126,10 @@ function runGeometry(rows, standalone, width) {
       out.push({ level: 'info', label: `«${t.title}» (строка ${t.line}): в стопке (tile-stack) — ширина от стопки, полей ${t.fields.length}, колонок ${cols} — ширинные проверки (K1/K4/K5) неприменимы` });
       return out;
     }
+    if (t.span === null && t.offGrid) {
+      out.push({ level: 'info', label: `«${t.title}» (строка ${t.line}): внесеточный блок (data-off-grid) — ширина задана причиной, а не колонками; ширинные проверки неприменимы` });
+      return out;
+    }
     if (t.span === null) {
       out.push({ level: 'fail', label: `тайл «${t.title}» (строка ${t.line}): ширина не читается (нет span/col-N)` });
       return out;
@@ -1193,10 +1228,17 @@ function runGeometry(rows, standalone, width) {
     let sum = 0;
     const parts = [];
     for (const t of row.tiles) {
-      if (t.span === null) continue;
+      if (t.span === null) { results.push(...analyzeTile(t)); continue; }
       sum += t.span;
       parts.push(`${t.title}(${t.span})`);
       results.push(...analyzeTile(t));
+    }
+    /* Стопка — такой же элемент сетки ряда, как тайл: её span и идёт в сумму,
+       а тайлы внутри ширины не объявляют (спека Tile, «.tile-stack»). */
+    for (const s of (row.stacks || [])) {
+      if (s.span === null) continue;
+      sum += s.span;
+      parts.push(`стопка(${s.span})`);
     }
     /* Метка с идентификатором Б7 — иначе проверка есть, а в `--rules` и в
        отчёте покрытия её не видно, и пункт числится незакрытым (класс Л50). */

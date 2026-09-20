@@ -8,10 +8,12 @@
 <title>Цвета — Дизайн-система</title>
 <link rel="stylesheet" href="../../styles/typography.css">
 <link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/palette.css">
 <link rel="stylesheet" href="../../styles/radius.css">
 <link rel="stylesheet" href="../../styles/ds-toc.css">
 <link rel="stylesheet" href="../../styles/ds-docs.css">
 <link rel="stylesheet" href="../../styles/table-cell.css">
+<link rel="stylesheet" href="../../styles/tab.css">
 <style>
 
   /* masthead */
@@ -46,27 +48,63 @@
     background-size:8px 8px; background-position:0 0,0 4px,4px -4px,-4px 0; }
   .sw .sw__fill { position:absolute; inset:0; }
 
+  /* вкладки: отступ задаёт обёртка, у ряда с рейлом паддинга нет */
+  .tabsbar { margin-top: 40px; }
+  .tabs-body { margin-top: 8px; }
+
+  /* вкладка «Базовые токены» */
+  .pane-lead { font: var(--type-body-m); color: var(--text-secondary); max-width: 82ch;
+    margin: 28px 0 0; text-wrap: pretty; }
+  .pane-lead + .pane-lead { margin-top: 12px; }
+  .pgrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(420px, 1fr));
+    gap: 40px 32px; margin-top: 40px; align-items: start; }
+  .pgroup .gname { font: var(--type-h5-strong); color: var(--text-primary); margin: 0 0 10px; }
+  .pstep { font: var(--type-body-s); color: var(--text-secondary); }
+
 </style>
   <link rel="stylesheet" href="../../styles/ds-nav.css">
 </head>
 <body>
 <main class="page" data-screen-label="Colors">
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.002</b></span><span>Обновлено: <b>29.07.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.003</b></span><span>Обновлено: <b>19.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Основы</p>
     <h1>Цвета</h1>
-    <p>Семантические токены сгруппированы по назначению: <strong>Static</strong> — фоны и информация, <strong>Active</strong> — интерактивные элементы, <strong>Situative</strong> — статусы успеха и ошибки, <strong>Local</strong> — палитры отдельных компонентов.</p>
-    <div class="legend">
-      <span><i class="key"></i> Сплошной цвет</span>
-      <span><i class="key alpha"></i> Полупрозрачный токен (значение opacity)</span>
-    </div>
+    <p>Два слоя. <strong>Семантические токены</strong> сгруппированы по назначению: <strong>Static</strong> — фоны и информация, <strong>Active</strong> — интерактивные элементы, <strong>Situative</strong> — статусы успеха и ошибки, <strong>Local</strong> — палитры отдельных компонентов. <strong>Базовые токены</strong> — полные цветовые рампы, из которых семантика берёт значения.</p>
   </header>
 
-  <div id="root"></div>
+  <div class="tabsbar">
+    <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+      <button type="button" class="tab tab--m tab--selected" id="tab-semantic" role="tab"
+              aria-selected="true" tabindex="0" data-pane="pane-semantic"
+              aria-controls="pane-semantic"><span class="tab__label">Семантические токены</span></button>
+      <button type="button" class="tab tab--m" id="tab-base" role="tab"
+              aria-selected="false" tabindex="-1" data-pane="pane-base"
+              aria-controls="pane-base"><span class="tab__label">Базовые токены</span></button>
+    </div>
+  </div>
+
+  <div class="tabs-body">
+    <div class="tabpane" id="pane-semantic" role="tabpanel" aria-labelledby="tab-semantic">
+      <div class="legend">
+        <span><i class="key"></i> Сплошной цвет</span>
+        <span><i class="key alpha"></i> Полупрозрачный токен (значение opacity)</span>
+      </div>
+
+      <div id="root"></div>
+    </div>
+
+    <div class="tabpane" id="pane-base" role="tabpanel" aria-labelledby="tab-base" hidden>
+      <p class="pane-lead">Полные цветовые рампы из образцов. Это <strong>базовые токены</strong> — источник значений для семантических: правка базового меняет все семантические токены, которые на него ссылаются.</p>
+      <p class="pane-lead">Связь ещё не проведена: семантика на вкладке слева по-прежнему собрана на примитивах <code class="tok">--c-*</code> из <code class="tok">styles/palette.css</code>, прописанных отдельными hex. Поэтому значения местами расходятся — например, <code class="tok">--emerald-300</code> здесь и <code class="tok">--c-emerald-300</code> в семантике дают разный цвет. Перевод семантики на базовые токены — отдельная правка.</p>
+
+      <div id="rootBase" class="pgrid"></div>
+    </div>
+  </div>
 
   <footer class="page-foot">
     <span>Дизайн-система · Цвета</span>
-    <span>Static · Active · Situative · Local</span>
+    <span>Семантические токены · Базовые токены</span>
   </footer>
 </main>
 
@@ -286,6 +324,87 @@ function tableHtml(g) {
   return `<div class="ctable"><div class="gname">${g.name}</div><div class="tbl">${head}${g.rows.map(rowHtml).join("")}</div></div>`;
 }
 
+/* ---------- вкладка «Базовые токены» ----------
+   [имя палитры, префикс токена, [[ступень, hex], …]]; данные сняты с образцов
+   Uploads/Colors и совпадают со styles/colors.css один в один */
+const base = [
+  ["Amber", "amber", [["50","#FFF8E1"], ["100","#FFECB3"], ["200","#FFE082"], ["300","#FFD54F"], ["400","#FFCA28"], ["500","#FFC107"], ["600","#FFB300"], ["700","#FFA000"], ["800","#FF8F00"], ["900","#FF6F00"], ["A100","#FEF0C2"], ["A200","#FCE9AE"], ["A400","#FFC400"], ["A700","#FFAB00"]]],
+  ["Blue", "blue", [["50","#E3F2FD"], ["100","#BBDEFB"], ["200","#90CAF9"], ["300","#64B5F6"], ["400","#42A5F5"], ["500","#2196F3"], ["600","#1E88E5"], ["700","#1976D2"], ["800","#1565C0"], ["900","#0D47A1"], ["A100","#82B1FF"], ["A200","#448AFF"], ["A400","#2979FF"], ["A700","#2962FF"]]],
+  ["Brown", "brown", [["50","#EFEBE9"], ["100","#D7CCC8"], ["200","#BCAAA4"], ["300","#A1887F"], ["400","#8D6E63"], ["500","#795548"], ["600","#6D4C41"], ["700","#5D4037"], ["800","#4E342E"], ["900","#3E2723"]]],
+  ["CGrey", "cgrey", [["50","#FBFBFB"], ["100","#E8EDED"], ["200","#BEC5C8"], ["300","#AAB2B1"], ["400","#A0A8B0"], ["500","#6C8080"], ["600","#324844"], ["700","#333F48"], ["800","#283237"], ["900","#131618"]]],
+  ["Cyan", "cyan", [["50","#E0F7FA"], ["100","#B2EBF2"], ["200","#80DEEA"], ["300","#4DD0E1"], ["400","#26C6DA"], ["500","#00BCD4"], ["600","#00ACC1"], ["700","#0097A7"], ["800","#00838F"], ["900","#006064"], ["A100","#84FFFF"], ["A200","#18FFFF"], ["A400","#00E5FF"], ["A700","#00B8D4"]]],
+  ["DeepOrange", "deep-orange", [["50","#FBE9E7"], ["100","#FFCCBC"], ["200","#FFAB91"], ["300","#FF8A65"], ["400","#FF7043"], ["500","#FF5722"], ["600","#F4511E"], ["700","#E64A19"], ["800","#D84315"], ["900","#BF360C"], ["A100","#FF9E80"], ["A200","#FF6E40"], ["A400","#FF3D00"], ["A700","#DD2C00"]]],
+  ["DeepPurple", "deep-purple", [["50","#EDE7F6"], ["100","#D1C4E9"], ["200","#B39DDB"], ["300","#9575CD"], ["400","#7E57C2"], ["500","#673AB7"], ["600","#5E35B1"], ["700","#512DA8"], ["800","#4527A0"], ["900","#311B92"], ["A100","#B388FF"], ["A200","#7C4DFF"], ["A400","#651FFF"], ["A700","#6200EA"]]],
+  ["Emerald", "emerald", [["50","#E0F3F1"], ["100","#CDE2E0"], ["200","#B8D6D3"], ["300","#82CDC6"], ["400","#2BAA9D"], ["500","#00AA9B"], ["600","#639994"], ["700","#0A7D6D"], ["800","#086D5F"], ["900","#055143"], ["A100","#A7FFEB"], ["A200","#64FFDA"], ["A400","#1DE9B6"], ["A700","#00BFA5"]]],
+  ["Green", "green", [["50","#E8F5E9"], ["100","#C8E6C9"], ["200","#A5D6A7"], ["300","#81C784"], ["400","#66BB6A"], ["500","#4CAF50"], ["600","#43A047"], ["700","#388E3C"], ["800","#2E7D32"], ["900","#1B5E20"], ["A100","#B9F6CA"], ["A200","#69F0AE"], ["A400","#00E676"], ["A700","#00C853"]]],
+  ["Indigo", "indigo", [["50","#E8EAF6"], ["100","#C5CAE9"], ["200","#9FA8DA"], ["300","#7986CB"], ["400","#5C6BC0"], ["500","#3F51B5"], ["600","#3949AB"], ["700","#303F9F"], ["800","#283593"], ["900","#1A237E"], ["A100","#8C9EFF"], ["A200","#536DFE"], ["A400","#3D5AFE"], ["A700","#304FFE"]]],
+  ["LightBlue", "light-blue", [["50","#EAF8FE"], ["100","#B3E5FC"], ["200","#81D4FA"], ["300","#4FC3F7"], ["400","#29B6F6"], ["500","#03A9F4"], ["600","#039BE5"], ["700","#0288D1"], ["800","#0277BD"], ["900","#01579B"], ["A100","#80D8FF"], ["A200","#40C4FF"], ["A400","#00B0FF"], ["A700","#0091EA"]]],
+  ["LightGreen", "light-green", [["50","#E9F6DA"], ["100","#DCEDC8"], ["200","#C5E1A5"], ["300","#AED581"], ["400","#9CCC65"], ["500","#8BC34A"], ["600","#7CB342"], ["700","#689F38"], ["800","#558B2F"], ["900","#33691E"], ["A100","#CCFF90"], ["A200","#B2FF59"], ["A400","#76FF03"], ["A700","#64DD17"]]],
+  ["Lime", "lime", [["50","#F9FBE7"], ["100","#F0F4C3"], ["200","#E6EE9C"], ["300","#DCE775"], ["400","#D4E157"], ["500","#CDDC39"], ["600","#C0CA33"], ["700","#AFB42B"], ["800","#9E9D24"], ["900","#827717"], ["A100","#F4FF81"], ["A200","#EEFF41"], ["A400","#C6FF00"], ["A700","#AEEA00"]]],
+  ["MGrey", "mgrey", [["50","#FFFFFF"], ["100","#FEFEFE"], ["200","#E0E0E0"], ["300","#CACACA"], ["400","#B3B3B3"], ["500","#979797"], ["600","#797979"], ["700","#333F48"], ["800","#515151"], ["900","#080808"]]],
+  ["Orange", "orange", [["50","#FFF3E0"], ["100","#FFE0B2"], ["200","#FFCC80"], ["300","#FFB74D"], ["400","#FFA726"], ["500","#FF9800"], ["600","#FB8C00"], ["700","#F57C00"], ["800","#EF6C00"], ["900","#E65100"], ["A100","#FFD180"], ["A200","#FFAB40"], ["A400","#FF9100"], ["A700","#FF6D00"]]],
+  ["Pink", "pink", [["50","#FCE4EC"], ["100","#F8BBD0"], ["200","#F48FB1"], ["300","#F06292"], ["400","#EC407A"], ["500","#E91E63"], ["600","#D81B60"], ["700","#C2185B"], ["800","#AD1457"], ["900","#880E4F"], ["A100","#F50057"], ["A200","#FF4081"], ["A400","#F50057"], ["A700","#C51162"]]],
+  ["Purple", "purple", [["50","#F3E5F5"], ["100","#E1BEE7"], ["200","#CE93D8"], ["300","#BA68C8"], ["400","#AB47BC"], ["500","#9C27B0"], ["600","#8E24AA"], ["700","#7B1FA2"], ["800","#6A1B9A"], ["900","#4A148C"], ["A100","#EA80FC"], ["A200","#E040FB"], ["A400","#D500F9"], ["A700","#AA00FF"]]],
+  ["Red", "red", [["50","#FEEBEE"], ["100","#FECDD2"], ["200","#E57373"], ["300","#E5625C"], ["400","#EF5350"], ["500","#F44336"], ["600","#E53935"], ["700","#D32F2F"], ["800","#C62828"], ["900","#B71C1C"], ["A100","#FCF1F1"], ["A200","#FBECEB"], ["A400","#F6D8D7"], ["A700","#D50000"]]],
+  ["Swamp", "swamp", [["50","#EEF2F1"], ["100","#E5ECEB"], ["200","#E1EDE7"], ["300","#B8CCCC"], ["400","#7A9994"], ["500","#617C7C"], ["600","#6C8080"], ["A100","#F5F7F7"], ["A200","#F2F7F7"], ["A400","#F6FAFA"], ["A700","#DEEDEC"]]],
+  ["Yellow", "yellow", [["50","#FFFDE7"], ["100","#FFF9C4"], ["200","#FFF59D"], ["300","#FFF176"], ["400","#FFEE58"], ["500","#FFEB3B"], ["600","#FDD835"], ["700","#FBC02D"], ["800","#F9A825"], ["900","#F57F17"], ["A100","#FFFF8D"], ["A200","#FFFF00"], ["A400","#FFEA00"], ["A700","#FFD600"]]],
+];
+const PGRID = "8px 0.75fr 1.5fr 0.45fr 1fr 8px";
+
+function baseRowHtml(prefix, name, [step, hex]) {
+  return `
+    <div class="tbl__row" style="grid-template-columns:${PGRID}">
+      <div class="tc tc--separator"></div>
+      <div class="tc"><span class="tc__row"><span class="tc__text">${step}<br><span class="pstep">${name}/${step}</span></span></span></div>
+      <div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--${prefix}-${step}</code></span></span></div>
+      <div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--${prefix}-${step})"></span></span></span></div>
+      <div class="tc"><span class="tc__row"><span class="tc__text">${hex}</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>`;
+}
+
+function baseTableHtml([name, prefix, rows]) {
+  const head = `<div class="tbl__row" style="grid-template-columns:${PGRID}">
+    <div class="th th--separator"></div>
+    <div class="th"><span class="th__label">Ступень</span></div>
+    <div class="th"><span class="th__label">Токен</span></div>
+    <div class="th"><span class="th__label">Образец</span></div>
+    <div class="th"><span class="th__label">Hex</span></div>
+    <div class="th th--separator"></div>
+  </div>`;
+  return `<div class="pgroup"><div class="gname">${name}</div><div class="tbl">${head}${rows.map(r => baseRowHtml(prefix, name, r)).join("")}</div></div>`;
+}
+
+document.getElementById("rootBase").innerHTML = base.map(baseTableHtml).join("");
+
+/* ---------- переключение вкладок ----------
+   рантайм ds-tabs.js держит roving tabindex и aria-selected, здесь только
+   связка «таб ↔ панель». Клик читает data-pane самой кнопки и не зависит от
+   порядка обработчиков; клавиатура — через setTimeout(0), то есть после того,
+   как рантайм обновил aria-selected (тот же приём, что в scripts/docs-split.js).
+   Оглавление ds-toc.js собрано по секциям первой вкладки и обновляться не умеет:
+   на второй его прячем, иначе скроллспай подсвечивает скрытые секции. */
+const tablist = document.querySelector('.tabs[data-tabs]');
+const tabsBody = document.querySelector('.tabs-body');
+
+function setPane(paneId) {
+  tabsBody.querySelectorAll('.tabpane').forEach(p => { p.hidden = p.id !== paneId; });
+  const toc = document.querySelector('.ds-toc');
+  if (toc) toc.hidden = paneId !== 'pane-semantic';
+  window.scrollTo({ top: 0 });
+}
+
+tablist.addEventListener('click', e => {
+  const t = e.target.closest('.tab');
+  if (t && tablist.contains(t) && t.dataset.pane) setPane(t.dataset.pane);
+});
+tablist.addEventListener('keydown', () => {
+  setTimeout(() => {
+    const sel = tablist.querySelector('.tab[aria-selected="true"]');
+    if (sel && sel.dataset.pane) setPane(sel.dataset.pane);
+  }, 0);
+});
+
 document.getElementById("root").innerHTML = data.map(cat => `
   <section class="category" data-screen-label="${cat.title}">
     <div class="cat-head"><h2>${cat.title}</h2><p>${cat.sub}</p></div>
@@ -293,6 +412,7 @@ document.getElementById("root").innerHTML = data.map(cat => `
   </section>
 `).join("");
 </script>
+<script src="../../scripts/ds-tabs.js"></script>
 <script src="../../scripts/ds-nav.js"></script>
 <script src="../../scripts/ds-toc.js"></script>
 </body>

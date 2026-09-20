@@ -9,6 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="../../assets/logo.svg">
 <link rel="stylesheet" href="../../styles/typography.css">
 <link rel="stylesheet" href="../../styles/colors.css">
+<link rel="stylesheet" href="../../styles/palette.css">
 <link rel="stylesheet" href="../../styles/radius.css">
 <link rel="stylesheet" href="../../styles/spacing.css">
 <link rel="stylesheet" href="../../styles/shadow.css">
@@ -117,8 +118,8 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     Обзор компонентов
   </a>
   <div class="meta">
-    <span>Версия: <b>1.003</b></span>
-    <span>Обновлено: <b>13.09.2026</b></span>
+    <span>Версия: <b>1.005</b></span>
+    <span>Обновлено: <b>19.09.2026</b></span>
     <span>CSS <b>styles/kanban.css</b></span>
     <span>Рантайм <b>scripts/ds-kanban.js</b></span>
   </div>
@@ -187,7 +188,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
       <ul class="anat__legend">
         <li><span class="n">1</span><span class="d"><b>Шапка</b> — <em>position: sticky</em>, видна при вертикальном скролле доски. Тянется на всю ширину колонки, содержимое стоит по кромке карточек.</span></li>
         <li><span class="n">2</span><span class="d"><b>Маркер тона</b> — круг 8×8 на статусной рампе <span class="tk">--st-*</span>. Признак вторичный: колонка опознаётся по имени и позиции.</span></li>
-        <li><span class="n">3</span><span class="d"><b>Имя и счётчик</b> — имя усекается многоточием и получает <em>Tooltip</em>; счётчик — <span class="tk">.badge--text.badge--s</span>.</span></li>
+        <li><span class="n">3</span><span class="d"><b>Имя и счётчик</b> — имя занимает до двух строк, дальше усекается многоточием и получает <em>Tooltip</em>; счётчик — <span class="tk">.badge--text.badge--s</span>.</span></li>
         <li><span class="n">4</span><span class="d"><b>Три действия</b> — добавить карточку · перейти на страницу колонки · меню. Порядок фиксирован.</span></li>
         <li><span class="n">5</span><span class="d"><b>Тело</b> — карточки с зазором 16. <em>Своего скролла нет</em>: доска прокручивается целиком.</span></li>
         <li><span class="n">6</span><span class="d"><b>Линия вставки</b> — 2px <span class="tk">--primary-dark</span>, показывает, куда именно ляжет карточка.</span></li>
@@ -246,7 +247,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     <p class="desc tight">Тон задаётся маркером 8×8 в шапке, а не заливкой колонки: заливка съедает контраст карточек и на шести колонках превращает доску в радугу. Тон закреплён за этапом, свободный выбор цвета пользователю не даётся — иначе доски разных команд перестают читаться одинаково.</p>
     <div class="samples" id="var-col-tone"></div>
     <p class="subhead">Свёрнутая колонка</p>
-    <p class="desc tight">При шести и более этапах часть колонок сворачивается в 48px с вертикальной подписью и счётчиком. Имя читается <b>снизу вверх</b> — так его удобнее читать при наклоне головы влево, и так же устроены свёрнутые панели в Jira и Azure DevOps. Свёрнутость — свойство пользователя, а не доски: у ЦУП и Operations свёрнуты разные колонки.</p>
+    <p class="desc tight">При шести и более этапах часть колонок сворачивается в 48px с вертикальной подписью и счётчиком. Имя читается <b>снизу вверх</b> — так его удобнее читать при наклоне головы влево, и так же устроены свёрнутые панели в Jira и Azure DevOps. Действия стоят над именем, а не под ним: свёрнутой колонкой управляют только они, а имя длиной до 320px уводило кнопки к нижней кромке. Свёрнутость — свойство пользователя, а не доски: у ЦУП и Operations свёрнуты разные колонки.</p>
     <div class="samples" id="var-col-collapsed"></div>
     <p class="subhead">Порядок колонок</p>
     <p class="desc tight">Колонка переносится за шапку: этапы у команд идут в разном порядке, и переставлять их через настройки — лишний слой. Ручка — вся шапка, кроме трёх кнопок в ней; летит клон шапки, а не колонка целиком (колонка высотой в экран под курсором перекрывает как раз то место, куда целятся). С клавиатуры — <b>Tab</b> до шапки, <b>Space</b>, <b>←</b> / <b>→</b>, <b>Space</b>; <b>Esc</b> возвращает колонку на исходный индекс. Каждый перенос — событие <span class="tk">kanban:colmove</span>.</p>
@@ -373,7 +374,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
         <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Свёрнутая колонка</span></span></div>
         <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">48px</span></span></div>
         <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">—</span></span></div>
-        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Помещает маркер, счётчик и вертикальное имя</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Сверху вниз: три действия, маркер, вертикальное имя, счётчик</span></span></div>
         <div class="tc tc--separator"></div>
       </div>
       <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
@@ -387,9 +388,9 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
       <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
         <div class="tc tc--separator"></div>
         <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Шапка колонки</span></span></div>
-        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">8px по кругу</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">52px, паддинг 8px по кругу</span></span></div>
         <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><span class="tk">--space-8</span></span></span></div>
-        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отрицательные margin тянут её на всю ширину колонки, паддинг возвращает содержимое на кромку карточек</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отрицательные margin тянут её на всю ширину колонки, паддинг возвращает содержимое на кромку карточек. Высота фиксирована: под имя зарезервированы две строки, поэтому шапки всех колонок равны</span></span></div>
         <div class="tc tc--separator"></div>
       </div>
       <div class="tbl__row" style="grid-template-columns:8px 1.5fr 1fr 1.4fr 2.2fr 8px;">
@@ -473,6 +474,17 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
       <li><b>Чипов — не больше трёх.</b> Дальше они занимают больше места, чем заголовок, и карточка перестаёт читаться как объект.</li>
       <li><b>Код объекта — не в заголовке</b>, а в подвале справа: по нему ищут, но не читают.</li>
     </ul>
+  </div>
+
+  <div class="subsec" data-screen-label="Имя колонки">
+    <h3>Имя колонки</h3>
+    <p class="desc tight">Имя занимает <b>до двух строк</b> и только потом уходит в эллипс: «Согласование и подписание договора» в одну строку не живёт, а ширины 288px хватает на два слова. Обрезанное имя получает Tooltip через тот же <span class="tk">DSTooltip.truncated</span>, что и заголовок карточки.</p>
+    <ul class="bullets">
+      <li><b>Место под две строки зарезервировано всегда</b>, даже под однословным именем: шапки всех колонок обязаны быть равной высоты (52px), иначе карточки соседних колонок начинаются с разной и доска перестаёт читаться рядами.</li>
+      <li><b>Маркер, счётчик и действия стоят на первой строке</b>, а не по центру двухстрочного блока. Полоса первой строки — 24px по высоте счётчика, поэтому однострочная шапка выглядит ровно так же, как до появления второй строки.</li>
+      <li><b>Смысловая часть — в начало</b>, как и у заголовка карточки: с третьей строки текст не виден никогда.</li>
+    </ul>
+    <div class="samples" id="content-col-name"></div>
   </div>
 
   <div class="subsec" data-screen-label="Поля">
@@ -1334,7 +1346,12 @@ window.DS_SPLIT_SWITCH_LABELS = {
   top: 0;
   z-index: 2;
   display: flex;
-  align-items: center;
+  /* Имя занимает до двух строк, всё остальное стоит на ПЕРВОЙ. Полоса первой
+     строки — 24px, высота счётчика .badge--s (самый высокий элемент шапки);
+     маркер, имя и кнопки доводятся до её центра собственным margin-top, и
+     центры всех четырёх сходятся на 12px от верха контент-бокса. Поэтому
+     однострочная шапка выглядит ровно так же, как до появления второй строки. */
+  align-items: flex-start;
   gap: var(--space-8);
   min-width: 0;
   /* тянется на всю ширину колонки, но содержимое стоит по кромке карточек */
@@ -1354,6 +1371,7 @@ window.DS_SPLIT_SWITCH_LABELS = {
 .kbcol__acts .ibtn { cursor: pointer; }
 .kbcol__marker {
   flex: none;
+  margin-top: var(--space-8);   /* (24 - 8) / 2 — центр полосы первой строки */
   width: 8px;
   height: 8px;
   border-radius: var(--radius-circle);
@@ -1365,16 +1383,30 @@ window.DS_SPLIT_SWITCH_LABELS = {
 .kbcol--dpurple .kbcol__marker { background: var(--st-dpurple); }
 .kbcol--primary .kbcol__marker { background: var(--st-primary); }
 
+/* Имя переносится на вторую строку и только потом уходит в эллипс: ширины
+   288px хватает на два слова, а «Согласование и подписание договора» в одну
+   строку не живёт. Клэмп — идиома .tile__title (tile.css), своей не заводим. */
 .kbcol__name {
   min-width: 0;
+  margin-top: var(--space-4);   /* (24 - 16) / 2 — первая строка по центру полосы */
   font: var(--type-body-s-strong);
   color: var(--text-primary);
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  /* Место под ДВЕ строки резервируется всегда, даже под однословным именем:
+     шапки всех колонок обязаны быть равной высоты, иначе карточки соседних
+     колонок начинаются с разной. Две декларации — не дубль: браузер без
+     единицы lh отбрасывает вторую и остаётся на px. */
+  min-height: 32px;             /* 2 строки --type-body-s-strong (14px/16px) */
+  min-height: 2lh;              /* где есть lh — высота следует за токеном */
 }
 /* Три действия: добавить · перейти на страницу колонки · меню */
 .kbcol__acts {
+  margin-top: var(--space-4);   /* (24 - 16) / 2 — центр полосы первой строки */
   margin-left: auto;
   flex: none;
   display: flex;
@@ -1460,7 +1492,15 @@ window.DS_SPLIT_SWITCH_LABELS = {
   gap: var(--space-12);
   border-radius: var(--radius-m);
 }
-.kbcol--collapsed .kbcol__acts { margin-left: 0; flex-direction: column; }
+/* Действия поднимаются над именем: в свёрнутой колонке они — единственное
+   управление, а имя длиной до 320px уводило их к нижней кромке. Переставляет
+   order, а не разметка: DOM один на оба состояния, и в развёрнутой шапке
+   действия обязаны идти последними — их прижимает margin-left: auto.
+   Порядок фокуса цел: кнопки — единственные фокусируемые узлы внутри шапки,
+   их взаимный порядок не менялся. */
+.kbcol--collapsed .kbcol__acts { order: -1; margin-top: 0; margin-left: 0; flex-direction: column; }
+/* Полосы первой строки в свёрнутой колонке нет — шапка идёт столбиком */
+.kbcol--collapsed .kbcol__marker { margin-top: 0; }
 /* Имя читается СНИЗУ ВВЕРХ: vertical-rl даёт сверху вниз,
    поворот на 180° разворачивает и направление письма, и порядок строк. */
 .kbcol__vname {
@@ -1586,7 +1626,8 @@ window.DS_SPLIT_SWITCH_LABELS = {
   background: var(--primary-bg);
   border-color: var(--primary);
 }
-.kbcard--error { border-color: var(--error); }</script>
+.kbcard--error { border-color: var(--error); }
+</script>
 <script type="text/plain" id="src-code-js">/* Рантайм ds-kanban.js подключается через scripts/ds.js и оживляет
    любую разметку с data-kanban сам. Экрану писать нечего. */
 

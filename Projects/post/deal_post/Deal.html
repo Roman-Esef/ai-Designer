@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!--
+  ИСТОЧНИК страницы сделки. Двойным кликом открывают НЕ этот файл, а собранный
+  Deal.preview.html: тайлы здесь стоят метками <ds-include>, а рантайм-инклуд
+  ДС тянет фрагменты через fetch, который по file:// не работает.
+
+    node Projects/post/assemble.mjs        — пересобрать после правки любого модуля
+
+  Страница держит только перечень тайлов и их место в сетке. Разметка тайла и
+  его паспорт живут в своей папке: Projects/post/post_local_components/<Имя>/.
+  Правка, касающаяся содержимого тайла, делается в модуле, а не здесь.
+-->
 <html lang="ru">
 <head>
 <script>window.__DS_ROOT = '../../../DS-IBP/';</script>
@@ -7,6 +18,7 @@
 <title>Сделка — IBP</title>
 <link rel="icon" type="image/svg+xml" href="../../../DS-IBP/assets/logo.svg">
 <link rel="stylesheet" href="../../../DS-IBP/ds.css">
+<!-- @lc-css --><!-- сюда ассемблер вставляет CSS подключённых локальных компонентов -->
 <style>
   /* ---------- только раскладка экрана, на токенах ДС ---------- */
   *, *::before, *::after { box-sizing: border-box; }
@@ -17,6 +29,43 @@
     color: var(--text-primary);
     background: var(--bg-page);
   }
+
+  /* ---------- Секция «Общая информация» ----------
+     Сворачиваемого заголовка раздела в ДС нет: Tile-аккордеон живёт только
+     внутри .tile (ds-tile.js ищет closest('.tile')), а здесь заголовок стоит
+     на фоне страницы. Секция собрана из атомов ДС — IconButton + токен
+     типографики; переключение делает экранный скрипт. Находка «нет компонента
+     SectionAccordion» записана в Deal.screen.md, §6. */
+  .gen { display: flex; flex-direction: column; gap: var(--space-12); }
+  .gen__head { display: flex; align-items: center; gap: var(--space-8); }
+  .gen__title { margin: 0; font: var(--type-h5-strong); color: var(--text-primary); }
+  .gen__chevron { transition: transform .15s ease; }
+  .gen__toggle[aria-expanded="false"] .gen__chevron { transform: rotate(180deg); }
+  @media (prefers-reduced-motion: reduce) { .gen__chevron { transition: none; } }
+
+  /* Две колонки блока: слева сетка тайлов, справа тайл фиксированной ширины.
+     Парное [hidden] — соглашение ДС: правило display у класса (0,1,0) иначе
+     перебивает UA-правило [hidden] (0,0,0) и сворачивание молча ломается. */
+  .gen__body { display: flex; align-items: stretch; gap: var(--space-16); }
+  .gen__body[hidden] { display: none; }
+  .gen__main { flex: 1; min-width: 0; }
+  /* display:grid — единственный ребёнок (тайл) тянется на всю высоту колонки
+     сам, без правил экрана на .tile */
+  .gen__side { flex: 0 0 320px; min-height: 400px; display: grid; }
+
+  /* ---------- Перестроение ----------
+     Настоящий механизм («адаптивно, а не по брейкпоинтам») ещё не описан — см.
+     Deal.screen.md, §6. До него — штатная пара .col-N/.colw-N из Spacing и
+     пороги по ширине РАБОЧЕЙ ОБЛАСТИ (контейнер screen из Layout): закрепление
+     боковой панели сужает контент, не меняя окна. Сами пороги — выбор этого
+     экрана, а не правило ДС: общих брейкпоинтов в ДС нет, порог задаёт экран. */
+  @container screen (max-width: 1560px) {
+    .gen__body { flex-direction: column; }
+    .gen__side { flex: 0 0 auto; }
+  }
+  @container screen (max-width: 1240px) {
+    .tile-row > [class*="colw-"] { grid-column: span var(--colw); }
+  }
 </style>
 </head>
 <body>
@@ -26,7 +75,7 @@
   <!-- Боковое меню строится экранным скриптом из ibp-home.js по роли -->
   <nav class="nav nav--rail" id="nav" aria-label="Главное меню"></nav>
 
-  <div class="screen screen--app">
+  <div class="screen">
     <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
       <li class="crumbs__item"><a class="link link--muted" href="../mainPage/index.html">Главная</a></li>
       <li class="crumbs__item"><a class="link link--muted" href="../Portfolio-did/Portfolio.html">Текущий портфель ДИД</a></li>
@@ -37,20 +86,126 @@
 
     <main class="screen__content">
 
-      <!-- Шапка страницы -->
+      <!-- ── Шапка страницы ─────────────────────────────────────────────── -->
       <div class="phead">
         <div class="phead__main">
           <div class="phead__title-row">
             <div class="phead__title-group">
               <h1 class="phead__title" id="deal-title">Сделка</h1>
+              <!-- Модалка редактирования номера и наименования — та же, что при
+                   создании сделки в реестре. Не собрана: скрима deal-rename-scrim
+                   на странице пока нет, хук ждёт его (Deal.screen.md, §6). -->
+              <button type="button" class="ibtn ibtn--neutral ibtn--s phead__edit"
+                      aria-label="Редактировать номер и наименование сделки"><i data-icon="edit"></i></button>
             </div>
+            <!-- Чипы статусов заполняет экранный скрипт из DealsStore:
+                 сделка · Operations · ЦУП. Мониторинг на странице сделки не показывается. -->
+            <div class="phead__chips" id="deal-chips"></div>
           </div>
+        </div>
+        <div class="phead__actions" data-actions-overflow>
+          <button type="button" class="btn btn--outline btn--m">
+            <i data-icon="calc"></i><span class="btn__label">Расчет задолженности</span></button>
+          <button type="button" class="btn btn--outline btn--m">
+            <span class="btn__label">Плановые платежи</span><i data-icon="arrow-right"></i></button>
+          <button type="button" class="btn btn--outline btn--m">
+            <span class="btn__label">Чек-листы</span><i data-icon="arrow-right"></i></button>
         </div>
       </div>
 
-      <!-- Состав страницы (тайлы сделки) собирается из локальных компонентов
-           направления — Projects/post/post_local_components/. Их перечень и
-           механика подключения согласуются отдельно. -->
+      <!-- ── Общая информация ───────────────────────────────────────────── -->
+      <section class="gen">
+        <div class="gen__head">
+          <button type="button" class="ibtn ibtn--neutral ibtn--m gen__toggle"
+                  aria-expanded="true" aria-controls="gen-body" aria-label="Свернуть">
+            <i data-icon="chevron-up" class="gen__chevron"></i>
+          </button>
+          <h2 class="gen__title">Общая информация</h2>
+        </div>
+
+        <div class="gen__body" id="gen-body">
+
+          <!-- Левая секция: 12 колонок, зазоры между рядами держит .tile-group -->
+          <div class="gen__main tile-group">
+
+            <div class="tile-row">
+              <ds-include src="../post_local_components/TileKNR/TileKNR.html" class="col-3 colw-6"></ds-include>
+              <ds-include src="../post_local_components/TileDealTerms/TileDealTerms.html" class="col-3 colw-6"></ds-include>
+              <ds-include src="../post_local_components/TileDealTeam/TileDealTeam.html" class="col-6 colw-12"></ds-include>
+            </div>
+
+            <div class="tile-row">
+              <ds-include src="../post_local_components/TileDealDescription/TileDealDescription.html" class="col-6 colw-12"></ds-include>
+              <ds-include src="../post_local_components/TileDealMetrics/TileDealMetrics.html" class="col-6 colw-12"></ds-include>
+            </div>
+
+            <!-- Третий ряд опционален: показывается только у сделок, где есть
+                 сведения о проекте. Условие не согласовано (Deal.screen.md, §6),
+                 в макете ряд показан. -->
+            <div class="tile-row">
+              <ds-include src="../post_local_components/TileProjectInfo/TileProjectInfo.html" class="col-12"></ds-include>
+            </div>
+
+          </div>
+
+          <!-- Правая колонка: ширина 320 и минимальная высота 400 — из ТЗ, вне
+               12-колоночной сетки, поэтому помечена data-off-grid (Spacing). -->
+          <div class="gen__side" data-off-grid="Заведение сделки — фиксированные 320px по ТЗ">
+            <ds-include src="../post_local_components/TileDealSetup/TileDealSetup.html"></ds-include>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── Табы разделов сделки ───────────────────────────────────────── -->
+      <div class="tabs tabs--horiz" role="tablist" id="deal-tabs" data-tabs>
+        <button type="button" class="tab tab--m tab--selected" role="tab" id="tab-fin"
+                aria-selected="true" aria-controls="panel-fin" tabindex="0">
+          <span class="tab__label">Финансовые данные</span>
+        </button>
+        <button type="button" class="tab tab--m" role="tab" id="tab-cpt"
+                aria-selected="false" aria-controls="panel-cpt" tabindex="-1">
+          <span class="tab__label">Контрагенты</span><span class="tab__badge">9</span>
+        </button>
+        <button type="button" class="tab tab--m" role="tab" id="tab-col"
+                aria-selected="false" aria-controls="panel-col" tabindex="-1">
+          <span class="tab__label">Обеспечения</span><span class="tab__badge">9</span>
+        </button>
+      </div>
+
+      <!-- Финансовые данные -->
+      <div class="tile-group" id="panel-fin" role="tabpanel" aria-labelledby="tab-fin" data-tabpanel>
+        <!-- Первый ряд: высота каждого тайла по своему контенту, а не по соседу.
+             Способ из спеки Tile: тайл лежит в .tile-stack — у flex-колонки
+             align-self:stretch тянет ширину, не высоту. -->
+        <div class="tile-row">
+          <div class="tile-stack col-6 colw-12">
+            <ds-include src="../post_local_components/TileDealProducts/TileDealProducts.html"></ds-include>
+          </div>
+          <div class="tile-stack col-6 colw-12">
+            <ds-include src="../post_local_components/TileFinInstruments/TileFinInstruments.html"></ds-include>
+          </div>
+        </div>
+        <!-- Второй ряд: обычный ряд — высоты выравниваются по самому высокому -->
+        <div class="tile-row">
+          <ds-include src="../post_local_components/TileEpsVbsImpact/TileEpsVbsImpact.html" class="col-6 colw-12"></ds-include>
+          <ds-include src="../post_local_components/TileFinMetrics/TileFinMetrics.html" class="col-6 colw-12"></ds-include>
+        </div>
+      </div>
+
+      <!-- Контрагенты -->
+      <div class="tile-group" id="panel-cpt" role="tabpanel" aria-labelledby="tab-cpt" data-tabpanel hidden>
+        <div class="tile-row">
+          <ds-include src="../post_local_components/TableCounterparties/TableCounterparties.html" class="col-12"></ds-include>
+        </div>
+      </div>
+
+      <!-- Обеспечения -->
+      <div class="tile-group" id="panel-col" role="tabpanel" aria-labelledby="tab-col" data-tabpanel hidden>
+        <div class="tile-row">
+          <ds-include src="../post_local_components/TileCollaterals/TileCollaterals.html" class="col-12"></ds-include>
+        </div>
+      </div>
 
     </main>
   </div>
@@ -61,9 +216,11 @@
 <script src="../../../DS-IBP/scripts/ds.js"></script>
 <script src="../../../DS-IBP/scripts/ibp-home.js"></script>
 <script>
-/* Экранный скрипт: меню панели навигации строится из каталога ibp-home.js
-   (window.IBPHome) по роли «Финансист ДИД»; пункт «Текущий портфель» selected —
-   страница сделки открывается из реестра портфеля и остаётся его разделом. */
+/* Экранный скрипт. Делает только то, чего рантаймы ДС не делают:
+   меню по каталогу ролей, данные сделки, переключение панелей табов и
+   сворачивание секции (компонента «заголовок-аккордеон» в ДС нет).
+   Скрипт синхронный и стоит после ds.js — поэтому его DSTabs.tabs(...) успевает
+   раньше автопривязки wireAll (она на DOMContentLoaded), и onChange не теряется. */
 (function () {
   'use strict';
   var role = window.IBPHome.defaultRole;
@@ -75,6 +232,11 @@
   var USER_LINK_TO = ' href="../../../index.html" aria-label="Хаб проектов"';
 
   function ic(name) { return '<i data-icon=\'' + name + '\'></i>'; }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
   function itemHTML(it) {
     /* пункт с тайлом-со-ссылками — аккордеон-родитель (под-пункты = ссылки тайла) */
@@ -122,7 +284,7 @@
         + '<span class="nav__user-name">Александров Петр Константинович</span>'
         + '<span class="nav__user-role">' + role + '</span>'
         + '</span></a>'
-        + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти"><i data-icon="logout"></i></button>'
+        + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти">' + ic('logout') + '</button>'
         + '</div>';
     nav.innerHTML = s;
     if (window.DSNavPanel) window.DSNavPanel.bind(nav);
@@ -140,20 +302,71 @@
     return deal || window.DealsStore.list()[0] || null;
   }
 
+  /* Три чипа-статуса: сделка · Operations · ЦУП. Статус мониторинга на странице
+     сделки не показывается (ТЗ 19.09.2026). Тон берётся из DealsStore.statusTone —
+     того же словаря, что красит колонки статусов в реестре портфеля: словарь
+     один, поэтому чип в таблице и чип в шапке не могут разойтись. */
+  function fillChips(deal) {
+    var box = document.getElementById('deal-chips');
+    if (!box) return;
+    var rows = [
+      { value: deal.status, letter: '' },
+      { value: deal.statusOps, letter: 'О' },
+      { value: deal.statusTsup, letter: 'Ц' }
+    ];
+    box.innerHTML = rows.map(function (r) {
+      if (!r.value) return '';
+      var av = r.letter
+        ? '<span class="chip__avatar av av--circular"><span class="av__text">' + esc(r.letter) + '</span></span>'
+        : '';
+      return '<span class="chip chip--rounded chip--s ' + window.DealsStore.statusTone(r.value) + '">'
+        + av + '<span class="chip__label">' + esc(r.value) + '</span></span>';
+    }).join('');
+  }
+
   function fillDeal() {
     var deal = currentDeal();
     if (!deal) return;
-    var label = 'Сделка № ' + deal.id;
-    document.getElementById('deal-title').textContent = deal.name || label;
-    document.getElementById('deal-crumb').textContent = label;
-    document.title = label + ' — IBP';
+    var num = 'Сделка № ' + deal.id;
+    document.getElementById('deal-title').textContent = deal.id + '. ' + (deal.name || '');
+    document.getElementById('deal-crumb').textContent = num;
+    document.title = num + ' — IBP';
+    fillChips(deal);
+  }
+
+  /* Сворачивание блока «Общая информация». Рантайм ds-tile.js сюда не подходит:
+     он ищет closest('.tile'), а заголовок раздела стоит на фоне страницы. */
+  function bindSection() {
+    var toggle = document.querySelector('.gen__toggle');
+    var body = document.getElementById('gen-body');
+    if (!toggle || !body) return;
+    toggle.addEventListener('click', function () {
+      var open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      toggle.setAttribute('aria-label', open ? 'Развернуть' : 'Свернуть');
+      body.hidden = open;
+    });
+  }
+
+  /* Табы: roving tabindex, стрелки и переполнение даёт рантайм ДС, а показ
+     нужной панели — модель данных экрана, рантайма для неё в ДС нет
+     (screen-assembly/references/runtime-hooks.md, «Чего рантаймы не делают»). */
+  function bindTabs() {
+    var bar = document.getElementById('deal-tabs');
+    if (!bar || !window.DSTabs) return;
+    var panels = Array.prototype.slice.call(document.querySelectorAll('[data-tabpanel]'));
+    window.DSTabs.tabs(bar, {
+      onChange: function (index) {
+        panels.forEach(function (p, i) { p.hidden = (i !== index); });
+      }
+    });
   }
 
   function paintAll() {
     if (window.dsIcons) window.dsIcons.apply(document);
   }
 
-  buildNav(); fillDeal(); paintAll();
+  buildNav(); fillDeal(); bindSection(); bindTabs(); paintAll();
 })();
 </script>
 
