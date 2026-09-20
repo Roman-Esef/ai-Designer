@@ -84,14 +84,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--c-swamp-100);
+  background: var(--swamp-100);
   color: var(--text-primary);
 }
 .entity__icon > :is(svg,[data-icon]){ width: var(--e-lead-icon); height: var(--e-lead-icon); display: block; }
 
 /* тон иконочного контейнера */
-.entity__icon--accent  { background: color-mix(in srgb, var(--primary) 14%, var(--c-mgrey-50)); color: var(--primary-dark); }
-.entity__icon--neutral { background: var(--c-cgrey-100); color: var(--text-secondary); }
+.entity__icon--accent  { background: color-mix(in srgb, var(--primary) 14%, var(--mgrey-50)); color: var(--primary-dark); }
+.entity__icon--neutral { background: var(--cgrey-100); color: var(--text-secondary); }
 
 /* аватар как ведущий (используется .av из ДС) — синхронизирует размер */
 .entity__lead .av { flex: none; }
@@ -233,7 +233,7 @@
   margin: -8px -10px;
   transition: background-color .15s ease;
 }
-.entity--interactive:hover { background: var(--bgtable-row-hover); }
+.entity--interactive:hover { background: var(--bg-table-default-hover); }
 .entity--interactive:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
 
 /* Корень-ссылка: строка ведёт на объект. Цвет задаёт .entity, здесь только

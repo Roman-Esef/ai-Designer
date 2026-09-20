@@ -16,7 +16,7 @@
      идентичны прежнему дефолту. */
   --link-fg:        var(--link);
   --link-fg-hover:  var(--link-dark);
-  --link-fg-active: var(--c-emerald-900);
+  --link-fg-active: var(--emerald-900);
   color: var(--link-fg, var(--link));
   text-decoration: none;
   text-decoration-color: currentColor;
@@ -38,7 +38,7 @@
 /* accent — layout & modal links (primary) */
 .link.link--accent  { color: var(--link); }
 .link.link--accent:hover, .link.link--accent.is-hover, .link.link--accent:focus-visible, .link.link--accent.is-focus { color: var(--link-dark); }
-.link.link--accent:active, .link.link--accent.is-pressed { color: var(--c-emerald-900); }
+.link.link--accent:active, .link.link--accent.is-pressed { color: var(--emerald-900); }
 /* muted — Breadcrumbs_1 (ancestor / secondary crumbs) */
 .link.link--muted   { color: var(--text-inactive); }
 .link.link--muted:hover, .link.link--muted.is-hover, .link.link--muted:focus-visible, .link.link--muted.is-focus { color: var(--text-secondary); }

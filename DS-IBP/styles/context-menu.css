@@ -43,7 +43,7 @@
   --menu-item-gap:    10px;
   --menu-icon:        20px;
   --menu-item-hover:  var(--tertiary);                                       /* #E5ECEB — нейтральный серый */
-  --menu-item-active: color-mix(in srgb, var(--c-swamp-500) 16%, var(--bg-popup));  /* нейтральный, чуть темнее hover */
+  --menu-item-active: color-mix(in srgb, var(--swamp-500) 16%, var(--bg-popup));  /* нейтральный, чуть темнее hover */
   --menu-shadow:      0 10px 30px rgba(40, 50, 55, .16);
 
   box-sizing: border-box;

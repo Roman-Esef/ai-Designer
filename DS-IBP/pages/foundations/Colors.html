@@ -59,7 +59,6 @@
   .pgrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(420px, 1fr));
     gap: 40px 32px; margin-top: 40px; align-items: start; }
   .pgroup .gname { font: var(--type-h5-strong); color: var(--text-primary); margin: 0 0 10px; }
-  .pstep { font: var(--type-body-s); color: var(--text-secondary); }
 
 </style>
   <link rel="stylesheet" href="../../styles/ds-nav.css">
@@ -67,10 +66,10 @@
 <body>
 <main class="page" data-screen-label="Colors">
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.003</b></span><span>Обновлено: <b>19.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.004</b></span><span>Обновлено: <b>20.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Основы</p>
     <h1>Цвета</h1>
-    <p>Два слоя. <strong>Семантические токены</strong> сгруппированы по назначению: <strong>Static</strong> — фоны и информация, <strong>Active</strong> — интерактивные элементы, <strong>Situative</strong> — статусы успеха и ошибки, <strong>Local</strong> — палитры отдельных компонентов. <strong>Базовые токены</strong> — полные цветовые рампы, из которых семантика берёт значения.</p>
+    <p>Два слоя. <strong>Базовые токены</strong> — полные цветовые рампы: только они держат hex. <strong>Семантические токены</strong> называют назначение и ссылаются на базовые, поэтому правка одного базового меняет всё, что на него смотрит. Группы семантики: <strong>Static</strong> — фоны и информация, <strong>Active</strong> — интерактивные элементы, <strong>Situative</strong> — успех, ошибка, внимание, информирование, <strong>Status</strong> — обозначение статусов, <strong>Chart</strong> — палитра графиков.</p>
   </header>
 
   <div class="tabsbar">
@@ -95,8 +94,8 @@
     </div>
 
     <div class="tabpane" id="pane-base" role="tabpanel" aria-labelledby="tab-base" hidden>
-      <p class="pane-lead">Полные цветовые рампы из образцов. Это <strong>базовые токены</strong> — источник значений для семантических: правка базового меняет все семантические токены, которые на него ссылаются.</p>
-      <p class="pane-lead">Связь ещё не проведена: семантика на вкладке слева по-прежнему собрана на примитивах <code class="tok">--c-*</code> из <code class="tok">styles/palette.css</code>, прописанных отдельными hex. Поэтому значения местами расходятся — например, <code class="tok">--emerald-300</code> здесь и <code class="tok">--c-emerald-300</code> в семантике дают разный цвет. Перевод семантики на базовые токены — отдельная правка.</p>
+      <p class="pane-lead">Полные цветовые рампы из образцов. Это <strong>базовые токены</strong> — единственное место в ДС, где живёт hex. Семантика со вкладки слева ссылается на них через <code class="tok">var()</code>, поэтому правка базового токена меняет все семантические, которые на него смотрят.</p>
+      <p class="pane-lead">Напрямую в экранах и компонентах базовые токены не применяются: цвет выбирается по назначению — <code class="tok">--text-primary</code>, а не <code class="tok">--cgrey-600</code>.</p>
 
       <div id="rootBase" class="pgrid"></div>
     </div>
@@ -104,209 +103,79 @@
 
   <footer class="page-foot">
     <span>Дизайн-система · Цвета</span>
-    <span>Семантические токены · Базовые токены</span>
+    <span>Static · Active · Situative · Status · Chart</span>
   </footer>
 </main>
 
 <script>
-/* row: [cssVar, name, ref, hex, opacity?] */
+/* row: [токен, базовый токен | null, hex, opacity | null]
+   Блок сгенерирован из styles/palette.css и styles/colors.css — руками не
+   править: таблица обязана совпадать с токенами, а не жить своей жизнью. */
 const data = [
   {
     title: "Static", sub: "Фоновые цвета и отображение информации",
     groups: [
-      { name: "BG", rows: [
-        ["--bg-popup",    "BG_Popup",    "MGrey_50",  "#FFFFFF"],
-        ["--bg-tile",     "BG_Tile",     "MGrey_50",  "#FFFFFF"],
-        ["--bg-mainmenu", "BG_MainMenu", "MGrey_100", "#FEFEFE"],
-        ["--bg-hint",     "BG_Hint",     "CGrey_800", "#283237"],
-        ["--bg-page",     "BG_Page",     "Swamp_A100", "#F5F7F7"],
-      ]},
-      { name: "Border", rows: [
-        ["--border-primary", "Border_Primary", "Swamp_300", "#B8CCCC"],
-        ["--border-light",   "Border_Light",   "Swamp_200", "#E1EDE7"],
-        ["--border-dark",    "Border_Dark",    "Swamp_600", "#6C8080"],
-      ]},
-      { name: "Text", rows: [
-        ["--text-primary",     "Text_Primary",     "CGrey_600", "#324844"],
-        ["--text-secondary",   "Text_Secondary",   "CGrey_500", "#6C8080"],
-        ["--text-inactive",    "Text_Inactive",    "CGrey_300", "#AAB2B1"],
-        ["--text-on-dark",     "Text_OnDark",      "MGrey_50",  "#FFFFFF"],
-      ]},
-      { name: "BGTable", rows: [
-        ["--bgtable",                 "BG_Table",              "MGrey_50",   "#FFFFFF"],
-        ["--bgtable-row-hover",       "BG_RowHover",           "Swamp_A400", "#F6FAFA"],
-        ["--bgtable-row-focus",       "BG_RowFocus",           "Swamp_A700", "#DEEDEC"],
-        ["--bgtable-row-focus-hover", "BG_RowFocusHover",      "Swamp_A700", "#DEEDEC"],
-        ["--bgtable-pinned",          "BGTable_Pinned",        "Swamp_A100", "#F5F7F7"],
-        ["--bgtable-pinned-hover",    "BGTable_PinnedHover",   "Swamp_50",   "#EEF2F1"],
-        ["--bgtable-pinned-focus",    "BGTable_PinnedFocus",   "Swamp_A700", "#DEEDEC"],
-        ["--bgtable-accent",          "BGTable_Accent",        "Amber_50",   "#FFF8E1"],
-        ["--bgtable-accent-hover",    "BGTable_AccentHover",   "Amber_A100", "#FEF0C2"],
-        ["--bgtable-accent-focus",    "BGTable_AccentFocus",   "Amber_A200", "#FCE9AE"],
-      ]},
+      { name: "BG", rows: [["--bg-popup", "--mgrey-50", "#FFFFFF", null], ["--bg-tile", "--mgrey-50", "#FFFFFF", null], ["--bg-main-menu", "--mgrey-100", "#FEFEFE", null], ["--bg-hint", "--cgrey-800", "#283237", null], ["--bg-page", "--swamp-A100", "#F5F7F7", null]] },
+      { name: "BGTable", rows: [["--bg-table-default", "--mgrey-50", "#FFFFFF", null], ["--bg-table-default-hover", "--swamp-A400", "#F6FAFA", null], ["--bg-table-default-focus", "--swamp-A700", "#DEEDEC", null], ["--bg-table-accent", "--amber-50", "#FFF8E1", null], ["--bg-table-accent-hover", "--amber-A100", "#FEF0C2", null], ["--bg-table-accent-focus", "--amber-A200", "#FCE9AE", null], ["--bg-table-pinned", "--swamp-A100", "#F5F7F7", null], ["--bg-table-pinned-hover", "--swamp-50", "#EEF2F1", null], ["--bg-table-pinned-focus", "--swamp-A700", "#DEEDEC", null]] },
+      { name: "Border", rows: [["--border-primary", "--swamp-300", "#B8CCCC", null], ["--border-light", "--swamp-200", "#E1EDE7", null], ["--border-dark", "--swamp-600", "#6C8080", null], ["--disabled-border", "--cgrey-100", "#E8EDED", null]] },
+      { name: "Text", rows: [["--text-primary", "--cgrey-600", "#324844", null], ["--text-secondary", "--cgrey-500", "#6C8080", null], ["--text-inactive", "--cgrey-300", "#AAB2B1", null], ["--text-on-dark", "--mgrey-50", "#FFFFFF", null]] },
     ]
   },
   {
     title: "Active", sub: "Для интерактивных элементов",
     groups: [
-      { name: "Primary", rows: [
-        ["--primary",                  "Primary",                "Emerald_500", "#00AA9B"],
-        ["--primary-dark",             "PrimaryDark",            "Emerald_700", "#007A6D"],
-        ["--primary-light",            "PrimaryLight",           "Emerald_300", "#58DCCC"],
-        ["--primary-bg",               "PrimaryBG",              "Emerald_500", "#00AA9B", "6%"],
-        ["--primary-bg-light",         "PrimaryBGLight",         "Emerald_500", "#00AA9B", "3%"],
-        ["--primary-bg-semitransparent","PrimaryBGSemyTransparent","MGrey_50",  "#FFFFFF", "50%"],
-      ]},
-      { name: "Secondary", rows: [
-        ["--secondary",        "Secondary",       "Emerald_200", "#B8D6D3"],
-        ["--secondary-dark",   "SecondaryDark",   "Emerald_600", "#639994"],
-        ["--secondary-light",  "SecondaryLight",  "Emerald_100", "#CDE2E0"],
-        ["--secondary-bg",       "SecondaryBG",      "Emerald_200", "#B8D6D3", "30%"],
-        ["--secondary-bg-light", "SecondaryBGLight", "Emerald_200", "#B8D6D3", "15%"],
-      ]},
-      { name: "Tertiary", rows: [
-        ["--tertiary",       "Tertiary",      "Swamp_100", "#E5ECEB"],
-        ["--tertiary-dark",  "TertiaryDark",  "Swamp_400", "#7A9994"],
-        ["--tertiary-light", "TertiaryLight", "Swamp_50",  "#EEF2F1"],
-      ]},
+      { name: "Primary", rows: [["--primary", "--emerald-500", "#00AA9B", null], ["--primary-dark", "--emerald-700", "#0A7D6D", null], ["--primary-light", "--emerald-300", "#82CDC6", null], ["--primary-bg", "--emerald-500", "#00AA9B", "8%"], ["--primary-bg-light", "--emerald-500", "#00AA9B", "4%"], ["--primary-bg-semy-transparent", "--mgrey-50", "#FFFFFF", "50%"]] },
+      { name: "Secondary", rows: [["--secondary", "--emerald-200", "#B8D6D3", null], ["--secondary-dark", "--emerald-600", "#639994", null], ["--secondary-light", "--emerald-100", "#CDE2E0", null], ["--secondary-bg", "--emerald-200", "#B8D6D3", "32%"], ["--secondary-bg-light", "--emerald-200", "#B8D6D3", "16%"]] },
+      { name: "Tertiary", rows: [["--tertiary", "--swamp-100", "#E5ECEB", null], ["--tertiary-dark", "--swamp-400", "#7A9994", null], ["--tertiary-light", "--swamp-50", "#EEF2F1", null], ["--tertiary-bg", "--swamp-500", "#617C7C", "8%"], ["--tertiary-bg-light", "--swamp-500", "#617C7C", "4%"]] },
     ]
   },
   {
-    title: "Situative", sub: "Для ситуаций успеха / неуспеха",
+    title: "Situative", sub: "Для ситуаций успеха / ошибки / внимания / информирования",
     groups: [
-      { name: "Error", rows: [
-        ["--error",          "Error",        "Red_300",  "#E5625C"],
-        ["--error-dark",     "ErrorDark",    "Red_700",  "#D32F2F"],
-        ["--error-light",    "ErrorLight",   "Red_200",  "#E57373"],
-        ["--error-bg-light", "ErrorBGLight", "Red_A100", "#FCF1F1"],
-        ["--error-bg",       "ErrorBG",      "Red_A200", "#FBECEB"],
-        ["--error-bg-dark",  "ErrorBGDark",  "Red_A400", "#F6D8D7"],
-      ]},
-      { name: "Warning", rows: [
-        ["--warning",       "Warning",      "Amber_600", "#FFB300"],
-        ["--warning-dark",  "WarningDark",  "Amber_800", "#C68400"],
-        ["--warning-light", "WarningLight", "Amber_400", "#FFE54C"],
-        ["--warning-bg",    "WarningBG",    "Amber_50",  "#FFF8E1"],
-      ]},
-      { name: "Success", rows: [
-        ["--success",       "Success",      "LightGreen_600", "#7CB342"],
-        ["--success-dark",  "SuccessDark",  "LightGreen_800", "#558B2F"],
-        ["--success-light", "SuccessLight", "LightGreen_400", "#9CCC65"],
-        ["--success-bg",    "SuccessBG",    "LightGreen_50",  "#E9F6DA"],
-      ]},
-      { name: "Info", rows: [
-        ["--info",       "Info",      "LightBlue_600", "#1E88E5"],
-        ["--info-dark",  "InfoDark",  "LightBlue_800", "#01579B"],
-        ["--info-light", "InfoLight", "LightBlue_400", "#29B6F6"],
-        ["--info-bg",    "InfoBG",    "LightBlue_50",  "#EAF8FE"],
-      ]},
-      { name: "Link", rows: [
-        ["--link",       "Link",      "Emerald_500", "#00AA9B"],
-        ["--link-dark",  "LinkDark",  "Emerald_700", "#007A6D"],
-        ["--link-light", "LinkLight", "Emerald_200", "#B8D6D3"],
-      ]},
-      { name: "Disabled", rows: [
-        ["--disabled",                  "Disabled",                "CGrey_200", "#BEC5C8"],
-        ["--disabled-bg",               "DisabledBG",              "CGrey_50",  "#FBFBFB"],
-        ["--disabled-bg-semitransparent","DisabledBGSemyTransparent","MGrey_50","#FFFFFF", "50%"],
-        ["--disabled-border",           "DisabledBorder",          "CGrey_100", "#E8EDED"],
-      ]},
+      { name: "Error", rows: [["--error", "--red-300", "#E5625C", null], ["--error-light", "--red-200", "#E57373", null], ["--error-dark", "--red-700", "#D32F2F", null], ["--error-bg", "--red-A200", "#FBECEB", null], ["--error-bg-light", "--red-A100", "#FCF1F1", null], ["--error-bg-dark", "--red-A400", "#F6D8D7", null]] },
+      { name: "Warning", rows: [["--warning", "--amber-600", "#FFB300", null], ["--warning-light", "--amber-400", "#FFCA28", null], ["--warning-dark", "--amber-800", "#FF8F00", null], ["--warning-bg", "--amber-50", "#FFF8E1", null]] },
+      { name: "Success", rows: [["--success", "--light-green-600", "#7CB342", null], ["--success-light", "--light-green-400", "#9CCC65", null], ["--success-dark", "--light-green-800", "#558B2F", null], ["--success-bg", "--light-green-50", "#E9F6DA", null]] },
+      { name: "Info", rows: [["--info", "--light-blue-600", "#039BE5", null], ["--info-light", "--light-blue-400", "#29B6F6", null], ["--info-dark", "--light-blue-900", "#01579B", null], ["--info-bg", "--light-blue-50", "#EAF8FE", null]] },
+      { name: "Link", rows: [["--link", "--emerald-500", "#00AA9B", null], ["--link-light", "--emerald-300", "#82CDC6", null], ["--link-dark", "--emerald-700", "#0A7D6D", null]] },
+      { name: "Disabled", rows: [["--disabled", "--cgrey-200", "#BEC5C8", null], ["--disabled-bg", "--cgrey-50", "#FBFBFB", null], ["--disabled-bg-semy-transparent", "--mgrey-50", "#FFFFFF", "56%"]] },
     ]
   },
   {
-    title: "Local", sub: "Для применения в отдельных компонентах",
+    title: "Status", sub: "Для обозначения статусов",
     groups: [
-      { name: "Status", rows: [
-        ["--st-green-dark",     "StGreen_Dark",     "Green_800", "#2E7D32"],
-        ["--st-green",          "StGreen",          "Green_500", "#4CAF50"],
-        ["--st-green-mid",      "StGreen_Mid",      "Green_500", "#4CAF50", "56%"],
-        ["--st-green-midlight", "StGreen_MidLight", "Green_500", "#4CAF50", "32%"],
-        ["--st-green-light",    "StGreen_Light",    "Green_500", "#4CAF50", "16%"],
-        ["--st-lblue-dark",     "StLBlue_Dark",     "LightBlue_900", "#01579B"],
-        ["--st-lblue",          "StLBlue",          "LightBlue_500", "#03A9F4"],
-        ["--st-lblue-mid",      "StLBlue_Mid",      "LightBlue_500", "#03A9F4", "56%"],
-        ["--st-lblue-midlight", "StLBlue_MidLight", "LightBlue_500", "#03A9F4", "32%"],
-        ["--st-lblue-light",    "StLBlue_Light",    "LightBlue_500", "#03A9F4", "16%"],
-        ["--st-orange-dark",     "StOrange_Dark",     "Amber_900", "#FF6F00"],
-        ["--st-orange",          "StOrange",          "Amber_700", "#FFA000"],
-        ["--st-orange-mid",      "StOrange_Mid",      "Amber_700", "#FFA000", "56%"],
-        ["--st-orange-midlight", "StOrange_MidLight", "Amber_700", "#FFA000", "32%"],
-        ["--st-orange-light",    "StOrange_Light",    "Amber_700", "#FFA000", "16%"],
-        ["--st-red-dark",     "StRed_Dark",     "Red_700", "#D32F2F"],
-        ["--st-red",          "StRed",          "Red_400", "#EF5350"],
-        ["--st-red-mid",      "StRed_Mid",      "Red_400", "#EF5350", "56%"],
-        ["--st-red-midlight", "StRed_MidLight", "Red_400", "#EF5350", "32%"],
-        ["--st-red-light",    "StRed_Light",    "Red_400", "#EF5350", "16%"],
-        ["--st-dpurple-dark",     "StDPurple_Dark",     "DeepPurple_900", "#311B92"],
-        ["--st-dpurple",          "StDPurple",          "DeepPurple_400", "#7E57C2"],
-        ["--st-dpurple-mid",      "StDPurple_Mid",      "DeepPurple_400", "#7E57C2", "56%"],
-        ["--st-dpurple-midlight", "StDPurple_MidLight", "DeepPurple_400", "#7E57C2", "32%"],
-        ["--st-dpurple-light",    "StDPurple_Light",    "DeepPurple_400", "#7E57C2", "16%"],
-        ["--st-grey-dark",     "StGrey_Dark",     "CGrey_900", "#131618"],
-        ["--st-grey",          "StGrey",          "CGrey_700", "#333F48"],
-        ["--st-grey-mid",      "StGrey_Mid",      "CGrey_700", "#333F48", "56%"],
-        ["--st-grey-midlight", "StGrey_MidLight", "CGrey_700", "#333F48", "32%"],
-        ["--st-grey-light",    "StGrey_Light",    "CGrey_700", "#333F48", "16%"],
-        ["--st-system-dark",     "StSystem_Dark",     "CGrey_600", "#324844"],
-        ["--st-system",          "StSystem",          "Swamp_400", "#7A9994"],
-        ["--st-system-mid",      "StSystem_Mid",      "Swamp_400", "#7A9994", "56%"],
-        ["--st-system-midlight", "StSystem_MidLight", "Swamp_400", "#7A9994", "32%"],
-        ["--st-system-light",    "StSystem_Light",    "Swamp_400", "#7A9994", "16%"],
-        ["--st-disabled-dark",     "StDisabled_Dark",     "CGrey_600", "#324844", "40%"],
-        ["--st-disabled",          "StDisabled",          "CGrey_600", "#324844", "24%"],
-        ["--st-disabled-mid",      "StDisabled_Mid",      "CGrey_600", "#324844", "16%"],
-        ["--st-disabled-midlight", "StDisabled_MidLight", "CGrey_600", "#324844", "8%"],
-        ["--st-disabled-light",    "StDisabled_Light",    "CGrey_600", "#324844", "4%"],
-        ["--st-primary-dark",     "StPrimary_Dark",     "Emerald_900", "#00635A"],
-        ["--st-primary",          "StPrimary",          "Emerald_500", "#00AA9B"],
-        ["--st-primary-mid",      "StPrimary_Mid",      "Emerald_500", "#00AA9B", "56%"],
-        ["--st-primary-midlight", "StPrimary_MidLight", "Emerald_500", "#00AA9B", "32%"],
-        ["--st-primary-light",    "StPrimary_Light",    "Emerald_500", "#00AA9B", "16%"],
-      ]},
-      { name: "Rate", rows: [
-        ["--rate-green",        "RGreen",       "LightGreen_200", "#C5E1A5"],
-        ["--rate-light-green",  "RLightGreen",  "Green_50",       "#E8F5E9"],
-        ["--rate-blue",         "RBlue",        "Blue_200",       "#90CAF9"],
-        ["--rate-light-blue",   "RLightBlue",   "LightBlue_50",   "#EAF8FE"],
-        ["--rate-purple",       "RPurple",      "DeepPurple_200", "#B39DDB"],
-        ["--rate-light-purple", "RLightPurple", "DeepPurple_50",  "#EDE7F6"],
-        ["--rate-orange",       "ROrange",      "Orange_200",     "#FFCC80"],
-        ["--rate-light-orange", "RLightOrange", "Orange_50",      "#FFF3E0"],
-      ]},
-      { name: "Chart", rows: [
-        ["--chart-red",          "ChRed",          "—", "#F99290"],
-        ["--chart-orange",       "ChOrange",       "—", "#F9A580"],
-        ["--chart-yellow",       "ChYellow",       "—", "#FFD081"],
-        ["--chart-shiny-green",  "ChShinyGreen",   "—", "#8CCB5E"],
-        ["--chart-pastel-green", "ChPastelGreen",  "—", "#76E385"],
-        ["--chart-turquoise",    "ChTurquoise",    "—", "#31D4A8"],
-        ["--chart-light-blue",   "ChLightBlue",    "—", "#7DCAFA"],
-        ["--chart-blue",         "ChBlue",         "—", "#5B9CFA"],
-        ["--chart-indigo",       "ChIndigo",       "—", "#8D87F9"],
-        ["--chart-purple",       "ChPurple",       "—", "#CB88F8"],
-        ["--chart-pale-purple",  "ChPalePurple",   "—", "#F58BD8"],
-        ["--chart-pink-purple",  "ChPinkPurple",   "—", "#EC7390"],
-      ]},
+      { name: "Green", rows: [["--st-green-dark", "--green-800", "#2E7D32", null], ["--st-green", "--green-500", "#4CAF50", null], ["--st-green-mid", "--green-500", "#4CAF50", "56%"], ["--st-green-midlight", "--green-500", "#4CAF50", "32%"], ["--st-green-light", "--green-500", "#4CAF50", "16%"]] },
+      { name: "Blue", rows: [["--st-blue-dark", "--light-blue-900", "#01579B", null], ["--st-blue", "--light-blue-500", "#03A9F4", null], ["--st-blue-mid", "--light-blue-500", "#03A9F4", "56%"], ["--st-blue-midlight", "--light-blue-500", "#03A9F4", "32%"], ["--st-blue-light", "--light-blue-500", "#03A9F4", "16%"]] },
+      { name: "Orange", rows: [["--st-orange-dark", "--amber-900", "#FF6F00", null], ["--st-orange", "--amber-700", "#FFA000", null], ["--st-orange-mid", "--amber-700", "#FFA000", "56%"], ["--st-orange-midlight", "--amber-700", "#FFA000", "32%"], ["--st-orange-light", "--amber-700", "#FFA000", "16%"]] },
+      { name: "Red", rows: [["--st-red-dark", "--red-700", "#D32F2F", null], ["--st-red", "--red-400", "#EF5350", null], ["--st-red-mid", "--red-400", "#EF5350", "56%"], ["--st-red-midlight", "--red-400", "#EF5350", "32%"], ["--st-red-light", "--red-400", "#EF5350", "16%"]] },
+      { name: "Purple", rows: [["--st-dpurple-dark", "--deep-purple-900", "#311B92", null], ["--st-dpurple", "--deep-purple-400", "#7E57C2", null], ["--st-dpurple-mid", "--deep-purple-400", "#7E57C2", "56%"], ["--st-dpurple-midlight", "--deep-purple-400", "#7E57C2", "32%"], ["--st-dpurple-light", "--deep-purple-400", "#7E57C2", "16%"]] },
+      { name: "Grey", rows: [["--st-grey-dark", "--cgrey-900", "#131618", null], ["--st-grey", "--cgrey-700", "#333F48", null], ["--st-grey-mid", "--cgrey-700", "#333F48", "56%"], ["--st-grey-midlight", "--cgrey-700", "#333F48", "32%"], ["--st-grey-light", "--cgrey-700", "#333F48", "16%"]] },
+      { name: "System", rows: [["--st-system-dark", "--cgrey-600", "#324844", null], ["--st-system", "--swamp-400", "#7A9994", null], ["--st-system-mid", "--swamp-400", "#7A9994", "56%"], ["--st-system-midlight", "--swamp-400", "#7A9994", "32%"], ["--st-system-light", "--swamp-400", "#7A9994", "16%"]] },
+      { name: "Disabled", rows: [["--st-disabled-dark", "--cgrey-600", "#324844", "40%"], ["--st-disabled", "--cgrey-600", "#324844", "24%"], ["--st-disabled-mid", "--cgrey-600", "#324844", "16%"], ["--st-disabled-midlight", "--cgrey-600", "#324844", "8%"], ["--st-disabled-light", "--cgrey-600", "#324844", "4%"]] },
+      { name: "Primary", rows: [["--st-primary-dark", "--emerald-900", "#055143", null], ["--st-primary", "--emerald-500", "#00AA9B", null], ["--st-primary-mid", "--emerald-500", "#00AA9B", "56%"], ["--st-primary-midlight", "--emerald-500", "#00AA9B", "32%"], ["--st-primary-light", "--emerald-500", "#00AA9B", "16%"]] },
+    ]
+  },
+  {
+    title: "Chart", sub: "Для применения в графиках",
+    groups: [
+      { name: "Chart", rows: [["--ch-red", null, "#F99290", null], ["--ch-orange", null, "#F9A580", null], ["--ch-yellow", null, "#FFD081", null], ["--ch-shiny-green", null, "#8CCB5E", null], ["--ch-pastel-green", null, "#76E385", null], ["--ch-turquoise", null, "#31D4A8", null], ["--ch-light-blue", null, "#7DCAFA", null], ["--ch-blue", null, "#5B9CFA", null], ["--ch-indigo", null, "#8D87F9", null], ["--ch-purple", null, "#CB88F8", null], ["--ch-pale-purple", null, "#F58BD8", null], ["--ch-pink-purple", null, "#EC7390", null]] },
     ]
   },
 ];
-const GRID = "8px 1.3fr 1fr 1.6fr 0.55fr 0.95fr 8px";
+const GRID = "8px 1.5fr 1.2fr 0.5fr 0.9fr 8px";
 
-function rowHtml([cssVar, name, ref, hex, op]) {
+function rowHtml([tok, base, hex, op]) {
   const fill = op
-    ? `<span class="sw sw--alpha"><span class="sw__fill" style="background:var(${cssVar})"></span></span>`
-    : `<span class="sw" style="background:var(${cssVar})"></span>`;
-  const hexCell = op
-    ? `<span class="tc__row"><span class="tc__text">${hex} · ${op}</span></span>`
-    : `<span class="tc__row"><span class="tc__text">${hex}</span></span>`;
+    ? `<span class="sw sw--alpha"><span class="sw__fill" style="background:var(${tok})"></span></span>`
+    : `<span class="sw" style="background:var(${tok})"></span>`;
+  const baseCell = base ? `<code class="tok">${base}</code>` : "—";
+  const hexCell = op ? `${hex} · ${op}` : hex;
   return `
     <div class="tbl__row" style="grid-template-columns:${GRID}">
       <div class="tc tc--separator"></div>
-      <div class="tc"><span class="tc__row"><span class="tc__text">${name}</span></span></div>
-      <div class="tc"><span class="tc__row"><span class="tc__text">${ref}</span></span></div>
-      <div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">${cssVar}</code></span></span></div>
+      <div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">${tok}</code></span></span></div>
+      <div class="tc"><span class="tc__row"><span class="tc__text">${baseCell}</span></span></div>
       <div class="tc"><span class="tc__row"><span class="tc__text">${fill}</span></span></div>
-      <div class="tc">${hexCell}</div>
+      <div class="tc"><span class="tc__row"><span class="tc__text">${hexCell}</span></span></div>
       <div class="tc tc--separator"></div>
     </div>`;
 }
@@ -314,9 +183,8 @@ function rowHtml([cssVar, name, ref, hex, op]) {
 function tableHtml(g) {
   const head = `<div class="tbl__row" style="grid-template-columns:${GRID}">
     <div class="th th--separator"></div>
-    <div class="th"><span class="th__label">Наименование</span></div>
-    <div class="th"><span class="th__label">Палитра</span></div>
     <div class="th"><span class="th__label">Токен</span></div>
+    <div class="th"><span class="th__label">Базовый токен</span></div>
     <div class="th"><span class="th__label">Образец</span></div>
     <div class="th"><span class="th__label">Hex</span></div>
     <div class="th th--separator"></div>
@@ -351,11 +219,11 @@ const base = [
 ];
 const PGRID = "8px 0.75fr 1.5fr 0.45fr 1fr 8px";
 
-function baseRowHtml(prefix, name, [step, hex]) {
+function baseRowHtml(prefix, [step, hex]) {
   return `
     <div class="tbl__row" style="grid-template-columns:${PGRID}">
       <div class="tc tc--separator"></div>
-      <div class="tc"><span class="tc__row"><span class="tc__text">${step}<br><span class="pstep">${name}/${step}</span></span></span></div>
+      <div class="tc"><span class="tc__row"><span class="tc__text">${step}</span></span></div>
       <div class="tc"><span class="tc__row"><span class="tc__text"><code class="tok">--${prefix}-${step}</code></span></span></div>
       <div class="tc"><span class="tc__row"><span class="tc__text"><span class="sw" style="background:var(--${prefix}-${step})"></span></span></span></div>
       <div class="tc"><span class="tc__row"><span class="tc__text">${hex}</span></span></div>
@@ -372,7 +240,7 @@ function baseTableHtml([name, prefix, rows]) {
     <div class="th"><span class="th__label">Hex</span></div>
     <div class="th th--separator"></div>
   </div>`;
-  return `<div class="pgroup"><div class="gname">${name}</div><div class="tbl">${head}${rows.map(r => baseRowHtml(prefix, name, r)).join("")}</div></div>`;
+  return `<div class="pgroup"><div class="gname">${name}</div><div class="tbl">${head}${rows.map(r => baseRowHtml(prefix, r)).join("")}</div></div>`;
 }
 
 document.getElementById("rootBase").innerHTML = base.map(baseTableHtml).join("");

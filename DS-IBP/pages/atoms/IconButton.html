@@ -41,7 +41,7 @@
       linear-gradient(var(--bg-tile),var(--bg-tile)) padding-box,
       repeating-conic-gradient(#f2f5f5 0% 25%, #fbfcfc 0% 50%) 0 / 22px 22px; }
   .pg__stagebox { display:flex; align-items:center; justify-content:center; }
-  .pg__stagebox.dark { background: var(--c-cgrey-800); border-radius:14px; padding:26px 34px; }
+  .pg__stagebox.dark { background: var(--cgrey-800); border-radius:14px; padding:26px 34px; }
 
   .ctl { display:flex; flex-direction:column; gap:10px; }
   .ctl > .lbl { font: var(--type-body-s-strong); color: var(--text-inactive); text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
@@ -208,7 +208,7 @@
     <div class="panel">
       <div class="tonegrid" id="tonegrid"></div>
     </div>
-    <div class="panel" style="margin-top:20px; background:var(--c-cgrey-800); border-color:var(--c-cgrey-800);">
+    <div class="panel" style="margin-top:20px; background:var(--cgrey-800); border-color:var(--cgrey-800);">
       <div class="row" id="contrast-row" style="gap:20px;"></div>
     </div>
   </div>
@@ -543,7 +543,7 @@ function makeIB(o = {}) {
   });
   // contrast on dark
   const cr = document.getElementById('contrast-row');
-  const cap = document.createElement('span'); cap.style.cssText='font:var(--type-body-s); color:var(--c-swamp-300); margin-right:8px;'; cap.textContent='Contrast на тёмной поверхности:';
+  const cap = document.createElement('span'); cap.style.cssText='font:var(--type-body-s); color:var(--swamp-300); margin-right:8px;'; cap.textContent='Contrast на тёмной поверхности:';
   cr.appendChild(cap);
   ['default','hover','pressed'].forEach(st=>{
     cr.appendChild(makeIB({ tone:'contrast', size:'l', icon:'settings', state:st, frozen:true, label:'Настройки' }));

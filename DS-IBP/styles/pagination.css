@@ -182,12 +182,12 @@
 
 /* текущая страница */
 .pgn__num[aria-current="page"] {
-  background: var(--bgtable-row-focus);
+  background: var(--bg-table-default-focus);
   color: var(--text-primary);
   font: var(--type-body-s-strong);
   cursor: default;
 }
-.pgn__num[aria-current="page"]:hover { background: var(--bgtable-row-focus); }
+.pgn__num[aria-current="page"]:hover { background: var(--bg-table-default-focus); }
 
 .pgn__ellipsis {
   flex: none;

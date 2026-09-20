@@ -88,7 +88,7 @@ status: auto
 //    на hover/focus подчёркивание → 100% currentColor
 
 // 2. Цвет задаёт тон:
-//    accent  → --link, hover/focus --link-dark, pressed --c-emerald-900
+//    accent  → --link, hover/focus --link-dark, pressed --emerald-900
 //    muted   → --text-inactive, hover --text-secondary (Breadcrumbs_1)
 //    neutral → --text-primary (Breadcrumbs_2); только Default, не кликабельна (pointer-events: none)
 //    info/warning/error/success → --<тон>, hover --<тон>-dark, pressed на ступень темнее (ссылки в Alert/SnackBar)

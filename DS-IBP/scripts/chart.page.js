@@ -66,7 +66,7 @@ function initExamples() {
     series: [
       { id: 'in', name: 'Поступления', data: IN, type: 'bar' },
       { id: 'out', name: 'Списания', data: OUT, type: 'bar' },
-      { id: 'rest', name: 'Остаток', data: REST, type: 'line', color: '--chart-indigo' }
+      { id: 'rest', name: 'Остаток', data: REST, type: 'line', color: '--ch-indigo' }
     ],
     crosshair: true, toolbar: { periods: ['Месяц', 'Квартал', 'Год'], active: 'Месяц' }
   }));
@@ -101,7 +101,7 @@ function initExamples() {
     type: 'combo', categories: six,
     series: [
       { id: 'v', name: 'Поступления', data: IN6, type: 'bar' },
-      { id: 'r', name: 'Среднее за квартал', data: [437e6, 437e6, 437e6, 560e6, 560e6, 560e6], type: 'line', color: '--chart-indigo' }
+      { id: 'r', name: 'Среднее за квартал', data: [437e6, 437e6, 437e6, 560e6, 560e6, 560e6], type: 'line', color: '--ch-indigo' }
     ]
   }));
   mount('var-pie', base({
@@ -129,7 +129,7 @@ function initExamples() {
     series: [{ id: 'w', name: 'Изменение', data: [500e6, 320e6, -180e6, 60e6, 700e6] }]
   }));
   mount('var-spark', { type: 'spark', size: 's', spark: 'line', tone: 'auto', series: [{ id: 's', data: REST }] });
-  mount('var-spark-bar', { type: 'spark', size: 's', spark: 'bar', series: [{ id: 's', data: OUT, color: '--chart-blue' }] });
+  mount('var-spark-bar', { type: 'spark', size: 's', spark: 'bar', series: [{ id: 's', data: OUT, color: '--ch-blue' }] });
 
   /* --- размеры --- */
   ['s', 'm', 'l'].forEach(function (sz) {
@@ -405,7 +405,7 @@ function initTables() {
       ['Сетка', 'Линии сетки', tok('--border-light'), sw('--border-light')],
       ['Сетка', 'Ось и нулевая линия', tok('--border-primary'), sw('--border-primary')],
       ['Оси', 'Подписи делений', tok('--text-inactive'), sw('--text-inactive')],
-      ['Поле', 'Подсветка категории под курсором', tok('--bgtable-row-hover'), sw('--bgtable-row-hover')],
+      ['Поле', 'Подсветка категории под курсором', tok('--bg-table-default-hover'), sw('--bg-table-default-hover')],
       ['Поле', 'Кросс-хэйр', tok('--border-dark'), sw('--border-dark')],
       ['Опора', 'Опорная линия и её подпись', tok('--text-secondary'), sw('--text-secondary')],
       ['Семантика', 'Рост, положительная дельта', tok('--success'), sw('--success')],
@@ -414,7 +414,7 @@ function initTables() {
       ['Семантика', 'План (фон) в паре план/факт', tok('--st-grey-midlight'), sw('--st-grey-midlight')],
       ['Служебное', 'Фон пустого состояния и расчёта', tok('--bg-page'), sw('--bg-page')],
       ['Служебное', 'Скелетон загрузки', tok('--st-disabled-light'), sw('--st-disabled-light')],
-      ['Brush', 'Окно выделенного диапазона', tok('--primary-bg-semitransparent'), sw('--primary-bg-semitransparent')],
+      ['Brush', 'Окно выделенного диапазона', tok('--primary-bg-semy-transparent'), sw('--primary-bg-semy-transparent')],
       ['Brush', 'Мини-график диапазона', tok('--st-grey-midlight'), sw('--st-grey-midlight')]
     ]);
 

@@ -139,7 +139,7 @@
     // Alert vs Toast vs SnackBar — витрина
     setHTML('diff-alert', alertHTML({ tone: 'info', title: 'Инлайн-сообщение', text: 'Живёт в потоке блока.' }));
     var diffToast = document.getElementById('diff-toast');
-    if (diffToast) diffToast.innerHTML = '<div style="display:inline-flex;align-items:center;gap:10px;background:var(--c-cgrey-700,#333F48);color:#fff;border-radius:8px;padding:10px 16px;font:var(--type-body-s)">Процесс запущен</div>';
+    if (diffToast) diffToast.innerHTML = '<div style="display:inline-flex;align-items:center;gap:10px;background:var(--cgrey-700,#333F48);color:#fff;border-radius:8px;padding:10px 16px;font:var(--type-body-s)">Процесс запущен</div>';
     var diffSnack = document.getElementById('diff-snack');
     if (diffSnack) { diffSnack.innerHTML = ''
       + '<div class="snack snack--info" data-snack-tone="info" role="status" aria-live="polite" style="position:static;width:auto;max-width:280px;box-shadow:var(--shadow-l,0 10px 30px rgba(40,50,55,.16))">'

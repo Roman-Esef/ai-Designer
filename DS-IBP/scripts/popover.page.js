@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!root) return;
     const groups = [
       { name: 'Поверхность', rows: [
-        ['Фон Body', '--bg-popup'], ['Фон Header/Footer', '--bgtable-pinned'], ['Тень', '--elevation-5 (без внешнего бордера)'],
+        ['Фон Body', '--bg-popup'], ['Фон Header/Footer', '--bg-table-pinned'], ['Тень', '--elevation-5 (без внешнего бордера)'],
       ]},
       { name: 'Типографика', rows: [
         ['Заголовок', '--text-primary'], ['Текст контента', '--text-primary'], ['Служебный текст в футере', '--text-secondary'],

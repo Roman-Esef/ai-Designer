@@ -311,7 +311,7 @@
       ['Current (текущая)', () => miniNav(nav => {
         [1, 2, 3].forEach(p => { const b = document.createElement('span'); b.className = 'pgn__num'; b.textContent = p; if (p === 2) b.setAttribute('aria-current', 'page'); nav.appendChild(b); });
       }), [
-        ['Фон', '--bgtable-row-focus', 'BGTable_RowFocus', 'Swamp_a700'],
+        ['Фон', '--bg-table-default-focus', 'BGTable_RowFocus', 'Swamp_a700'],
         ['Текст', '--text-primary', 'Text_Primary', 'CGrey_800'],
       ]],
       ['Arrow · Default / граница', () => miniNav(nav => {
@@ -433,7 +433,7 @@
       let s = '#' + hx(r) + hx(g) + hx(b); if (a < 1) s += ' · ' + Math.round(a * 100) + '%'; return s;
     }
     const groups = [
-      { name: 'Номер страницы', rows: [['Default текст', '--text-secondary'], ['Hover фон', '--tertiary-light'], ['Hover текст', '--text-primary'], ['Current фон', '--bgtable-row-focus'], ['Current текст', '--text-primary']] },
+      { name: 'Номер страницы', rows: [['Default текст', '--text-secondary'], ['Hover фон', '--tertiary-light'], ['Hover текст', '--text-primary'], ['Current фон', '--bg-table-default-focus'], ['Current текст', '--text-primary']] },
       { name: 'Стрелки / прочее', rows: [['Default', '--text-secondary'], ['Disabled', '--text-inactive'], ['Разделитель строки', '--border-light']] },
       { name: 'Pagesize', rows: [['Текст (лейбл)', '--text-secondary'], ['Значение', '--text-primary'], ['Рамка открыт', '--border-primary']] },
       { name: 'Disabled', rows: [['Текст', '--text-inactive'], ['Current фон', '--disabled-bg']] },

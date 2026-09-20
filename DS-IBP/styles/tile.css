@@ -311,13 +311,13 @@
 /* Hover */
 .tile--card:hover,
 .tile--card.is-hover {
-  background: var(--bgtable-row-hover);
+  background: var(--bg-table-default-hover);
   border-color: var(--border-primary);
 }
 /* Active — нажатие */
 .tile--card:active,
 .tile--card.is-pressed {
-  background: var(--bgtable-row-focus);
+  background: var(--bg-table-default-focus);
   border-color: var(--border-dark);
 }
 .tile--card:focus-visible {

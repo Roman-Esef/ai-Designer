@@ -45,12 +45,12 @@
    (accent = primary = дефолт, его indeterminate покрывает базовое правило). */
 .pbar--accent  .pbar__fill { background: var(--primary); }
 .pbar--success .pbar__fill { background: var(--st-green); }
-.pbar--info    .pbar__fill { background: var(--st-lblue); }
+.pbar--info    .pbar__fill { background: var(--st-blue); }
 .pbar--warning .pbar__fill { background: var(--st-orange); }
 .pbar--error   .pbar__fill { background: var(--st-red); }
 .pbar--system  .pbar__fill { background: var(--st-system); }
 .pbar--success.pbar--indeterminate .pbar__fill { background: linear-gradient(90deg, transparent, var(--st-green) 35%, var(--st-green) 65%, transparent); }
-.pbar--info.pbar--indeterminate .pbar__fill    { background: linear-gradient(90deg, transparent, var(--st-lblue) 35%, var(--st-lblue) 65%, transparent); }
+.pbar--info.pbar--indeterminate .pbar__fill    { background: linear-gradient(90deg, transparent, var(--st-blue) 35%, var(--st-blue) 65%, transparent); }
 .pbar--warning.pbar--indeterminate .pbar__fill { background: linear-gradient(90deg, transparent, var(--st-orange) 35%, var(--st-orange) 65%, transparent); }
 .pbar--error.pbar--indeterminate .pbar__fill   { background: linear-gradient(90deg, transparent, var(--st-red) 35%, var(--st-red) 65%, transparent); }
 .pbar--system.pbar--indeterminate .pbar__fill  { background: linear-gradient(90deg, transparent, var(--st-system) 35%, var(--st-system) 65%, transparent); }

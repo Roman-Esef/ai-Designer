@@ -574,16 +574,16 @@
       ] },
       { name: 'Статусы — фон (Light)', rows: [
         ['System', '--st-system-light'],
-        ['Primary (accent)', '--st-primary-light'], ['Green (success)', '--st-green-light'], ['LBlue (info)', '--st-lblue-light'],
+        ['Primary (accent)', '--st-primary-light'], ['Green (success)', '--st-green-light'], ['LBlue (info)', '--st-blue-light'],
         ['Orange (warning)', '--st-orange-light'], ['Red (error)', '--st-red-light'], ['DPurple', '--st-dpurple-light'], ['Grey (dark)', '--st-grey-light'],
       ] },
       { name: 'Статусы — текст (Dark)', rows: [
         ['System', '--st-system-dark'],
-        ['Primary (accent)', '--st-primary-dark'], ['Green (success)', '--st-green-dark'], ['LBlue (info)', '--st-lblue-dark'],
+        ['Primary (accent)', '--st-primary-dark'], ['Green (success)', '--st-green-dark'], ['LBlue (info)', '--st-blue-dark'],
         ['Orange (warning)', '--st-orange-dark'], ['Red (error)', '--st-red-dark'], ['DPurple', '--st-dpurple-dark'], ['Grey (dark)', '--st-grey-dark'],
       ] },
       { name: 'Solid — заливка (base) · белый текст', rows: [
-        ['Primary (accent)', '--st-primary'], ['Green (success)', '--st-green'], ['LBlue (info)', '--st-lblue'],
+        ['Primary (accent)', '--st-primary'], ['Green (success)', '--st-green'], ['LBlue (info)', '--st-blue'],
         ['Orange (warning)', '--st-orange'], ['Red (error)', '--st-red'], ['DPurple', '--st-dpurple'], ['Grey (dark)', '--st-grey'],
       ] },
     ];

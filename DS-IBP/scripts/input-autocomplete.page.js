@@ -366,7 +366,7 @@
       ['Список (DropdownList)', [
         ['Фон списка', '--bg-popup'],
         ['Hover опции', '--tertiary-light'],
-        ['Выбранная строка', '--bgtable-row-focus'],
+        ['Выбранная строка', '--bg-table-default-focus'],
         ['Подсветка совпадения', '--primary'],
       ]],
     ];

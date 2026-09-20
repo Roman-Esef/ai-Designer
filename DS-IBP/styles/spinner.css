@@ -20,7 +20,7 @@
 .spin--success{border-top-color:var(--st-green)}
 .spin--warning{border-top-color:var(--st-orange)}
 .spin--error{border-top-color:var(--st-red)}
-.spin--info{border-top-color:var(--st-lblue)}
+.spin--info{border-top-color:var(--st-blue)}
 .spin--system{border-top-color:var(--st-system)}
 .spin--inverse{border-color:color-mix(in srgb, var(--text-on-dark) 28%, transparent);border-top-color:var(--text-on-dark)}
 @keyframes spin-rotate{to{transform:rotate(360deg)}}

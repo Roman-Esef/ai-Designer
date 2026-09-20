@@ -50,7 +50,7 @@ main.ds-split .docs-toc{position:sticky;top:28px;align-self:start;max-height:cal
 main.ds-split .docs-toc__label{font:var(--type-button-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--text-inactive);margin:0 0 10px;padding-left:15px}
 main.ds-split .docs-toc__list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 main.ds-split .docs-toc__link{display:block;padding:6px 10px 6px 13px;border-left:2px solid var(--border-light);font:var(--type-body-s);color:var(--text-secondary);text-decoration:none;transition:color .12s ease,border-color .12s ease,background-color .12s ease;text-wrap:balance}
-main.ds-split .docs-toc__link:hover{color:var(--text-primary);background:var(--bgtable-row-hover)}
+main.ds-split .docs-toc__link:hover{color:var(--text-primary);background:var(--bg-table-default-hover)}
 main.ds-split .docs-toc__link.is-active{border-left-color:var(--primary);color:var(--primary);font-weight:600}
 @media(max-width:1280px){main.ds-split .docs-layout{grid-template-columns:1fr}main.ds-split .docs-toc{display:none}}
 
