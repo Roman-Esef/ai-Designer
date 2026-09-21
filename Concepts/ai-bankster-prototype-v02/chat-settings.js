@@ -33,6 +33,10 @@
     'ООО «Каспий-Порт» — расширение терминала': 10
   };
   var CHANNELS = { mail: 'Почта', sberchat: 'Сберчат', ui: 'В интерфейсе' };
+  var NOTIFY_HELP = {
+    local: 'Настройка действует только для этого чата. Можно выбрать несколько каналов.',
+    global: 'Настройка действует для всех чатов. Можно выбрать несколько каналов.'
+  };
   var cache = Object.create(null);
   var provider = function () { return null; };
   var menuChat = null, editingChat = null, draft = null;
@@ -50,6 +54,7 @@
     try { value = JSON.parse(localStorage.getItem(key(id))) || value; } catch (_) { /* file:// может ограничить хранилище */ }
     value = value && typeof value === 'object' ? value : {};
     return {
+      scope: value.scope === 'global' ? 'global' : 'local',
       channels: Array.isArray(value.channels) ? value.channels.filter(function (c) { return CHANNELS[c]; }) : ['mail', 'ui'],
       users: Array.isArray(value.users) ? value.users.filter(function (id) { return PEOPLE.some(function (p) { return p.id === id; }); }) : [],
       desks: Array.isArray(value.desks) ? value.desks.filter(function (id) { return DESKS.some(function (d) { return d.id === id; }); }) : []
@@ -67,6 +72,28 @@
   function toast(message) {
     if (window.DSToast) window.DSToast.show({ message: message, kind: 'bar', tone: 'success', duration: 3000 });
   }
+  function syncNotifyUi() {
+    /* Название чата имеет смысл только для локальной настройки: глобальные
+       действуют на все чаты сразу. */
+    el('notify-chat').hidden = notifyScope() !== 'local';
+    updateNotifyHelp();
+  }
+  function applyNotifyScope(scope) {
+    el('notify-scope').querySelectorAll('.segctrl__item').forEach(function (item) {
+      var on = item.getAttribute('data-scope') === scope;
+      item.setAttribute('aria-checked', on ? 'true' : 'false');
+      item.tabIndex = on ? 0 : -1;
+    });
+    syncNotifyUi();
+  }
+  function notifyScope() {
+    var on = el('notify-scope').querySelector('.segctrl__item[aria-checked="true"]');
+    return on && on.getAttribute('data-scope') === 'global' ? 'global' : 'local';
+  }
+  function updateNotifyHelp() {
+    var help = el('notify-help');
+    if (help) help.textContent = NOTIFY_HELP[notifyScope()];
+  }
   function modal(id, title, body, action, width) {
     return '<div class="modal-scrim" id="' + id + '-scrim" hidden data-modal-guarded>' +
       '<div class="modal modal--w' + width + '" role="dialog" aria-modal="true" aria-labelledby="' + id + '-title">' +
@@ -79,12 +106,13 @@
       '</div></footer></div></div>';
   }
   function field(id, label, placeholder, readonly) {
-    return '<div class="inp inp--m"><label class="ds-label" for="' + id + '"><span class="ds-label__text">' + label + '</span></label>' +
+    var ext = readonly ? 'share-desks-selected' : 'share-selected';
+    return '<div class="inp inp--m inp--fullwidth"><label class="ds-label" for="' + id + '"><span class="ds-label__text">' + label + '</span></label>' +
       '<div class="inp__field" id="' + id + '-field" aria-label="' + label + '">' +
       '<input class="inp__control" id="' + id + '" placeholder="' + placeholder + '" autocomplete="off"' + (readonly ? ' readonly' : '') + '>' +
       '<span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список ' + label.toLowerCase() + '"><i data-icon="chevron-down"></i></button></span></div>' +
       '<div id="' + id + '-list" class="ddl ddl--floating ddl--scroll" role="listbox" aria-label="' + label + '" aria-multiselectable="true"></div>' +
-      (readonly ? '' : '<div class="inp-ext" id="share-selected" role="group" aria-label="Выбранные пользователи"></div>') + '</div>';
+      '<div class="inp-ext" id="' + ext + '" role="group" aria-label="Выбранные: ' + label.toLowerCase() + '"></div></div>';
   }
   function option(id, label, helper, checked, all) {
     return '<button type="button" tabindex="-1" class="ddl__item ddl__item--checkbox' + (all ? ' ddl__item--all' : '') + '" role="option" data-value="' + id + '" aria-checked="' + checked + '">' +
@@ -106,15 +134,42 @@
     window.dsIcons.apply(el('share-people-list'));
     if (peopleApi && peopleApi.isOpen()) peopleApi.place();
   }
+  function initials(name) {
+    return name.split(' ').map(function (part) { return part.charAt(0); }).join('');
+  }
+  function chipPerson(p) {
+    return '<span class="chip chip--edit chip--s chip--rounded" tabindex="0">' +
+      '<span class="chip__avatar av av--circular" aria-hidden="true"><span class="av__text">' + initials(p.name) + '</span></span>' +
+      '<span class="chip__label">' + esc(p.name) + '</span>' +
+      '<span class="chip__remove" role="button" data-remove-person="' + p.id + '" aria-label="Убрать ' + esc(p.name) + '"><i data-icon="close"></i></span></span>';
+  }
+  function chipDesk(d) {
+    return '<span class="chip chip--edit chip--s" tabindex="0">' +
+      '<span class="chip__label">' + esc(d.name) + '</span>' +
+      '<span class="chip__remove" role="button" data-remove-desk="' + d.id + '" aria-label="Убрать ' + esc(d.name) + '"><i data-icon="close"></i></span></span>';
+  }
   function drawSelection() {
     var selected = PEOPLE.filter(function (p) { return draft.users.indexOf(p.id) !== -1; });
-    el('share-selected').innerHTML = selected.map(function (p) {
-      return '<span class="chip chip--edit chip--s"><span class="chip__label">' + esc(p.name) + '</span>' +
-        '<button type="button" class="chip__remove" data-remove-person="' + p.id + '" aria-label="Убрать ' + esc(p.name) + '"><i data-icon="close"></i></button></span>';
-    }).join('');
-    el('share-desks').value = DESKS.filter(function (d) { return draft.desks.indexOf(d.id) !== -1; }).map(function (d) { return d.name; }).join(', ');
+    var peopleBox = el('share-selected');
+    peopleBox.innerHTML = selected.map(chipPerson).join('');
+    peopleBox.hidden = !selected.length;
+    var chosenDesks = DESKS.filter(function (d) { return draft.desks.indexOf(d.id) !== -1; });
+    var deskBox = el('share-desks-selected');
+    deskBox.innerHTML = chosenDesks.map(chipDesk).join('');
+    deskBox.hidden = !chosenDesks.length;
+    el('share-desks').value = chosenDesks.map(function (d) { return d.name; }).join(', ');
+    /* Список десков не перерисовывается (в отличие от людей) — чекбоксы
+       и «Выбрать всё» синхронизируются атрибутами, чтобы не ронять фокус
+       открытого списка. */
+    var allItem = el('share-desks-list').querySelector('.ddl__item--all');
+    if (allItem) allItem.setAttribute('aria-checked', chosenDesks.length === DESKS.length ? 'true' : chosenDesks.length ? 'mixed' : 'false');
+    DESKS.forEach(function (d) {
+      var item = el('share-desks-list').querySelector('[data-value="' + d.id + '"]');
+      if (item) item.setAttribute('aria-checked', draft.desks.indexOf(d.id) !== -1 ? 'true' : 'false');
+    });
     el('share-summary').textContent = 'Получателей: ' + recipients(draft).length + '. Владелец чата — Александров Пётр.';
-    window.dsIcons.apply(el('share-selected'));
+    window.dsIcons.apply(peopleBox);
+    window.dsIcons.apply(deskBox);
   }
   function prepareShare() {
     draft = read(editingChat.id);
@@ -131,18 +186,24 @@
   function init() {
     var menu = el('hist-menu') || el('row-menu');
     if (!menu) return;
-    var content = '<p class="ds-body-m" id="notify-chat"></p><div class="cb-group" role="group" aria-labelledby="notify-channels-title">' +
+    var content = '<div class="segctrl segctrl--fullwidth" role="radiogroup" aria-label="Область действия уведомлений" data-segctrl id="notify-scope">' +
+      '<div class="segctrl__thumb"></div>' +
+      '<button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-scope="global"><span class="segctrl__label">Глобальные</span></button>' +
+      '<button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0" data-scope="local"><span class="segctrl__label">Локальные</span></button>' +
+      '</div><p class="ds-body-m" id="notify-chat" hidden></p><div class="cb-group" role="group" aria-labelledby="notify-channels-title">' +
       '<p class="cb-group__title" id="notify-channels-title">Сообщить о готовности материала</p><div class="cb-group__items">' +
       Object.keys(CHANNELS).map(function (id) {
         return '<label class="cb"><input type="checkbox" class="cb__input" name="notify-channel" value="' + id + '">' +
           '<span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">' + CHANNELS[id] + '</span></span></label>';
-      }).join('') + '</div></div><span class="ds-helper ds-helper--left">Настройка действует только для этого чата. Можно выбрать несколько каналов.</span>';
+      }).join('') + '</div></div><span class="ds-helper ds-helper--left" id="notify-help">' + NOTIFY_HELP.local + '</span>';
     document.body.insertAdjacentHTML('beforeend', modal('notify', 'Настроить уведомление', content, 'Сохранить', 4));
+    window.DSTabs.segment(el('notify-scope'), { onChange: syncNotifyUi });
     menu.insertAdjacentHTML('beforeend', '<button type="button" class="menu__item" role="menuitem" data-chat-settings="notify" data-modal="notify-scrim" data-modal-guarded><span class="menu__item-icon"><i data-icon="settings"></i></span><span class="menu__item-label">Настроить уведомление</span></button>');
     /* Новое действие стоит до разделителя и удаления. */
     menu.insertBefore(menu.lastElementChild, menu.querySelector('.menu__divider') || menu.querySelector('.menu__item--danger'));
     el('notify-save').addEventListener('click', function () {
       var value = read(editingChat.id);
+      value.scope = notifyScope();
       value.channels = Array.from(document.querySelectorAll('[name="notify-channel"]:checked')).map(function (n) { return n.value; });
       save(editingChat.id, value);
       window.DSModal.closeTop();
@@ -188,6 +249,13 @@
         draft.users = draft.users.filter(function (id) { return id !== remove.getAttribute('data-remove-person'); });
         drawPeople(); drawSelection(); el('share-people').focus();
       }, true);
+      el('share-desks-selected').addEventListener('click', function (e) {
+        var remove = e.target.closest('[data-remove-desk]');
+        if (!remove) return;
+        e.preventDefault(); e.stopPropagation();
+        draft.desks = draft.desks.filter(function (id) { return id !== remove.getAttribute('data-remove-desk'); });
+        drawSelection(); el('share-desks').focus();
+      }, true);
     }
     window.dsIcons.apply(menu); window.dsIcons.apply(el('notify-scrim'));
     if (el('share-scrim')) window.dsIcons.apply(el('share-scrim'));
@@ -213,6 +281,11 @@
       var value = read(editingChat.id);
       el('notify-chat').textContent = editingChat.title;
       document.querySelectorAll('[name="notify-channel"]').forEach(function (n) { n.checked = value.channels.indexOf(n.value) !== -1; });
+      applyNotifyScope(value.scope);
+      /* Индикатор сегконтрола измерен, пока модалка скрыта (capture-фаза
+         клика идёт раньше снятия hidden) — пересчитываем в кадре, когда у
+         сегментов уже есть реальные размеры. */
+      requestAnimationFrame(function () { window.DSTabs.positionThumb(el('notify-scope')); });
     } else prepareShare();
   }, true);
   /* Рантайм модалки закрывает окно; его списки освобождаются тем же событием. */
@@ -238,8 +311,7 @@
       var names = people.map(function (p) { return p.name; }).join(', ');
       return '<span class="av-group av-group--m" role="group" tabindex="0" aria-label="Чат доступен для просмотра: ' + esc(names) + '" data-tooltip="' + esc(names) + '" data-tooltip-multiline="yes">' +
         people.slice(0, 4).map(function (p) {
-          var initials = p.name.split(' ').map(function (part) { return part.charAt(0); }).join('');
-          return '<span class="av av--circular av--m" aria-hidden="true"><span class="av__text">' + initials + '</span></span>';
+          return '<span class="av av--circular av--m" aria-hidden="true"><span class="av__text">' + initials(p.name) + '</span></span>';
         }).join('') + (people.length > 4 ? '<span class="av-group__more" aria-hidden="true">+' + (people.length - 4) + '</span>' : '') + '</span>';
     }
   };
