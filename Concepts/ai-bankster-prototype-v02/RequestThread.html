@@ -150,6 +150,8 @@
   .think__text   { color: transparent; background: linear-gradient(90deg, var(--text-secondary) 0%, var(--text-secondary) 40%, var(--text-inactive) 50%, var(--text-secondary) 60%, var(--text-secondary) 100%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; animation: thinkShimmer 3.2s ease-in-out infinite; transition: opacity .3s ease; }
   .think__text.is-out { opacity: 0; }
   .think__time   { font: var(--type-body-xs); color: var(--text-inactive); font-variant-numeric: tabular-nums; }
+  .think-row    { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-8); }
+  .think-row__notify { margin-left: auto; }
   @keyframes thinkSpin { to { transform: rotate(360deg); } }
   @keyframes thinkShimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
@@ -802,6 +804,7 @@
 
 
 <script src="../../DS-IBP/scripts/ds.js"></script>
+<script src="chat-settings.js"></script>
 <script>
 /* ============================================================================
    Скрипт экрана «Новый отчёт» / нить запроса.
@@ -856,6 +859,7 @@
 
   /* ── Состояние нити ───────────────────────────────────────────────────── */
   var S = {
+    settingsId: 'new-' + Date.now(),
     msgs: [],
     versions: [
       { n: 1, date: '11.09.2026, 14:20', note: 'Исходный материал по параметрам конструктора' },
@@ -886,6 +890,21 @@
     return '12.09.2026, ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
   }
   function el(id) { return document.getElementById(id); }
+
+  function settingsId() { return S.openId && S.openId !== 'new' ? S.openId : S.settingsId; }
+  window.PitcherChatSettings.configure(function () {
+    return { id: settingsId(), title: el('hdTitle').textContent };
+  });
+  function accessText() {
+    var count = window.PitcherChatSettings.recipients(settingsId()).length;
+    return count ? 'Доступ для просмотра: ' + count : 'Доступ: только вы';
+  }
+  document.addEventListener('pitcher:settings', function (e) {
+    if (String(e.detail.id) !== String(settingsId())) return;
+    setActions(true);
+    var access = el('hdAccess');
+    if (access) access.textContent = accessText();
+  });
 
   /* Пересборка поддерева через innerHTML отвязывает рантаймы ДС —
      связываем заново одной функцией из единственного места (урок Л93). */
@@ -1003,7 +1022,7 @@
       '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="calendar"></i></span>Обновлён ' + esc(h.upd) + '</span>' +
       '<span class="phead__meta"><span class="phead__meta-ico phead__meta-ico--ok"><i data-icon="check-circle"></i></span>' + versions + '</span>' +
       '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="attach"></i></span>Файлов: ' + (h.files || 0) + '</span>' +
-      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="lock"></i></span>Доступ: только вы</span>';
+      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="lock"></i></span><span id="hdAccess">' + accessText() + '</span></span>';
     rebind(meta);
   }
 
@@ -1013,7 +1032,7 @@
   function setActions(on) {
     var acts = el('hdActions');
     acts.innerHTML = on
-      ? '<button class="btn btn--outline btn--m btn--icon-only" aria-label="Действия с запросом" aria-haspopup="menu" aria-expanded="false" data-menu="hist-menu"><i data-icon="more-dots"></i></button>'
+      ? window.PitcherChatSettings.avatars(settingsId()) + '<button class="btn btn--outline btn--m btn--icon-only" aria-label="Действия с запросом" aria-haspopup="menu" aria-expanded="false" data-menu="hist-menu"><i data-icon="more-dots"></i></button>'
       : '';
     rebind(acts);
   }
@@ -1116,10 +1135,11 @@
     return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
   }
   function thinkingCard() {
-    return '<button type="button" class="think" data-act="finish" title="Прототип: нажмите, чтобы завершить подготовку" aria-label="AI Pitcher готовит материал. Прототип: нажмите, чтобы завершить подготовку">' +
+    return '<div class="think-row"><button type="button" class="think" data-act="finish" title="Прототип: нажмите, чтобы завершить подготовку" aria-label="AI Pitcher готовит материал. Прототип: нажмите, чтобы завершить подготовку">' +
       '<span class="think__loader" aria-hidden="true"></span>' +
       '<span class="think__text" data-think aria-hidden="true">' + THINK[think.i] + '</span>' +
-      '<span class="think__time" aria-hidden="true"><span data-think-time>' + elapsed() + '</span></span></button>';
+      '<span class="think__time" aria-hidden="true"><span data-think-time>' + elapsed() + '</span></span></button>' +
+      '<button type="button" class="btn btn--transparent btn--s think-row__notify" data-chat-settings="notify" data-modal="notify-scrim" data-modal-guarded><i data-icon="settings"></i><span class="btn__label">Настроить уведомление</span></button></div>';
   }
   function startThinking() {
     if (think.timer) return;
@@ -1147,11 +1167,11 @@
     var h = HIST.filter(function (x) { return x.id === S.openId; })[0];
     if (h) { h.state = 'ready'; h.versions = Math.max(1, h.versions); drawHist(); }
     push('agent', text('Готово — материал по ' + esc(OBJECT) + ' собран: ключевые показатели, возможности для продуктов, инсайты, риски и позиция на встречу. Откройте просмотр или скачайте в нужном формате.') + docCard());
-    if (window.DSSnack) {
+    if (window.DSSnack && window.PitcherChatSettings.channels(settingsId()).indexOf('ui') !== -1) {
       window.DSSnack.show({
         tone: 'success',
         title: 'Материал готов',
-        text: OBJECT + ' — материал с идеями. Уведомление отправлено на корпоративную почту.',
+        text: OBJECT + ' — материал с идеями.',
         buttons: [{ label: 'Открыть просмотр', variant: 'outline', onClick: function () { openPreview(); } }]
       });
     }
@@ -1178,7 +1198,7 @@
     }
     if (window.DSToast) window.DSToast.show({ message: 'Подготовка материала запущена', kind: 'bar', duration: 3000 });
     think.start = Date.now(); think.i = 0;
-    push('agent', text(intro + ' Это займёт до 30 минут — можно спокойно выпить кофе. Как будет готово, сообщу здесь и пришлю уведомление на корпоративную почту.'), { think: true });
+    push('agent', text(intro + ' Это займёт до 30 минут. Как будет готово, сообщу в чате и уведомлю по выбранным каналам.'), { think: true });
     startThinking();
   }
 
@@ -2033,7 +2053,7 @@
       think.start = Date.now() - 7 * 60 * 1000;
       S.running = true;
       S.msgs.push({ role: 'agent', time: '12.09.2026, 11:40', think: true, html:
-        text('Готовлю материал по параметрам запроса. Это займёт до 30 минут — можно спокойно выпить кофе. Как будет готово, сообщу здесь и пришлю уведомление на корпоративную почту.') });
+        text('Готовлю материал по параметрам запроса. Это займёт до 30 минут. Как будет готово, сообщу в чате и уведомлю по выбранным каналам.') });
       startThinking();
     }
     render();
