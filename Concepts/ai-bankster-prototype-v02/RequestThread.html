@@ -176,6 +176,7 @@
   .doc__title:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-2xs); }
   .doc__meta     { overflow: hidden; font: var(--type-body-xs); color: var(--text-secondary); white-space: nowrap; text-overflow: ellipsis; }
   .doc__acts     { flex: none; display: flex; align-items: center; gap: var(--space-8); }
+  .doc__ctx      { display: flex; }
 
   /* ── Ошибка подготовки в нити ────────────────────────────────────────────
      Не только сообщает о сбое: говорит, что случилось, что поможет его
@@ -1293,6 +1294,7 @@
         '<span class="chip__remove" role="button" aria-label="Убрать файл ' + esc(f) + '" data-act="rmfile" data-i="' + i + '"><i data-icon="close"></i></span></span>';
     }).join('');
     rebind(el('cmpFiles'));
+    syncPriorCtxAll();
   }
 
   /* ── Контекст из материала («Доработать в чате») ──────────────────────────
@@ -1449,6 +1451,18 @@
     }
     else if (act === 'rmfile') {
       S.files.splice(Number(t.getAttribute('data-i')), 1); drawFiles();
+    }
+    else if (act === 'prior-ctx') {
+      var dCtx = priorById(t.getAttribute('data-id'));
+      if (!dCtx) return;
+      var fi = S.files.indexOf(dCtx.title);
+      if (fi === -1) {
+        S.files.push(dCtx.title); drawFiles();
+        if (window.DSToast) window.DSToast.show({ message: 'Документ добавлен в контекст запроса', kind: 'bar', tone: 'success', duration: 2500 });
+      } else {
+        S.files.splice(fi, 1); drawFiles();
+      }
+      syncPriorCtx(dCtx.id);
     }
   });
 
@@ -1669,7 +1683,28 @@
       '<div class="doc__acts">' +
         '<button type="button" class="btn btn--outline btn--s" data-act="open-prior" data-id="' + d.id + '"><i data-icon="visibility-on"></i><span class="btn__label">Просмотр</span></button>' +
         '<button type="button" class="btn btn--outline btn--s" aria-haspopup="menu" aria-expanded="false" data-menu="doc-menu"><i data-icon="download"></i><span class="btn__label">Скачать</span><i data-icon="chevron-down"></i></button>' +
-      '</div></div>';
+      '</div></div>' +
+      '<div class="doc__ctx"><button type="button" class="btn btn--transparent btn--s" data-act="prior-ctx" data-id="' + d.id + '" aria-pressed="false"><i data-icon="add"></i><span class="btn__label">Добавить в контекст</span></button></div>';
+  }
+
+  /* Документ коллеги в контексте запроса живёт как приложенный файл
+     (S.files), поэтому и состояние кнопки, и чип в композере читают его
+     оттуда: чип можно убрать крестиком — кнопка под документом вернётся
+     к исходному виду. Стиль и размер — как у действий ответа («Копировать»):
+     прозрачная S в обоих состояниях, различие несут глиф и подпись. */
+  function syncPriorCtx(id) {
+    var d = priorById(id);
+    var btn = el('thrMsgs').querySelector('[data-act="prior-ctx"][data-id="' + id + '"]');
+    if (!d || !btn) return;
+    var inCtx = S.files.indexOf(d.title) !== -1;
+    btn.setAttribute('aria-pressed', String(inCtx));
+    btn.className = 'btn btn--transparent btn--s';
+    btn.innerHTML = '<i data-icon="' + (inCtx ? 'check' : 'add') + '"></i><span class="btn__label">' +
+      (inCtx ? 'В контексте' : 'Добавить в контекст') + '</span>';
+    window.dsIcons.apply(btn);
+  }
+  function syncPriorCtxAll() {
+    each('[data-act="prior-ctx"]', function (n) { syncPriorCtx(n.getAttribute('data-id')); });
   }
 
   /* Документ встаёт в нить один раз; повторное нажатие прокручивает к нему.
