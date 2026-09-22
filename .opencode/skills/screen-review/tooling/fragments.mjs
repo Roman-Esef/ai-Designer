@@ -16,7 +16,8 @@
 
    Владелец один — этот модуль. Импортируют: `layout-check.mjs`,
    `DS-IBP/scripts/ds-lint-cli.mjs` (мягко: ДС без оснастки линтуется как
-   раньше), `lessons-cli gate`.
+   раньше), `lessons-cli gate`, `Projects/post/assemble.mjs` (предикат
+   `hasActiveInclude` — им ассемблер отбирает источники сборки).
    ============================================================ */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -25,7 +26,28 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const REPO = path.resolve(HERE, '..', '..', '..', '..');
 
-const stripComments = (s) => s.replace(/<!--[\s\S]*?-->/g, '');
+/* Разметка без того, что разметкой не является. Комментарий вырезался здесь и
+   раньше; скрипты, <pre> и <code> добавлены 20.09.2026.
+
+   Причина. Витрина компонента показывает метку `<ds-include src="…">` ПРИМЕРОМ
+   КОДА — в `<script type="text/plain" id="src-code-html">` вкладки «Код». По
+   подстроке такой пример неотличим от настоящей метки, и витрина молча
+   становилась «источником сборки»: ассемблер собирал ей лишний `.preview.html`,
+   а сенсор печатал ПРОПУЩЕН и не проверял её вовсе (класс Л100 — молчание
+   читается как чистота). Разбор один на всех потребителей: два почти одинаковых
+   разбора одного признака — это Л43. */
+export function activeMarkup(s) {
+  return s
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi, '')
+    .replace(/<code\b[^>]*>[\s\S]*?<\/code>/gi, '');
+}
+
+/** Есть ли в файле метка сборки, которую ассемблер обязан развернуть. */
+export function hasActiveInclude(s) {
+  return /<ds-include\b/i.test(activeMarkup(s));
+}
 
 /* `.opencode` не исключается намеренно: фикстуры корпуса лежат там, и источник
    фрагмента-фикстуры обязан находиться. */
@@ -58,7 +80,7 @@ function htmlUnder(dir, out = []) {
 export function includersOf(file) {
   const abs = path.resolve(file);
   let text;
-  try { text = stripComments(readFileSync(abs, 'utf8')); } catch { return []; }
+  try { text = activeMarkup(readFileSync(abs, 'utf8')); } catch { return []; }
   if (/<!DOCTYPE|<html\b/i.test(text)) return [];
 
   let dir = path.dirname(abs);
@@ -67,7 +89,7 @@ export function includersOf(file) {
     for (const host of htmlUnder(dir)) {
       if (host === abs) continue;
       let h;
-      try { h = stripComments(readFileSync(host, 'utf8')); } catch { continue; }
+      try { h = activeMarkup(readFileSync(host, 'utf8')); } catch { continue; }
       for (const m of h.matchAll(/<ds-include\b[^>]*\bsrc="([^"]+)"/gi)) {
         if (path.resolve(path.dirname(host), m[1]) === abs) out.push(host);
       }

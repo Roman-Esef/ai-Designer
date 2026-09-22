@@ -1,8 +1,8 @@
 ---
 component: ReadOnlyField
 title: "ReadOnlyField"
-version: "1.007"
-updated: "05.09.2026"
+version: "1.008"
+updated: "21.09.2026"
 page: pages/molecules/ReadOnlyField.html
 page_js: scripts/read-only-field.page.js
 runtime: scripts/ds-copy.js, scripts/ds-readonlyfield.js (+ scripts/ds-tooltip.js — тултип переполнения)

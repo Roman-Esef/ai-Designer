@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карточка контрагента — локальные компоненты Post</title>
+<link rel="icon" type="image/svg+xml" href="../../../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../../../DS-IBP/ds.css">
+<!-- @lc-css -->
+<!-- docs-split.css и ds-docs.css в барель ds.css не входят: это слой страниц
+     документации, а не экранов. Линкуем явно. -->
+<link rel="stylesheet" href="../../../../DS-IBP/styles/docs-split.css">
+<link rel="stylesheet" href="../../../../DS-IBP/styles/ds-docs.css">
+<!-- tab.css и segment-control.css приходят из бареля ds.css выше. Явные линки
+     стоят потому, что их требует docs-split check: он читает текст страницы и
+     про барель не знает. Повторная загрузка того же файла ничего не меняет. -->
+<link rel="stylesheet" href="../../../../DS-IBP/styles/tab.css">
+<link rel="stylesheet" href="../../../../DS-IBP/styles/segment-control.css">
+<style>
+  body { margin: 0; font-family: var(--font-text), system-ui, sans-serif; color: var(--text-primary); }
+  /* Карточка живёт в колонке окна — демо повторяет её ширину. */
+  .pg__stage { display: flex; justify-content: center; padding: 32px 24px; }
+  .pg__stagebox { width: 320px; transition: width .15s ease; }
+  .pg__stagebox[data-w="narrow"] { width: 220px; }
+  .pg__stagebox[data-w="wide"] { width: 480px; }
+  .cases { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; align-items: start; }
+  .case__label { margin: 0 0 8px; font: var(--type-body-s-strong); }
+</style>
+</head>
+<body>
+<div class="nav-layout">
+  <nav class="nav nav--fixed" id="nav" aria-label="Локальные компоненты">
+    <div class="nav__top">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Свернуть меню"><i data-icon="left-menu"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list"></div>
+  </nav>
+
+  <main class="page ds-split" data-screen-label="Карточка контрагента">
+    <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+
+      <div class="splitpane__panel splitpane__a app-pane-demo">
+        <div class="demo-stage">
+          <div class="pg__stage"><div class="pg__stagebox" id="pg-stage" data-w="normal"></div></div>
+        </div>
+      </div>
+
+      <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+      <div class="splitpane__panel splitpane__b app-pane-docs">
+        <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+          <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+          <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+          <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+        </div>
+
+        <div class="tabs-body">
+
+          <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+            <div class="docs-layout">
+              <div class="docs-main">
+
+<header class="masthead">
+  <div class="meta"><span>Версия: <b>0.005</b></span><span>Обновлено: <b>21.09.2026</b></span><span>Категория: <b>Общие</b></span></div>
+  <p class="eyebrow"><a class="inl" href="../index.html">Локальные компоненты Post</a> · Общие</p>
+  <h1>Карточка контрагента</h1>
+  <p class="lead">Один контрагент сделки — юрлицо или физлицо — карточкой: наименование, реквизиты, рейтинг и отметка «КНР». Компонент переиспользуемый: сейчас его использует <a class="inl" href="../TileKNR/TileKNRModal.doc.preview.html">модальное окно КНР</a> тайла <a class="inl" href="../TileKNR/TileKNR.doc.preview.html">КНР</a>.</p>
+</header>
+
+<section class="section" data-screen-label="Назначение">
+  <h2>Назначение</h2>
+  <p class="desc">Карточка показывает одного контрагента там, где их перебирают: в результатах поиска и в списке участников сделки. Она не экран контрагента и не его полная анкета — только то, по чему его узнают и выбирают.</p>
+</section>
+
+<section class="section" data-screen-label="Из чего собрана">
+  <h2>Из чего собрана</h2>
+  <p class="desc">Своего в карточке — только раскладка тела в две колонки и сетка полей «лейбл — значение». Всё остальное — готовые компоненты.</p>
+  <div class="tbl" data-table>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="th th--separator"></div>
+      <div class="th"><span class="th__label">Компонент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+      <div class="th"><span class="th__label">Что делает в карточке</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+      <div class="th th--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/organisms/Tile.html">Card</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Сама карточка: шапка с наименованием, тело, состояния наведения, переноса и блокировки</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/atoms/IconButton.html">IconButton</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Кнопка переноса в соседнюю колонку, 20×20 справа в шапке</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/organisms/RiskMetric.html">RiskMetric</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Рейтинг и зона проблемности — справа в теле карточки</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/atoms/Checkbox.html">Checkbox</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Отметка «КНР»</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-screen-label="Варианты и состояния">
+  <h2>Варианты и состояния</h2>
+  <p class="desc">Вариант — кто перед нами: юрлицо или физлицо. Состояние — где карточка лежит: «Найдено» — контрагент найден поиском, «Выбрано» — он участник сделки. Пока контрагент только найден, у него нет ни риск-метрики, ни строки ГСЗ, ни чекбокса «КНР»: отмечать носителем риска того, кто в сделке не участвует, нельзя.</p>
+  <p class="desc">При наведении у карточки меняются фон и рамка. Кнопка со стрелками в шапке переносит карточку в соседнюю колонку, двойной клик по карточке делает то же самое. Если править нельзя — у роли нет права или статус сделки не допускает правку, — кнопки нет, а отметка «КНР» у участника видна, но не переключается.</p>
+  <p class="desc">Заблокированная карточка видна, но с ней ничего нельзя сделать: не перенести, не отметить КНР, не открыть рейтинг. Так модальное окно КНР показывает участников сделки другого вида: на вкладке юрлиц — физлиц, на вкладке физлиц — юрлиц.</p>
+
+  <div class="subsec">
+    <h3>Юридические лица</h3>
+    <p class="desc">Сабхедер необязателен — «Нерезидент», «Консолидированная группа». В «Выбрано» у юрлица появляются риск-метрика, строка ГСЗ и чекбокс «КНР».</p>
+    <div class="cases" id="cases-ul"></div>
+  </div>
+
+  <div class="subsec">
+    <h3>Физические лица</h3>
+    <p class="desc">Сабхедер — дата рождения, он есть всегда. Найденное физлицо показывается без контактных данных, у выбранного видны доступные контакты и чекбокс «КНР».</p>
+    <div class="cases" id="cases-fl"></div>
+  </div>
+</section>
+
+<section class="section" data-screen-label="Переполнение">
+  <h2>Переполнение</h2>
+  <p class="desc">Реквизиты у разных контрагентов разные. Если поля нет в данных, его нет и в карточке: место под него не резервируется — прочерк читался бы как потерянное значение.</p>
+  <p class="desc">Длинные значения без пробелов — а реквизиты это длинные числа — переносятся по символам. Наименование занимает не больше двух строк, дальше многоточие. Как карточка ведёт себя в узкой колонке, можно посмотреть в конструкторе.</p>
+</section>
+
+<section class="section" data-screen-label="Backlog">
+  <h2>Бэклог</h2>
+  <p class="desc">Кейсы, которых недостаёт документации.</p>
+  <div class="panel">
+    <ul class="rules">
+      <li><b>Плотное поле «лейбл — значение»</b> — реквизиты стоят в строку, лейбл слева от значения. В ДС такого варианта у ReadOnlyField нет, кандидат в заявку на ДС.</li>
+      <li><b>Источник данных</b> — откуда карточка получает контрагента в продукте и какие поля в нём обязательны.</li>
+      <li><b>Загрузка и ошибка</b> — как выглядит карточка, пока данные контрагента грузятся или не пришли.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="page-foot"><p class="desc">Паспорт компонента — <code>CardCounterparty.md</code>, журнал — <code>CHANGELOG.md</code>.</p></footer>
+
+              </div>
+              <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+            </div>
+          </div>
+
+          <!-- Вёрстка под всеми тремя табами одинакова: общий контейнер
+               .docs-layout > .docs-main. Без него панели расходятся по ширине и
+               отступам с «Документацией» (ds-rules §11). -->
+          <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+            <div class="docs-layout">
+              <div class="docs-main">
+                <h2>Конструктор</h2>
+                <p class="desc">Вариант, состояние и доступность — оси компонента. Ширина показывает карточку в узкой и в широкой колонке, «Полный состав полей» — с полным и с минимальным набором реквизитов, «Доступно перемещение» — с кнопкой переноса и без неё.</p>
+                <div class="pg__controls" id="pg-controls"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+            <div class="docs-layout">
+              <div class="docs-main">
+                <h2>Код компонента</h2>
+                <p class="desc">Эталон разметки из шаблона, CSS компонента и API его рендера.</p>
+                <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                  <div class="segctrl__thumb"></div>
+                  <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                  <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                  <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+                </div>
+                <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+                <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+                <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- эталон карточки: та же метка, что в модальном окне КНР — витрина не держит копию -->
+<ds-include src="./CardCounterparty.html"></ds-include>
+
+<!-- модалка смены роли (триггер — кнопка выхода в футере панели) -->
+<div class="modal-scrim" id="role-modal" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="role-modal-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="role-modal-title">Сменить роль</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" data-modal-close aria-label="Закрыть"><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button type="button" class="btn btn--outline btn--m" data-role="Финансист ДИД" data-modal-close><span class="btn__label">Финансист ДИД</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../kit.js"></script>
+<script src="../../../../DS-IBP/scripts/ds.js"></script>
+<script src="../../../../DS-IBP/scripts/ibp-home.js"></script>
+<script src="../kit-nav.js"></script>
+<script src="../kit-docpage.js"></script>
+<script src="./CardCounterparty.js"></script>
+<script>
+/* Экранный скрипт страницы. Панель рисует общий PostKitNav, контролы —
+   PostKitDoc, саму карточку — PostCardCounterparty по шаблону компонента:
+   копии разметки на странице нет.
+   Футер отдаёт IBPHome.footerHTML с зашитым href="#" — подменяем здесь.
+   Проверяет сторож projects-hub.mjs (П5). */
+(function () {
+  'use strict';
+  var USER_LINK_FROM = ' href="#" aria-label="Открыть личный кабинет"';
+  var USER_LINK_TO = ' href="../../../../index.html" aria-label="Хаб проектов"';
+  var role = (window.IBPHome && window.IBPHome.defaultRole) || 'Финансист ДИД';
+  /* Запасная разметка футера — не украшение: анатомия NavPanel берётся как
+     есть, и приёмка читает .html, а не ibp-home.js (линтер, F5). */
+  var footer = (window.IBPHome && window.IBPHome.footerHTML)
+    ? window.IBPHome.footerHTML(role, { logoutModal: 'role-modal', logoutLabel: 'Сменить роль / выйти' }).replace(USER_LINK_FROM, USER_LINK_TO)
+    : '<div class="nav__footer">'
+      + '<a class="nav__user" href="../../../../index.html" aria-label="Хаб проектов">'
+      + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
+      + '<span class="nav__user-text">'
+      + '<span class="nav__user-name">Александров Петр Константинович</span>'
+      + '<span class="nav__user-role">' + role + '</span>'
+      + '</span></a>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти" data-modal="role-modal"><i data-icon="logout"></i></button>'
+      + '</div>';
+
+  window.PostKitNav.render({
+    nav: document.getElementById('nav'),
+    base: '..',
+    current: 'CardCounterparty',
+    footer: footer
+  });
+
+  /* Демо-данные витрины. Стор здесь не нужен: он про состав колонок окна, а
+     карточке нужна одна запись. Форма записи — из паспорта компонента. */
+  var RISK = { rating: 26, zone: 'green', ratingDate: '24.10.2025', zoneDate: '24.10.2025',
+               segment: 'Крупный бизнес', profile: 'Непроектный' };
+  var FULL = [['ИНН', '076543834'], ['КПП', '33432423423'], ['ОГРН', '076543834'],
+              ['КИО', '12345'], ['ЕПК ID', '123456']];
+  var SHORT = [['ИНН', '076543834']];
+  var CONTACTS = [['Почта', 'egorov@domain.ru'], ['Телефон', '+7 999 876 12 34']];
+
+  function item(o) {
+    return {
+      id: o.id || 'demo',
+      kind: o.kind || 'ul',
+      name: o.name || 'СамолётИнвестХолдинг Inc',
+      subheader: o.subheader === undefined ? 'Консолидированная группа' : o.subheader,
+      place: o.place || 'found',
+      knr: !!o.knr,
+      fields: o.fields || FULL,
+      gsz: o.gsz || '',
+      risk: o.risk || null,
+      contacts: o.contacts || []
+    };
+  }
+
+  /* физлицо: сабхедер — дата рождения, реквизитов нет, контакты — у выбранного */
+  function person(o) {
+    return item({
+      kind: 'fl',
+      name: o.name || 'Егоров Михаил Степанович',
+      subheader: '01.01.2001',
+      fields: [],
+      place: o.place,
+      knr: o.knr,
+      contacts: o.place === 'member' ? CONTACTS : []
+    });
+  }
+
+  /* state — статичный класс состояния Card из ДС (is-hover): так наведение
+     видно на витрине без мыши */
+  function put(host, data, mode, disabled, state) {
+    host.innerHTML = '';
+    var el = window.PostCardCounterparty.render(data, { mode: mode || 'edit', disabled: !!disabled });
+    if (el && state) el.classList.add(state);
+    if (el) host.appendChild(el);
+    if (window.DSRiskMetric) window.DSRiskMetric.mount(host);
+  }
+
+  var stage = document.getElementById('pg-stage');
+  PostKitDoc.controls([
+    { key: 'width', label: 'Ширина колонки', options: [['narrow', 'Узкая колонка'], ['normal', 'Обычная колонка'], ['wide', 'Широкая колонка']], value: 'normal' },
+    { key: 'kind', label: 'Вариант', options: [['fl', 'Физлицо'], ['ul', 'Юрлицо']], value: 'ul' },
+    { key: 'place', label: 'Состояние', options: [['found', 'Найдено'], ['member', 'Выбрано']] },
+    { key: 'access', label: 'Доступность', options: [['available', 'Карточка доступна'], ['blocked', 'Карточка заблокирована']] },
+    { key: 'move', label: 'Доступно перемещение', bool: true, value: true },
+    { key: 'full', label: 'Полный состав полей', bool: true, value: true }
+  ], function (st) {
+    stage.setAttribute('data-w', st.width);
+    var fl = st.kind === 'fl';
+    var member = st.place === 'member';
+    put(stage, item({
+      kind: st.kind,
+      name: fl ? 'Константинопольский Константин Константинович' : 'СамолётИнвестХолдинг Inc',
+      subheader: fl ? '01.01.2001' : (st.full ? 'Консолидированная группа' : ''),
+      place: st.place,
+      knr: member,
+      fields: fl ? [] : (st.full ? FULL : SHORT),
+      gsz: member && st.full ? 'ПАО «Газпром»' : '',
+      risk: member && !fl ? RISK : null,
+      contacts: member && fl ? [['Почта', 'konstantin.opolsky@domain.ru'], ['Телефон', '+7 999 876 12 34']] : []
+    }), st.move ? 'edit' : 'view', st.access === 'blocked');
+  });
+
+  /* варианты и состояния рядом — секция документации, по подгруппам */
+  function cases(hostId, list) {
+    var host = document.getElementById(hostId);
+    list.forEach(function (c) {
+      var box = document.createElement('div');
+      var label = document.createElement('p');
+      label.className = 'case__label';
+      label.textContent = c[0];
+      var slot = document.createElement('div');
+      box.appendChild(label);
+      box.appendChild(slot);
+      host.appendChild(box);
+      put(slot, c[1], c[2], c[3], c[4]);
+    });
+  }
+
+  cases('cases-ul', [
+    ['Найдено', item({}), 'edit'],
+    ['Найдено · без сабхедера, минимум полей', item({ subheader: '', fields: SHORT }), 'edit'],
+    ['Выбрано', item({ place: 'member', knr: true, risk: RISK, gsz: 'ПАО «Газпром»' }), 'edit'],
+    ['Выбрано · перемещение недоступно', item({ place: 'member', risk: RISK }), 'view'],
+    ['Наведение', item({}), 'edit', false, 'is-hover'],
+    ['Заблокирована (вкладка физлиц)', item({ place: 'member', risk: RISK }), 'edit', true]
+  ]);
+
+  cases('cases-fl', [
+    ['Найдено', person({ name: 'Иванов Михаил Степанович', place: 'found' }), 'edit'],
+    ['Выбрано', person({ place: 'member', knr: true }), 'edit'],
+    ['Наведение', person({ name: 'Иванов Михаил Степанович', place: 'found' }), 'edit', false, 'is-hover'],
+    ['Заблокирована (вкладка юрлиц)', person({ place: 'member' }), 'edit', true]
+  ]);
+})();
+</script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Доступно перемещение': 'Доступно перемещение', 'Полный состав полей': 'Полный состав полей' };</script>
+<script src="../../../../DS-IBP/scripts/docs-split.js"></script>
+
+<script type="text/plain" id="src-code-html">
+<!-- Эталон разметки карточки. Живёт в CardCounterparty.html внутри template:
+     потребитель клонирует его и заполняет слоты data-cp из своих данных. -->
+<article class="tile tile--card lc-knrm__card" data-state="found" data-mode="edit">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title" data-cp="name"></h3></div>
+      <p class="tile__subtitle" data-cp="subheader"></p>
+    </div>
+    <div class="tile__actions">
+      <!-- перенос в соседнюю колонку: IconButton M 20×20; подпись и
+           подсказку ставит рендер по opts.moveLabel -->
+      <button type="button" class="ibtn ibtn--neutral ibtn--m" data-knr-move
+              aria-label="Перенести" data-tooltip="Перенести"><i data-icon="arrow-left-right"></i></button>
+    </div>
+  </header>
+  <div class="tile__body">
+    <div class="lc-knrm__content">
+      <div class="lc-knrm__main">
+        <div class="lc-knrm__fields" data-cp="fields"></div>
+        <label class="cb lc-knrm__knr">
+          <input type="checkbox" class="cb__input" data-cp="knr">
+          <span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span>
+          <span class="cb__content"><span class="cb__label">КНР</span></span>
+        </label>
+      </div>
+      <span data-cp="risk" data-riskmetric></span>
+    </div>
+  </div>
+</article>
+<!-- Заблокирована: рендер ставит на корень aria-disabled="true" (Disabled у Card) и inert.
+     Наведение — состояние Card из ДС: :hover / .is-hover. Двойной клик по карточке
+     переносит её так же, как кнопка, — это делает потребитель (окно КНР). -->
+</script>
+
+<script type="text/plain" id="src-code-css">
+</script>
+
+<script type="text/plain" id="src-code-js">
+/* Оживление шаблона — CardCounterparty.js.
+
+   PostCardCounterparty.render(item, opts) → HTMLElement
+     item — запись стора: id, kind, name, subheader, place, knr,
+            fields[], gsz, risk{}, contacts[]
+     opts.mode      — 'edit' (кнопка переноса есть) | 'view' (её нет)
+     opts.disabled  — карточка заблокирована: aria-disabled="true"
+                      (Disabled у Card из ДС) + inert
+     opts.moveLabel — подпись и подсказка кнопки переноса: куда она переносит
+
+   Слоты шаблона помечены data-cp: name · subheader · risk · fields · knr.
+   Риск-метрику рантайм ДС собирает сам из data-атрибутов слота.
+
+   Предметные правила сюда не дублируются: что риск-метрика, ГСЗ и чекбокс
+   КНР принадлежат участнику сделки, решают стор и CSS компонента.
+</script>
+</body>
+</html>

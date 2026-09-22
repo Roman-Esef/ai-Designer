@@ -115,7 +115,7 @@ function textBlock(t, dim){
     ()=>state.variant, v=>state.variant=v,
     ()=>state.orientation==='v');
   const cAlign = select('Выравнивание подписи',
-    [['left','Слева'],['center','По центру'],['right','Справа']],
+    [['left','Подпись слева'],['center','Подпись по центру'],['right','Подпись справа']],
     ()=>state.align, v=>state.align=v,
     ()=>!(state.withText && state.orientation==='h'));
 

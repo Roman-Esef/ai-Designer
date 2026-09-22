@@ -25,18 +25,20 @@
     ms = ms || 1300;
     var tip = document.createElement('span');
     tip.className = 'tip tip--main tip--top tip--center tip--floating';
-    tip.style.position = 'fixed'; tip.style.pointerEvents = 'none'; tip.style.zIndex = '1000';
+    /* z-index не ставится: слой даёт класс .tip (--tip-z, максимальный) */
+    tip.style.position = 'fixed'; tip.style.pointerEvents = 'none';
     tip.appendChild(document.createTextNode(text));
     var arrow = document.createElement('span'); arrow.className = 'tip__arrow'; tip.appendChild(arrow);
     document.body.appendChild(tip);
+    /* сначала показать, потом мерить: закрытый тултип — display:none
+       (tooltip.css), размера у него нет; появление даёт @starting-style */
+    tip.classList.add('is-visible');
     var r = anchor.getBoundingClientRect();
     var tw = tip.offsetWidth, th = tip.offsetHeight;
     var left = Math.max(8, Math.min(r.left + r.width / 2 - tw / 2, window.innerWidth - tw - 8));
     var top = Math.max(8, r.top - th - 8);
     tip.style.left = Math.round(left) + 'px';
     tip.style.top = Math.round(top) + 'px';
-    void tip.offsetHeight;
-    tip.classList.add('is-visible');
     setTimeout(function () {
       tip.classList.remove('is-visible');
       setTimeout(function () { tip.remove(); }, 160);

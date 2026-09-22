@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Локальные компоненты Post — IBP</title>
+<link rel="icon" type="image/svg+xml" href="../../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../../DS-IBP/ds.css">
+<style>
+  /* Витрина кита: только раскладка на токенах. */
+  body { margin: 0; font-family: var(--font-text), system-ui, sans-serif; color: var(--text-primary); }
+
+  /* Группа категории: заголовок + карточки компонентов. */
+  .kit-group { display: flex; flex-direction: column; gap: 16px; }
+  .kit-group__head { margin: 0; font: var(--type-h5-strong); color: var(--text-primary); }
+  .kit-group__count { color: var(--text-secondary); font: var(--type-body-m); margin-left: 8px; }
+
+  /* Карточки — штатная сетка .grid12 из ДС, ширину задаёт пара col-N/colw-N
+     на самой карточке. Своей сетки экран не строит. */
+  .kit-card { min-width: 0; text-decoration: none; color: inherit; }
+  .kit-card .tile__title { text-decoration: none; }
+  .kit-card__purpose { margin: 0; font: var(--type-body-s); color: var(--text-secondary); }
+  .kit-card__meta { margin: 12px 0 0; font: var(--type-body-xs); color: var(--text-secondary); }
+  .kit-card__no-doc { margin: 12px 0 0; font: var(--type-body-xs); color: var(--text-inactive); }
+
+  /* Перестроение — тот же приём, что на главной: пара col-N/colw-N, ниже неё
+     последний шаг в одну колонку. Специфичность (0,2,0) обязана совпадать с
+     правилом пары, иначе оно не сработает. */
+  @container screen (max-width: 1560px) { .grid12 > [class*="colw-"] { grid-column: span var(--colw); } }
+  @container screen (max-width: 900px)  { .grid12 > .kit-card { grid-column: span 12; } }
+</style>
+</head>
+<body>
+<div class="nav-layout">
+  <!-- Левая панель — NavPanel. Постоянная часть (шапка) стоит здесь, список
+       групп и пунктов наполняет PostKitNav из kit.js: группы = категории
+       паспортов, пункты = компоненты. Руками список не ведётся. -->
+  <nav class="nav nav--fixed" id="nav" aria-label="Локальные компоненты">
+    <div class="nav__top">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Свернуть меню"><i data-icon="left-menu"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list"></div>
+  </nav>
+
+  <div class="screen">
+    <nav class="crumbs" aria-label="Хлебные крошки">
+      <li class="crumbs__item crumbs__item--current">
+        <span class="crumbs__current" aria-current="page">Локальные компоненты</span>
+      </li>
+    </nav>
+    <main class="screen__content">
+
+      <div class="phead">
+        <div class="phead__main">
+          <div class="phead__title-row">
+            <div class="phead__title-group">
+              <h1 class="phead__title">Локальные компоненты Post</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Карточки групп строит экранный скрипт из того же kit.js -->
+      <div id="kit-groups" style="display:flex;flex-direction:column;gap:32px;"></div>
+
+    </main>
+  </div>
+</div>
+
+<!-- модалка смены роли (триггер — кнопка выхода в футере панели) -->
+<div class="modal-scrim" id="role-modal" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="role-modal-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="role-modal-title">Сменить роль</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" data-modal-close aria-label="Закрыть"><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button type="button" class="btn btn--outline btn--m" data-role="Финансист ДИД" data-modal-close><span class="btn__label">Финансист ДИД</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="./kit.js"></script>
+<script src="../../../DS-IBP/scripts/ds.js"></script>
+<script src="../../../DS-IBP/scripts/ibp-home.js"></script>
+<script src="./kit-nav.js"></script>
+<script>
+/* Экранный скрипт. Панель и карточки рисует PostKitNav из kit.js; здесь —
+   только то, что принадлежит этой странице: футер панели со ссылкой на хаб.
+   Футер отдаёт IBPHome.footerHTML с зашитым href="#" — подменяем ссылку
+   здесь, каталог ДС не трогаем. Проверяет сторож projects-hub.mjs (П5). */
+(function () {
+  'use strict';
+  var USER_LINK_FROM = ' href="#" aria-label="Открыть личный кабинет"';
+  var USER_LINK_TO = ' href="../../../index.html" aria-label="Хаб проектов"';
+  var role = (window.IBPHome && window.IBPHome.defaultRole) || 'Финансист ДИД';
+  /* Запасная разметка футера — не украшение: анатомия NavPanel берётся как
+     есть, и приёмка читает .html, а не ibp-home.js (линтер, F5). Тот же приём,
+     что на остальных экранах направления. */
+  var footer = (window.IBPHome && window.IBPHome.footerHTML)
+    ? window.IBPHome.footerHTML(role, { logoutModal: 'role-modal', logoutLabel: 'Сменить роль / выйти' }).replace(USER_LINK_FROM, USER_LINK_TO)
+    : '<div class="nav__footer">'
+      + '<a class="nav__user" href="../../../index.html" aria-label="Хаб проектов">'
+      + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
+      + '<span class="nav__user-text">'
+      + '<span class="nav__user-name">Александров Петр Константинович</span>'
+      + '<span class="nav__user-role">' + role + '</span>'
+      + '</span></a>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти" data-modal="role-modal"><i data-icon="logout"></i></button>'
+      + '</div>';
+
+  window.PostKitNav.render({
+    nav: document.getElementById('nav'),
+    groups: document.getElementById('kit-groups'),
+    base: '.',
+    current: null,
+    footer: footer
+  });
+})();
+</script>
+</body>
+</html>

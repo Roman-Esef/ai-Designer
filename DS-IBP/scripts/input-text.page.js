@@ -49,7 +49,7 @@
       ['warning', 'Warning'], ['warning-focus', 'WarningFocus'],
       ['disabled', 'Disabled'],
     ], 'state', true));
-    controls.appendChild(ctlSelect('Наполнение', [['empty', 'Пусто'], ['placeholder', 'Плейсхолдер'], ['value', 'Заполнено']], 'fill'));
+    controls.appendChild(ctlSelect('Наполнение', [['empty', 'Пустое поле'], ['placeholder', 'Плейсхолдер'], ['value', 'Заполненное поле']], 'fill'));
     const labelCtl = ctlToggle('Label', 'label');
     const helperCtl = ctlToggle('Helper', 'helper');
     const resizableCtl = ctlToggle('Resize', 'resizable');

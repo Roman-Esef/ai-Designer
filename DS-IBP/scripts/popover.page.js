@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ], () => state.footLeft, v => state.footLeft = v));
 
     controls.appendChild(ctl('Footer · справа', [
-      ['none', 'Нет'], ['primary', 'Primary'], ['both', 'Secondary + Primary'],
+      ['none', 'Без кнопок'], ['primary', 'Primary'], ['both', 'Secondary + Primary'],
     ], () => state.footRight, v => state.footRight = v));
 
     controls.appendChild(ctl('Контент', [

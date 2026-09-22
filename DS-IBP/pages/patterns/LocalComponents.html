@@ -41,7 +41,7 @@ ol.tight li b{font-weight:600}
   <header class="masthead">
     <p class="eyebrow">Правила и паттерны</p>
     <h1>Локальные компоненты</h1>
-    <p class="meta"><span>Версия: <b>1.003</b></span><span>Обновлено: <b>21.08.2026</b></span></p>
+    <p class="meta"><span>Версия: <b>1.005</b></span><span>Обновлено: <b>21.09.2026</b></span></p>
     <p class="lead">Локальный компонент знает предметную область: он собран из компонентов этой ДС, но фиксирует конкретный состав полей, порядок, термины и правила отображения одного продукта. Тайлы, таблицы, формы, панели — всё это локальные компоненты и живёт по правилам с этой страницы. Сами компоненты и их паспорта хранятся в проекте продукта, здесь только правила.</p>
   </header>
 
@@ -281,8 +281,8 @@ ol.tight li b{font-weight:600}
         <div class="tc tc--separator"></div>
         <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Данных нет</b></span></span></div>
         <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Ответ пришёл пустым: записей нет, заполнение не начиналось</span></span></div>
-        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Пустое состояние внутри компонента: одна строка о том, почему пусто, и действие — если у роли есть право заполнить. Компонент не исчезает с экрана</span></span></div>
-        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">EmptyState</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Пустое состояние внутри компонента: одна строка о том, почему пусто, и действие — если у роли есть право заполнить. Компонент не исчезает с экрана. Чем собирается — зависит от ширины компонента, см. ниже</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">EmptyState · Button</span></span></div>
         <div class="tc tc--separator"></div>
       </div>
       <div class="tbl__row" style="grid-template-columns:8px 0.6fr 0.95fr 1.3fr 0.62fr 8px;">
@@ -303,6 +303,10 @@ ol.tight li b{font-weight:600}
       </div>
     </div>
     <div class="out"><b>Три разные пустоты, которые нельзя показывать одинаково:</b> значения нет (прочерк в поле), записей нет вообще (пустое состояние компонента), данные не удалось получить (ошибка с повтором). Четвёртая, отдельная от них, — у роли нет права видеть эти данные.</div>
+    <p class="claim">Чем собирается пустота — решает ширина компонента, а не вкус.</p>
+    <p class="desc">EmptyState несёт иллюстрацию 96px и центрирует содержимое: это верный вид для компонента во всю ширину, для списка и для таблицы — там пустой экран должен объяснять себя крупно. В узком компоненте (до четырёх колонок из двенадцати) та же иллюстрация съедает всю высоту плашки и оставляет полю причины одну строку в углу: смысл правила — «одна строка и действие» — исполняется, а вид ломается. Поэтому в узком компоненте пустота собирается строкой причины на токенах ДС и кнопкой действия, без иллюстрации и без центрирования: строка встаёт слева вверху контентной области, на месте первого поля.</p>
+    <p class="desc">Правило от этого не раздваивается: состав пустоты один и тот же в обоих случаях — причина плюс действие по праву роли, — меняется только то, чем он собран. Что именно выбрано, компонент записывает в паспорте строкой состояния «Данных нет».</p>
+    <div class="note">Уточнено 20.09.2026 на тайле «КНР» страницы сделки: он стоит на трёх колонках из двенадцати, и EmptyState в нём не помещался. До этого правило называло EmptyState единственным способом.</div>
     <h3>Состояние прав</h3>
     <div class="tbl">
       <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.5fr 0.8fr 8px;">
@@ -322,15 +326,8 @@ ol.tight li b{font-weight:600}
       <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.5fr 0.8fr 8px;">
         <div class="tc tc--separator"></div>
         <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Только просмотр</b></span></span></div>
-        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Действия не рисуются вообще, а не показываются выключенными. Выключенная кнопка обещает право, которого у роли нет, и порождает вопрос «почему нельзя». Состав и порядок полей тот же, что в режиме редактирования</span></span></div>
+        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Править нельзя: у роли нет права или статус сущности, этап процесса не допускает правку — статус при этом сильнее роли. Действия не рисуются вообще, а не показываются выключенными: выключенная кнопка обещает правку, которой сейчас нет, и порождает вопрос «почему нельзя». Состав и порядок полей тот же, что в режиме редактирования</span></span></div>
         <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">ReadOnlyField</span></span></div>
-        <div class="tc tc--separator"></div>
-      </div>
-      <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.5fr 0.8fr 8px;">
-        <div class="tc tc--separator"></div>
-        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><b>Правка временно запрещена</b></span></span></div>
-        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Право есть, но статус сущности или этап процесса не даёт править. Здесь действие остаётся видимым и выключенным, а причина называется в подсказке: она устранима</span></span></div>
-        <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Button · Tooltip</span></span></div>
         <div class="tc tc--separator"></div>
       </div>
       <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.5fr 0.8fr 8px;">

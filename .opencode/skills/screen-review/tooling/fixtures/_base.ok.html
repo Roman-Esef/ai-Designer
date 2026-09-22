@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <!-- ФИКСТУРА сенсора layout-check. Это НЕ экран продукта и не открывается в
-     браузере: файл существует только как вход для проверки самого сторожа,
-     поэтому относительные пути до ds.css/ds.js намеренно не разрешаются.
+     браузере: файл существует только как вход для проверки самого сторожа.
+     Пути до ds.css/ds.js при этом настоящие и резолвятся (21.09.2026, было
+     `../../DS-IBP/` — в никуда): у правила Б34 «локальная ссылка резолвится
+     в файл» вход — ровно эти строки, и эталон обязан нести его в исправном
+     виде, иначе правило доказано на дефекте и не проверено на норме (Л116).
      `_base.ok.html` — эталон без дефектов: на нём ни одно правило не обязано
      давать FAIL. Файл <ID>.bad.html отличается от базы ровно одним дефектом —
      иначе проверка сторожа проверяет не то. У одного правила вариантов может
@@ -20,7 +23,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Фикстура — IBP</title>
-<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<link rel="stylesheet" href="../../../../../DS-IBP/ds.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   body {
@@ -35,6 +38,14 @@
     <aside class="nav nav--rail">
       <div class="nav__list">
         <a class="nav__item nav__item--selected"><i class="nav__ico" data-icon="folder"></i><span class="nav__label">Сделки</span></a>
+        <!-- Пункт-аккордеон в НОРМАЛЬНОМ виде: адрес `#`, страницы открываются
+             под-пунктами. Вход правила Б35 — ds-nav-panel.js отменяет переход
+             по родителю, поэтому осмысленный href на нём недостижим. Эталон
+             обязан нести этот вход исправным (Л116). -->
+        <a class="nav__item nav__item--acc" href="#" aria-expanded="false" aria-controls="fx-sub"><i class="nav__ico" data-icon="folder"></i><span class="nav__label">Отчёты</span><i class="nav__caret" data-icon="chevron-down"></i></a>
+        <div class="nav__sub" id="fx-sub"><div class="nav__sub-in">
+          <a class="nav__item" href="#"><span class="nav__label">Сводный</span></a>
+        </div></div>
       </div>
       <button class="ibtn ibtn--neutral ibtn--m nav__pin" type="button" aria-label="Закрепить панель"><i data-icon="pin"></i></button>
       <div class="nav__footer"><span class="nav__user-text">Иванов И. И.</span></div>
@@ -112,7 +123,18 @@
        было бы — и фикстура стала бы фикцией. */
     var railSize = 'm';
     var railPin = '<button class="ibtn ibtn--neutral ibtn--' + railSize + ' nav__pin" type="button" aria-label="Закрепить панель"><i data-icon="pin"></i></button>';
+
+    /* Разметка с хуком рантайма, собранная и вставленная скриптом, — В НОРМЕ:
+       рядом стоит привязка поддерева. Вход правила З12; без него замечание
+       доказывалось бы только дефектом, а молчание на норме не проверялось бы
+       (Л116). Дефекта здесь нет — эталон обязан молчать. */
+    var host = document.getElementById('fx-actions');
+    if (host) {
+      host.innerHTML = '<button type="button" class="ibtn ibtn--m" aria-label="Открыть настройку" data-modal="fx-modal"><i data-icon="settings"></i></button>';
+      if (window.DSModal) window.DSModal.bindAll(host);
+      if (window.dsIcons) window.dsIcons.apply(host);
+    }
   </script>
-  <script src="../../DS-IBP/scripts/ds.js"></script>
+  <script src="../../../../../DS-IBP/scripts/ds.js"></script>
 </body>
 </html>

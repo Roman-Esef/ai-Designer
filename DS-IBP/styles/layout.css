@@ -11,8 +11,11 @@
               между крошками и контентом отступ 8px (--layout-pad-top);
               контентная область резиновая, на узком окне раскладка перестраивается
               по брейкпоинтам — горизонтального скролла нет.
+   Прокрутка: .ds-scroll — общая полоса прокрутки внутренних областей
+              (только бегунок, гаснет после прокрутки; рантайм scripts/ds-scroll.js).
    Requires:  spacing.css (шкала и сетка .grid12/.col-N), colors.css,
-              nav-panel.css, breadcrumbs.css
+              palette.css и radius.css (бегунок .ds-scroll), nav-panel.css,
+              breadcrumbs.css
    ========================================================================= */
 
 :root {
@@ -67,3 +70,65 @@
 
 /* колоночная сетка — компонент Spacing (.grid12 + .col-N), здесь не дублируется:
    <div class="grid12"><section class="col-3">…</section></div> */
+
+/* ---------- прокрутка: .ds-scroll ----------
+   Общая полоса прокрутки ДС для областей, которые скроллятся внутри экрана
+   (колонки модального окна, списки в панели). Только бегунок: дорожки и
+   стрелок нет, скругление полное, цвет Secondary. В покое бегунок скрыт,
+   появляется при прокрутке и плавно гаснет: класс .is-scrolling ставит и
+   снимает рантайм scripts/ds-scroll.js — делегированно, привязывать не нужно.
+   Место под бегунок зарезервировано (scrollbar-gutter: stable): контент не
+   сдвигается, когда у области появляется скролл.
+   Как гаснет. Переход у псевдоэлемента скроллбара браузеры не поддерживают,
+   поэтому бегунок берёт цвет из border-color самой области (рамки у неё нет:
+   border-style не задан) и заливает себя им широкой правой рамкой, а переход
+   идёт на border-color области. Отсюда инвариант: у элемента с .ds-scroll
+   своей видимой рамки не бывает — рамку ставят обёртке.
+   Прокрутка только по вертикали. Без явного overflow-x браузер вычисляет его
+   в auto (раз overflow-y не visible), и горизонтальный скролл давали
+   невидимые узлы: закрытые тултип и выпадающий список стоят в раскладке
+   (position:absolute + visibility:hidden) и выходят за правый край области
+   (колонки окна КНР, 21.09.2026). clip здесь не годится — при overflow-y:auto
+   он всё равно вычисляется в hidden. Открытый плавающий слой уезжает в
+   DSFloat (position:fixed), поэтому hidden его не обрезает. */
+.ds-scroll {
+  --scroll-w: 8px;     /* ширина бегунка — как у тела Modal */
+  --scroll-show: .1s;  /* появление при прокрутке */
+  --scroll-fade: .3s;  /* затухание после остановки */
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  border-color: transparent;
+  transition: border-color var(--scroll-fade) ease;
+}
+.ds-scroll.is-scrolling {
+  border-color: var(--secondary);
+  transition-duration: var(--scroll-show);
+}
+.ds-scroll::-webkit-scrollbar { width: var(--scroll-w); height: var(--scroll-w); background: transparent; }
+.ds-scroll::-webkit-scrollbar-track,
+.ds-scroll::-webkit-scrollbar-corner { background: transparent; }
+.ds-scroll::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+.ds-scroll::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-full);
+  border-style: solid;
+  border-color: inherit;
+  border-width: 0 calc(100vw + 100vh) 0 0;
+}
+/* Firefox: псевдоэлементов скроллбара нет — тонкая системная полоса с тем
+   же цветом и тем же появлением. Стандартные свойства заданы только здесь:
+   Chrome, увидев scrollbar-color, перестал бы применять ::-webkit-scrollbar. */
+@supports not selector(::-webkit-scrollbar) {
+  .ds-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color var(--scroll-fade) ease;
+  }
+  .ds-scroll.is-scrolling {
+    scrollbar-color: var(--secondary) transparent;
+    transition-duration: var(--scroll-show);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-scroll { transition: none; }
+}

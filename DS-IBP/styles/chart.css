@@ -81,8 +81,9 @@
 .chart__cursor{position:absolute;top:0;width:1px;background:var(--border-dark);opacity:0;pointer-events:none;transition:opacity .1s ease}
 .chart__cursor.is-visible{opacity:1}
 
-/* тултип: контейнер — компонент Tooltip, строки — Chart */
-.chart__tip{position:absolute;z-index:5;pointer-events:none;max-width:280px}
+/* тултип: контейнер — компонент Tooltip, строки — Chart. Слой — общий слой
+   тултипов ДС (--tip-z из tooltip.css, максимальный z-index) */
+.chart__tip{position:absolute;z-index:var(--tip-z);pointer-events:none;max-width:280px}
 .chart__tip-title{display:block;font:var(--type-body-s-strong);margin-bottom:6px}
 .chart__tip-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:8px;padding:1px 0}
 .chart__tip-row .chart__marker{width:10px;height:10px}

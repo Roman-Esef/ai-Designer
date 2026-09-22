@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!-- ФИКСТУРА <Б34>: база + ровно один дефект — у ds.css на два уровня
+     меньше «../», чем нужно. Файла по такому пути нет; по file:// это
+     молчаливый отказ: страница открывается без стилей, ничего не падает.
+     Эталон без дефекта — _base.ok.html. -->
+<!-- ФИКСТУРА сенсора layout-check. Это НЕ экран продукта и не открывается в
+     браузере: файл существует только как вход для проверки самого сторожа.
+     Пути до ds.css/ds.js при этом настоящие и резолвятся (21.09.2026, было
+     `../../DS-IBP/` — в никуда): у правила Б34 «локальная ссылка резолвится
+     в файл» вход — ровно эти строки, и эталон обязан нести его в исправном
+     виде, иначе правило доказано на дефекте и не проверено на норме (Л116).
+     `_base.ok.html` — эталон без дефектов: на нём ни одно правило не обязано
+     давать FAIL. Файл <ID>.bad.html отличается от базы ровно одним дефектом —
+     иначе проверка сторожа проверяет не то. У одного правила вариантов может
+     быть несколько: <ID>@<вариант>.bad.html — один и тот же дефект на разном
+     ВХОДЕ (статическая разметка и разметка из JS-шаблона). Идентификатор —
+     часть имени до «@»; разделитель не точка, её идентификаторы вида K2.1
+     уже содержат.
+     ЦЕНА СОСТОЯНИЯ В ЭТАЛОНЕ. Эталон — общий вход ВСЕХ правил, и состояние,
+     внесённое сюда ради одного из них, становится фактом для остальных:
+     правило, чей предмет — это состояние, теряет возможность быть доказанным
+     парой (`verify` требует молчания на эталоне). Так вышло со склейкой в
+     <script> ниже: она внесена как состояние без дефекта ради отката Л103, и
+     замечание З11 («сколько атрибутов сенсор не прочитал») из-за неё фикстуры
+     не имеет и доказывается мутацией настоящего экрана. Урок Л105. -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Фикстура — IBP</title>
+<link rel="stylesheet" href="../../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: var(--font-text), system-ui, sans-serif;
+    color: var(--text-primary); background: var(--bg-page);
+  }
+  .fx-grid { display: grid; gap: var(--layout-block-gap); }
+</style>
+</head>
+<body>
+  <div class="nav-layout">
+    <aside class="nav nav--rail">
+      <div class="nav__list">
+        <a class="nav__item nav__item--selected"><i class="nav__ico" data-icon="folder"></i><span class="nav__label">Сделки</span></a>
+        <!-- Пункт-аккордеон в НОРМАЛЬНОМ виде: адрес `#`, страницы открываются
+             под-пунктами. Вход правила Б35 — ds-nav-panel.js отменяет переход
+             по родителю, поэтому осмысленный href на нём недостижим. Эталон
+             обязан нести этот вход исправным (Л116). -->
+        <a class="nav__item nav__item--acc" href="#" aria-expanded="false" aria-controls="fx-sub"><i class="nav__ico" data-icon="folder"></i><span class="nav__label">Отчёты</span><i class="nav__caret" data-icon="chevron-down"></i></a>
+        <div class="nav__sub" id="fx-sub"><div class="nav__sub-in">
+          <a class="nav__item" href="#"><span class="nav__label">Сводный</span></a>
+        </div></div>
+      </div>
+      <button class="ibtn ibtn--neutral ibtn--m nav__pin" type="button" aria-label="Закрепить панель"><i data-icon="pin"></i></button>
+      <div class="nav__footer"><span class="nav__user-text">Иванов И. И.</span></div>
+    </aside>
+
+    <div class="screen">
+      <nav class="crumbs"><a class="crumbs__item">Главная</a></nav>
+      <main class="screen__content">
+        <header class="phead">
+          <h1 class="phead__title">Реестр сделок</h1>
+        </header>
+        <div class="phead__actions">
+          <button type="button" class="ibtn ibtn--m" aria-label="Настроить таблицу" data-modal="fx-modal"><i data-icon="settings"></i></button>
+        </div>
+
+        <div class="tile-row">
+          <section class="tile" style="grid-column:span 12">
+            <header class="tile__header"><div class="tile__header-main"><div class="tile__title-row"><h3 class="tile__title">Условия</h3></div></div></header>
+            <div class="tile__grid" style="grid-template-columns:repeat(4,1fr)">
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Номер сделки</span></span><div class="rof__row"><span class="rof__value">DL-2024-000481</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Сумма</span></span><div class="rof__row"><span class="rof__value">1 240 500,00</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Валюта</span></span><div class="rof__row"><div class="rof__value rof__value--chips"><span class="chip chip--fit"><span class="chip__label">RUB</span></span></div></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Дата подписания</span></span><div class="rof__row"><span class="rof__value">20.04.2024</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Статус</span></span><div class="rof__row"><div class="rof__value rof__value--chips"><span class="chip"><span class="chip__label">Активна</span></span></div></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Менеджер</span></span><div class="rof__row"><span class="rof__value">Иванов И. И.</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Срок</span></span><div class="rof__row"><span class="rof__value">31.12.2025</span></div></div>
+              <div class="rof"><span class="ds-label"><span class="ds-label__text">Ставка</span></span><div class="rof__row"><span class="rof__value">12,50</span></div></div>
+            </div>
+          </section>
+        </div>
+        <div class="dtable">
+          <div class="dtable__body">
+            <div class="tbl tbl--scroll" data-table>
+              <div class="tbl__row tbl__row--head" style="grid-template-columns:8px 200px 160px 96px 8px">
+                <div class="th th--separator"></div>
+                <div class="th">Сделка</div>
+                <div class="th">Сумма</div>
+                <div class="th th--center">Действия</div>
+                <div class="th th--separator"></div>
+              </div>
+              <!-- Колонка действий с вложенным .tc__hidden — канонический вид из чит-шита
+                   (TableCell) и вход, на котором Б8 давал ЛОЖНЫЙ FAIL: захват строки
+                   обрывался на внутреннем </div></div>, и последней ячейкой строки
+                   становился сам .tc__hidden. Эталон обязан нести этот вход, иначе
+                   правило «работает», не применяясь к реальным реестрам (класс Л71). -->
+              <div class="tbl__row" style="grid-template-columns:8px 200px 160px 96px 8px">
+                <div class="tc tc--separator"></div>
+                <div class="tc"><span class="tc__text">DL-2024-000481</span></div>
+                <div class="tc tc--numbers"><span class="tc__text">1 240 500,00</span></div>
+                <div class="tc"><div class="tc__hidden"><button class="ibtn ibtn--neutral ibtn--s" aria-label="Изменить"><i data-icon="edit"></i></button></div></div>
+                <div class="tc tc--separator"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-scrim" id="fx-modal" hidden>
+    <div class="modal modal--w4">
+      <div class="modal__head"><h2 class="modal__title">Настройка</h2></div>
+      <div class="modal__body"><p>Состав колонок</p></div>
+    </div>
+  </div>
+  <script>
+    /* Разметка, собранная JS-склейкой: размер приходит переменной, поэтому
+       атрибут class разорван выражением. Дефекта здесь НЕТ — эталон обязан
+       молчать всеми правилами. Случай лежит в базе потому, что 12.09.2026
+       именно он давал ложный FAIL: код между литералами гасился пробелом,
+       разорванный атрибут выглядел литеральным и терял размерный модификатор
+       вместе с вырезанным выражением (урок Л103).
+       Литерал ТОЛЬКО в одинарных кавычках: при двойных сюда попала бы
+       экранированная кавычка, регулярки правил ищут обычную, совпадения не
+       было бы — и фикстура стала бы фикцией. */
+    var railSize = 'm';
+    var railPin = '<button class="ibtn ibtn--neutral ibtn--' + railSize + ' nav__pin" type="button" aria-label="Закрепить панель"><i data-icon="pin"></i></button>';
+
+    /* Разметка с хуком рантайма, собранная и вставленная скриптом, — В НОРМЕ:
+       рядом стоит привязка поддерева. Вход правила З12; без него замечание
+       доказывалось бы только дефектом, а молчание на норме не проверялось бы
+       (Л116). Дефекта здесь нет — эталон обязан молчать. */
+    var host = document.getElementById('fx-actions');
+    if (host) {
+      host.innerHTML = '<button type="button" class="ibtn ibtn--m" aria-label="Открыть настройку" data-modal="fx-modal"><i data-icon="settings"></i></button>';
+      if (window.DSModal) window.DSModal.bindAll(host);
+      if (window.dsIcons) window.dsIcons.apply(host);
+    }
+  </script>
+  <script src="../../../../../DS-IBP/scripts/ds.js"></script>
+</body>
+</html>

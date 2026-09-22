@@ -21,7 +21,8 @@
    Код выхода: 1 при любой невыполненной проверке, иначе 0.
    ============================================================ */
 import { readFile, writeFile, readdir } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import vm from 'node:vm';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import path from 'node:path';
@@ -102,29 +103,82 @@ async function cmdCheck(pageArg) {
     const c = (noScript.match(new RegExp('</' + tag + '>', 'g')) || []).length;
     return o - c;
   };
-  ok(bal('div') === 0, `баланс <div> (${bal('div')})`);
-  ok(bal('section') === 0, `баланс <section> (${bal('section')})`);
-  ok(bal('table') === 0, `баланс <table> (${bal('table')})`);
+  ok(bal('div') === 0, `ДС1 баланс <div> (${bal('div')})`);
+  ok(bal('section') === 0, `ДС2 баланс <section> (${bal('section')})`);
+  ok(bal('table') === 0, `ДС3 баланс <table> (${bal('table')})`);
 
   const count = (re) => (t.match(re) || []).length;
   const countFrame = (re) => (noScript.match(re) || []).length;
-  ok(count(/<\/body>/gi) === 1, `один </body> (${count(/<\/body>/gi)})`);
-  ok(count(/<\/html>/gi) === 1, `один </html> (${count(/<\/html>/gi)})`);
-  ok(count(/ds-toc\.js/g) === 0, `нет ds-toc.js (${count(/ds-toc\.js/g)})`);
-  ok(count(/pg-kit\.js/g) === 0, `нет pg-kit.js (${count(/pg-kit\.js/g)})`);
-  ok(count(/ds-toc\.css/g) === 0, `нет ds-toc.css (${count(/ds-toc\.css/g)})`);
-  ok(count(/styles\/tab\.css/) >= 1, `tab.css подключён (${count(/styles\/tab\.css/)})`);
-  ok(count(/styles\/segment-control\.css/) >= 1, `segment-control.css подключён (${count(/styles\/segment-control\.css/)})`);
-  ok(count(/\{\s*on:\s*'[^']*'\s*,\s*off:/) === 0, `нет {on, off} словарей в DS_SPLIT_SWITCH_LABELS (${count(/\{\s*on:\s*'[^']*'\s*,\s*off:/)})`);
+  ok(count(/<\/body>/gi) === 1, `ДС4 один </body> (${count(/<\/body>/gi)})`);
+  ok(count(/<\/html>/gi) === 1, `ДС5 один </html> (${count(/<\/html>/gi)})`);
+  ok(count(/ds-toc\.js/g) === 0, `ДС6 нет ds-toc.js (${count(/ds-toc\.js/g)})`);
+  ok(count(/pg-kit\.js/g) === 0, `ДС7 нет pg-kit.js (${count(/pg-kit\.js/g)})`);
+  ok(count(/ds-toc\.css/g) === 0, `ДС8 нет ds-toc.css (${count(/ds-toc\.css/g)})`);
+  ok(count(/styles\/tab\.css/) >= 1, `ДС9 tab.css подключён (${count(/styles\/tab\.css/)})`);
+  ok(count(/styles\/segment-control\.css/) >= 1, `ДС10 segment-control.css подключён (${count(/styles\/segment-control\.css/)})`);
+  ok(count(/\{\s*on:\s*'[^']*'\s*,\s*off:/) === 0, `ДС11 нет {on, off} словарей в DS_SPLIT_SWITCH_LABELS (${count(/\{\s*on:\s*'[^']*'\s*,\s*off:/)})`);
   /* .splitpane--app считается по КАРКАСУ (noScript), не по всему файлу: правила
      --app входят в styles/splitter.css, который inject кладёт в src-code-css
      вкладки «Код» (полный CSS компонента) — упоминания в код-образцах легальны.
      Запрет паттерна касается каркаса main.ds-split (урок Splitter, 30.08.2026). */
-  ok(countFrame(/splitpane--app/g) === 0, `нет .splitpane--app в каркасе (${countFrame(/splitpane--app/g)})`);
-  ok(count(/class="page ds-split"/) === 1, `main.page.ds-split (${count(/class="page ds-split"/)})`);
-  ok(count(/docs-split\.js/g) >= 1, `docs-split.js подключён (${count(/docs-split\.js/g)})`);
-  ok(count(/id="src-code-(html|css|js)"/g) === 3, `3 src-code блока (${count(/id="src-code-(html|css|js)"/g)})`);
-  ok(count(/id="pane-docs"/g) === 1 && count(/id="pane-constructor"/g) === 1 && count(/id="pane-code"/g) === 1, 'panes docs/constructor/code');
+  ok(countFrame(/splitpane--app/g) === 0, `ДС12 нет .splitpane--app в каркасе (${countFrame(/splitpane--app/g)})`);
+  ok(count(/class="page ds-split"/) === 1, `ДС13 main.page.ds-split (${count(/class="page ds-split"/)})`);
+  ok(count(/docs-split\.js/g) >= 1, `ДС14 docs-split.js подключён (${count(/docs-split\.js/g)})`);
+  ok(count(/id="src-code-(html|css|js)"/g) === 3, `ДС15 3 src-code блока (${count(/id="src-code-(html|css|js)"/g)})`);
+  ok(count(/id="pane-docs"/g) === 1 && count(/id="pane-constructor"/g) === 1 && count(/id="pane-code"/g) === 1, 'ДС16 panes docs/constructor/code');
+
+  /* ДС17 — у каждого таба своя `.docs-layout > .docs-main`. Это ровно то, что
+     кладёт `scaffold` (константы TABS_OPEN и FOOT_CLOSE), но чего `check` не
+     требовал: панели под «Конструктором» и «Кодом» расходились с «Документацией»
+     по ширине и отступам, и дефект дошёл до человека при зелёной проверке
+     (витрины локальных компонентов, 20.09.2026). Правило требуют ds-rules §11. */
+  const paneSlice = (id) => {
+    const at = t.indexOf('id="' + id + '"');
+    if (at < 0) return null;
+    const start = t.lastIndexOf('<div', at);
+    return start < 0 ? null : sliceTag(t, start, 'div');
+  };
+  const noLayout = ['pane-docs', 'pane-constructor', 'pane-code'].filter((id) => {
+    const s = paneSlice(id);
+    return !s || !/class="docs-layout"/.test(s) || !/class="docs-main"/.test(s);
+  });
+  ok(noLayout.length === 0, noLayout.length
+    ? `ДС17 без .docs-layout > .docs-main: ${noLayout.join(', ')} — вёрстка под табами разойдётся`
+    : 'ДС17 у всех трёх табов общий контейнер .docs-layout > .docs-main');
+
+  /* ДС18 — переключатель языка во вкладке «Код» собран компонентом ДС, а не
+     руками. Эталон — та же разметка, что кладёт `scaffold`. Самодельные `.seg`
+     на странице не запрещены (Л12 оставляет их локальным стилям), запрещено
+     собирать ими ЭТОТ переключатель: он часть каркаса вкладки. */
+  const codePane = paneSlice('pane-code') || '';
+  const switchOk = /class="segctrl[^"]*"[^>]*\bdata-segctrl\b/.test(codePane)
+    && /class="segctrl__thumb"/.test(codePane)
+    && (codePane.match(/class="segctrl__item"[^>]*data-lang="/g) || []).length === 3;
+  ok(switchOk, switchOk
+    ? 'ДС18 переключатель языка — штатный segctrl с тремя сегментами'
+    : 'ДС18 во вкладке «Код» нет штатного сегмент-контрола (.segctrl[data-segctrl] + .segctrl__thumb + три .segctrl__item[data-lang])');
+
+  /* ДС19 — инлайновый скрипт компилируется. Конструктор страницы строится
+     скриптом, и синтаксическая ошибка в нём убивает ВСЮ страницу: ни контролов,
+     ни демо, ни табов — а статические проверки этого не видят (витрина карточки
+     контрагента, 20.09.2026). Компиляция без исполнения: разметки и рантаймов
+     здесь нет, выполнять нечего и небезопасно. */
+  const broken = [];
+  for (const m of t.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    const attrs = m[1] || '';
+    if (/\bsrc=/.test(attrs)) continue;
+    if (/\btype="(?!text\/javascript)/.test(attrs)) continue;   // text/plain — образцы кода, module — не вход vm.Script
+    const lineOffset = t.slice(0, m.index).split('\n').length - 1;
+    try {
+      new vm.Script(m[2], { filename: name, lineOffset });
+    } catch (e) {
+      const line = (e.stack || '').match(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ':(\\d+)'));
+      broken.push(`строка ${line ? line[1] : '?'}: ${e.message}`);
+    }
+  }
+  ok(broken.length === 0, broken.length
+    ? `ДС19 инлайновый скрипт не компилируется — ${broken.join('; ')}`
+    : 'ДС19 инлайновые скрипты компилируются');
 
   let bad = 0;
   log(`== check ${name} ==`);
@@ -488,12 +542,32 @@ async function cmdMap() {
   process.exit(0);
 }
 
+/* ---------------- --rules ----------------
+
+   Состав проверок печатает сам инструмент, а не проза в шапке: перечисление
+   в тексте разъезжается с кодом (Л43, Л50). Отсюда же реестр якорей
+   (`lessons-cli anchors`) берёт пространство `док-сплит` — на эти
+   идентификаторы ссылается журнал уроков. */
+function printRules() {
+  const src = readFileSync(fileURLToPath(import.meta.url), 'utf8');
+  const ids = [...new Set([...src.matchAll(/[`'"]\s*(ДС\d{1,2})(?!\d)/gu)].map((m) => m[1]))];
+  ids.sort((a, b) => parseInt(a.slice(2), 10) - parseInt(b.slice(2), 10));
+  log('== docs-split check: реализованные проверки ==');
+  log('');
+  log('док-сплит:ДС — структура страницы документации (паттерн «сплиттер + табы»):');
+  log('  ' + ids.join(' '));
+  log('');
+  log('Якорь для журнала уроков пишется с пространством имён: док-сплит:ДС17.');
+  log('Пространство кириллическое — латинское имя `lessons-cli check` не валидирует.');
+}
+
 /* ---------------- main ---------------- */
 
 const args = process.argv.slice(2);
 const cmd = args[0];
+if (args.includes('--rules')) { printRules(); process.exit(0); }
 if (!cmd) {
-  log('Использование: node docs-split.mjs <map|scaffold|inject|rollout|check> [page] [--css styles/x.css] [--html]');
+  log('Использование: node docs-split.mjs <map|scaffold|inject|rollout|check> [page] [--css styles/x.css] [--html] | --rules');
   process.exit(1);
 }
 const pageArg = args.slice(1).find((a) => !a.startsWith('--'));

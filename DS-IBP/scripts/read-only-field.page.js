@@ -22,10 +22,10 @@
     /* Тултип живёт в <body> и позиционируется fixed относительно цели: строка
        значения слишком низкая, чтобы вместить тултип НАД иконкой внутри себя —
        раньше он прижимался к верху строки, перекрывал иконку и мигал (курсор
-       уходил с цели). pointer-events:none — курсор всегда остаётся на цели. */
+       уходил с цели). pointer-events:none — курсор всегда остаётся на цели.
+       z-index не ставится: слой даёт класс .tip (--tip-z, максимальный). */
     el.style.position = 'fixed';
     el.style.pointerEvents = 'none';
-    el.style.zIndex = '1000';
     return el;
   }
   /* По центру НАД целью с зазором 8px; если сверху не помещается — переворот
@@ -51,10 +51,11 @@
       timer = setTimeout(() => {
         tip = makeFloatingTip(text, opts);
         document.body.appendChild(tip);
+        /* сначала показать, потом мерить: закрытый тултип — display:none
+           (tooltip.css), размера у него нет; появление даёт @starting-style */
+        tip.classList.add('is-visible');
         positionTipAbove(container, tip, target);
         window.addEventListener('scroll', hide, true);
-        void tip.offsetHeight; // reflow вместо rAF: кадры могут быть заморожены в фоновой вкладке
-        tip.classList.add('is-visible');
       }, 280);
     }
     function hide() {
@@ -70,9 +71,8 @@
   function flashTip(container, target, text, ms = 1300) {
     const tip = makeFloatingTip(text, { type: 'main' });
     document.body.appendChild(tip);
-    positionTipAbove(container, tip, target);
-    void tip.offsetHeight;
     tip.classList.add('is-visible');
+    positionTipAbove(container, tip, target);
     setTimeout(() => {
       tip.classList.remove('is-visible');
       setTimeout(() => tip.remove(), 160);

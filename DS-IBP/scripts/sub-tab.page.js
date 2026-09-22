@@ -165,7 +165,7 @@
     controls.appendChild(select('Кол-во подразделов', [['2', '2'], ['3', '3'], ['4', '4'], ['5', '5']],
       function () { return state.count; },
       function (v) { state.count = +v; if (state.selected >= state.count) state.selected = 0; }));
-    controls.appendChild(select('Длина подписей', [['short', 'Короткие'], ['long', 'Длинные']],
+    controls.appendChild(select('Длина подписей', [['short', 'Короткие подписи'], ['long', 'Длинные подписи']],
       function () { return state.labels; },
       function (v) { state.labels = v; }));
     controls.appendChild(ctlToggle('Счётчик (badge)', 'withBadge'));

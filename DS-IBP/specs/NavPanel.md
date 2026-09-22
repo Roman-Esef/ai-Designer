@@ -1,8 +1,8 @@
 ---
 component: NavPanel
 title: "Панель навигации"
-version: "1.019"
-updated: "13.09.2026"
+version: "1.020"
+updated: "21.09.2026"
 page: pages/organisms/NavPanel.html
 page_js: scripts/nav-panel.page.js
 runtime: scripts/ds-nav-panel.js (+ scripts/ds-tooltip.js — тултип усечённой подписи пункта/футера)
@@ -84,7 +84,7 @@ NavPanel — главная навигация приложения в лево�
 | Сворачивание drawer кликом вне / Esc | Drawer (не Fixed) сворачивается в rail кликом вне `.nav` или по Esc; клики внутри открытых модалок (смена роли) панель не сворачивают; панели с `data-nav-modes="no"` не затрагиваются |
 | Вложенные разделы | Рендер родителя — по данным (`item.tile.links`), по умолчанию свёрнут; клик по `.nav__item--acc` переключает `aria-expanded`, в rail клик разворачивает панель |
 | Rail-тултипы | Подписи `.nav__label` позиционируются `position:fixed` справа от панели (зазор 10px); пересчёт по hover, focus, скроллу списка и resize |
-| Футер | Строка пользователя + выход — `IBPHome.footerHTML(role)` (данные пользователя — `IBPHome.user`); тултип усечённой подписи рисуется ВЫШЕ панели (`zIndex:2000`) |
+| Футер | Строка пользователя + выход — `IBPHome.footerHTML(role)` (данные пользователя — `IBPHome.user`); тултип усечённой подписи рисуется ВЫШЕ панели — слоем Tooltip (`--tip-z`, максимальный z-index); своего `zIndex` панель с 1.020 не передаёт |
 | Каретка аккордеона | `.nav__caret` прижата вправо (`margin-left:auto`) — на одной вертикали независимо от длины подписи и от обёртки `.tip-anchor` при усечении |
 | Настройки на панели | `data-nav-collapsed-mode` (drawer\|fixed — куда разворачивает бургер) · `data-nav-modes="no"` (только тултипы, режимы не переключаются) · `data-nav-auto="no"` (не подключать) |
 | Закрепление между страницами | fixed-режим живой панели (`.nav-layout`) сохраняется в `localStorage` (`ibp.navpanel.mode`) и восстанавливается при загрузке; при переходе в rail/drawer ключ очищается |

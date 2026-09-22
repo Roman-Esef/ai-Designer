@@ -12,8 +12,19 @@
      --tip-bg   — фон тултипа и стрелки
      --tip-fg   — цвет текста
      --tip-max  — максимальная ширина контейнера
+     --tip-z    — слой тултипа (:root): максимальный z-index, общий для всех
+                  тултипов ДС, в том числе чужих классов (.chart__tip)
    Requires: typography.css, colors.css
    ========================================================================= */
+
+/* Слой тултипа — максимальный z-index (2^31−1). Тултип поверх всего, что есть
+   в ДС: панели навигации (1000), модалки (1000/1010), календаря (9500),
+   снекбара (9900). Раньше было 30: слой DSFloat не создаёт своего контекста
+   наложения, и на странице сделки тултип уходил под панель навигации
+   (21.09.2026). На :root, а не на .tip — токен читают и тултипы других
+   компонентов (.chart__tip). Инлайновый z-index в рантаймах не ставится:
+   он перебил бы этот слой. */
+:root { --tip-z: 2147483647; /* @kind other */ }
 
 /* Парные `[hidden]` — правило B11 линтера.
    Браузерное `[hidden] { display: none }` живёт в UA-стиле со специфичностью
@@ -48,7 +59,7 @@
   overflow: hidden;
   text-overflow: ellipsis;           /* защита, если контент длиннее --tip-max и JS не переключил на --multiline */
   box-shadow: 0 4px 14px rgba(40, 50, 55, .18);
-  z-index: 30;
+  z-index: var(--tip-z);
 }
 
 /* перенос длинного контента — ограничение по --tip-max */
@@ -164,16 +175,26 @@
 .tip.tip--floating {
   position: absolute;
   opacity: 0;
+  /* закрытый тултип выключен из раскладки полностью: visibility:hidden
+     оставляет его в потоке прокрутки, и невидимый узел удлиняет страницу
+     или колонку, давая лишний скролл (страницы документации, окно КНР,
+     21.09.2026). display в переходе — с allow-discrete, появление —
+     через @starting-style. Размер тултипа меряют ПОСЛЕ .is-visible. */
+  display: none;
   visibility: hidden;
   transform: scale(.96);
   transform-origin: var(--tip-origin, center);
-  transition: opacity .14s ease, transform .14s ease, visibility 0s linear .14s;
+  transition: opacity .14s ease, transform .14s ease, visibility 0s linear .14s, display .14s allow-discrete;
 }
 .tip.tip--floating.is-visible {
+  display: inline-block;
   opacity: 1;
   visibility: visible;
   transform: scale(1);
   transition: opacity .14s ease, transform .14s ease;
+}
+@starting-style {
+  .tip.tip--floating.is-visible { opacity: 0; transform: scale(.96); }
 }
 @media (prefers-reduced-motion: reduce) {
   .tip.tip--floating { transition: opacity .01s; transform: none; }
@@ -182,6 +203,7 @@
 
 /* pinned — always-visible positioned tooltip (demos that aren't hover-triggered) */
 .tip.tip--floating.tip--pinned {
+  display: inline-block;
   opacity: 1;
   visibility: visible;
   transform: none;

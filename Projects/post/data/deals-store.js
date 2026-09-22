@@ -10,6 +10,8 @@
                                              обрезанным пробелам
      statusTone(value[, scope]) → класс   — тон статусного чипа; scope 'mon' —
                                              словарь статусов мониторинга
+     isEditable(deal) → boolean           — допускает ли статус сделки правку
+                                             её сущностей (см. READ_ONLY_STATUSES)
      create(partial) → запись             — новая сделка (см. ниже)
      update(id, patch) → запись|null
      on(type, fn) → off()                 — подписка на 'change'
@@ -68,6 +70,19 @@
   function statusTone(value, scope) {
     var map = (scope === 'mon') ? TONE_MON : TONE_GENERAL;
     return map[value] || 'chip--dark';
+  }
+
+  /* Статусы сделки, в которых её сущности не правятся — при любой роли.
+     Требования (deal_post/Текущий портфель.md): «В активной сделке нельзя
+     редактировать сущности». Погашенная сделка и оба этапа утверждения —
+     решение человека 21.09.2026. Список живёт рядом со словарём тонов по той
+     же причине: страница сделки и реестр читают одно правило. Статус без
+     запрета (Черновик, Корректировка, Ввод изменений…) правку не закрывает —
+     что можно роли, решают её права. */
+  var READ_ONLY_STATUSES = ['Активная', 'Погашена', 'Ожидает подтверждения', 'Подтверждение изменений'];
+
+  function isEditable(deal) {
+    return !!deal && READ_ONLY_STATUSES.indexOf(deal.status) === -1;
   }
 
   function byId(id) {
@@ -132,6 +147,7 @@
     create: create,
     update: update,
     statusTone: statusTone,
+    isEditable: isEditable,
     on: on,
   };
 })();

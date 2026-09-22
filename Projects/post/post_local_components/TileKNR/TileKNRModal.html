@@ -1,0 +1,188 @@
+<!-- Связанный артефакт тайла «КНР»: модальное окно поиска и выбора ключевого
+     носителя риска. Фрагмент вшивается ассемблером отдельной меткой ds-include —
+     скрим должен лежать в конце body, а не внутри тайла.
+
+     Два таба: юрлица и физлица. Под каждым — три колонки: форма поиска,
+     результаты поиска и участники сделки.
+
+     Карточек в разметке нет. Разметку карточки даёт локальный компонент
+     «Карточка контрагента» (метка ниже вшивает его шаблон), а данные приходят
+     из CounterpartiesStore — так же, как реестр портфеля рисует сделки из
+     mock-deals.js. Раскладывает одно по другому TileKNRModal.js: он же
+     переключает панели табов (рантайма показа панели в ДС нет), ищет по базе
+     контрагентов, переносит карточки между колонками (кнопкой со стрелками и
+     двойным кликом) и ведёт черновик: «Сохранить» применяет правки к сделке,
+     крестик и Esc их отменяют.
+
+     Формы поиска — <form>: Enter в любом поле запускает поиск так же, как
+     «Найти». Колонки «Найдено» и «Физические лица» пусты, пока поиск не задан.
+
+     Что различает колонки: пока контрагент не участник сделки, у него нет ни
+     чекбокса «КНР», ни строки ГСЗ, ни риск-метрики — их показывает только
+     третья колонка. Правило живёт в сторе и в CSS карточки, не здесь.
+
+     Раскладка: окно шириной 8 колонок (modal--w8) и фиксированной высоты
+     (60vh — не прыгает при смене вкладки), колонки разделены вертикальными
+     Divider. У каждой колонки свой скролл с полосой ДС (.ds-scroll, Layout):
+     бегунок стоит вплотную к разделителю, появляется при прокрутке и гаснет.
+     Заголовок H6 Strong и линия под ним стоят на месте. -->
+
+<div class="modal-scrim" id="knr-scrim" hidden>
+
+  <!-- эталон карточки: единственный источник её разметки -->
+  <ds-include src="../CardCounterparty/CardCounterparty.html"></ds-include>
+
+  <!-- data-mode — режим прав окна: edit | view. Ставит страница: статус сделки,
+       не допускающий правку, даёт view при любой роли. В view поиск работает,
+       но карточки не переносятся, отметка «КНР» не меняется, а вместо
+       «Сохранить» — «Закрыть» (TileKNRModal.css, TileKNRModal.js). -->
+  <div class="modal modal--w8 lc-knrm" data-mode="edit" role="dialog" aria-modal="true" aria-labelledby="knr-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="knr-title">Ключевой носитель риска</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+
+    <div class="modal__body">
+
+      <div class="tabs tabs--horiz" role="tablist" data-tabs id="knr-tabs">
+        <button type="button" class="tab tab--s tab--selected" role="tab" aria-selected="true" tabindex="0">
+          <span class="tab__label">Юридические лица</span></button>
+        <button type="button" class="tab tab--s" role="tab" aria-selected="false" tabindex="-1">
+          <span class="tab__label">Физические лица</span></button>
+      </div>
+
+      <!-- ══ Панель: юридические лица ══════════════════════════════════ -->
+      <div class="lc-knrm__cols" data-knr-panel>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Параметры поиска</h3>
+          <hr class="dvd dvd--h">
+          <form class="lc-knrm__form ds-scroll" data-knr-search="ul" novalidate>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-name"><span class="ds-label__text">Наименование</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-name" name="name"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-inn"><span class="ds-label__text">ИНН</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-inn" name="inn" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-kpp"><span class="ds-label__text">КПП</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-kpp" name="kpp" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-ogrn"><span class="ds-label__text">ОГРН</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-ogrn" name="ogrn" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-kio"><span class="ds-label__text">КИО</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-kio" name="kio" inputmode="numeric"></div>
+            </div>
+            <button type="submit" class="btn btn--outline btn--m btn--fullwidth"><span class="btn__label">Найти</span></button>
+          </form>
+        </section>
+
+        <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Найдено</h3>
+          <hr class="dvd dvd--h">
+          <div class="lc-knrm__drop ds-scroll" data-knr-drop="ul-found">
+            <p class="lc-knrm__hint" data-knr-hint>Поиск осуществляется по любому из параметров</p>
+          </div>
+        </section>
+
+        <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Участники сделки</h3>
+          <hr class="dvd dvd--h">
+          <div class="lc-knrm__drop ds-scroll" data-knr-drop="ul-members">
+            <p class="lc-knrm__hint">Перенесите выбранных участников сделки сюда.
+              Добавить можно только носителей риска или все группы и контрагентов, участвующих в сделке.</p>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ══ Панель: физические лица ═══════════════════════════════════ -->
+      <!-- Поиск физлиц возможен только среди юрлиц — участников сделки,
+           поэтому первое поле формы — выбор юрлица из уже перенесённых.
+           Опции списка собирает TileKNRModal.js из участников сделки. -->
+      <div class="lc-knrm__cols" data-knr-panel hidden>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Параметры поиска</h3>
+          <hr class="dvd dvd--h">
+          <form class="lc-knrm__form ds-scroll" data-knr-search="fl" novalidate>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-ul"><span class="ds-label__text">Юридическое лицо</span></label>
+              <div class="inp__field" role="combobox" aria-expanded="false" aria-controls="knr-fl-ul-list" data-ddl="knr-fl-ul-list">
+                <input class="inp__control" id="knr-fl-ul" placeholder="Поиск…" autocomplete="off">
+                <span class="inp__acts">
+                  <button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button>
+                </span>
+              </div>
+              <div id="knr-fl-ul-list" class="ddl ddl--floating" role="listbox"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-inn"><span class="ds-label__text">ИНН</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-fl-inn" name="inn" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-bd"><span class="ds-label__text">Дата рождения</span></label>
+              <div class="inp__field">
+                <input class="inp__control" id="knr-fl-bd" name="birthDate" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
+                <span class="inp__acts">
+                  <button type="button" class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button>
+                </span>
+              </div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-pass"><span class="ds-label__text">Номер паспорта</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-fl-pass" name="passport" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-tel"><span class="ds-label__text">Номер телефона</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-fl-tel" name="phone" inputmode="tel"></div>
+            </div>
+            <button type="submit" class="btn btn--outline btn--m btn--fullwidth"><span class="btn__label">Найти</span></button>
+          </form>
+        </section>
+
+        <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Физические лица</h3>
+          <hr class="dvd dvd--h">
+          <div class="lc-knrm__drop ds-scroll" data-knr-drop="fl-found">
+            <p class="lc-knrm__hint" data-knr-hint>Поиск осуществляется по юридическим лицам, входящим в участники сделки</p>
+          </div>
+        </section>
+
+        <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Участники сделки</h3>
+          <hr class="dvd dvd--h">
+          <!-- Юрлица здесь тоже видны, но с этой вкладки их не трогают: они
+               рисуются недоступными (Disabled у Card). Зеркально на вкладке
+               юрлиц недоступны физлица. Удаление юрлица не тянет за собой
+               удаление входящих в него физлиц. -->
+          <div class="lc-knrm__drop ds-scroll" data-knr-drop="fl-members">
+            <p class="lc-knrm__hint">Перенесите выбранных физических лиц сюда</p>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--accent btn--m" data-knr-save data-modal-close><span class="btn__label">Сохранить</span></button>
+        <button type="button" class="btn btn--outline btn--m lc-knrm__close" data-modal-close><span class="btn__label">Закрыть</span></button>
+      </div>
+    </footer>
+  </div>
+</div>

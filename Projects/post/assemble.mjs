@@ -35,6 +35,11 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+/* Предикат «в файле есть метка сборки» — общий с оснасткой приёмки: витрина
+   показывает `<ds-include>` примером кода во вкладке «Код», и по подстроке
+   пример неотличим от настоящей метки. Владелец разбора один (Л43); там же
+   причина, по которой вырезаются скрипты и <pre>. */
+import { hasActiveInclude } from '../../.opencode/skills/screen-review/tooling/fragments.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
@@ -142,7 +147,35 @@ function cssFor(inputDir, src, override) {
   return existsSync(path.resolve(inputDir, rel)) ? rel : null;
 }
 
-/* Обработка одной метки: возвращает строку фрагмента, готовую к вставке. */
+/* Элементы без закрывающего тега — у них «конец элемента» равен концу
+   открывающего тега. Нужен проверке «один корень». */
+const VOID_TAGS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img',
+  'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+
+/* Где кончается корневой элемент: от его открывающего тега идём с глубиной,
+   считая одноимённые вложенные теги. Комментарии и примеры кода пропускаем —
+   в них бывает разметка примера. Вернёт -1, если парный закрывающий не нашёлся. */
+function findElementEnd(frag, root) {
+  const nameMatch = /^<\s*([a-zA-Z][\w-]*)/.exec(frag.slice(root.start, root.end));
+  if (!nameMatch) return -1;
+  const name = nameMatch[1].toLowerCase();
+  if (VOID_TAGS.has(name) || /\/\s*>$/.test(frag.slice(root.start, root.end))) return root.end;
+
+  const re = new RegExp('<\\s*(/?)' + name + '\\b[^>]*>', 'gi');
+  const inert = inertRanges(frag);
+  const inInert = (pos) => inert.some((r) => pos >= r[0] && pos < r[1]);
+  re.lastIndex = root.end;
+  let depth = 1;
+  let m;
+  while ((m = re.exec(frag)) !== null) {
+    if (inInert(m.index)) continue;
+    if (m[1]) { if (--depth === 0) return m.index + m[0].length; }
+    else if (!/\/\s*>$/.test(m[0])) depth++;
+  }
+  return -1;
+}
+
+/* Обработка одной метки: возвращает разметку фрагмента и путь до его файла. */
 function loadFragment(inputDir, tag) {
   const attrs = parseAttrs(tag);
   const rel = attrs.src;
@@ -164,6 +197,18 @@ function loadFragment(inputDir, tag) {
   const root = findRootTag(frag);
   if (!root) fail('во фрагменте нет корневого элемента: ' + rel);
 
+  /* Один корень — требование контракта, но до 20.09.2026 его никто не проверял.
+     Цена молчания: сборщик вставляет все корни, а рантайм ds-include.js берёт
+     только первый (doc.body.firstElementChild) — один и тот же фрагмент даёт
+     разный DOM в сборке и в браузере. */
+  const rootEnd = findElementEnd(frag, root);
+  if (rootEnd === -1) fail('у корневого элемента фрагмента нет парного закрывающего тега: ' + rel);
+  const tail = frag.slice(rootEnd).replace(/<!--[\s\S]*?-->/g, '').trim();
+  if (tail) {
+    fail('во фрагменте ' + rel + ' больше одного корневого элемента — после корня идёт: ' +
+         tail.slice(0, 60).replace(/\s+/g, ' ') + '…');
+  }
+
   // перенос атрибутов метки на корень (паритет с рантаймом ds-include.js)
   const extra = {};
   if (attrs.id) extra.id = attrs.id;
@@ -180,12 +225,18 @@ function loadFragment(inputDir, tag) {
   const rootOpen = frag.slice(root.start, root.end);
   const newOpen = injectAttrs(rootOpen, extra);
 
-  return frag.slice(0, root.start) + newOpen + frag.slice(root.end);
+  return { html: frag.slice(0, root.start) + newOpen + frag.slice(root.end), file: file };
 }
 
-/* Найти диапазоны HTML-комментариев <!-- … -->, чтобы не принимать за метки
-   упоминания <ds-include …> в тексте комментариев. */
-function commentRanges(text) {
+/* Диапазоны, где метка — не метка: HTML-комментарий и содержимое <script>,
+   <pre>, <code>. Комментарии считались и раньше; блоки кода добавлены
+   20.09.2026 — витрина компонента показывает `<ds-include>` примером кода во
+   вкладке «Код», и без этого ассемблер подставлял фрагмент прямо в пример.
+   Тот же признак при ОТБОРЕ источников считает `hasActiveInclude` из
+   fragments.mjs — разбор один на оба применения (Л43). */
+const INERT_BLOCKS = /<(script|pre|code)\b[^>]*>[\s\S]*?<\/\1>/gi;
+
+function inertRanges(text) {
   const ranges = [];
   let i = 0;
   while (i < text.length) {
@@ -196,6 +247,10 @@ function commentRanges(text) {
     ranges.push([start, end + 3]);
     i = end + 3;
   }
+  const re = new RegExp(INERT_BLOCKS.source, 'gi');
+  let m;
+  while ((m = re.exec(text))) ranges.push([m.index, m.index + m[0].length]);
+  ranges.sort(function (a, b) { return a[0] - b[0]; });
   return ranges;
 }
 
@@ -218,33 +273,41 @@ function injectCss(html, hrefs) {
   return html.slice(0, headAt) + block.slice(1) + '\n' + html.slice(headAt);
 }
 
-/* Основной цикл замены. */
-function assemble(source, inputDir) {
-  let out = source;
-  const inlined = [];
-  const cssHrefs = [];
-  /* Диапазоны комментариев пересчитываются на каждой итерации, а НЕ один раз по
+/* Раскрыть метки в тексте. Рекурсивно: фрагмент может включать другой фрагмент —
+   так переиспользуемый компонент («Общие») попадает внутрь предметного.
+
+   base      — папка, относительно которой считаются src меток ЭТОГО текста.
+               У источника это его папка, у фрагмента — папка самого фрагмента:
+               компонент пишет пути от себя и не знает, кто его включил.
+   sourceDir — папка собираемой страницы. От неё считаются href у <link>, потому
+               что резолвятся они браузером относительно .preview.html.
+   ctx       — общее на прогон: что вшито, какой CSS собран, счётчик меток.
+   stack     — цепочка включений: защита от цикла A → B → A. */
+function expand(text, base, sourceDir, ctx, stack) {
+  let out = text;
+  /* Своя регулярка на каждый вызов. TAG_OPEN_RE хранит lastIndex, и вложенный
+     вызов затёр бы позицию внешнего цикла — часть меток осталась бы текстом. */
+  const re = new RegExp(TAG_OPEN_RE.source, 'gi');
+  /* Инертные диапазоны пересчитываются на каждой итерации, а НЕ один раз по
      исходнику: вставка фрагмента сдвигает все позиции после неё, и настоящая
      метка попадает в устаревший диапазон — её молча пропускают вместе с куском
      страницы. Ловится только счётом вшитых фрагментов, поэтому build() его и
      печатает. */
-  let comments = commentRanges(out);
-  let loops = 0;
+  let inert = inertRanges(out);
 
-  function inComment(pos) {
-    return comments.some(function (r) { return pos >= r[0] && pos < r[1]; });
+  function inInert(pos) {
+    return inert.some(function (r) { return pos >= r[0] && pos < r[1]; });
   }
 
-  TAG_OPEN_RE.lastIndex = 0;
   while (true) {
-    if (++loops > 200) fail('похоже на бесконечный цикл: больше 200 меток');
-    const m = TAG_OPEN_RE.exec(out);
+    if (++ctx.loops > 500) fail('похоже на бесконечный цикл: больше 500 меток');
+    const m = re.exec(out);
     if (!m) break;
 
-    if (inComment(m.index)) {
-      // метка — на самом деле текст внутри комментария: пропустить комментарий
-      const range = comments.find(function (r) { return m.index >= r[0] && m.index < r[1]; });
-      TAG_OPEN_RE.lastIndex = range[1];
+    if (inInert(m.index)) {
+      // метка — текст внутри комментария или примера кода: пропустить блок
+      const range = inert.find(function (r) { return m.index >= r[0] && m.index < r[1]; });
+      re.lastIndex = range[1];
       continue;
     }
 
@@ -263,18 +326,43 @@ function assemble(source, inputDir) {
     }
 
     const attrs = parseAttrs(tag);
-    const frag = loadFragment(inputDir, tag);
-    inlined.push(attrs.src + (attrs.id ? '  (id="' + attrs.id + '")' : ''));
+    const loaded = loadFragment(base, tag);
 
-    const css = cssFor(inputDir, attrs.src, attrs.css);
-    if (css && cssHrefs.indexOf(css) === -1) cssHrefs.push(css);
+    if (stack.indexOf(loaded.file) !== -1) {
+      fail('цикл включений: ' + stack.concat([loaded.file])
+        .map(function (f) { return path.relative(HERE, f).split(path.sep).join('/'); })
+        .join(' → '));
+    }
+
+    ctx.inlined.push(attrs.src + (attrs.id ? '  (id="' + attrs.id + '")' : ''));
+
+    /* CSS компонента лежит рядом с ним, а href в <link> читается от страницы —
+       поэтому путь пересчитывается, а не берётся как написан в метке. Для метки
+       верхнего уровня base === sourceDir и строка не меняется. */
+    const cssRel = cssFor(base, attrs.src, attrs.css);
+    if (cssRel) {
+      const href = path.relative(sourceDir, path.resolve(base, cssRel)).split(path.sep).join('/');
+      if (ctx.cssHrefs.indexOf(href) === -1) ctx.cssHrefs.push(href);
+    }
+
+    // сначала раскрываем вложенные метки — от папки САМОГО фрагмента
+    const frag = expand(loaded.html, path.dirname(loaded.file), sourceDir, ctx,
+                        stack.concat([loaded.file]));
 
     out = out.slice(0, tagStart) + frag + out.slice(closeEnd);
-    comments = commentRanges(out);
-    TAG_OPEN_RE.lastIndex = tagStart + frag.length;
+    inert = inertRanges(out);
+    // фрагмент уже раскрыт целиком — продолжаем за ним
+    re.lastIndex = tagStart + frag.length;
   }
 
-  return { html: injectCss(out, cssHrefs), inlined: inlined, css: cssHrefs };
+  return out;
+}
+
+/* Основной цикл замены. */
+function assemble(source, inputDir) {
+  const ctx = { inlined: [], cssHrefs: [], loops: 0 };
+  const out = expand(source, inputDir, inputDir, ctx, []);
+  return { html: injectCss(out, ctx.cssHrefs), inlined: ctx.inlined, css: ctx.cssHrefs };
 }
 
 /* Собрать один источник. */
@@ -296,15 +384,24 @@ function build(inputPath) {
   console.log('assemble: готово → ' + path.relative(HERE, outputPath).split(path.sep).join('/'));
 }
 
-/* Источники направления: любой .html внутри Projects/post/ с меткой <ds-include>.
-   Собранные *.preview.html пропускаются — они результат, а не источник. */
+/* Источники направления: целая СТРАНИЦА внутри Projects/post/ с меткой
+   <ds-include>. Собранные *.preview.html пропускаются — они результат.
+
+   Условие «это страница» обязательно. С тех пор как фрагмент может включать
+   другой фрагмент, метка встречается и во фрагментах — а фрагмент источником не
+   является: у него нет <head>, и injectCss уронил бы на нём весь прогон
+   («в источнике нет </head>»), либо рядом с компонентом появился бы мусорный
+   <Имя>.preview.html. */
 function findSources(dir, out) {
   out = out || [];
   for (const e of readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, e.name);
     if (e.isDirectory()) { findSources(full, out); continue; }
     if (!e.isFile() || !/\.html$/i.test(e.name) || /\.preview\.html$/i.test(e.name)) continue;
-    if (readFileSync(full, 'utf8').indexOf('<ds-include') !== -1) out.push(full);
+    const text = readFileSync(full, 'utf8');
+    if (!hasActiveInclude(text)) continue;
+    if (!/<html[\s>]/i.test(text) && !/^﻿?\s*<!DOCTYPE/i.test(text)) continue;
+    out.push(full);
   }
   return out;
 }

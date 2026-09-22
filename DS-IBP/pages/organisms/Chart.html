@@ -81,7 +81,7 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;col
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.002</b></span><span>Обновлено: <b>05.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.003</b></span><span>Обновлено: <b>21.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>Chart</h1>
     <p class="lead">Графики данных: столбчатые, линейные, области, круговые, точечные, водопад и спарклайн — одна анатомия на все типы. Предметной области компонент не знает: подписи серий, категории и числа приходят данными. Цвета серий — палитра <code class="tok">--chart-*</code> из <a class="inl" href="../foundations/Colors.html">Colors</a>, тултип — <a class="inl" href="../molecules/Tooltip.html">Tooltip</a>, служебные состояния — <a class="inl" href="../molecules/Alert.html">Alert</a> и <a class="inl" href="../atoms/Skeleton.html">Skeleton</a>, переключатель периода — <a class="inl" href="../molecules/SegmentControl.html">SegmentControl</a>.</p>
@@ -647,8 +647,9 @@ const c = DSChart.make({
 .chart__cursor{position:absolute;top:0;width:1px;background:var(--border-dark);opacity:0;pointer-events:none;transition:opacity .1s ease}
 .chart__cursor.is-visible{opacity:1}
 
-/* тултип: контейнер — компонент Tooltip, строки — Chart */
-.chart__tip{position:absolute;z-index:5;pointer-events:none;max-width:280px}
+/* тултип: контейнер — компонент Tooltip, строки — Chart. Слой — общий слой
+   тултипов ДС (--tip-z из tooltip.css, максимальный z-index) */
+.chart__tip{position:absolute;z-index:var(--tip-z);pointer-events:none;max-width:280px}
 .chart__tip-title{display:block;font:var(--type-body-s-strong);margin-bottom:6px}
 .chart__tip-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:8px;padding:1px 0}
 .chart__tip-row .chart__marker{width:10px;height:10px}

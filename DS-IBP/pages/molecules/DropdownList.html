@@ -164,7 +164,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.012</b></span><span>Обновлено: <b>05.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.013</b></span><span>Обновлено: <b>21.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>DropdownList</h1>
     <p class="lead">Выпадающий список — всплывающая поверхность со списком опций, которая раскрывается под полем <b>Select</b> или <a class="inl" href="../molecules/InputAutocomplete.html">InputAutocomplete</a>. Служит для выбора значения из перечня: одиночного (подсветка выбранной строки), множественного (ведущие чекбоксы) или с поиском по мере набора (подсветка совпадения). В отличие от <a class="inl" href="../molecules/ContextMenu.html">Context Menu</a> — это выбор данных, а не список команд.</p>
@@ -293,7 +293,7 @@
   
 <div class="subsec" data-screen-label="Positioning">
     <h3>Позиционирование и авто-разворот</h3>
-    <p class="desc">Список выравнивается по левому краю поля, его ширина равна ширине поля. Если снизу не хватает места, список разворачивается вверх. Перетащите поле к нижнему краю области.</p>
+    <p class="desc">Список выравнивается по левому краю поля, его ширина равна ширине поля. Если снизу не хватает места, список разворачивается вверх. Закрытый список не занимает места на странице и не добавляет прокрутки. Перетащите поле к нижнему краю области.</p>
     <div class="panel">
       <div class="vp" id="flip-vp">
         <span class="fldwrap" id="flip-field"></span>
@@ -854,16 +854,26 @@
 .ddl.ddl--floating {
   position: absolute;
   opacity: 0;
+  /* закрытый список выключен из раскладки полностью: visibility:hidden
+     оставляет его в потоке прокрутки, и невидимый узел удлиняет страницу
+     или колонку, давая лишний скролл (окно КНР, страницы документации,
+     21.09.2026). display в переходе — с allow-discrete, появление —
+     через @starting-style. Размер списка меряют ПОСЛЕ .is-open. */
+  display: none;
   visibility: hidden;
   transform: scale(.98);
   transform-origin: var(--ddl-origin, top center);
-  transition: opacity .13s ease, transform .13s ease, visibility 0s linear .13s;
+  transition: opacity .13s ease, transform .13s ease, visibility 0s linear .13s, display .13s allow-discrete;
 }
 .ddl.ddl--floating.is-open {
+  display: inline-flex;
   opacity: 1;
   visibility: visible;
   transform: scale(1);
   transition: opacity .13s ease, transform .13s ease;
+}
+@starting-style {
+  .ddl.ddl--floating.is-open { opacity: 0; transform: scale(.98); }
 }
 @media (prefers-reduced-motion: reduce) {
   .ddl.ddl--floating { transition: opacity .01s; transform: none; }
@@ -871,6 +881,7 @@
 }
 /* pinned — всегда открытый список (для демонстраций в документации) */
 .ddl.ddl--floating.ddl--pinned {
+  display: inline-flex;
   opacity: 1;
   visibility: visible;
   transform: none;

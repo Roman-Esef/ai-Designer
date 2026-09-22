@@ -7,6 +7,10 @@
    ds.js, линкуют файл напрямую).
    Ручки с [data-resize] (Конструктор, демо «Ширина колонок»)
    уже имеют свою логику — этот скрипт их не трогает.
+   Событие: 'columnresize' на .tbl (bubbles) с { column, width } —
+   column — индекс ячейки в строке шапки, width — новая ширина в px.
+   Шлётся по отпусканию ручки и на каждый шаг стрелками; его слушает
+   хранение колонок (data-table-persist, ds-table-settings.js).
    ============================================================ */
 (function () {
   'use strict';
@@ -29,6 +33,11 @@
     var str = tracks.join(' ');
     tbl.querySelectorAll('.tbl__row').forEach(function (row) { row.style.gridTemplateColumns = str; });
   }
+  /* ширина поменялась — сообщаем наружу: без события хранение колонок
+     (data-table-persist) не узнало бы о новой ширине и не записало её */
+  function emitResize(tbl, idx, width) {
+    tbl.dispatchEvent(new CustomEvent('columnresize', { bubbles: true, detail: { column: idx, width: width } }));
+  }
   function guideAt(tbl, clientX) {
     var g = ensureGuide(tbl);
     g.style.left = (clientX - tbl.getBoundingClientRect().left + tbl.scrollLeft) + 'px';
@@ -43,11 +52,11 @@
     var idx = colIndex(row, th);
     var tracks = freezeTracks(row);
     applyTracksAll(tbl, tracks);
-    var x0 = e.clientX, w0 = parseFloat(tracks[idx]);
+    var x0 = e.clientX, w0 = parseFloat(tracks[idx]), w = w0;
     tbl.classList.add('tbl--resizing');
     th.classList.add('th--resizing');
     function move(ev) {
-      var w = Math.max(MIN, Math.round(w0 + (ev.clientX - x0)));
+      w = Math.max(MIN, Math.round(w0 + (ev.clientX - x0)));
       var next = tracks.slice(); next[idx] = w + 'px';
       applyTracksAll(tbl, next);
       guideAt(tbl, ev.clientX);
@@ -57,6 +66,7 @@
       th.classList.remove('th--resizing');
       document.removeEventListener('pointermove', move);
       document.removeEventListener('pointerup', up);
+      emitResize(tbl, idx, w);
     }
     document.addEventListener('pointermove', move);
     document.addEventListener('pointerup', up);
@@ -81,5 +91,6 @@
     var w = Math.max(MIN, Math.round(parseFloat(tracks[idx]) + (e.key === 'ArrowRight' ? 16 : -16)));
     tracks[idx] = w + 'px';
     applyTracksAll(tbl, tracks);
+    emitResize(tbl, idx, w);
   });
 })();

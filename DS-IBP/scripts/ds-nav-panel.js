@@ -220,14 +220,16 @@
       контенту) — isTruncated отсекает, и собственный rail-тултип
       (placeRailLabels) не конфликтует с механизмом. Заголовок блока
       (.nav__block-label) не регистрируем: спека тултип для него не обещает.
-      zIndex:2000 — тултип рисуется ВЫШЕ панели (.nav в .nav-layout несёт
-      z-index:1000), иначе в развёрнутом виде он остаётся под панелью. */
+      Слой тултипа здесь не задаётся: с Tooltip 2.010 все тултипы ДС стоят на
+      максимальном z-index (--tip-z в tooltip.css), выше панели (.nav в
+      .nav-layout несёт z-index:1000). Прежний инлайновый zIndex:2000 был
+      заплаткой ровно этой панели — остальные тултипы под ней пропадали. */
   var truncatedHandle = null;
   function registerTrunc() {
     if (truncatedHandle || !window.DSTooltip) return;
     truncatedHandle = window.DSTooltip.truncated(
       '.nav__label, .nav__user-name, .nav__user-role',
-      { host: '.nav__item, .nav__user', zIndex: 2000 }
+      { host: '.nav__item, .nav__user' }
     );
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { registerTrunc(); });

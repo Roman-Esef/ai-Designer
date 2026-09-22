@@ -105,7 +105,7 @@
       box.appendChild(sel); wrap.appendChild(box); return wrap;
     }
 
-    controls.appendChild(select('Размер', [['m', 'M'], ['s', 'S'], ['xs', 'XS']], () => state.size, v => state.size = v));
+    controls.appendChild(select('Размер', [['m', 'M · 40 px'], ['s', 'S · 32 px'], ['xs', 'XS · 24 px']], () => state.size, v => state.size = v));
     controls.appendChild(select('Кол-во сегментов', [['2', '2'], ['3', '3'], ['4', '4'], ['5', '5'], ['6', '6']], () => state.count, v => { state.count = +v; if (state.selected >= state.count) state.selected = 0; }));
     controls.appendChild(select('Контент', [['text', 'Текст'], ['icon-text', 'Иконка + текст'], ['icon', 'Только иконки']], () => state.content, v => state.content = v));
     controls.appendChild(select('Состояние', [['default', 'Default'], ['disabled', 'Disabled']], () => state.tabState, v => state.tabState = v));

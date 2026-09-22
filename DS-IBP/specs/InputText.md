@@ -1,8 +1,8 @@
 ---
 component: InputText
 title: "InputText"
-version: "1.012"
-updated: "06.09.2026"
+version: "1.013"
+updated: "21.09.2026"
 page: pages/molecules/InputText.html
 runtime: scripts/ds-input.js
 page_js: scripts/input-text.page.js
@@ -42,7 +42,7 @@ status: curated
 - **Размеры · Радиус скругления** — Радиус поля не зависит от размера; поля — единственная группа контролов на 4px. поле M и S — 4px (--radius-field) · кнопка-действие в поле — 4px (--radius-xs) · textarea — inherit.
 - **Контент** — метка-существительное без двоеточия; плейсхолдер = формат/пример, не дублирует метку; хелпер = правило (в Error → текст ошибки); префикс/постфикс — неизменяемые единицы.
 - **Поведение** — плейсхолдер исчезает при вводе (не при фокусе); крестик только у заполненного поля; очищенное поле по blur возвращается в пустое; многострочный растёт по высоте.
-- **Состояния** — Default/Hover/Focus/Error/ErrorFocus/Warning/WarningFocus/Disabled. Фокус — бордер 2px `--primary` + кольцо `--primary-bg-light`; `box-sizing:border-box` держит габариты. ПРАВИЛО: текст ошибки/предупреждения по умолчанию НЕ в хелпере — только в тултипе при *Focus; тултип не смещает хелпер (position:absolute, z-index выше поля). helperError:true — намеренное исключение.
+- **Состояния** — Default/Hover/Focus/Error/ErrorFocus/Warning/WarningFocus/Disabled. Фокус — бордер 2px `--primary` + кольцо `--primary-bg-light`; `box-sizing:border-box` держит габариты. ПРАВИЛО: текст ошибки/предупреждения по умолчанию НЕ в хелпере — только в тултипе при *Focus; тултип не смещает хелпер (position:absolute, z-index — слой тултипа `--tip-z`, максимальный). helperError:true — намеренное исключение.
 - **Доступность** — `label[for]`, `aria-describedby`, `aria-invalid="true"`; ошибка не только цветом; крестик — button с aria-label.
 - **Типографика** — значение SB Sans Text (M — Body M, S — Body S); Label/Helper — Body XS.
 - **Цвета** — фон `--bg-tile`, рамка `--border-primary`, hover/focus `--primary` (+ тень `--primary-bg-light`), Error `--error`, Warning `--warning`, disabled `--st-disabled-light`,плейсхолдер/префикс/постфикс `--text-inactive`. Иконки в поле (ведущая + действия) — Active · `--secondary`, hover → `--secondary-dark`.

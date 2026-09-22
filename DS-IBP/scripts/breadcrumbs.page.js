@@ -81,10 +81,11 @@ function attachCrumbTip(el, text) {
     tip.style.top = (er.top - ar.top) - 8 - th + 'px';
   }
   let timer;
-  el.addEventListener('mouseenter', () => { timer = setTimeout(() => { place(); tip.classList.add('is-visible'); }, 300); });
+  /* сначала показать, потом мерить: закрытый тултип — display:none (tooltip.css) */
+  el.addEventListener('mouseenter', () => { timer = setTimeout(() => { tip.classList.add('is-visible'); place(); }, 300); });
   el.addEventListener('mouseleave', () => { clearTimeout(timer); tip.classList.remove('is-visible'); });
   el.setAttribute('tabindex', '0');
-  el.addEventListener('focus', () => { place(); tip.classList.add('is-visible'); });
+  el.addEventListener('focus', () => { tip.classList.add('is-visible'); place(); });
   el.addEventListener('blur', () => tip.classList.remove('is-visible'));
 }
 

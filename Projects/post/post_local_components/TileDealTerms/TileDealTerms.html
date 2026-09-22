@@ -2,9 +2,11 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли. В view
+                  действия правки не рисуются (TileDealTerms.css)
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section class="tile" data-state="empty" data-mode="view">
+<section class="tile lc-deal-terms" data-state="empty" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Сроки сделки</h3></div>

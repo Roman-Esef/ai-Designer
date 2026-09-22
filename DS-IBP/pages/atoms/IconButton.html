@@ -146,7 +146,7 @@
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.011</b></span><span>Обновлено: <b>07.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.011</b></span><span>Обновлено: <b>21.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>IconButton</h1>
     <p class="lead">Безрамочная кнопка с одной иконкой и квадратным (скруглённым control) стейт-слоем (риплом). Цвет рипла соответствует цвету иконки. Тоны Neutral / Primary / Danger / Contrast, размеры L / M / S, состояния Default / Hover / Pressed / Focus / Disabled / Loading, режим-переключатель и встроенный вариант для полей ввода.</p>
@@ -779,7 +779,7 @@ document.getElementById('ic-good').innerHTML = UI.good;
   controls.appendChild(select('Тон',
     [['neutral','Neutral'],['primary','Primary'],['danger','Danger'],['contrast','Contrast']],
     ()=>state.tone, v=>state.tone=v));
-  controls.appendChild(select('Размер', [['l','L'],['m','M'],['s','S']], ()=>state.size, v=>state.size=v));
+  controls.appendChild(select('Размер', [['l','L · 24 px'],['m','M · 20 px'],['s','S · 16 px']], ()=>state.size, v=>state.size=v));
   controls.appendChild(select('Иконка',
     [['edit','Edit'],['more-dots','More'],['search','Search'],['close','Close'],['trash','Trash'],['settings','Settings'],['download','Download'],['star','Star']],
     ()=>state.icon, v=>state.icon=v));
