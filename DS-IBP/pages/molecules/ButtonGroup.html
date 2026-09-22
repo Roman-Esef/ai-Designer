@@ -133,7 +133,7 @@
 
   <header class="masthead">
     <a class="crumb" href="../../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Дизайн-система</a>
-    <div class="meta"><span>Версия: <b>1.004</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.005</b></span><span>Обновлено: <b>21.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>ButtonGroup</h1>
     <p class="lead">Объединяет связанные кнопки в единый визуальный блок с общим фоном или обводкой. Поддерживает 2–5 кнопок, типы Accent / Outline, все три размера, вариант Split&nbsp;Button и сегментированный выбор. Собирается из компонентов <b>Button</b> — кнопки наследуют свои свойства.</p>
@@ -260,6 +260,7 @@
     <p class="desc tight">Текстовые правила наследуются от <a class="crumb" style="display:inline; margin:0; padding:0;" href="../atoms/Buttons.html">Button</a>, но внутри группы есть дополнительные ограничения:</p>
     <ul class="bullets" style="margin-bottom:26px;">
       <li>текст кнопки — короткий глагол в повелительном наклонении («Сохранить», «Неделя»), без точки в конце;</li>
+      <li>группу не подписывают отдельным заголовком сверху — каждая кнопка называет свой вариант целиком и понятна без подписи: «1 чип / 2 чипа / 3 чипа», а не «1 / 2 / 3» под заголовком «Количество чипов». Так же подписывают Switch;</li>
       <li>держите метки одного типа сопоставимыми по длине — сильно разные по ширине кнопки делают группу визуально неровной;</li>
       <li>не смешивайте в одной группе кнопки с текстом и чисто icon-only — выбирайте один формат для всей группы;</li>
       <li>у каждой icon-only кнопки в группе должен быть <code class="tok">aria-label</code>, описывающий действие;</li>
@@ -781,7 +782,7 @@ mount('do-demo', makeGroup({ type:'outline', items:[{text:'День'},{text:'Н�
 
   controls.appendChild(select('Вариант', [['standard','Standard'],['split','Split Button'],['toggle','Toggle / Segmented']], ()=>state.variant, v=>state.variant=v));
   controls.appendChild(select('Тип', [['accent','Accent'],['outline','Outline'],['transparent','Transparent']], ()=>state.type, v=>state.type=v));
-  controls.appendChild(select('Размер', [['m','M'],['s','S'],['xs','XS']], ()=>state.size, v=>state.size=v));
+  controls.appendChild(select('Размер', [['m','M · 40 px'],['s','S · 32 px'],['xs','XS · 24 px']], ()=>state.size, v=>state.size=v));
   controls.appendChild(select('Кол-во кнопок', [['2','2'],['3','3'],['4','4'],['5','5']], ()=>state.count, v=>state.count=+v));
   controls.appendChild(select('Ориентация', [['horizontal','Гориз.'],['vertical','Верт.']], ()=>state.orientation, v=>state.orientation=v));
   controls.appendChild(select('Контент', [['text','Текст'],['icon-text','Иконка + текст'],['icon','Только иконки']], ()=>state.content, v=>state.content=v));

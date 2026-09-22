@@ -83,8 +83,14 @@
       <div class="dtable dtable--fill">
         <div class="dtable__body">
           <!-- data-sort-rows — рантайм сам переставляет строки по клику в шапке
-               (макет; с бэкендом и пагинацией сортирует сервер по событию sort) -->
-          <div class="tbl tbl--scroll" data-table data-sort-rows>
+               (макет; с бэкендом и пагинацией сортирует сервер по событию sort).
+               data-table-persist — вид таблицы живёт на время сессии: рантайм
+               ds-table-settings.js пишет в sessionStorage порядок, видимость,
+               закрепление и ширину колонок, сортировку и скролл тела и
+               восстанавливает их при возврате на страницу. Страницу пагинации,
+               её размер и применённый фильтр помнит скрипт экрана (ключ
+               post.portfolio-did.view) — пагинацию и фильтр ведёт он -->
+          <div class="tbl tbl--scroll" data-table data-sort-rows data-table-persist="post-portfolio-did">
 
             <!-- Шапка. grid-template-columns одинаковый у шапки и всех строк -->
             <div class="tbl__row tbl__row--head" style="grid-template-columns:8px 150px 280px 140px 176px 176px 320px 120px 150px 220px 88px 180px 240px 240px 170px 170px 150px 130px 130px 130px 120px 120px 120px 140px minmax(8px,1fr);">
@@ -691,6 +697,11 @@
 
 <script src="../data/mock-deals.js"></script>
 <script src="../data/deals-store.js"></script>
+<!-- состав участников сделок: стор переносит сохранённые на странице сделки
+     КНР в DealsStore, колонка «КНР» читает их оттуда. Хранение — data/API.md -->
+<script src="../data/mock-counterparties.js"></script>
+<script src="../data/post-api.js"></script>
+<script src="../data/counterparties-store.js"></script>
 <script src="../../../DS-IBP/scripts/ds.js"></script>
 <script src="../../../DS-IBP/scripts/ibp-home.js"></script>
 <script>
@@ -938,6 +949,24 @@
   Array.prototype.slice.call(wrap.children).forEach(function (row) { frag.appendChild(row); });
   headRow.parentNode.insertBefore(frag, headRow.nextSibling);
 
+  /* Колонка «КНР» — состав, сохранённый на странице сделки. CounterpartiesStore
+     переносит его в DealsStore; если хранилище ответило раньше рендера строк
+     (localStorage), строки уже нарисованы с ним, если позже (сервер данных) —
+     ячейка перерисовывается здесь. Фильтр по КНР читает тот же deal.knr. */
+  window.DealsStore.on('change', function (e) {
+    if (!e || e.type !== 'update' || !e.patch || !e.patch.knr) return;
+    var row = tbl.querySelector('.tbl__row[data-row="' + String(e.id).replace(/"/g, '') + '"]');
+    /* DSTable.cell находит и ячейку скрытой колонки: скрытая настройкой
+       колонка (она переживает возврат на страницу) в DOM строки не стоит */
+    var cell = row && window.DSTable.cell(row, 'knr');
+    if (!cell) return;
+    /* меняется только содержимое: атрибуты ячейки (ширину, видимость
+       колонки) держит рантайм таблицы */
+    var tmp = document.createElement('div');
+    tmp.innerHTML = linkCell('knr', e.deal.knr);
+    cell.innerHTML = tmp.firstElementChild.innerHTML;
+  });
+
   /* ---------- переход на страницу сделки: двойной клик по строке ----------
      Штатный рантайм таблицы двойной клик не обслуживает (ds-table.js знает
      только фокус строки и чекбоксы), поэтому переход — экранный. Номер сделки
@@ -958,10 +987,43 @@
   /* ---------- пагинация: реальные total/страницы, окно по DOM-порядку ---------- */
   var footerHost = document.querySelector('.dtable__footer');
   var emptyState = document.getElementById('deals-empty');
+
+  /* ---------- вид реестра на время сессии: страница, размер, фильтр ----------
+     Колонки, ширины, сортировку и скролл тела помнит рантайм ДС
+     (data-table-persist на .tbl). Пагинацию и фильтр ведёт экран, поэтому их
+     помнит он: после «открыл сделку → вернулся» реестр открывается на той же
+     странице с тем же фильтром. Запись — { v, page, pageSize, filter };
+     filter — снимок ПРИМЕНЁННОГО фильтра (правки формы без «Применить» не
+     запоминаются). Хранилище недоступно — экран работает без памяти. */
+  var VIEW_KEY = 'post.portfolio-did.view';
+  function readView() {
+    try {
+      var data = JSON.parse(window.sessionStorage.getItem(VIEW_KEY) || 'null');
+      return data && data.v === 1 ? data : null;
+    } catch (e) { return null; }
+  }
+  function writeView() {
+    try {
+      window.sessionStorage.setItem(VIEW_KEY, JSON.stringify({
+        v: 1, page: state.page, pageSize: state.pageSize, filter: appliedFilter,
+      }));
+    } catch (e) { /* без памяти */ }
+  }
+  /* читается один раз, до первой отрисовки: applyView() сразу пишет вид,
+     и фильтр, который восстанавливается ниже, взялся бы уже из перезаписи */
+  var savedView = readView();
+
   var state = { page: 1, pageSize: 20 };
+  if (savedView) {
+    if (window.DSPagination.SIZES.indexOf(savedView.pageSize) >= 0) state.pageSize = savedView.pageSize;
+    /* страницу больше последней отрежет applyView() — сделок могло стать меньше */
+    if (savedView.page >= 1) state.page = Math.floor(savedView.page);
+  }
   /* activeFilter — null = фильтр не применён (все строки в результате);
-     иначе Set id сделок, прошедших последний клик «Применить» (Этап 4 плана) */
+     иначе Set id сделок, прошедших последний клик «Применить» (Этап 4 плана).
+     appliedFilter — снимок полей этого применения для хранения вида */
   var activeFilter = null;
+  var appliedFilter = null;
 
   function dataRowsInDomOrder() {
     return Array.prototype.filter.call(tbl.children, function (r) { return r.hasAttribute('data-row'); });
@@ -991,6 +1053,7 @@
       tbl.hidden = true;
       footerHost.hidden = true;
       if (emptyState) emptyState.hidden = false;
+      writeView();
       return;
     }
     tbl.hidden = false;
@@ -1009,14 +1072,21 @@
       r.hidden = !(idx >= start && idx < end);
     });
     drawFooter(total);
+    writeView();
   }
 
   applyView();
 
   /* Сортировка (data-sort-rows, ds-table.js) переставляет строки внутри
      .tbl — окно пагинации считается по позиции в НОВОМ порядке DOM, поэтому
-     после сортировки сбрасываем на первую страницу и пересчитываем видимость. */
-  tbl.addEventListener('sort', function () { state.page = 1; applyView(); });
+     после сортировки пересчитываем видимость. Клик по сортировке сбрасывает
+     на первую страницу; сортировку, возвращённую рантаймом при возврате на
+     страницу (restored), — нет: страница восстановлена выше и относится
+     именно к этому порядку. */
+  tbl.addEventListener('sort', function (e) {
+    if (!(e.detail && e.detail.restored)) state.page = 1;
+    applyView();
+  });
 
   /* ---------- «Новая сделка»: валидация номера/наименования, запись в
      DealsStore, вставка строки без пересоздания остальных (см. правило
@@ -1353,6 +1423,17 @@
         syncChips();
         sectionBadges();
       });
+      /* возврат на страницу: применённый фильтр из хранения вида — галочки
+         в списке и чипы в поле ставятся тем же путём, что и ручной выбор */
+      f.restore = function (labels) {
+        f.state = new Set(Array.isArray(labels) ? labels : []);
+        list.querySelectorAll('.ddl__item--checkbox:not(.ddl__item--all)').forEach(function (it) {
+          var lab = it.querySelector('.ddl__item-label');
+          it.setAttribute('aria-checked', String(!!lab && f.state.has(lab.textContent)));
+        });
+        refreshAllRow();
+        syncChips();
+      };
     });
 
     /* ---------- инициализация одиночного выбора ---------- */
@@ -1380,6 +1461,18 @@
         list && list.querySelectorAll('.ddl__item[aria-selected="true"]').forEach(function (it) { it.setAttribute('aria-selected', 'false'); });
         sectionBadges();
       });
+      /* возврат на страницу: значение в поле и отметка в списке. У Да/Нет-полей
+         списка в f.list нет — он находится по data-ddl поля */
+      f.restore = function (value) {
+        f.state = String(value);
+        input.value = f.state;
+        var ddl = list || document.getElementById(field.getAttribute('data-ddl'));
+        if (ddl) ddl.querySelectorAll('.ddl__item[aria-selected]').forEach(function (it) {
+          var lab = it.querySelector('.ddl__item-label');
+          it.setAttribute('aria-selected', String(!!lab && lab.textContent === f.state));
+        });
+        if (window.DSInput) window.DSInput.sync(field.closest('.inp'));
+      };
     });
 
     /* ---------- инициализация текстовых полей ---------- */
@@ -1390,6 +1483,11 @@
         f.state = norm(input.value);
         sectionBadges();
       });
+      /* хранится введённый текст как есть — в поле он и возвращается */
+      f.restore = function (value) {
+        input.value = String(value);
+        f.state = norm(input.value);
+      };
     });
 
     /* ---------- инициализация диапазонов дат ---------- */
@@ -1404,6 +1502,11 @@
       }
       fromInput.addEventListener('input', sync);
       toInput.addEventListener('input', sync);
+      f.restore = function (range) {
+        fromInput.value = (range && range.from) || '';
+        toInput.value = (range && range.to) || '';
+        sync();
+      };
     });
 
     /* ---------- чекбокс «Только сделки ограниченного доступа» ---------- */
@@ -1414,6 +1517,10 @@
         f.state = input.checked;
         sectionBadges();
       });
+      f.restore = function (on) {
+        input.checked = !!on;
+        f.state = input.checked;
+      };
     });
 
     /* ---------- применить / очистить ---------- */
@@ -1444,15 +1551,39 @@
       if (window.DSInput) window.DSInput.syncAll(document.getElementById('filter-scrim') || document);
     }
 
-    function applyFilters() {
+    /* снимок применённого фильтра для хранения вида: только активные поля,
+       по id поля, значения — в том виде, в каком их принимает f.restore
+       (текст и даты — как введены, а не нормализованные) */
+    function snapshotFilter() {
+      var out = {};
+      MULTI_FIELDS.forEach(function (f) { if (isActive(f, 'multi')) out[f.id] = Array.from(f.state); });
+      SINGLE_FIELDS.forEach(function (f) { if (isActive(f, 'single')) out[f.id] = f.state; });
+      TEXT_FIELDS.forEach(function (f) { if (isActive(f, 'text')) out[f.id] = document.getElementById(f.id).value; });
+      DATE_FIELDS.forEach(function (f) {
+        if (!isActive(f, 'date')) return;
+        out[f.id] = { from: document.getElementById(f.id + '-from').value, to: document.getElementById(f.id + '-to').value };
+      });
+      CHECKBOX_FIELDS.forEach(function (f) { if (isActive(f, 'checkbox')) out[f.id] = true; });
+      return out;
+    }
+
+    /* выборка по текущим полям формы + чип «Применено: N»; страницу не трогает —
+       это делает вызывающий (клик «Применить» сбрасывает её, возврат — нет) */
+    function computeFilter() {
       var n = appliedCount();
       if (n === 0) {
         activeFilter = null;
+        appliedFilter = null;
       } else {
         var ids = window.DealsStore.list().filter(dealMatchesFilters).map(function (d) { return String(d.id); });
         activeFilter = new Set(ids);
+        appliedFilter = snapshotFilter();
       }
       drawAppliedChip(n);
+    }
+
+    function applyFilters() {
+      computeFilter();
       state.page = 1;
       applyView();
     }
@@ -1477,13 +1608,31 @@
     if (tfilterBar) tfilterBar.addEventListener('tfilter:reset', function () {
       resetAllFields();
       activeFilter = null;
+      appliedFilter = null;
       state.page = 1;
       applyView();
     });
 
-    /* стартовая разметка несла статичный демо-чип «Применено: 5» (черновик
-       показа состояния) — до реального «Применить» фильтр не применён */
-    drawAppliedChip(0);
+    /* Стартовая разметка несла статичный демо-чип «Применено: 5» (черновик
+       показа состояния) — до реального «Применить» фильтр не применён.
+       Возврат на страницу: фильтр, применённый до ухода, ставится обратно в
+       поля формы и в выборку, а страница пагинации не сбрасывается — она
+       восстановлена вместе с ним. Выборка считается заново по текущим данным
+       DealsStore: пока пользователь был в сделке, сделки могли измениться. */
+    var savedFilter = savedView && savedView.filter;
+    if (savedFilter && typeof savedFilter === 'object') {
+      [MULTI_FIELDS, SINGLE_FIELDS, TEXT_FIELDS, DATE_FIELDS, CHECKBOX_FIELDS].forEach(function (group) {
+        group.forEach(function (f) {
+          if (f.restore && savedFilter[f.id] != null) f.restore(savedFilter[f.id]);
+        });
+      });
+      /* значения полей поставлены напрямую — сообщить ДС, чтобы показала крестики */
+      if (window.DSInput) window.DSInput.syncAll(document.getElementById('filter-scrim') || document);
+      computeFilter();
+      applyView();
+    } else {
+      drawAppliedChip(0);
+    }
     sectionBadges();
   })();
 })();

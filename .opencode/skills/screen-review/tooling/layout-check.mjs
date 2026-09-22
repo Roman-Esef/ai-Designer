@@ -36,7 +36,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { logRun, codesFrom } from './runlog.mjs';
-import { includersOf } from './fragments.mjs';
+import { includersOf, hasActiveInclude } from './fragments.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const DS = path.join(ROOT, 'DS-IBP');
@@ -920,6 +920,25 @@ function checkMechanics(html, icons, pagePath) {
   }
   for (const m of styleSrc.matchAll(/\.(-?[a-zA-Z][\w-]*)/g)) dsClasses.add(m[1]);
 
+  /* CSS локальных компонентов. Экран проекта подключает его <link>-ами, которые
+     ассемблер (Projects/post/assemble.mjs) вставляет после маркера @lc-css:
+     классы `.lc-<имя>__*` живут в `<Модуль>.css` рядом с фрагментом, а не в
+     DS-IBP/styles и не в <style> экрана. Без этого шага Б4 объявляет дефектом
+     каждый локальный компонент, у которого есть внутренняя раскладка, — первым
+     под это попал TileKNR (20.09.2026), до него ни у одного модуля своего CSS
+     не было. Читаются только локальные относительные пути; ds.css уже покрыт
+     разбором styles/*.css выше, повторно его не открываем. */
+  if (pagePath) {
+    const pageDir = path.dirname(pagePath);
+    for (const m of raw.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/gi)) {
+      const href = m[1];
+      if (href.startsWith('http') || href.startsWith('//')) continue;
+      const abs = path.resolve(pageDir, href);
+      if (abs.startsWith(stylesDir) || !existsSync(abs)) continue;
+      for (const c of readFileSync(abs, 'utf8').matchAll(/\.(-?[a-zA-Z][\w-]*)/g)) dsClasses.add(c[1]);
+    }
+  }
+
   /* Хуки рантаймов: класс без собственных правил в CSS, по которому работает
      скрипт ДС, — не опечатка. `.nav__burger` правил не имеет вовсе, но его
      ищет `ds-nav-panel.js`; без этого шага Б4 объявил бы дефектом рабочую
@@ -1061,6 +1080,141 @@ function checkMechanics(html, icons, pagePath) {
           warn(`K12 @container задаёт ${prop} для .${cls}, а на элементе (строка ${lineOf(html, hit.index)}) тот же ${prop} стоит инлайн — адаптивное правило не сработает никогда`);
         }
       }
+    }
+  }
+
+  /* Б34 — локальная ссылка обязана резолвиться в файл. Путь, написанный на
+     уровень выше или ниже нужного (`../../../data/` вместо `../../data/`),
+     выглядит правильным и не падает: браузер по file:// молча не грузит
+     скрипт, стиль или картинку, и страница открывается наполовину живой.
+
+     Вход у сенсора уже был: Б4 резолвит `<link>` относительно страницы и
+     несуществующий файл ПРОПУСКАЕТ — здесь тот же резолв, но пропуск и есть
+     находка. Проверяются только литеральные локальные пути: внешний адрес,
+     `#якорь`, `mailto:` и склейка в JS-шаблоне ссылкой на файл не являются. */
+  if (pagePath && isEtalon) {
+    /* Эталон скилла — заготовка, а не страница: относительные пути в нём
+       написаны для БУДУЩЕГО места копии (`Concepts/<Имя>/` — два уровня до
+       корня), а не для его собственного. Резолвить их от папки эталона значит
+       требовать, чтобы заготовка ломалась при копировании (Л10, Л101).
+       Пропуск печатается строкой — молчаливого пропуска нет (ds-rules §9). */
+    ok(true, 'Б34 ПРОПУЩЕН: эталон скилла — пути написаны для места копии, а не для его папки');
+  } else if (pagePath) {
+    const pageDir = path.dirname(pagePath);
+    const EXTERNAL = /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i;
+    const broken = [];
+    const seenHref = new Set();
+    for (const m of html.matchAll(/<(?:link|script|img|a|ds-include)\b[^>]*?\s(?:href|src)="([^"]+)"/gi)) {
+      const val = m[1].trim();
+      if (!val || EXTERNAL.test(val) || !isLiteralAttr(val)) continue;
+      const clean = val.split('#')[0].split('?')[0];
+      if (!clean) continue;
+      let rel = clean;
+      try { rel = decodeURIComponent(clean); } catch { /* путь с одиноким % — берём как написан */ }
+      if (existsSync(path.resolve(pageDir, rel))) continue;
+      const where = `${clean} (строка ${lineOf(html, m.index)})`;
+      if (seenHref.has(where)) continue;
+      seenHref.add(where);
+      broken.push(where);
+    }
+    ok(broken.length === 0, broken.length
+      ? `Б34 ссылки не резолвятся от папки страницы: ${broken.slice(0, 6).join(', ')}${broken.length > 6 ? ` и ещё ${broken.length - 6}` : ''} — файла по пути нет, по file:// это молчаливый отказ`
+      : 'Б34 локальные ссылки резолвятся в файлы');
+  }
+
+  /* Б35 — пункт-родитель аккордеона в панели навигации не ссылка. Контракт
+     рантайма: `ds-nav-panel.js` перехватывает клик по `.nav__item--acc` и
+     вызывает `preventDefault()` безусловно — в rail разворачивает панель, в
+     остальных режимах переключает `aria-expanded`. Адрес на таком пункте
+     недостижим, а разметка выглядит рабочей: страница компонента, на которую
+     «вёл» родитель, оказалась недоступной из панели (20.09.2026).
+
+     Вход двойной — разметка и литералы скриптов: панели кита и страницы
+     сделки строятся JS-шаблоном (как у Б31 и Б33). */
+  const accHref = [];
+  for (const src of [html, markupInScripts]) {
+    for (const m of src.matchAll(/<a\b[^>]*>/gi)) {
+      const tag = m[0];
+      if (!/class="[^"]*\bnav__item--acc\b/.test(tag)) continue;
+      const href = (tag.match(/\shref="([^"]*)"/) || [])[1];
+      if (href === undefined || href === '' || href === '#') continue;
+      if (!isLiteralAttr(href)) continue;
+      accHref.push(`${href} (строка ${lineOf(src, m.index)})`);
+    }
+  }
+  if (/nav__item--acc/.test(html + markupInScripts)) {
+    ok(accHref.length === 0, accHref.length
+      ? `Б35 у родителя аккордеона адрес ${accHref.join(', ')} — ds-nav-panel.js отменяет по нему переход; страница открывается под-пунктом, а не родителем`
+      : 'Б35 родители аккордеонов панели не ведут ссылкой');
+  }
+
+  /* З12 — разметка с хуком рантайма, собранная скриптом. Рантаймы ДС связывают
+     хуки один раз, на DOMContentLoaded: разметка, нарисованная позже (ответ
+     стора, перерисовка демо, смена фильтра), остаётся мёртвой — ничего не
+     падает, клик просто не работает (Л93).
+
+     Это ЗАМЕЧАНИЕ, а не блокер, и понижение осознанное: статикой не отличить
+     разметку, собранную при разборе страницы (её свяжет штатный проход
+     рантайма), от перерисованной по событию. Блокер на этом различении был бы
+     сторожем на угадывании — он дороже отсутствия сторожа (класс Л72).
+     Сенсор называет случай и цену, решение остаётся за автором — тот же
+     жанр, что З11. */
+  /* хук · как связывают поддерево · что засчитывается вызовом. Третий столбец
+     короче второго намеренно: связать можно и поштучно (`DSModal.bind(trigger)`
+     на реестре сделок) — это тот же ответ на вопрос правила. */
+  const HOOK_BINDS = [
+    ['data-modal', 'DSModal.bindAll', 'DSModal.bind'],
+    ['data-menu', 'DSMenu.bindAll', 'DSMenu.bind'],
+    ['data-drawer', 'DSDrawer.bindAll', 'DSDrawer.bind'],
+    ['data-tabs', 'DSTabs.wireAll', 'DSTabs.wire'],
+    ['data-icon', 'dsIcons.apply', 'dsIcons.apply'],
+  ];
+  if (pagePath) {
+    const pageDir = path.dirname(pagePath);
+    /* Скрипты страницы: инлайновые и подключённые локальные, каждый ОТДЕЛЬНО.
+       Рантаймы ДС сюда не входят — в них хук и привязка лежат рядом по
+       устройству, и любой экран выглядел бы связанным.
+
+       Хук и вставку сводим в пределах ОДНОГО скрипта: разметка с хуком в одном
+       файле и `innerHTML` в другом — разные конструкции, и пара из них ложная.
+       Проверено на киту: футер панели с `data-modal` собирает страница, а
+       `innerHTML` зовёт `kit-nav.js`; в объединении это выглядело дефектом,
+       которого нет. Вызов привязки при этом ищется по ВСЕМ скриптам страницы —
+       связать поддерево может и соседний файл. */
+    const parts = [...raw.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
+    for (const m of raw.matchAll(/<script\b[^>]*\ssrc="([^"]+)"/gi)) {
+      const href = m[1];
+      if (/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href) || !isLiteralAttr(href)) continue;
+      const abs = path.resolve(pageDir, href);
+      if (!existsSync(abs) || abs.startsWith(path.join(DS, 'scripts'))) continue;
+      parts.push(readFileSync(abs, 'utf8'));
+    }
+    const allSrc = parts.join('\n');
+    const missed = new Map();
+    for (const src of parts) {
+      /* `innerHTML = ''` — это очистка контейнера, а не вставка разметки:
+         связывать в ней нечего. Без этой оговорки правило сводило очистку
+         в одном месте скрипта с хуком в другом (витрина карточки).
+         Пустота проверяется РАЗБОРОМ найденного, а не отрицательным
+         просмотром вперёд: `\s*` перед ним отступает на пробел, и `= ''`
+         проходит как непустое присваивание. */
+      const writes = [...src.matchAll(/\.innerHTML\s*\+?=\s*(\S{0,2})/g)].map((m) => m[1]);
+      const insertsMarkup = writes.some((w) => !/^(?:''|""|``)/.test(w)) || /insertAdjacentHTML\s*\(/.test(src);
+      if (!insertsMarkup) continue;
+      /* Литералы достаются тем же разбором, что у Б15 и Б31: второй разбор
+         строк JS завёл бы вторую границу «что считать разметкой». */
+      const markup = collectScriptMarkup('<script>' + src + '</script>');
+      for (const [hook, bind, accepted] of HOOK_BINDS) {
+        /* Хук засчитывается только В РАЗМЕТКЕ — после открывающего тега.
+           Строка-селектор `'[data-modal="new-deal-scrim"]'` содержит ту же
+           подстроку, но разметкой не является и связывать в ней нечего
+           (реестр сделок, ложная пара 21.09.2026). */
+        const inMarkup = new RegExp('<[a-zA-Z][^<>]{0,400}' + hook + '=').test(markup);
+        if (inMarkup && !allSrc.includes(accepted)) missed.set(hook, bind);
+      }
+    }
+    if (missed.size) {
+      warn(`З12 скрипт страницы собирает и вставляет разметку с хуками ${[...missed.keys()].join(', ')}, а вызова ${[...missed.values()].join(', ')} на странице нет — если разметка рисуется после загрузки, рантайм её не свяжет (Л93)`);
     }
   }
 
@@ -1304,6 +1458,37 @@ function printRules() {
   log("Кириллическая Б и латинская K — разные ряды; латинские B* принадлежат ds-lint.js.");
 }
 
+/* Идентификатор правила — первый токен его строки отчёта. Второй перечень
+   идентификаторов рядом с первым разошёлся бы с кодом (Л43), поэтому код
+   читается из самого отчёта — как это делает `codesFrom` для журнала прогонов. */
+const codeOf = (label) => (String(label).match(/^([БЗКK]\d{1,2}(?:\.\d)?)(?![\d.])/u) || [])[1] || '';
+
+/* Правила, чей предмет — КАРКАС ЭКРАНА. На витрине локального компонента их
+   вход отсутствует по устройству стенда, а не по недосмотру автора: витрина не
+   сдаётся приёмкой как экран, у неё нет ни меню, ни крошек, ни спутника-спеки,
+   и тайлы на ней стоят вне 12-колоночной сетки.
+
+   Список закрытый и пофамильный: «пропустить всё, что упало» — это способ
+   никогда не узнать о настоящем дефекте. Причина у каждого своя.
+
+     Б1  витрина подключает styles/docs-split.css и styles/ds-docs.css явно —
+         в барель ds.css они не входят (правила docs-split, §11 ds-rules);
+     Б5  каркас экрана (.nav-layout > .nav + .screen) — у стенда его нет;
+     Б6  крошки и h1 в .phead__title принадлежат экрану, не стенду;
+     Б12 спутник витрины — паспорт `<Имя>.md`, а не `<Имя>.screen.md`;
+     Б31 анатомия NavPanel: панель кита — навигация по витринам, личного
+         кабинета и закрепления в ней нет;
+     Б23 классы страницы документации (masthead, eyebrow, lead, desc) на
+         экране — дефект, а витрина документацией и является: они её жанр;
+     Б32 журнал правок сторожится в спеке экрана; у компонента история живёт
+         в его CHANGELOG.md и там законна.
+
+   Список выведен замером 21.09.2026: пропуск снимался на трёх витринах
+   (TileKNR, CardCounterparty, TileKNRModal), сработавшие коды разбирались
+   поимённо. Добавлять сюда код без замера нельзя — это и есть возврат к
+   пропуску файла целиком. */
+const SCREEN_ONLY = new Set(['Б1', 'Б5', 'Б6', 'Б12', 'Б23', 'Б31', 'Б32']);
+
 /* ---------------- проверка одного файла ----------------
 
    Вынесена из `main()` ради обхода каталога (`--etalons`). До этого тело
@@ -1328,14 +1513,18 @@ function checkOne(pageArg, width) {
   }
   const html = readFileSync(p, 'utf8');
 
-  /* Шаблон-исходник — не собранный экран. Файл с активной (вне комментария)
-     меткой <ds-include> собирается ассемблером (Projects/test/post/assemble.mjs),
-     и проверять надо результат, а не источник: у источника нет ни разметки
-     включённых фрагментов, ни смысла экранных проверок (Б12 «нет спутника-
-     спеки» на источнике — ложный FAIL). Пропуск печатается строкой ПРОПУЩЕН:,
-     молчаливого пропуска нет (ds-rules §9). */
-  const noComments = html.replace(/<!--[\s\S]*?-->/g, '');
-  if (/<ds-include\b/i.test(noComments)) {
+  /* Шаблон-исходник — не собранный экран. Файл с АКТИВНОЙ меткой <ds-include>
+     собирается ассемблером (Projects/post/assemble.mjs), и проверять надо
+     результат, а не источник: у источника нет ни разметки включённых
+     фрагментов, ни смысла экранных проверок (Б12 «нет спутника-спеки» на
+     источнике — ложный FAIL). Пропуск печатается строкой ПРОПУЩЕН:,
+     молчаливого пропуска нет (ds-rules §9).
+
+     «Активная» считается общим предикатом `hasActiveInclude` (fragments.mjs):
+     метка в комментарии, в примере кода вкладки «Код» или в <pre> разметкой не
+     является. Со своей регуляркой здесь витрина, показывающая метку образцом,
+     объявлялась исходником и не проверялась ВООБЩЕ — молча (Л124, класс Л100). */
+  if (hasActiveInclude(html)) {
     say(`== layout-check ${name} ==`);
     say('ПРОПУЩЕН: ' + pageArg + ' — шаблон-исходник с неразвёрнутыми <ds-include>; проверять собранный файл (результат assemble.mjs).');
     return { status: 'пропущен', path: p, printed, fails: 0, warns: 0 };
@@ -1351,14 +1540,48 @@ function checkOne(pageArg, width) {
     return { status: 'пропущен', path: p, printed, fails: 0, warns: 0 };
   }
 
+  /* Витрина локального компонента — не экран. `<Имя>.doc.html` предписан
+     шаблоном `DS-IBP/templates/local-component/`: это стенд, где состояния
+     компонента стоят рядом на демо-данных. Каркаса экрана (.nav-layout, .nav,
+     .screen, .crumbs, h1 в .phead__title) у него нет и быть не должно, а тайлы
+     на стенде стоят вне 12-колоночной сетки — ширину им задаёт сцена.
+
+     Витрина, которая показывает внутри себя другой локальный компонент,
+     собирается ассемблером — у неё есть и источник `<Имя>.doc.html`, и
+     результат `<Имя>.doc.preview.html`. Профиль получают оба.
+
+     Определение строгое — как у фрагмента: мало окончания, рядом обязан лежать
+     паспорт `<Имя>.md`. Иначе настоящий экран, случайно так названный, молча
+     перестал бы проверяться (класс Л100).
+
+     ДО 20.09.2026 ВИТРИНА ПРОПУСКАЛАСЬ ЦЕЛИКОМ — и это оказалось дороже 17
+     ложных блокеров, ради которых пропуск вводили: у файла не осталось ни
+     одного читателя, и три дефекта подряд (сломанный JS конструктора,
+     самодельный переключатель языка, разъехавшаяся вёрстка под табами) дошли
+     до человека при зелёном гейте. Пропускается не файл, а НЕПРИМЕНИМЫЕ
+     правила — те, чей предмет каркас экрана; всё остальное витрину касается
+     так же, как экран. Структуру самой витрины проверяет docs-split check. */
+  const docSuffix = ['.doc.preview.html', '.doc.html'].find((s) => name.endsWith(s));
+  const showcase = !!docSuffix && existsSync(path.join(path.dirname(p), name.slice(0, -docSuffix.length) + '.md'));
+
   /* иконки из specs/Icons.md (формат: строка имён через ·) */
   const iconsText = readFileSync(path.join(DS, 'specs', 'Icons.md'), 'utf8');
   const iconsSection = iconsText.slice(iconsText.indexOf('## Все глифы'));
   const icons = new Set(iconsSection.split('·').map((s) => s.trim()).filter(Boolean));
 
-  const mech = checkMechanics(html, icons, p);
-  const { rows, standalone } = parseTiles(html);
-  const geo = runGeometry(rows, standalone, width);
+  const mechAll = checkMechanics(html, icons, p);
+  const dropped = showcase
+    ? [...new Set(mechAll.map((r) => codeOf(r.label)).filter((c) => SCREEN_ONLY.has(c)))]
+      .sort((a, b) => parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10))
+    : [];
+  const mech = showcase ? mechAll.filter((r) => !SCREEN_ONLY.has(codeOf(r.label))) : mechAll;
+  /* Геометрия на витрине не считается вовсе: стенд стоит вне 12-колоночной
+     сетки, ширину тайлу задаёт сцена демо, а не колонка. */
+  let geo = { results: [], contentW: 0, colW: 0 };
+  if (!showcase) {
+    const { rows, standalone } = parseTiles(html);
+    geo = runGeometry(rows, standalone, width);
+  }
 
   const all = [...mech, ...geo.results];
   const fails = all.filter((r) => r.level === 'fail');
@@ -1368,10 +1591,16 @@ function checkOne(pageArg, width) {
      журнала прогонов. Разбирать собственный отчёт дешевле, чем вести второй
      перечень идентификаторов рядом с первым — такие перечни расходятся (Л43). */
   say(`== layout-check ${name} (ширина ${width}) ==`);
+  if (showcase) {
+    say('ПРОФИЛЬ: витрина локального компонента (паспорт рядом) — каркас экрана и геометрия колонок к ней неприменимы.');
+    say('ПРОПУЩЕНЫ правила экрана: ' + (dropped.length ? dropped.join(' ') : 'нет') + ' · причина каждого — SCREEN_ONLY в layout-check.mjs. Структуру витрины проверяет docs-split check.');
+  }
   say('[механика]');
   for (const r of mech) say((r.level === 'ok' ? 'PASS  ' : r.level === 'warn' ? 'WARN  ' : 'FAIL  ') + r.label);
-  say(`[геометрия] контент ${Math.round(geo.contentW)}px, колонка ${Math.round(geo.colW * 10) / 10}px`);
-  for (const r of geo.results) say((r.level === 'info' ? '  ·   ' : r.level === 'warn' ? 'WARN  ' : 'FAIL  ') + r.label);
+  if (!showcase) {
+    say(`[геометрия] контент ${Math.round(geo.contentW)}px, колонка ${Math.round(geo.colW * 10) / 10}px`);
+    for (const r of geo.results) say((r.level === 'info' ? '  ·   ' : r.level === 'warn' ? 'WARN  ' : 'FAIL  ') + r.label);
+  }
   say('');
   say(fails.length === 0 ? `ВЕРДИКТ: OK (замечаний: ${warns.length})` : `ВЕРДИКТ: FAIL (${fails.length} блокер, ${warns.length} замечание)`);
 

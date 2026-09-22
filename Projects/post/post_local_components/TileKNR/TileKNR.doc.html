@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КНР — локальные компоненты Post</title>
+<link rel="icon" type="image/svg+xml" href="../../../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../../../DS-IBP/ds.css">
+<!-- docs-split.css и ds-docs.css в барель ds.css не входят: это слой страниц
+     документации, а не экранов. Линкуем явно. -->
+<link rel="stylesheet" href="../../../../DS-IBP/styles/docs-split.css">
+<link rel="stylesheet" href="../../../../DS-IBP/styles/ds-docs.css">
+<!-- tab.css и segment-control.css приходят из бареля ds.css выше. Явные линки
+     стоят потому, что их требует docs-split check: он читает текст страницы и
+     про барель не знает. Повторная загрузка того же файла ничего не меняет. -->
+<link rel="stylesheet" href="../../../../DS-IBP/styles/tab.css">
+<link rel="stylesheet" href="../../../../DS-IBP/styles/segment-control.css">
+<link rel="stylesheet" href="./TileKNR.css">
+<style>
+  body { margin: 0; font-family: var(--font-text), system-ui, sans-serif; color: var(--text-primary); }
+  /* Демо по умолчанию 400px — около трёх колонок из 12 на экране 1920.
+     Ширину крутит слайдер конструктора (180–940px): ниже 240px видно, как
+     строка складывается в одну колонку. */
+  .pg__stage { display: flex; justify-content: center; padding: 32px 24px; }
+  .pg__stagebox { width: 400px; max-width: 100%; }
+  /* слайдер ширины в конструкторе — как на странице Pagination */
+  .pg__controls input[type=range] { width: 100%; accent-color: var(--primary); }
+  .pg__controls .lbl b { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  /* состояния рядом — в секции документации, по три в ряд */
+  .cases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .case__label { margin: 0 0 8px; font: var(--type-body-s-strong); }
+</style>
+</head>
+<body>
+<div class="nav-layout">
+  <nav class="nav nav--fixed" id="nav" aria-label="Локальные компоненты">
+    <div class="nav__top">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__burger" aria-label="Свернуть меню"><i data-icon="left-menu"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m nav__pin" aria-pressed="false" aria-label="Закрепить панель"><i data-icon="pin-menu"></i></button>
+    </div>
+    <div class="nav__list"></div>
+  </nav>
+
+  <main class="page ds-split" data-screen-label="КНР">
+    <div class="splitpane splitpane--h" data-splitter data-min="25" data-max="75" data-initial="42">
+
+      <div class="splitpane__panel splitpane__a app-pane-demo">
+        <div class="demo-stage">
+          <div class="pg__stage"><div class="pg__stagebox" id="pg-stage"></div></div>
+        </div>
+      </div>
+
+      <div class="spl spl--h" role="separator" aria-orientation="horizontal" aria-label="Изменить высоту демо" tabindex="0"><span class="spl__grip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+      <div class="splitpane__panel splitpane__b app-pane-docs">
+        <div class="tabs tabs--horiz" role="tablist" data-tabs aria-label="Разделы страницы">
+          <button type="button" class="tab tab--m" id="tab-constructor" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-constructor" aria-controls="pane-constructor"><span class="tab__label">Конструктор</span></button>
+          <button type="button" class="tab tab--m tab--selected" id="tab-docs" role="tab" aria-selected="true" tabindex="0" data-pane="pane-docs" aria-controls="pane-docs"><span class="tab__label">Документация</span></button>
+          <button type="button" class="tab tab--m" id="tab-code" role="tab" aria-selected="false" tabindex="-1" data-pane="pane-code" aria-controls="pane-code"><span class="tab__label">Код</span></button>
+        </div>
+
+        <div class="tabs-body">
+
+          <div class="tabpane" id="pane-docs" role="tabpanel" aria-labelledby="tab-docs">
+            <div class="docs-layout">
+              <div class="docs-main">
+
+<header class="masthead">
+  <div class="meta"><span>Версия: <b>0.008</b></span><span>Обновлено: <b>21.09.2026</b></span><span>Категория: <b>Сделка</b></span></div>
+  <p class="eyebrow"><a class="inl" href="../index.html">Локальные компоненты Post</a> · Сделка</p>
+  <h1>КНР</h1>
+  <p class="lead">Ключевые носители риска по сделке с рейтингом и зоной проблемности. Тайл отвечает на один вопрос: кто несёт кредитный риск по этой сделке и насколько он проблемный. Состав правится в связанном окне выбора.</p>
+</header>
+
+<section class="section" data-screen-label="Назначение">
+  <h2>Назначение</h2>
+  <p class="desc">КНР — основной контрагент по сделке, но их может быть несколько, поэтому тайл показывает список, а не одно значение. Те же КНР видны в колонке «КНР» реестра «Текущий портфель». Строка тайла — пара «наименование ↔ риск-метрика», а не карточка контрагента: подробности открываются по ссылке с наименования.</p>
+  <p class="desc">На странице сделки тайл показывает КНР этой сделки — тех, кого отметили в модальном окне КНР и сохранили. Пока данные загружаются, строки показаны каркасом в их размерах. После сохранения в окне тайл обновляется сразу.</p>
+  <p class="desc">На странице сделки тайл стоит на трёх колонках из двенадцати, на узкой странице — на шести. Высота — не меньше 200px, даже когда тайл пуст.</p>
+</section>
+
+<section class="section" data-screen-label="Из чего собрана">
+  <h2>Из чего собрана</h2>
+  <p class="desc">Своего в тайле — только раскладка двух колонок. Всё остальное — готовые компоненты.</p>
+  <div class="tbl" data-table>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="th th--separator"></div>
+      <div class="th"><span class="th__label">Компонент</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+      <div class="th"><span class="th__label">Что делает в тайле</span><span class="th__resize" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Изменить ширину колонки"></span></div>
+      <div class="th th--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/organisms/Tile.html">Tile</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Плашка, шапка с заголовком и действиями, место под сообщение об ошибке</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/atoms/Link.html">Link</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Наименование контрагента — ссылка на его карточку, до двух строк</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/organisms/RiskMetric.html">RiskMetric</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Рейтинг и зона проблемности: чип и поповер</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/molecules/Tooltip.html">Tooltip</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Список скрытых КНР у строки «и ещё N КНР»</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/atoms/LabelHelper.html">LabelHelper</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Лейблы колонок</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/molecules/Alert.html">Alert</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Ошибка загрузки</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/atoms/Buttons.html">Buttons</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">«Заполнить» в пустом состоянии</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/atoms/IconButton.html">IconButton</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Действия шапки: «Редактировать» и «Развернуть»</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/atoms/Skeleton.html">Skeleton</a></span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Загрузка: строки в габаритах будущих данных</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
+      <div class="tc tc--separator"></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../CardCounterparty/CardCounterparty.doc.preview.html">Карточка контрагента</a> (локальный компонент)</span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Карточки в модальном окне КНР</span></span></div>
+      <div class="tc tc--separator"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-screen-label="Состояния">
+  <h2>Состояния</h2>
+  <p class="desc">Состояние складывается из двух осей: что с данными — есть, загружаются, заполнены частично, их нет или пришла ошибка — и можно ли править.</p>
+  <p class="desc">Править нельзя, когда у роли нет права или когда статус сделки не допускает правку: «Активная», «Погашена», «Ожидает подтверждения», «Подтверждение изменений» — статус здесь сильнее роли. Тогда тайл в режиме просмотра: вместо «Редактировать» — «Развернуть», и окно открывается без правки. Пока КНР не заполнены, вместо кнопки «Заполнить» стоит строка «Не заполнено».</p>
+  <div class="cases" id="cases"></div>
+</section>
+
+<section class="section" data-screen-label="Переполнение">
+  <h2>Переполнение</h2>
+  <p class="desc">Показываются первые два КНР, остальные — строкой «и ещё N КНР». При наведении на неё тултип показывает скрытых списком.</p>
+  <p class="desc">Длинное наименование переносится до двух строк, дальше — многоточие; риск-метрика с места не уходит.</p>
+  <p class="desc">Лейблы колонок — в две строки: «Наименование / контрагента» и «Рейтинг и зона / проблемности». В одну строку они встают только вместе, когда тайл шире 406px и помещаются обе подписи.</p>
+  <p class="desc">Тайл реагирует на свою ширину: ниже 240px строка складывается в две, и правый лейбл убирается — над одной колонкой он ни над чем не стоит. Проверить это можно слайдером ширины в конструкторе.</p>
+</section>
+
+<section class="section" data-screen-label="Связанные артефакты">
+  <h2>Связанные артефакты</h2>
+  <p class="desc">Действие в шапке и кнопка «Заполнить» открывают <a class="inl" href="TileKNRModal.doc.preview.html">модальное окно КНР</a> — там ищут контрагентов, переносят их в участники сделки и отмечают среди них носителей риска.</p>
+  <p class="desc">Когда из участников убирают контрагента, уже отмеченного как КНР, поверх окна появляется окно подтверждения. Правки окна применяются к сделке кнопкой «Сохранить»; крестик и Esc их отменяют.</p>
+</section>
+
+<section class="section" data-screen-label="Backlog">
+  <h2>Бэклог</h2>
+  <p class="desc">Кейсы, которых недостаёт документации.</p>
+  <div class="panel">
+    <ul class="rules">
+      <li><b>Обновление</b> — как выглядит тайл, пока данные перезапрашиваются.</li>
+      <li><b>Нет права видеть</b> — что стоит на месте тайла, если роль не видит КНР.</li>
+      <li><b>Повтор запроса из ошибки</b> — кнопки повтора на макете нет, и данные не перезапросить, не перезагрузив страницу.</li>
+      <li><b>Порог «и ещё N» на шести колонках</b> — сколько КНР показывать, когда тайл шире.</li>
+      <li><b>Адрес карточки контрагента</b> — ссылка с наименования пока никуда не ведёт: экрана контрагента нет.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="page-foot"><p class="desc">Паспорт компонента — <code>TileKNR.md</code>, журнал — <code>CHANGELOG.md</code>.</p></footer>
+
+              </div>
+              <nav class="docs-toc" id="docs-toc" aria-label="Содержание страницы"></nav>
+            </div>
+          </div>
+
+          <!-- Вёрстка под всеми тремя табами одинакова: общий контейнер
+               .docs-layout > .docs-main. Без него панели расходятся по ширине и
+               отступам с «Документацией» (ds-rules §11). -->
+          <div class="tabpane" id="pane-constructor" role="tabpanel" aria-labelledby="tab-constructor" hidden>
+            <div class="docs-layout">
+              <div class="docs-main">
+                <h2>Конструктор</h2>
+                <p class="desc">Состояние данных и режим прав — две оси, из которых складываются состояния тайла. Слайдер ширины показывает перестроение по своей ширине и лейблы в одну или в две строки, длинные наименования — строку «и ещё N» и перенос наименования в две строки.</p>
+                <div class="pg__controls" id="pg-controls"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tabpane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+            <div class="docs-layout">
+              <div class="docs-main">
+                <h2>Код компонента</h2>
+                <p class="desc">Эталонная разметка, CSS компонента и выжимка того, чем он оживает.</p>
+                <div class="segctrl segctrl--s code-switch" role="radiogroup" aria-label="Язык кода" data-segctrl>
+                  <div class="segctrl__thumb"></div>
+                  <button type="button" class="segctrl__item" role="radio" aria-checked="true" data-lang="html"><span class="segctrl__label">HTML</span></button>
+                  <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="css"><span class="segctrl__label">CSS</span></button>
+                  <button type="button" class="segctrl__item" role="radio" aria-checked="false" data-lang="js"><span class="segctrl__label">JS</span></button>
+                </div>
+                <div class="code-panel code-view" data-view="html"><pre><code id="code-out-html"></code></pre></div>
+                <div class="code-panel code-view" data-view="css" hidden><pre><code id="code-out-css"></code></pre></div>
+                <div class="code-panel code-view" data-view="js" hidden><pre><code id="code-out-js"></code></pre></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- модалка смены роли (триггер — кнопка выхода в футере панели) -->
+<!-- Связанный артефакт тайла: то же окно и то же подтверждение, что на странице
+     сделки. Стоят здесь, чтобы действия демо-тайла реально его поднимали —
+     иначе страница рассказывает про окно, но показать его не может. -->
+<ds-include src="./TileKNRModal.html"></ds-include>
+<ds-include src="./TileKNRConfirm.html"></ds-include>
+
+<div class="modal-scrim" id="role-modal" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="role-modal-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="role-modal-title">Сменить роль</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" data-modal-close aria-label="Закрыть"><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button type="button" class="btn btn--outline btn--m" data-role="Финансист ДИД" data-modal-close><span class="btn__label">Финансист ДИД</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../kit.js"></script>
+<!-- контрагенты окна: мок и стор — до рантаймов, как на странице сделки -->
+<script src="../../data/mock-counterparties.js"></script>
+<script src="../../data/post-api.js"></script>
+<script src="../../data/counterparties-store.js"></script>
+<script src="../../../../DS-IBP/scripts/ds.js"></script>
+<script src="../../../../DS-IBP/scripts/ibp-home.js"></script>
+<script src="../kit-nav.js"></script>
+<script src="../kit-docpage.js"></script>
+<!-- рендер карточки — до скрипта окна: он им рисует свои колонки -->
+<script src="../CardCounterparty/CardCounterparty.js"></script>
+<script src="./TileKNRModal.js"></script>
+<script src="./TileKNR.js"></script>
+<script>
+/* Экранный скрипт страницы. Панель рисует общий PostKitNav из ../kit.js,
+   контролы конструктора — PostKitDoc; здесь только то, что принадлежит этому
+   компоненту: его разметка и ссылка на хаб в футере панели.
+   Футер отдаёт IBPHome.footerHTML с зашитым href="#" — подменяем здесь.
+   Проверяет сторож projects-hub.mjs (П5). */
+(function () {
+  'use strict';
+  var USER_LINK_FROM = ' href="#" aria-label="Открыть личный кабинет"';
+  var USER_LINK_TO = ' href="../../../../index.html" aria-label="Хаб проектов"';
+  var role = (window.IBPHome && window.IBPHome.defaultRole) || 'Финансист ДИД';
+  /* Запасная разметка футера — не украшение: анатомия NavPanel берётся как
+     есть, и приёмка читает .html, а не ibp-home.js (линтер, F5). */
+  var footer = (window.IBPHome && window.IBPHome.footerHTML)
+    ? window.IBPHome.footerHTML(role, { logoutModal: 'role-modal', logoutLabel: 'Сменить роль / выйти' }).replace(USER_LINK_FROM, USER_LINK_TO)
+    : '<div class="nav__footer">'
+      + '<a class="nav__user" href="../../../../index.html" aria-label="Хаб проектов">'
+      + '<span class="av av--circular av--m"><span class="av__text">АП</span></span>'
+      + '<span class="nav__user-text">'
+      + '<span class="nav__user-name">Александров Петр Константинович</span>'
+      + '<span class="nav__user-role">' + role + '</span>'
+      + '</span></a>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m nav__logout" aria-label="Выйти" data-modal="role-modal"><i data-icon="logout"></i></button>'
+      + '</div>';
+
+  window.PostKitNav.render({
+    nav: document.getElementById('nav'),
+    base: '..',
+    current: 'TileKNR',
+    footer: footer
+  });
+
+  /* ── Разметка тайла ────────────────────────────────────────────────
+     Единственное место, где она живёт на этой странице: и демо, и блоки
+     состояний собираются одной функцией — иначе они разошлись бы. */
+  function knr(name, rating, zone) {
+    return { name: name, risk: { rating: rating, zone: zone, ratingDate: '24.10.2025', zoneDate: '24.10.2025',
+      segment: 'Крупный бизнес', profile: 'Непроектный' } };
+  }
+  var KNR = [
+    knr('КГ Самолёт', 26, 'red'),
+    knr('СамолётИнвестХолдинг Inc', 26, 'green'),
+    knr('ООО «ЮгСтрой»', 18, 'watchlist'),
+    knr('АО «Самолёт-Девелопмент»', 31, 'green')
+  ];
+  var LONG = [
+    knr('Консолидированная группа «Самолёт-Инвест-Холдинг-Девелопмент-Северо-Запад»', 26, 'red'),
+    knr('Акционерное общество «Специализированный застройщик Самолёт-Мытищи»', 26, 'green'),
+    knr('ООО «ЮгСтрой»', 18, 'watchlist')
+  ];
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function head() {
+    return '<div class="lc-knr__head">'
+      + '<span class="ds-label ds-label--wrap"><span class="ds-label__text">Наименование <br class="lc-knr__br">контрагента</span></span>'
+      + '<span class="ds-label ds-label--wrap ds-label--right"><span class="ds-label__text">Рейтинг и зона <br class="lc-knr__br">проблемности</span></span>'
+      + '</div>';
+  }
+
+  /* Строки КНР строит компонент (TileKNR.js) — та же функция, что на
+     странице сделки, поэтому разметка строки одна. */
+  function rows(list) { return window.PostTileKNR.rowsHTML(list); }
+
+  function tile(state, mode, list) {
+    var partial = state === 'partial';
+    var body = state === 'loading'
+      ? '<div class="lc-knr__loading" aria-busy="true">' + head()
+        + '<div class="lc-knr__row"><span class="sk-line" style="--sk-w:80%" aria-hidden="true"></span>'
+        + '<span class="sk-block sk-block--rounded" style="--sk-w:52px;--sk-h:24px" aria-hidden="true"></span></div>'
+        + '<div class="lc-knr__row"><span class="sk-line" style="--sk-w:64%" aria-hidden="true"></span>'
+        + '<span class="sk-block sk-block--rounded" style="--sk-w:52px;--sk-h:24px" aria-hidden="true"></span></div></div>'
+      : '<div class="lc-knr__list">' + head()
+        + (partial
+            ? rows([{ name: 'КГ Самолёт', risk: null }])
+            : rows(list))
+        + '</div>'
+        + '<div class="lc-knr__fill"><button type="button" class="btn btn--accent btn--m" data-modal="knr-scrim" data-modal-guarded><span class="btn__label">Заполнить</span></button></div>'
+        + '<p class="lc-knr__empty">Не заполнено</p>';
+
+    return '<section class="tile lc-knr" data-state="' + state + '" data-mode="' + mode + '">'
+      + '<header class="tile__header"><div class="tile__header-main">'
+      + '<div class="tile__title-row"><h3 class="tile__title">КНР</h3></div></div>'
+      + '<div class="tile__actions">'
+      /* data-modal — тот же хук, что на странице сделки: действие тайла
+         поднимает связанное окно рантаймом ds-modal.js, своего кода не нужно.
+         data-modal-guarded — в окне черновик, клик мимо его не сбрасывает */
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m lc-knr__act lc-knr__act--edit" aria-label="Редактировать" data-modal="knr-scrim" data-modal-guarded><i data-icon="edit"></i></button>'
+      + '<button type="button" class="ibtn ibtn--neutral ibtn--m lc-knr__act lc-knr__act--view" aria-label="Развернуть" data-modal="knr-scrim" data-modal-guarded><i data-icon="maximize"></i></button>'
+      + '</div></header>'
+      + '<div class="tile__alert lc-knr__error"><div class="alert alert--error alert--m" data-alert-tone="error" role="alert">'
+      + '<span class="alert__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>'
+      + '<div class="alert__body"><p class="alert__title">Не удалось загрузить КНР</p>'
+      + '<p class="alert__text">Сервис рейтингов не ответил. Повторите попытку позже.</p></div></div></div>'
+      + '<div class="tile__body">' + body + '</div>'
+      + '</section>';
+  }
+
+  function paint(root) {
+    if (window.dsIcons) window.dsIcons.apply(root);
+    if (window.DSRiskMetric) window.DSRiskMetric.mount(root);
+    /* Триггеры модалки рантайм привязывает поштучно на DOMContentLoaded
+       (ds-modal.js: bindAll, не делегирование). Тайл здесь рисуется скриптом,
+       поэтому после каждой перерисовки привязку надо повторить — иначе кнопки
+       демо окно не поднимут. */
+    if (window.DSModal) window.DSModal.bindAll(root);
+    /* то же у тултипа «и ещё N КНР»: ds-tooltip.js обходит [data-tooltip]
+       только на загрузке страницы */
+    if (window.DSTooltip) window.DSTooltip.bindAll(root);
+  }
+
+  /* демо */
+  var stage = document.getElementById('pg-stage');
+  PostKitDoc.controls([
+    { key: 'state', label: 'Состояние данных', options: [
+      ['data', 'Данные есть'], ['loading', 'Загрузка'], ['partial', 'Заполнено частично'],
+      ['empty', 'Данных нет'], ['error', 'Ошибка']] },
+    { key: 'mode', label: 'Режим прав', options: [['edit', 'Редактирование'], ['view', 'Только просмотр']] },
+    { key: 'width', label: 'Ширина, px', range: { min: 180, max: 940, step: 10 }, value: 400 },
+    { key: 'long', label: 'Длинные наименования', bool: true, value: false }
+  ], function (st) {
+    stage.style.width = st.width + 'px';
+    stage.innerHTML = tile(st.state, st.mode, st.long ? LONG : KNR);
+    paint(stage);
+  });
+
+  /* состояния рядом — секция документации */
+  var cases = document.getElementById('cases');
+  [['Данные есть · просмотр', 'data', 'view'],
+   ['Данные есть · правка', 'data', 'edit'],
+   ['Загрузка', 'loading', 'edit'],
+   ['Заполнено частично', 'partial', 'edit'],
+   ['Данных нет · правка', 'empty', 'edit'],
+   ['Данных нет · просмотр', 'empty', 'view'],
+   ['Ошибка · правка', 'error', 'edit'],
+   ['Ошибка · просмотр', 'error', 'view']].forEach(function (c) {
+    var box = document.createElement('div');
+    box.innerHTML = '<p class="case__label">' + c[0] + '</p>' + tile(c[1], c[2], KNR);
+    cases.appendChild(box);
+  });
+  paint(cases);
+})();
+</script>
+<script>window.DS_SPLIT_SWITCH_LABELS = { 'Длинные наименования': 'Длинные наименования' };</script>
+<script src="../../../../DS-IBP/scripts/docs-split.js"></script>
+
+<script type="text/plain" id="src-code-html">
+<section class="tile lc-knr" data-state="data" data-mode="edit">
+  <header class="tile__header">
+    <div class="tile__header-main">
+      <div class="tile__title-row"><h3 class="tile__title">КНР</h3></div>
+    </div>
+    <div class="tile__actions">
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-knr__act lc-knr__act--edit"
+              aria-label="Редактировать" data-modal="knr-scrim" data-modal-guarded><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-knr__act lc-knr__act--view"
+              aria-label="Развернуть" data-modal="knr-scrim" data-modal-guarded><i data-icon="maximize"></i></button>
+    </div>
+  </header>
+
+  <div class="tile__alert lc-knr__error">
+    <div class="alert alert--error alert--m" data-alert-tone="error" role="alert">
+      <span class="alert__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+      <div class="alert__body">
+        <p class="alert__title">Название ошибки</p>
+        <p class="alert__text">Описание ошибки</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile__body">
+    <div class="lc-knr__list">
+      <div class="lc-knr__head">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Наименование <br class="lc-knr__br">контрагента</span></span>
+        <span class="ds-label ds-label--wrap ds-label--right"><span class="ds-label__text">Рейтинг и зона <br class="lc-knr__br">проблемности</span></span>
+      </div>
+      <div class="lc-knr__row">
+        <span class="lc-knr__name"><a class="link link--accent link--s" href="#">КГ Самолёт</a></span>
+        <span data-riskmetric data-risk="26" data-zone="red"
+              data-rating-date="24.10.2025" data-zone-date="24.10.2025"></span>
+      </div>
+      <span class="lc-knr__more" tabindex="0"
+            data-tooltip="ООО «ЮгСтрой», АО «Самолёт-Девелопмент»"
+            data-tooltip-multiline="yes">и ещё 2 КНР</span>
+    </div>
+
+    <div class="lc-knr__loading" aria-busy="true">…скелетоны в габаритах строк…</div>
+    <div class="lc-knr__fill"><button type="button" class="btn btn--accent btn--m"><span class="btn__label">Заполнить</span></button></div>
+    <p class="lc-knr__empty">Не заполнено</p>
+  </div>
+</section>
+</script>
+
+<script type="text/plain" id="src-code-css">
+</script>
+
+<script type="text/plain" id="src-code-js">
+/* Риск-метрику, тултип и открытие модалки поднимают рантаймы ДС по хукам
+   в разметке:
+
+   data-riskmetric     — чип и поповер собирает ds-riskmetric.js
+   data-tooltip        — список скрытых КНР показывает ds-tooltip.js
+                         (обязателен data-tooltip-multiline="yes")
+   data-modal          — окно выбора открывает ds-modal.js
+   data-modal-guarded  — клик мимо окна его не закрывает: в окне черновик
+
+   Что показывать — решают два атрибута на корне, их ставит экран на метке.
+   Страница сделки ставит loading: строки придут из данных.
+
+     <ds-include src="…/TileKNR.html" id="tile-knr" class="col-3 colw-6" state="loading" mode="edit"></ds-include>
+
+   Строки КНР — TileKNR.js:
+
+     PostTileKNR.rowsHTML(list)   — первые два КНР строками, остальные —
+                                    «и ещё N КНР»; list — [{ name, risk }]
+     PostTileKNR.render(tile, list) — заменить строки, data-state → data | empty
+
+   Страница сделки берёт КНР своей сделки из CounterpartiesStore и
+   перерисовывает тайл после «Сохранить» в окне:
+
+     store.use(dealId).then(paint);   // paint = render(tile, store.knr())
+     store.on('commit', paint);
+</script>
+</body>
+</html>

@@ -146,7 +146,7 @@
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.003</b></span><span>Обновлено: <b>05.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.003</b></span><span>Обновлено: <b>21.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>ProgressBar</h1>
     <p class="lead">Линейный индикатор прогресса: заполнение трека отражает долю значения от максимума. Определённый режим (значение известно) и неопределённый (длительность неизвестна); шесть тональных вариантов на локальных статусных токенах; три размера.</p>
@@ -584,7 +584,7 @@ function positionFloatingMarkers(scope) {
     () => state.tone, v => state.tone = v);
   controls.appendChild(toneCtl);
   controls.appendChild(select('Размер',
-    [['s','S'],['m','M'],['l','L']],
+    [['s','S · 4 px'],['m','M · 6 px'],['l','L · 8 px']],
     () => state.size, v => state.size = v));
   const valueCtl = range('Значение', 0, 100, 1, () => state.value, v => state.value = v, v => v + '%');
   controls.appendChild(valueCtl);

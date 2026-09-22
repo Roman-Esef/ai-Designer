@@ -107,6 +107,10 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
   .ctl .rng-row { display:flex; align-items:center; justify-content:space-between; }
   .ctl .rng-row .val { font: var(--type-body-s-strong); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
   .pg__stage { flex:1; min-height:0; width:100%; padding:32px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:14px; }
+  /* пример полосы прокрутки: рамка — у обёртки, у самой области .ds-scroll её нет (инвариант) */
+  .scroll-demo { max-width:360px; border:1px solid var(--border-light); border-radius:var(--radius-m); background:var(--bg-tile); overflow:hidden; }
+  .scroll-demo__area { height:180px; padding:var(--space-12) var(--space-8) var(--space-12) var(--space-16); }
+  .scroll-demo__row { margin:0; padding:var(--space-8) 0; font:var(--type-body-m); color:var(--text-primary); border-bottom:1px solid var(--border-light); }
 </style>
   <link rel="stylesheet" href="../../styles/splitter.css">
   <link rel="stylesheet" href="../../styles/segment-control.css">
@@ -154,7 +158,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.010</b></span><span>Обновлено: <b>13.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.012</b></span><span>Обновлено: <b>21.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Основы</p>
     <h1>Каркас экрана</h1>
     <p class="lead">Любой экран продукта складывается из одних и тех же зон: панель навигации слева, рабочая область справа, внутри рабочей области зона хлебных крошек над контентной областью. Стартовая страница с навигационными тайлами, реестр с таблицей и карточка сущности отличаются только содержимым контентной области — зоны, поля и правила скролла у них одинаковые.</p>
@@ -256,6 +260,24 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
     <h2>Поведение</h2>
     <h3>Скролл</h3>
     <p class="desc">Скроллится только контентная область. Панель навигации со страницей не скроллится: она фиксирована на всю высоту вьюпорта (<code class="tok">position: fixed; height: 100vh</code>), а её список пунктов имеет собственный внутренний скролл — длинное меню прокручивается независимо от контента, верхний блок и подвал панели остаются на месте. Зона крошек залипает у верхней кромки рабочей области (<code class="tok">position: sticky; top: 0</code>) и остаётся видимой на всей длине страницы.</p>
+    <h3>Полоса прокрутки</h3>
+    <p class="desc">Внутренняя область, которая прокручивается сама по себе — колонка модального окна, список в панели, — получает общую полосу прокрутки ДС, класс <code class="tok">.ds-scroll</code>. Видна только полоса-бегунок: 8&nbsp;px, полное скругление, цвет Secondary. Дорожки и стрелок нет. В покое бегунок скрыт, при прокрутке появляется и через 800&nbsp;мс после остановки плавно гаснет. Место под бегунок зарезервировано, поэтому контент не сдвигается, когда у области появляется скролл. Прокручивается область только по вертикали: горизонтального скролла у неё не бывает, даже если внутри есть элемент шире неё. Своей рамки у такой области нет: рамку ставят обёртке. Прокрутите пример.</p>
+    <div class="scroll-demo">
+      <div class="scroll-demo__area ds-scroll" tabindex="0" aria-label="Пример полосы прокрутки">
+        <p class="scroll-demo__row">Строка 1</p>
+        <p class="scroll-demo__row">Строка 2</p>
+        <p class="scroll-demo__row">Строка 3</p>
+        <p class="scroll-demo__row">Строка 4</p>
+        <p class="scroll-demo__row">Строка 5</p>
+        <p class="scroll-demo__row">Строка 6</p>
+        <p class="scroll-demo__row">Строка 7</p>
+        <p class="scroll-demo__row">Строка 8</p>
+        <p class="scroll-demo__row">Строка 9</p>
+        <p class="scroll-demo__row">Строка 10</p>
+        <p class="scroll-demo__row">Строка 11</p>
+        <p class="scroll-demo__row">Строка 12</p>
+      </div>
+    </div>
     <h3>Адаптивность</h3>
     <p class="desc">При уменьшении окна раскладка перестраивается по брейкпоинтам: блоки меняют число занимаемых колонок и переходят один под другой, экран остаётся собранным под меньшее разрешение. Горизонтального скролла у рабочей области нет — контент не выталкивается за кромку.</p>
     <p class="desc">Точка отсчёта — ширина рабочей области, а не окна: закрепление панели навигации сужает контент на 216&nbsp;px, не меняя вьюпорт, и раскладка обязана отреагировать так же, как на уменьшение окна. Поэтому рабочая область объявлена контейнером (<code class="tok">container-name: screen</code>), а экран пишет свои шаги как <code class="tok">@container screen (max-width: …)</code>, не через <code class="tok">@media</code>.</p>
@@ -458,6 +480,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 
 <script src="../../scripts/ds-splitter.js"></script>
 <script src="../../scripts/ds-tabs.js"></script>
+<script src="../../scripts/ds-scroll.js"></script>
 <script src="../../scripts/layout.page.js"></script>
 <script src="../../scripts/ds-nav.js"></script>
 <script>window.DS_SPLIT_SWITCH_LABELS = {};</script>
@@ -496,8 +519,11 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
               между крошками и контентом отступ 8px (--layout-pad-top);
               контентная область резиновая, на узком окне раскладка перестраивается
               по брейкпоинтам — горизонтального скролла нет.
+   Прокрутка: .ds-scroll — общая полоса прокрутки внутренних областей
+              (только бегунок, гаснет после прокрутки; рантайм scripts/ds-scroll.js).
    Requires:  spacing.css (шкала и сетка .grid12/.col-N), colors.css,
-              nav-panel.css, breadcrumbs.css
+              palette.css и radius.css (бегунок .ds-scroll), nav-panel.css,
+              breadcrumbs.css
    ========================================================================= */
 
 :root {
@@ -551,6 +577,68 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .screen--app .screen__content { min-height: 0; }
 
 /* колоночная сетка — компонент Spacing (.grid12 + .col-N), здесь не дублируется:
-   <div class="grid12"><section class="col-3">…</section></div> */</script>
+   <div class="grid12"><section class="col-3">…</section></div> */
+
+/* ---------- прокрутка: .ds-scroll ----------
+   Общая полоса прокрутки ДС для областей, которые скроллятся внутри экрана
+   (колонки модального окна, списки в панели). Только бегунок: дорожки и
+   стрелок нет, скругление полное, цвет Secondary. В покое бегунок скрыт,
+   появляется при прокрутке и плавно гаснет: класс .is-scrolling ставит и
+   снимает рантайм scripts/ds-scroll.js — делегированно, привязывать не нужно.
+   Место под бегунок зарезервировано (scrollbar-gutter: stable): контент не
+   сдвигается, когда у области появляется скролл.
+   Как гаснет. Переход у псевдоэлемента скроллбара браузеры не поддерживают,
+   поэтому бегунок берёт цвет из border-color самой области (рамки у неё нет:
+   border-style не задан) и заливает себя им широкой правой рамкой, а переход
+   идёт на border-color области. Отсюда инвариант: у элемента с .ds-scroll
+   своей видимой рамки не бывает — рамку ставят обёртке.
+   Прокрутка только по вертикали. Без явного overflow-x браузер вычисляет его
+   в auto (раз overflow-y не visible), и горизонтальный скролл давали
+   невидимые узлы: закрытые тултип и выпадающий список стоят в раскладке
+   (position:absolute + visibility:hidden) и выходят за правый край области
+   (колонки окна КНР, 21.09.2026). clip здесь не годится — при overflow-y:auto
+   он всё равно вычисляется в hidden. Открытый плавающий слой уезжает в
+   DSFloat (position:fixed), поэтому hidden его не обрезает. */
+.ds-scroll {
+  --scroll-w: 8px;     /* ширина бегунка — как у тела Modal */
+  --scroll-show: .1s;  /* появление при прокрутке */
+  --scroll-fade: .3s;  /* затухание после остановки */
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  border-color: transparent;
+  transition: border-color var(--scroll-fade) ease;
+}
+.ds-scroll.is-scrolling {
+  border-color: var(--secondary);
+  transition-duration: var(--scroll-show);
+}
+.ds-scroll::-webkit-scrollbar { width: var(--scroll-w); height: var(--scroll-w); background: transparent; }
+.ds-scroll::-webkit-scrollbar-track,
+.ds-scroll::-webkit-scrollbar-corner { background: transparent; }
+.ds-scroll::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+.ds-scroll::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-full);
+  border-style: solid;
+  border-color: inherit;
+  border-width: 0 calc(100vw + 100vh) 0 0;
+}
+/* Firefox: псевдоэлементов скроллбара нет — тонкая системная полоса с тем
+   же цветом и тем же появлением. Стандартные свойства заданы только здесь:
+   Chrome, увидев scrollbar-color, перестал бы применять ::-webkit-scrollbar. */
+@supports not selector(::-webkit-scrollbar) {
+  .ds-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color var(--scroll-fade) ease;
+  }
+  .ds-scroll.is-scrolling {
+    scrollbar-color: var(--secondary) transparent;
+    transition-duration: var(--scroll-show);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-scroll { transition: none; }
+}</script>
 </body>
 </html>

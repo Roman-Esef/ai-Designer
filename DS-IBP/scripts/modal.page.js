@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ], () => state.content, v => state.content = v));
 
     controls.appendChild(ctl('Алерт над контентом', [
-      ['none','Нет'],['error','Ошибка'],['warning','Предупреждение'],
+      ['none','Без алерта'],['error','Алерт-ошибка'],['warning','Алерт-предупреждение'],
     ], () => state.alert, v => state.alert = v));
 
     controls.appendChild(ctl('Состояние', [

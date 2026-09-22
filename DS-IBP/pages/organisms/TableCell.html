@@ -131,8 +131,8 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     Обзор компонентов
   </a>
   <div class="meta">
-    <span>Версия <b>2.020</b></span>
-    <span>Обновлено <b>19.09.2026</b></span>
+    <span>Версия <b>2.021</b></span>
+    <span>Обновлено <b>21.09.2026</b></span>
     <span>CSS <b>styles/table-cell.css</b></span>
     <span>Зависимости <b>checkbox, chip, icon-button, button, input, dropdown-list, tooltip, chart</b></span>
   </div>
@@ -805,7 +805,7 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
                     <div class="ctl" id="ctl-sort-dir-wrap">
                       <div class="lbl">Состояние сортировки</div>
                       <div class="pg-select"><select id="ctl-sort-dir">
-                        <option value="none" selected>Не выбрана</option>
+                        <option value="none" selected>Без сортировки</option>
                         <option value="asc">По возрастанию</option>
                         <option value="desc">По убыванию</option>
                       </select></div>
@@ -838,8 +838,8 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
                     <div class="ctl" id="ctl-align-wrap">
                       <div class="lbl">Выравнивание</div>
                       <div class="pg-select"><select id="ctl-align">
-                        <option value="left" selected>Слева</option>
-                        <option value="right">Справа</option>
+                        <option value="left" selected>По левому краю</option>
+                        <option value="right">По правому краю</option>
                       </select></div>
                     </div>
                     <div class="ctl" id="ctl-text-wrap">
@@ -849,14 +849,14 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
                     <div class="ctl" id="ctl-level-wrap">
                       <div class="lbl">Уровень дерева</div>
                       <div class="pg-select"><select id="ctl-level">
-                        <option value="0" selected>0 — корень</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
+                        <option value="0" selected>Корень</option>
+                        <option value="1">Уровень 1</option>
+                        <option value="2">Уровень 2</option>
                       </select></div>
                     </div>
                     <div class="ctl" id="ctl-lead-wrap">
-                      <div class="lbl">Иконка слева</div>
-                      <label class="pg-toggle"><input id="ctl-lead-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать</span></label>
+                      <label class="pg-toggle"><input id="ctl-lead-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Иконка слева</span></label>
+                      <div class="lbl">Вариант</div>
                       <div class="pg-select"><select id="ctl-lead-glyph">
                         <option value="check-circle" selected>check-circle</option>
                         <option value="bank">bank</option>
@@ -867,18 +867,18 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
                       </select></div>
                     </div>
                     <div class="ctl" id="ctl-prefix-wrap">
-                      <div class="lbl">Prefix</div>
-                      <label class="pg-toggle"><input id="ctl-prefix-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать</span></label>
+                      <label class="pg-toggle"><input id="ctl-prefix-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Prefix</span></label>
+                      <div class="lbl">Пример</div>
                       <div class="pg-text"><input id="ctl-prefix-text" type="text" placeholder="от" maxlength="16"></div>
                     </div>
                     <div class="ctl" id="ctl-postfix-wrap">
-                      <div class="lbl">Postfix</div>
-                      <label class="pg-toggle"><input id="ctl-postfix-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать</span></label>
+                      <label class="pg-toggle"><input id="ctl-postfix-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Postfix</span></label>
+                      <div class="lbl">Пример</div>
                       <div class="pg-text"><input id="ctl-postfix-text" type="text" placeholder="RUB" maxlength="16"></div>
                     </div>
                     <div class="ctl" id="ctl-icon-wrap">
-                      <div class="lbl">Иконка справа</div>
-                      <label class="pg-toggle"><input id="ctl-icon-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Показывать</span></label>
+                      <label class="pg-toggle"><input id="ctl-icon-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Иконка справа</span></label>
+                      <div class="lbl">Вариант</div>
                       <div class="pg-select"><select id="ctl-icon-glyph">
                         <option value="alert-triangle" selected>alert-triangle</option>
                         <option value="check-circle">check-circle</option>
@@ -889,16 +889,16 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
                       </select></div>
                     </div>
                     <div class="ctl" id="ctl-subtext-wrap">
-                      <div class="lbl">Вторая строка</div>
-                      <label class="pg-toggle"><input id="ctl-subtext-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Дополнительная строка мельче</span></label>
+                      <label class="pg-toggle"><input id="ctl-subtext-on" type="checkbox"><span class="pg-toggle__sw"></span><span>Вторая строка</span></label>
+                      <div class="lbl">Пример</div>
                       <div class="pg-text"><input id="ctl-subtext-text" type="text" placeholder="ИНН 7701234567" maxlength="48"></div>
                     </div>
                     <div class="ctl" id="ctl-chips-count-wrap">
                       <div class="lbl">Количество чипов</div>
                       <div class="pg-select"><select id="ctl-chips-count">
-                        <option value="1">1</option>
-                        <option value="2" selected>2</option>
-                        <option value="3">3</option>
+                        <option value="1">1 чип</option>
+                        <option value="2" selected>2 чипа</option>
+                        <option value="3">3 чипа</option>
                       </select></div>
                     </div>
                     <div class="ctl" id="ctl-chips-tone-wrap">
@@ -911,20 +911,14 @@ if (truncateEnabled &amp;&amp; cellText.scrollWidth &gt; cellText.clientWidth) a
                         <option value="info">Info</option>
                       </select></div>
                     </div>
-                    <div class="ctl">
-                      <div class="lbl">Фон ячейки (колонка)</div>
-                      <div class="pg-select"><select id="ctl-bg">
-                        <option value="none" selected>Обычный</option>
-                        <option value="accent">Accent</option>
-                      </select></div>
-                    </div>
                   </div>
                   <div class="toggles">
-                    <label class="pg-toggle" id="ctl-numeric-wrap"><input id="ctl-numeric" type="checkbox"><span class="pg-toggle__sw"></span><span>Справа, табулярные цифры, разряды</span></label>
-                    <label class="pg-toggle" id="ctl-truncate-wrap"><input id="ctl-truncate" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Три точки + Tooltip (иначе перенос строк)</span></label>
-                    <label class="pg-toggle" id="ctl-chips-rounded-wrap"><input id="ctl-chips-rounded" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Rounded (pill)</span></label>
-                    <label class="pg-toggle" id="ctl-hidden-wrap"><input id="ctl-hidden" type="checkbox"><span class="pg-toggle__sw"></span><span>Появляются по наведению на строку</span></label>
-                    <label class="pg-toggle" id="ctl-edited-wrap"><input id="ctl-edited" type="checkbox"><span class="pg-toggle__sw"></span><span>Признак правки (правый верхний угол)</span></label>
+                    <label class="pg-toggle" id="ctl-numeric-wrap"><input id="ctl-numeric" type="checkbox"><span class="pg-toggle__sw"></span><span>Числовое значение</span></label>
+                    <label class="pg-toggle" id="ctl-truncate-wrap"><input id="ctl-truncate" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Усекать текст с Tooltip</span></label>
+                    <label class="pg-toggle" id="ctl-chips-rounded-wrap"><input id="ctl-chips-rounded" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Скруглённые чипы (pill)</span></label>
+                    <label class="pg-toggle" id="ctl-hidden-wrap"><input id="ctl-hidden" type="checkbox"><span class="pg-toggle__sw"></span><span>Действия по наведению на строку</span></label>
+                    <label class="pg-toggle" id="ctl-edited-wrap"><input id="ctl-edited" type="checkbox"><span class="pg-toggle__sw"></span><span>Признак правки</span></label>
+                    <label class="pg-toggle"><input id="ctl-bg" type="checkbox"><span class="pg-toggle__sw"></span><span>Фон Accent у всей колонки</span></label>
                   </div>
                 </div>
 

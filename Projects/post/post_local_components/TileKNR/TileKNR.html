@@ -2,23 +2,106 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section class="tile" data-state="empty" data-mode="view">
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли
+     Разметка держит ВСЕ состояния сразу, показывает нужное TileKNR.css по этим
+     двум атрибутам — так устроен шаблон ДС (templates/local-component/Component.css).
+     Строки КНР ниже — пример с макета. На странице сделки их заменяет
+     TileKNR.js (PostTileKNR.render) данными сделки, пока они грузятся, тайл
+     стоит в loading. Окно КНР открывается с data-modal-guarded: в нём
+     черновик, и клик мимо окна не должен его сбросить. -->
+<section class="tile lc-knr" data-state="data" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">КНР</h3></div>
     </div>
+    <!-- Действия шапки: в edit — правка, в view — просмотр того же окна.
+         В состоянии «не заполнено» не рисуется ни одно (см. TileKNR.css). -->
     <div class="tile__actions">
-      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-knr__act lc-knr__act--edit"
+              aria-label="Редактировать" data-modal="knr-scrim" data-modal-guarded><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-knr__act lc-knr__act--view"
+              aria-label="Развернуть" data-modal="knr-scrim" data-modal-guarded><i data-icon="maximize"></i></button>
     </div>
   </header>
-  <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
+
+  <!-- Ошибка: полноширинный Alert между шапкой и контентом. Радиус гасит сам
+       слот .tile__alert, свой --flush здесь не нужен. -->
+  <div class="tile__alert lc-knr__error">
+    <div class="alert alert--error alert--m" data-alert-tone="error" role="alert">
+      <span class="alert__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+      <div class="alert__body">
+        <p class="alert__title">Название ошибки</p>
+        <p class="alert__text">Описание ошибки</p>
       </div>
     </div>
+  </div>
+
+  <div class="tile__body">
+
+    <!-- Заполнено: две колонки. Показываем не больше двух КНР, остальные —
+         строкой «и ещё N КНР» с тултипом-списком.
+         Строка — отдельный блок, а не ячейки общей сетки: на своей узкой
+         ширине строка складывается в одну колонку, и в плоской сетке лейбл
+         второй колонки уехал бы вперёд данных. -->
+    <!-- Лейблы колонок — обе подписи в две строки с переносом по смыслу
+         (<br class="lc-knr__br">); в одну строку обе сразу — только когда
+         тайл шире 406px (TileKNR.css). Наименование — до двух строк: клэмп
+         держит обёртка .lc-knr__name, сама ссылка остаётся Link из ДС. -->
+    <div class="lc-knr__list">
+      <div class="lc-knr__head">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Наименование <br class="lc-knr__br">контрагента</span></span>
+        <span class="ds-label ds-label--wrap ds-label--right"><span class="ds-label__text">Рейтинг и зона <br class="lc-knr__br">проблемности</span></span>
+      </div>
+
+      <div class="lc-knr__row">
+        <span class="lc-knr__name"><a class="link link--accent link--s" href="#">КГ Самолёт</a></span>
+        <span data-riskmetric data-risk="26" data-zone="red"
+              data-rating-date="24.10.2025" data-zone-date="24.10.2025"
+              data-segment="Крупный бизнес" data-profile="Непроектный"></span>
+      </div>
+
+      <div class="lc-knr__row">
+        <span class="lc-knr__name"><a class="link link--accent link--s" href="#">СамолётИнвестХолдинг Inc</a></span>
+        <span data-riskmetric data-risk="26" data-zone="green"
+              data-rating-date="24.10.2025" data-zone-date="24.10.2025"
+              data-segment="Крупный бизнес" data-profile="Непроектный"></span>
+      </div>
+
+      <!-- Счётчик скрытых: тултип обязан быть multiline, иначе рантайм режет
+           список в одну строку на 280px (specs/Tooltip.md). -->
+      <span class="lc-knr__more" tabindex="0"
+            data-tooltip="ООО «ЮгСтрой», АО «Самолёт-Девелопмент»"
+            data-tooltip-multiline="yes">и ещё 2 КНР</span>
+    </div>
+
+    <!-- Загрузка: каркас уже на месте — лейблы колонок видны, строки стоят в
+         габаритах будущего содержимого, чтобы раскладка не прыгнула после
+         ответа. Чип метрики — блок в габаритах chip--s (24px). -->
+    <div class="lc-knr__loading" aria-busy="true">
+      <div class="lc-knr__head">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Наименование <br class="lc-knr__br">контрагента</span></span>
+        <span class="ds-label ds-label--wrap ds-label--right"><span class="ds-label__text">Рейтинг и зона <br class="lc-knr__br">проблемности</span></span>
+      </div>
+      <div class="lc-knr__row">
+        <span class="sk-line" style="--sk-w:80%" aria-hidden="true"></span>
+        <span class="sk-block sk-block--rounded" style="--sk-w:52px;--sk-h:24px" aria-hidden="true"></span>
+      </div>
+      <div class="lc-knr__row">
+        <span class="sk-line" style="--sk-w:64%" aria-hidden="true"></span>
+        <span class="sk-block sk-block--rounded" style="--sk-w:52px;--sk-h:24px" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <!-- Не заполнено, право на заполнение есть -->
+    <div class="lc-knr__fill">
+      <button type="button" class="btn btn--accent btn--m" data-modal="knr-scrim" data-modal-guarded>
+        <span class="btn__label">Заполнить</span>
+      </button>
+    </div>
+
+    <!-- Не заполнено, права нет: одна строка причины, действия нет -->
+    <p class="lc-knr__empty">Не заполнено</p>
+
   </div>
 </section>

@@ -141,8 +141,8 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
     Обзор компонентов
   </a>
   <div class="meta">
-    <span>Версия <b>1.012</b></span>
-    <span>Обновлено <b>10.09.2026</b></span>
+    <span>Версия <b>1.013</b></span>
+    <span>Обновлено <b>21.09.2026</b></span>
     <span>CSS <b>styles/tile.css</b></span>
     <span>Зависимости <b>icon-button, button, link, chip, badge, alert, divider, read-only-field, table-cell</b></span>
   </div>
@@ -385,7 +385,8 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
 
   <div class="subsec">
     <h3>Card</h3>
-    <p class="desc tight">Родственник с хэдером типа Card: Title на ступень ниже (<code class="tok">--type-h6-strong</code>, 16/20 вместо 18/24), отступы контента 8/16/20/16 вместо 10/20/24/20 и — главное — <b>собственные интерактивные состояния</b>, которых у Tile нет. Применяется в модальных окнах, списках и на канбан-доске. Alert-слот у Card не предполагается.</p>
+    <p class="desc tight">Родственник с хэдером типа Card: Title на ступень ниже (<code class="tok">--type-h6-strong</code>, 16/20 вместо 18/24), отступы контента 8/16/20/16 вместо 10/20/24/20, зазор Title↔Subtitle↔Chiplist 4 вместо 8 и — главное — <b>собственные интерактивные состояния</b>, которых у Tile нет. Применяется в модальных окнах, списках и на канбан-доске. Alert-слот у Card не предполагается.</p>
+    <p class="desc tight"><b>Грип переноса</b> — <code class="tok">.tile__grip</code>: IconButton M (20×20, глиф <code class="tok">drag-dots</code>) последним в <code class="tok">.tile__actions</code>, разметка <code class="tok">&lt;button class="ibtn ibtn--neutral ibtn--m tile__grip" aria-label="Перенести"&gt;</code>. Card даёт только точку захвата и курсор; жест переноса — у потребителя. Грип нужен, когда в карточке должно работать выделение текста и тащить за тело нельзя. Собрать карточку с грипом можно в конструкторе.</p>
     <p class="desc tight">Класс — модификатор <code class="tok">.tile--card</code>: вся анатомия TileHeader (<code class="tok">.tile__header-main</code>, <code class="tok">.tile__title-row</code>, <code class="tok">.tile__chiplist</code>, <code class="tok">.tile__actions</code>) остаётся той же, меняются геометрия, ступень заголовка и набор состояний. Пример сборки на нём — организм <a class="inl" href="Kanban.html">Kanban</a>.</p>
     <div class="stagebg">
       <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;">
@@ -957,7 +958,7 @@ onToggle():
           <div class="docs-layout">
             <div class="docs-main">
               <h2>Конструктор</h2>
-              <p class="desc">Соберите тайл: тип (обычный / аккордеон / без хэдера), ширина по колонкам сетки, заголовок с дополнением, подзаголовок, чипы, трейлинг-действия (до 3) и алерт-слот. Демо обновляется наверху, панель настроек — две колонки.</p>
+              <p class="desc">Соберите тайл: тип (обычный / аккордеон / без хэдера / карточка Card), ширина по колонкам сетки, заголовок с дополнением, подзаголовок, чипы, трейлинг-действия (до 3) и алерт-слот; у карточки вместо алерт-слота — грип переноса. Демо обновляется наверху, панель настроек — две колонки.</p>
               <div class="pg__controls">
                 <div class="ctl-col">
                   <div class="ctl">
@@ -966,6 +967,7 @@ onToggle():
                       <option value="normal" selected>Обычный</option>
                       <option value="accordion">Аккордеон</option>
                       <option value="headless">Без хэдера</option>
+                      <option value="card">Карточка (Card)</option>
                     </select></div>
                   </div>
                   <div class="ctl">
@@ -1005,8 +1007,8 @@ onToggle():
                   <div class="ctl" id="wrap-act1">
                     <div class="lbl">Действие 1</div>
                     <div class="pg-select"><select id="ctl-act1-kind">
-                      <option value="ibtn" selected>IconButton</option>
-                      <option value="btn">Кнопка</option>
+                      <option value="ibtn" selected>IconButton 1</option>
+                      <option value="btn">Кнопка 1</option>
                     </select></div>
                   </div>
                   <div class="ctl" id="wrap-act1-icon">
@@ -1029,8 +1031,8 @@ onToggle():
                   <div class="ctl" id="wrap-act2">
                     <div class="lbl">Действие 2</div>
                     <div class="pg-select"><select id="ctl-act2-kind">
-                      <option value="ibtn" selected>IconButton</option>
-                      <option value="btn">Кнопка</option>
+                      <option value="ibtn" selected>IconButton 2</option>
+                      <option value="btn">Кнопка 2</option>
                     </select></div>
                   </div>
                   <div class="ctl" id="wrap-act2-icon">
@@ -1053,8 +1055,8 @@ onToggle():
                   <div class="ctl" id="wrap-act3">
                     <div class="lbl">Действие 3</div>
                     <div class="pg-select"><select id="ctl-act3-kind">
-                      <option value="ibtn" selected>IconButton</option>
-                      <option value="btn">Кнопка</option>
+                      <option value="ibtn" selected>IconButton 3</option>
+                      <option value="btn">Кнопка 3</option>
                     </select></div>
                   </div>
                   <div class="ctl" id="wrap-act3-icon">
@@ -1087,6 +1089,7 @@ onToggle():
                 <div class="toggles">
                   <label class="pg-toggle" id="wrap-sub"><input id="ctl-sub" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Subtitle с иконкой</span></label>
                   <label class="pg-toggle" id="wrap-chips"><input id="ctl-chips" type="checkbox"><span class="pg-toggle__sw"></span><span>Ряд чипов</span></label>
+                  <label class="pg-toggle is-off" id="wrap-grip"><input id="ctl-grip" type="checkbox" checked><span class="pg-toggle__sw"></span><span>Показывать грип переноса</span></label>
                 </div>
               </div>
             </div>
@@ -1428,6 +1431,96 @@ DSTile.toggle(tileEl, true);        // свернуть / развернуть �
 }
 @media (prefers-reduced-motion: reduce) {
   .tile__chevron { transition: none; }
+}
+
+/* ------------------------------------------------------------
+   Card — родственник Tile с хэдером типа Card.
+   Тип TileHeader и определяет, чем становится тайл: TileHeader M —
+   плашка рабочей области, без хэдера — TileHeadless, TileHeader Card —
+   карточка. Отличия от Tile: Title на ступень ниже (H6 Strong вместо
+   H5 Strong), отступы контента 8/16/20/16 вместо 10/20/24/20 и —
+   главное — СВОИ интерактивные состояния, которых у Tile нет.
+
+   Применение: карточка в модальном окне, в списке и на канбан-доске.
+   Alert-слот у Card не предполагается.
+
+   Состояния (набор объявлен в документации Tile с самого начала):
+   Default · Hover · Active · Move · Disabled. Move — состояние
+   перетаскивания: карточка схвачена и следует за указателем.
+   Имена служебных классов — как у IconButton (.is-hover / .is-pressed):
+   они нужны, чтобы показать состояние статично в документации.
+   ------------------------------------------------------------ */
+.tile--card {
+  --tile-pad-x: 16px;
+  --tile-pad-bottom: 20px;
+
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.tile--card > .tile__header {
+  padding: 16px var(--tile-pad-x) 8px;
+}
+.tile--card > .tile__body {
+  padding: 8px var(--tile-pad-x) var(--tile-pad-bottom);
+}
+/* Title Card — H6 Strong (16/20). Клэмп 2 строки и усечение уже заданы
+   у .tile__title, здесь меняется только ступень шрифта. */
+.tile--card .tile__title {
+  font: var(--type-h6-strong);
+}
+/* Зазор Title↔Subtitle↔Chiplist у Card — 4 (у плашки 8): заголовок на
+   ступень ниже, и 8px отрывали сабхедер от своего заголовка. */
+.tile--card .tile__header-main {
+  gap: 4px;
+}
+/* Грип — точка захвата карточки для переноса. Это IconButton M (20×20,
+   глиф drag-dots), последний элемент в .tile__actions:
+   <button class="ibtn ibtn--neutral ibtn--m tile__grip" aria-label="Перенести">.
+   Размер, тон, hover и фокус — у IconButton; здесь только курсор захвата.
+   Жеста у Card нет: переносом управляет потребитель (Kanban, свой рантайм),
+   грип лишь говорит, за что тащить, — нужен, когда в карточке должно
+   работать выделение текста и тащить за тело нельзя. */
+.tile__grip {
+  cursor: grab;
+  touch-action: none;
+}
+.tile--card.is-move .tile__grip,
+.tile__grip:active {
+  cursor: grabbing;
+}
+
+/* Hover */
+.tile--card:hover,
+.tile--card.is-hover {
+  background: var(--bg-table-default-hover);
+  border-color: var(--border-primary);
+}
+/* Active — нажатие */
+.tile--card:active,
+.tile--card.is-pressed {
+  background: var(--bg-table-default-focus);
+  border-color: var(--border-dark);
+}
+.tile--card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+/* Move — карточка схвачена и едет за указателем */
+.tile--card.is-move {
+  background: var(--bg-tile);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-modal-form);
+  cursor: grabbing;
+}
+/* Disabled — карточка недоступна: роль не вправе её трогать */
+.tile--card[aria-disabled="true"],
+.tile--card.is-disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile--card { transition: none; }
 }</script>
 
 <script>
@@ -1453,12 +1546,17 @@ function buildTile(){
   var chips   = document.getElementById('ctl-chips').checked;
   var actions = document.getElementById('ctl-actions').value;
   var alert   = document.getElementById('ctl-alert').value;
+  var grip    = document.getElementById('ctl-grip').checked;
 
   var headless = (type === 'headless');
+  var card = (type === 'card');
   /* hide header-only controls when headless */
   ['wrap-title','wrap-add','wrap-sub','wrap-chips','wrap-actions','wrap-alert'].forEach(function(id){
     document.getElementById(id).classList.toggle('is-off', headless);
   });
+  /* Card: alert-слота нет, зато есть грип переноса (.tile__grip) */
+  if (card) { document.getElementById('wrap-alert').classList.add('is-off'); alert = 'none'; }
+  document.getElementById('wrap-grip').classList.toggle('is-off', !card);
 
   /* per-action controls: показываем только актуальные */
   var actCount = { none:0, one:1, two:2, three:3 }[actions] || 0;
@@ -1477,6 +1575,7 @@ function buildTile(){
   var cls = 'tile';
   if (headless) cls += ' tile--headless';
   if (type === 'accordion') cls += ' tile--accordion';
+  if (card) cls += ' tile--card';
 
   var host = document.getElementById('demo-tile');
   host.className = cls;
@@ -1515,6 +1614,8 @@ function buildTile(){
       items += '<button class="ibtn ibtn--neutral ibtn--m" aria-label="' + esc(icn) + '">' + getIcon(icn,20) + '</button>';
     }
   }
+  /* грип Card — IconButton M, всегда последним в actions */
+  if (card && grip) items += '<button class="ibtn ibtn--neutral ibtn--m tile__grip" aria-label="Перенести">' + getIcon('drag-dots',20) + '</button>';
   var actHtml = items ? '<div class="tile__actions">' + items + '</div>' : '';
   /* accordion toggle always present in actions */
   if (type === 'accordion'){
@@ -1538,7 +1639,7 @@ function buildTile(){
   host.innerHTML = header + alertHtml + body;
 }
 
-['ctl-type','ctl-cols','ctl-title','ctl-add','ctl-sub','ctl-chips','ctl-actions','ctl-alert',
+['ctl-type','ctl-cols','ctl-title','ctl-add','ctl-sub','ctl-chips','ctl-grip','ctl-actions','ctl-alert',
  'ctl-act1-kind','ctl-act1-icon','ctl-act1-label','ctl-act2-kind','ctl-act2-icon','ctl-act2-label','ctl-act3-kind','ctl-act3-icon','ctl-act3-label'].forEach(function(id){
   var el = document.getElementById(id);
   if (el){ el.addEventListener('change', buildTile); el.addEventListener('input', buildTile); }

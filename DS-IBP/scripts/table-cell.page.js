@@ -80,7 +80,7 @@
       chipsRounded: el('ctl-chips-rounded').checked,
       hiddenOn: el('ctl-hidden').checked,
       edited: el('ctl-edited').checked,
-      bg: el('ctl-bg').value,
+      bg: el('ctl-bg').checked ? 'accent' : 'none',
       state: el('ctl-state').value
     };
   }
@@ -147,7 +147,7 @@
     var open = kind === 'autocomplete' && S.acOpen === i;
     var ddl = '';
     if (open) {
-      ddl = '<div class="ddl ddl--floating" role="listbox">' +
+      ddl = '<div class="ddl ddl--floating is-open" role="listbox">' +
         ['Услуги подряда', 'Поставка оборудования', 'Монтажные работы'].map(function (t, k) {
           return '<button class="ddl__item" role="option" aria-selected="' + (k === 0) + '"><span class="ddl__item-body"><span class="ddl__item-label">' + t + '</span></span></button>';
         }).join('') + '</div>';
@@ -377,8 +377,12 @@
       var sortBtn = t.closest('[data-sort]');
       if (sortBtn) {
         S.sortDir = S.sortDir === 'none' ? 'asc' : S.sortDir === 'asc' ? 'desc' : 'none';
-        var dirSel = el('ctl-sort-dir'); if (dirSel) { dirSel.value = S.sortDir; dirSel.dispatchEvent(new Event('pg:sync')); }
-        render(); return;
+        /* change, а не своё событие: на него подписаны ButtonGroup конструктора
+           (docs-split.js) и bind() — он же и перерисует демо */
+        var dirSel = el('ctl-sort-dir');
+        if (dirSel) { dirSel.value = S.sortDir; dirSel.dispatchEvent(new Event('change', { bubbles: true })); }
+        else render();
+        return;
       }
       var pinBtn = t.closest('[data-pin]');
       if (pinBtn) {

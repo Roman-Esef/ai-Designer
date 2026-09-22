@@ -105,13 +105,13 @@ function classListHelper(o){ return 'ds-helper ds-helper--' + o.align + (o.statu
   const tLabel = ctlToggle('Показывать Label','label');
 
   const cIcon = select('Иконки в Label',
-    [['0','Нет'],['1','Одна'],['2','Две']],
+    [['0','Без иконок'],['1','1 иконка'],['2','2 иконки']],
     ()=>String(state.icons), v=>state.icons=Number(v));
 
   const tHelper = ctlToggle('Показывать Helper','helper');
 
   const cAlign = select('Выравнивание (Label + Helper, только для полей)',
-    [['left','Слева'],['right','Справа']],
+    [['left','По левому краю'],['right','По правому краю']],
     ()=>state.align, v=>state.align=v);
 
   const tHelperIcon = ctlToggle('Показывать иконку (Helper, Error)','helperIcon');

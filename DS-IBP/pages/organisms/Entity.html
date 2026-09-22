@@ -130,7 +130,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
   </a>
   <div class="meta">
     <span>Версия <b>1.008</b></span>
-    <span>Обновлено <b>15.09.2026</b></span>
+    <span>Обновлено <b>21.09.2026</b></span>
     <span>CSS <b>styles/entity.css</b></span>
     <span>Зависимости <b>avatar, chip, icon-button, button, badge</b></span>
   </div>
@@ -609,9 +609,9 @@ if (more > 0) render(<span class="entity__subs-more">+{more}</span>)
                   <div class="ctl">
                     <div class="lbl">Ведущий элемент</div>
                     <div class="pg-select" data-pg-keep-select><select id="ctl-lead">
-                      <option value="icon" selected>Иконка</option>
-                      <option value="avatar">Аватар</option>
-                      <option value="none">Нет</option>
+                      <option value="icon" selected>Иконка слева</option>
+                      <option value="avatar">Аватар слева</option>
+                      <option value="none">Без элемента слева</option>
                     </select></div>
                   </div>
                   <div class="ctl" id="ctl-glyph-wrap">
@@ -638,15 +638,15 @@ if (more > 0) render(<span class="entity__subs-more">+{more}</span>)
                   <div class="ctl">
                     <div class="lbl">Подзаголовки</div>
                     <div class="pg-select"><select id="ctl-subs">
-                      <option value="none">Нет</option>
-                      <option value="one">Один</option>
-                      <option value="many" selected>Много + N</option>
+                      <option value="none">Без подзаголовков</option>
+                      <option value="one">1 подзаголовок</option>
+                      <option value="many" selected>Несколько + N</option>
                     </select></div>
                   </div>
                   <div class="ctl">
                     <div class="lbl">Действия (трейлинг)</div>
                     <div class="pg-select"><select id="ctl-actions">
-                      <option value="none" selected>Нет</option>
+                      <option value="none" selected>Без действий</option>
                       <option value="one">Кнопка + закрыть</option>
                       <option value="two">2 кнопки + закрыть</option>
                     </select></div>

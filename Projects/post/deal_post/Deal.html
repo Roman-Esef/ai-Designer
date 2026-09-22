@@ -59,6 +59,14 @@
      пороги по ширине РАБОЧЕЙ ОБЛАСТИ (контейнер screen из Layout): закрепление
      боковой панели сужает контент, не меняя окна. Сами пороги — выбор этого
      экрана, а не правило ДС: общих брейкпоинтов в ДС нет, порог задаёт экран. */
+  /* ---------- Минимальная высота тайла ----------
+     200px — решение человека 21.09.2026 (закрыт вопрос «H min со схемы
+     раскладки» в паспортах тайлов). Задаёт страница: это параметр раскладки,
+     а не компонента. Нужнее всего пустым тайлам — без него пустое состояние
+     «Данные ещё не заведены» сжималось до одной строки. Карточки окна КНР (Card —
+     тоже .tile) стоят вне .screen__content и правило не получают. */
+  .screen__content .tile { min-height: 200px; }
+
   @container screen (max-width: 1560px) {
     .gen__body { flex-direction: column; }
     .gen__side { flex: 0 0 auto; }
@@ -129,7 +137,7 @@
           <div class="gen__main tile-group">
 
             <div class="tile-row">
-              <ds-include src="../post_local_components/TileKNR/TileKNR.html" class="col-3 colw-6"></ds-include>
+              <ds-include src="../post_local_components/TileKNR/TileKNR.html" class="col-3 colw-6" id="tile-knr" state="loading" mode="edit"></ds-include>
               <ds-include src="../post_local_components/TileDealTerms/TileDealTerms.html" class="col-3 colw-6"></ds-include>
               <ds-include src="../post_local_components/TileDealTeam/TileDealTeam.html" class="col-6 colw-12"></ds-include>
             </div>
@@ -211,14 +219,33 @@
   </div>
 </div>
 
+<!-- Модальные окна тайла «КНР». Скримы живут в конце body, а не внутри тайла:
+     вложенный в скрытый родитель скрим не показать. Окно подтверждения —
+     отдельным фрагментом, потому что у фрагмента один корневой элемент. -->
+<ds-include src="../post_local_components/TileKNR/TileKNRModal.html"></ds-include>
+<ds-include src="../post_local_components/TileKNR/TileKNRConfirm.html"></ds-include>
+
 <script src="../data/mock-deals.js"></script>
 <script src="../data/deals-store.js"></script>
+<!-- контрагенты сделки: база, адаптер хранения и стор — до рантаймов, как у
+     сделок. Стор подключается после deals-store.js: он переносит сохранённые
+     КНР в DealsStore. Хранение — data/API.md -->
+<script src="../data/mock-counterparties.js"></script>
+<script src="../data/post-api.js"></script>
+<script src="../data/counterparties-store.js"></script>
 <script src="../../../DS-IBP/scripts/ds.js"></script>
 <script src="../../../DS-IBP/scripts/ibp-home.js"></script>
+<!-- после ds.js и синхронно: его DSTabs.tabs(...) должен успеть раньше
+     автопривязки wireAll на DOMContentLoaded.
+     Рендер карточки — до модалки: она им рисует свои колонки. -->
+<script src="../post_local_components/CardCounterparty/CardCounterparty.js"></script>
+<script src="../post_local_components/TileKNR/TileKNRModal.js"></script>
+<script src="../post_local_components/TileKNR/TileKNR.js"></script>
 <script>
 /* Экранный скрипт. Делает только то, чего рантаймы ДС не делают:
-   меню по каталогу ролей, данные сделки, переключение панелей табов и
-   сворачивание секции (компонента «заголовок-аккордеон» в ДС нет).
+   меню по каталогу ролей, данные сделки (шапка и тайл «КНР»), переключение
+   панелей табов и сворачивание секции (компонента «заголовок-аккордеон» в ДС
+   нет).
    Скрипт синхронный и стоит после ds.js — поэтому его DSTabs.tabs(...) успевает
    раньше автопривязки wireAll (она на DOMContentLoaded), и onChange не теряется. */
 (function () {
@@ -332,6 +359,37 @@
     document.getElementById('deal-crumb').textContent = num;
     document.title = num + ' — IBP';
     fillChips(deal);
+    applyMode(deal);
+    fillKnr(deal);
+  }
+
+  /* Режим правки страницы. Статус сделки сильнее роли: в статусе, который не
+     допускает правку сущностей (DealsStore.isEditable), вся страница — только
+     просмотр, какой бы ни была роль. Режим — входной атрибут компонента
+     (data-mode): его ставит страница, а свой вид в просмотре каждый компонент
+     держит сам (действия правки не рисуются). Окно КНР — такой же компонент.
+     Статус правку не закрыл — режимы остаются теми, что пришли с фрагментами.
+     Кнопка переименования — разметка самого экрана, её прячет экран. */
+  function applyMode(deal) {
+    if (window.DealsStore.isEditable(deal)) return;
+    document.querySelectorAll('.screen__content .tile[data-mode], .lc-knrm[data-mode]').forEach(function (el) {
+      el.setAttribute('data-mode', 'view');
+    });
+    var rename = document.querySelector('.phead__edit');
+    if (rename) rename.hidden = true;
+  }
+
+  /* Тайл «КНР» — КНР этой сделки из CounterpartiesStore. Пока состав
+     грузится (сервер данных или localStorage, см. data/API.md), тайл стоит в
+     loading. После «Сохранить» в окне КНР тайл перерисовывается сразу —
+     таблица портфеля увидит то же при следующем открытии. */
+  function fillKnr(deal) {
+    var store = window.CounterpartiesStore;
+    var tile = document.getElementById('tile-knr');
+    if (!store || !tile || !window.PostTileKNR) return;
+    function paint() { window.PostTileKNR.render(tile, store.knr()); }
+    store.use(deal.id).then(paint);
+    store.on('commit', paint);
   }
 
   /* Сворачивание блока «Общая информация». Рантайм ds-tile.js сюда не подходит:

@@ -18,7 +18,17 @@
 <title>Сделка — IBP</title>
 <link rel="icon" type="image/svg+xml" href="../../../DS-IBP/assets/logo.svg">
 <link rel="stylesheet" href="../../../DS-IBP/ds.css">
-<!-- @lc-css --><!-- сюда ассемблер вставляет CSS подключённых локальных компонентов -->
+<!-- @lc-css -->
+<link rel="stylesheet" href="../post_local_components/TileKNR/TileKNR.css">
+<link rel="stylesheet" href="../post_local_components/TileDealTerms/TileDealTerms.css">
+<link rel="stylesheet" href="../post_local_components/TileDealTeam/TileDealTeam.css">
+<link rel="stylesheet" href="../post_local_components/TileDealDescription/TileDealDescription.css">
+<link rel="stylesheet" href="../post_local_components/TileProjectInfo/TileProjectInfo.css">
+<link rel="stylesheet" href="../post_local_components/TileDealSetup/TileDealSetup.css">
+<link rel="stylesheet" href="../post_local_components/TileDealProducts/TileDealProducts.css">
+<link rel="stylesheet" href="../post_local_components/TileFinInstruments/TileFinInstruments.css">
+<link rel="stylesheet" href="../post_local_components/TileKNR/TileKNRModal.css">
+<link rel="stylesheet" href="../post_local_components/CardCounterparty/CardCounterparty.css"><!-- сюда ассемблер вставляет CSS подключённых локальных компонентов -->
 <style>
   /* ---------- только раскладка экрана, на токенах ДС ---------- */
   *, *::before, *::after { box-sizing: border-box; }
@@ -59,6 +69,14 @@
      пороги по ширине РАБОЧЕЙ ОБЛАСТИ (контейнер screen из Layout): закрепление
      боковой панели сужает контент, не меняя окна. Сами пороги — выбор этого
      экрана, а не правило ДС: общих брейкпоинтов в ДС нет, порог задаёт экран. */
+  /* ---------- Минимальная высота тайла ----------
+     200px — решение человека 21.09.2026 (закрыт вопрос «H min со схемы
+     раскладки» в паспортах тайлов). Задаёт страница: это параметр раскладки,
+     а не компонента. Нужнее всего пустым тайлам — без него пустое состояние
+     «Данные ещё не заведены» сжималось до одной строки. Карточки окна КНР (Card —
+     тоже .tile) стоят вне .screen__content и правило не получают. */
+  .screen__content .tile { min-height: 200px; }
+
   @container screen (max-width: 1560px) {
     .gen__body { flex-direction: column; }
     .gen__side { flex: 0 0 auto; }
@@ -133,33 +151,118 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile col-3 colw-6">
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли
+     Разметка держит ВСЕ состояния сразу, показывает нужное TileKNR.css по этим
+     двум атрибутам — так устроен шаблон ДС (templates/local-component/Component.css).
+     Строки КНР ниже — пример с макета. На странице сделки их заменяет
+     TileKNR.js (PostTileKNR.render) данными сделки, пока они грузятся, тайл
+     стоит в loading. Окно КНР открывается с data-modal-guarded: в нём
+     черновик, и клик мимо окна не должен его сбросить. -->
+<section id="tile-knr" data-state="loading" data-mode="edit" class="tile lc-knr col-3 colw-6">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">КНР</h3></div>
     </div>
+    <!-- Действия шапки: в edit — правка, в view — просмотр того же окна.
+         В состоянии «не заполнено» не рисуется ни одно (см. TileKNR.css). -->
     <div class="tile__actions">
-      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-knr__act lc-knr__act--edit"
+              aria-label="Редактировать" data-modal="knr-scrim" data-modal-guarded><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-knr__act lc-knr__act--view"
+              aria-label="Развернуть" data-modal="knr-scrim" data-modal-guarded><i data-icon="maximize"></i></button>
     </div>
   </header>
-  <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
+
+  <!-- Ошибка: полноширинный Alert между шапкой и контентом. Радиус гасит сам
+       слот .tile__alert, свой --flush здесь не нужен. -->
+  <div class="tile__alert lc-knr__error">
+    <div class="alert alert--error alert--m" data-alert-tone="error" role="alert">
+      <span class="alert__icon" aria-hidden="true"><i data-icon="alert-circle-filled"></i></span>
+      <div class="alert__body">
+        <p class="alert__title">Название ошибки</p>
+        <p class="alert__text">Описание ошибки</p>
       </div>
     </div>
+  </div>
+
+  <div class="tile__body">
+
+    <!-- Заполнено: две колонки. Показываем не больше двух КНР, остальные —
+         строкой «и ещё N КНР» с тултипом-списком.
+         Строка — отдельный блок, а не ячейки общей сетки: на своей узкой
+         ширине строка складывается в одну колонку, и в плоской сетке лейбл
+         второй колонки уехал бы вперёд данных. -->
+    <!-- Лейблы колонок — обе подписи в две строки с переносом по смыслу
+         (<br class="lc-knr__br">); в одну строку обе сразу — только когда
+         тайл шире 406px (TileKNR.css). Наименование — до двух строк: клэмп
+         держит обёртка .lc-knr__name, сама ссылка остаётся Link из ДС. -->
+    <div class="lc-knr__list">
+      <div class="lc-knr__head">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Наименование <br class="lc-knr__br">контрагента</span></span>
+        <span class="ds-label ds-label--wrap ds-label--right"><span class="ds-label__text">Рейтинг и зона <br class="lc-knr__br">проблемности</span></span>
+      </div>
+
+      <div class="lc-knr__row">
+        <span class="lc-knr__name"><a class="link link--accent link--s" href="#">КГ Самолёт</a></span>
+        <span data-riskmetric data-risk="26" data-zone="red"
+              data-rating-date="24.10.2025" data-zone-date="24.10.2025"
+              data-segment="Крупный бизнес" data-profile="Непроектный"></span>
+      </div>
+
+      <div class="lc-knr__row">
+        <span class="lc-knr__name"><a class="link link--accent link--s" href="#">СамолётИнвестХолдинг Inc</a></span>
+        <span data-riskmetric data-risk="26" data-zone="green"
+              data-rating-date="24.10.2025" data-zone-date="24.10.2025"
+              data-segment="Крупный бизнес" data-profile="Непроектный"></span>
+      </div>
+
+      <!-- Счётчик скрытых: тултип обязан быть multiline, иначе рантайм режет
+           список в одну строку на 280px (specs/Tooltip.md). -->
+      <span class="lc-knr__more" tabindex="0"
+            data-tooltip="ООО «ЮгСтрой», АО «Самолёт-Девелопмент»"
+            data-tooltip-multiline="yes">и ещё 2 КНР</span>
+    </div>
+
+    <!-- Загрузка: каркас уже на месте — лейблы колонок видны, строки стоят в
+         габаритах будущего содержимого, чтобы раскладка не прыгнула после
+         ответа. Чип метрики — блок в габаритах chip--s (24px). -->
+    <div class="lc-knr__loading" aria-busy="true">
+      <div class="lc-knr__head">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Наименование <br class="lc-knr__br">контрагента</span></span>
+        <span class="ds-label ds-label--wrap ds-label--right"><span class="ds-label__text">Рейтинг и зона <br class="lc-knr__br">проблемности</span></span>
+      </div>
+      <div class="lc-knr__row">
+        <span class="sk-line" style="--sk-w:80%" aria-hidden="true"></span>
+        <span class="sk-block sk-block--rounded" style="--sk-w:52px;--sk-h:24px" aria-hidden="true"></span>
+      </div>
+      <div class="lc-knr__row">
+        <span class="sk-line" style="--sk-w:64%" aria-hidden="true"></span>
+        <span class="sk-block sk-block--rounded" style="--sk-w:52px;--sk-h:24px" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <!-- Не заполнено, право на заполнение есть -->
+    <div class="lc-knr__fill">
+      <button type="button" class="btn btn--accent btn--m" data-modal="knr-scrim" data-modal-guarded>
+        <span class="btn__label">Заполнить</span>
+      </button>
+    </div>
+
+    <!-- Не заполнено, права нет: одна строка причины, действия нет -->
+    <p class="lc-knr__empty">Не заполнено</p>
+
   </div>
 </section>
               <!-- Локальный компонент «Сроки сделки» — фрагмент страницы сделки.
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли. В view
+                  действия правки не рисуются (TileDealTerms.css)
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile col-3 colw-6">
+<section data-state="empty" data-mode="edit" class="tile lc-deal-terms col-3 colw-6">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Сроки сделки</h3></div>
@@ -181,9 +284,11 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли. В view
+                  действия правки не рисуются (TileDealTeam.css)
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+<section data-state="empty" data-mode="edit" class="tile lc-deal-team col-6 colw-12">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Команда сделки</h3></div>
@@ -208,9 +313,11 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли. В view
+                  действия правки не рисуются (TileDealDescription.css)
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+<section data-state="empty" data-mode="edit" class="tile lc-deal-description col-6 colw-12">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Описание сделки</h3></div>
@@ -232,7 +339,7 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
 <section data-state="empty" data-mode="view" class="tile col-6 colw-12">
   <header class="tile__header">
@@ -262,9 +369,11 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли. В view
+                  действия правки не рисуются (TileProjectInfo.css)
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile col-12">
+<section data-state="empty" data-mode="edit" class="tile lc-project-info col-12">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Сведения о проекте</h3></div>
@@ -293,9 +402,11 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли. В view
+                  действия правки не рисуются (TileDealSetup.css)
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section class="tile" data-state="empty" data-mode="view">
+<section class="tile lc-deal-setup" data-state="empty" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Заведение сделки</h3></div>
@@ -345,9 +456,11 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли. В view
+                  действия правки не рисуются (TileDealProducts.css)
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section class="tile" data-state="empty" data-mode="view">
+<section class="tile lc-deal-products" data-state="empty" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Продукты сделки</h3></div>
@@ -371,15 +484,17 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
+                  не допускающий правку, даёт view при любой роли. В view
+                  действия правки не рисуются (TileFinInstruments.css)
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section class="tile" data-state="empty" data-mode="view">
+<section class="tile lc-fin-instruments" data-state="empty" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Финансовые инструменты</h3></div>
     </div>
     <div class="tile__actions">
-      <button type="button" class="btn btn--outline btn--xs"><i data-icon="add"></i><span class="btn__label">Фин. инструмент</span></button>
+      <button type="button" class="btn btn--outline btn--xs lc-fin-instruments__add"><i data-icon="add"></i><span class="btn__label">Фин. инструмент</span></button>
       <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Действия"><i data-icon="more-dots"></i></button>
     </div>
   </header>
@@ -400,7 +515,7 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
 <section data-state="empty" data-mode="view" class="tile col-6 colw-12">
   <header class="tile__header">
@@ -421,7 +536,7 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
 <section data-state="empty" data-mode="view" class="tile col-6 colw-12">
   <header class="tile__header">
@@ -469,7 +584,7 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view | locked
+     data-mode  — режим прав:       edit | view
      Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
 <section data-state="empty" data-mode="view" class="tile col-12">
   <header class="tile__header">
@@ -493,14 +608,318 @@
   </div>
 </div>
 
+<!-- Модальные окна тайла «КНР». Скримы живут в конце body, а не внутри тайла:
+     вложенный в скрытый родитель скрим не показать. Окно подтверждения —
+     отдельным фрагментом, потому что у фрагмента один корневой элемент. -->
+<!-- Связанный артефакт тайла «КНР»: модальное окно поиска и выбора ключевого
+     носителя риска. Фрагмент вшивается ассемблером отдельной меткой ds-include —
+     скрим должен лежать в конце body, а не внутри тайла.
+
+     Два таба: юрлица и физлица. Под каждым — три колонки: форма поиска,
+     результаты поиска и участники сделки.
+
+     Карточек в разметке нет. Разметку карточки даёт локальный компонент
+     «Карточка контрагента» (метка ниже вшивает его шаблон), а данные приходят
+     из CounterpartiesStore — так же, как реестр портфеля рисует сделки из
+     mock-deals.js. Раскладывает одно по другому TileKNRModal.js: он же
+     переключает панели табов (рантайма показа панели в ДС нет), ищет по базе
+     контрагентов, переносит карточки между колонками (кнопкой со стрелками и
+     двойным кликом) и ведёт черновик: «Сохранить» применяет правки к сделке,
+     крестик и Esc их отменяют.
+
+     Формы поиска — <form>: Enter в любом поле запускает поиск так же, как
+     «Найти». Колонки «Найдено» и «Физические лица» пусты, пока поиск не задан.
+
+     Что различает колонки: пока контрагент не участник сделки, у него нет ни
+     чекбокса «КНР», ни строки ГСЗ, ни риск-метрики — их показывает только
+     третья колонка. Правило живёт в сторе и в CSS карточки, не здесь.
+
+     Раскладка: окно шириной 8 колонок (modal--w8) и фиксированной высоты
+     (60vh — не прыгает при смене вкладки), колонки разделены вертикальными
+     Divider. У каждой колонки свой скролл с полосой ДС (.ds-scroll, Layout):
+     бегунок стоит вплотную к разделителю, появляется при прокрутке и гаснет.
+     Заголовок H6 Strong и линия под ним стоят на месте. -->
+
+<div class="modal-scrim" id="knr-scrim" hidden>
+
+  <!-- эталон карточки: единственный источник её разметки -->
+  <!-- Локальный компонент «Карточка контрагента» — переиспользуемый.
+     Вшивается ассемблером (../../assemble.mjs) по метке ds-include.
+
+     Корень фрагмента — <template>: карточек на странице много и содержимое у
+     них разное (наименование, состав полей), а через метку ds-include
+     передаются только id/class/state/mode. Поэтому компонент отдаёт ЭТАЛОН
+     разметки, а карточки по нему рисует потребитель из своего стора — так же,
+     как реестр портфеля рисует 50 строк из mock-deals.js.
+
+     data-state — где карточка лежит: found найден | member участник сделки
+     data-mode  — режим прав:         edit (кнопка переноса есть) | view (её нет)
+
+     Недоступность — не data-mode, а состояние Card из ДС: aria-disabled="true"
+     плюс inert (ставит рендер по opts.disabled). Так показываются участники
+     сделки другого вида в окне КНР: видны, но с текущей вкладки не трогаются.
+
+     Что чем управляется. Риск-метрика, строка ГСЗ и чекбокс «КНР» осмыслены
+     только у участника сделки — у найденного контрагента их нет. Сабхедер у
+     юрлица необязателен («Нерезидент», «Консолидированная группа»), у физлица
+     это дата рождения и он есть всегда. Состав полей — контент, а не вариант:
+     у разных контрагентов он разный, и пустых строк под отсутствующее не
+     резервируется.
+
+     Раскладка тела — две колонки: слева реквизиты и чекбокс «КНР», справа
+     риск-метрика. Колонки — flex-ряд, а не сетка: у найденного контрагента
+     метрики нет, и пустая колонка со своим зазором не остаётся.
+
+     Префикс классов lc-knrm__ исторический: карточка выросла из модалки КНР и
+     эти классы держит её скрипт. Переименование стоило бы правок в окне без
+     пользы для вида. -->
+
+<!-- Корень — пустой скрытый контейнер вокруг шаблона. Он нужен по двум
+     причинам: у фрагмента должен быть один корневой элемент, а приёмка читает
+     разметку текстом и видит карточку внутри <template> как обычный тайл —
+     поэтому зона помечена data-off-grid: ширину карточке задаёт колонка
+     потребителя, а не 12-колоночная сетка страницы. -->
+<div hidden
+     data-off-grid="Эталон карточки контрагента: ширину задаёт колонка потребителя, а не сетка страницы">
+<template id="lc-cpcard-tpl">
+  <article class="tile tile--card lc-knrm__card" data-state="found" data-mode="edit">
+    <header class="tile__header">
+      <div class="tile__header-main">
+        <div class="tile__title-row"><h3 class="tile__title" data-cp="name"></h3></div>
+        <p class="tile__subtitle" data-cp="subheader"></p>
+      </div>
+      <div class="tile__actions">
+        <!-- Перенос в соседнюю колонку — действие Card (IconButton M 20×20).
+             Карточку не перетаскивают: её переносят этой кнопкой или двойным
+             кликом. Подпись и подсказку («Перенести в участники сделки» /
+             «Убрать из участников сделки») ставит рендер по opts.moveLabel.
+             data-knr-move — хук переноса в окне КНР -->
+        <button type="button" class="ibtn ibtn--neutral ibtn--m" data-knr-move
+                aria-label="Перенести" data-tooltip="Перенести"><i data-icon="arrow-left-right"></i></button>
+      </div>
+    </header>
+    <div class="tile__body">
+      <div class="lc-knrm__content">
+        <div class="lc-knrm__main">
+          <div class="lc-knrm__fields" data-cp="fields"></div>
+          <label class="cb lc-knrm__knr">
+            <input type="checkbox" class="cb__input" data-cp="knr">
+            <span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span>
+            <span class="cb__content"><span class="cb__label">КНР</span></span>
+          </label>
+        </div>
+        <!-- риск-метрику рантайм ds-riskmetric.js собирает сам из атрибутов -->
+        <span data-cp="risk" data-riskmetric></span>
+      </div>
+    </div>
+  </article>
+</template>
+</div>
+
+  <!-- data-mode — режим прав окна: edit | view. Ставит страница: статус сделки,
+       не допускающий правку, даёт view при любой роли. В view поиск работает,
+       но карточки не переносятся, отметка «КНР» не меняется, а вместо
+       «Сохранить» — «Закрыть» (TileKNRModal.css, TileKNRModal.js). -->
+  <div class="modal modal--w8 lc-knrm" data-mode="edit" role="dialog" aria-modal="true" aria-labelledby="knr-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="knr-title">Ключевой носитель риска</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+
+    <div class="modal__body">
+
+      <div class="tabs tabs--horiz" role="tablist" data-tabs id="knr-tabs">
+        <button type="button" class="tab tab--s tab--selected" role="tab" aria-selected="true" tabindex="0">
+          <span class="tab__label">Юридические лица</span></button>
+        <button type="button" class="tab tab--s" role="tab" aria-selected="false" tabindex="-1">
+          <span class="tab__label">Физические лица</span></button>
+      </div>
+
+      <!-- ══ Панель: юридические лица ══════════════════════════════════ -->
+      <div class="lc-knrm__cols" data-knr-panel>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Параметры поиска</h3>
+          <hr class="dvd dvd--h">
+          <form class="lc-knrm__form ds-scroll" data-knr-search="ul" novalidate>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-name"><span class="ds-label__text">Наименование</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-name" name="name"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-inn"><span class="ds-label__text">ИНН</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-inn" name="inn" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-kpp"><span class="ds-label__text">КПП</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-kpp" name="kpp" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-ogrn"><span class="ds-label__text">ОГРН</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-ogrn" name="ogrn" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-ul-kio"><span class="ds-label__text">КИО</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-ul-kio" name="kio" inputmode="numeric"></div>
+            </div>
+            <button type="submit" class="btn btn--outline btn--m btn--fullwidth"><span class="btn__label">Найти</span></button>
+          </form>
+        </section>
+
+        <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Найдено</h3>
+          <hr class="dvd dvd--h">
+          <div class="lc-knrm__drop ds-scroll" data-knr-drop="ul-found">
+            <p class="lc-knrm__hint" data-knr-hint>Поиск осуществляется по любому из параметров</p>
+          </div>
+        </section>
+
+        <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Участники сделки</h3>
+          <hr class="dvd dvd--h">
+          <div class="lc-knrm__drop ds-scroll" data-knr-drop="ul-members">
+            <p class="lc-knrm__hint">Перенесите выбранных участников сделки сюда.
+              Добавить можно только носителей риска или все группы и контрагентов, участвующих в сделке.</p>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ══ Панель: физические лица ═══════════════════════════════════ -->
+      <!-- Поиск физлиц возможен только среди юрлиц — участников сделки,
+           поэтому первое поле формы — выбор юрлица из уже перенесённых.
+           Опции списка собирает TileKNRModal.js из участников сделки. -->
+      <div class="lc-knrm__cols" data-knr-panel hidden>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Параметры поиска</h3>
+          <hr class="dvd dvd--h">
+          <form class="lc-knrm__form ds-scroll" data-knr-search="fl" novalidate>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-ul"><span class="ds-label__text">Юридическое лицо</span></label>
+              <div class="inp__field" role="combobox" aria-expanded="false" aria-controls="knr-fl-ul-list" data-ddl="knr-fl-ul-list">
+                <input class="inp__control" id="knr-fl-ul" placeholder="Поиск…" autocomplete="off">
+                <span class="inp__acts">
+                  <button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button>
+                </span>
+              </div>
+              <div id="knr-fl-ul-list" class="ddl ddl--floating" role="listbox"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-inn"><span class="ds-label__text">ИНН</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-fl-inn" name="inn" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-bd"><span class="ds-label__text">Дата рождения</span></label>
+              <div class="inp__field">
+                <input class="inp__control" id="knr-fl-bd" name="birthDate" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
+                <span class="inp__acts">
+                  <button type="button" class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button>
+                </span>
+              </div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-pass"><span class="ds-label__text">Номер паспорта</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-fl-pass" name="passport" inputmode="numeric"></div>
+            </div>
+            <div class="inp inp--m inp--fullwidth">
+              <label class="ds-label" for="knr-fl-tel"><span class="ds-label__text">Номер телефона</span></label>
+              <div class="inp__field"><input class="inp__control" id="knr-fl-tel" name="phone" inputmode="tel"></div>
+            </div>
+            <button type="submit" class="btn btn--outline btn--m btn--fullwidth"><span class="btn__label">Найти</span></button>
+          </form>
+        </section>
+
+        <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Физические лица</h3>
+          <hr class="dvd dvd--h">
+          <div class="lc-knrm__drop ds-scroll" data-knr-drop="fl-found">
+            <p class="lc-knrm__hint" data-knr-hint>Поиск осуществляется по юридическим лицам, входящим в участники сделки</p>
+          </div>
+        </section>
+
+        <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
+
+        <section class="lc-knrm__col">
+          <h3 class="ds-h6-strong">Участники сделки</h3>
+          <hr class="dvd dvd--h">
+          <!-- Юрлица здесь тоже видны, но с этой вкладки их не трогают: они
+               рисуются недоступными (Disabled у Card). Зеркально на вкладке
+               юрлиц недоступны физлица. Удаление юрлица не тянет за собой
+               удаление входящих в него физлиц. -->
+          <div class="lc-knrm__drop ds-scroll" data-knr-drop="fl-members">
+            <p class="lc-knrm__hint">Перенесите выбранных физических лиц сюда</p>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--accent btn--m" data-knr-save data-modal-close><span class="btn__label">Сохранить</span></button>
+        <button type="button" class="btn btn--outline btn--m lc-knrm__close" data-modal-close><span class="btn__label">Закрыть</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+<!-- Связанный артефакт тайла «КНР»: подтверждение удаления контрагента из
+     участников сделки. Открывается ПОВЕРХ модального окна КНР,
+     когда убирают контрагента, уже выбранного как КНР.
+
+     Отдельный файл, потому что у фрагмента один корневой элемент, а вложенный
+     скрим должен быть соседом основного, а не его потомком: иначе он
+     наследует hidden родителя и не покажется.
+
+     Вложение держит ds-modal.js: класс --nested на скриме поднимает слой, не
+     закрывая нижний, и снимает блокировку прокрутки только на последнем. -->
+<div class="modal-scrim modal-scrim--nested" id="knr-confirm-scrim" hidden>
+  <div class="modal modal--w3" role="alertdialog" aria-modal="true" aria-labelledby="knr-confirm-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="knr-confirm-title">Подтверждение действия</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <!-- один текст в две строки: без зазора между абзацами -->
+      <p class="ds-body-m">Удаление контрагента, который задействован в:<br>1234.1.1.2. Договор займа (НКЛ)</p>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-knr-confirm="cancel"><span class="btn__label">Отменить</span></button>
+        <button type="button" class="btn btn--accent btn--error btn--m" data-knr-confirm="ok"><span class="btn__label">Подтвердить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+
 <script src="../data/mock-deals.js"></script>
 <script src="../data/deals-store.js"></script>
+<!-- контрагенты сделки: база, адаптер хранения и стор — до рантаймов, как у
+     сделок. Стор подключается после deals-store.js: он переносит сохранённые
+     КНР в DealsStore. Хранение — data/API.md -->
+<script src="../data/mock-counterparties.js"></script>
+<script src="../data/post-api.js"></script>
+<script src="../data/counterparties-store.js"></script>
 <script src="../../../DS-IBP/scripts/ds.js"></script>
 <script src="../../../DS-IBP/scripts/ibp-home.js"></script>
+<!-- после ds.js и синхронно: его DSTabs.tabs(...) должен успеть раньше
+     автопривязки wireAll на DOMContentLoaded.
+     Рендер карточки — до модалки: она им рисует свои колонки. -->
+<script src="../post_local_components/CardCounterparty/CardCounterparty.js"></script>
+<script src="../post_local_components/TileKNR/TileKNRModal.js"></script>
+<script src="../post_local_components/TileKNR/TileKNR.js"></script>
 <script>
 /* Экранный скрипт. Делает только то, чего рантаймы ДС не делают:
-   меню по каталогу ролей, данные сделки, переключение панелей табов и
-   сворачивание секции (компонента «заголовок-аккордеон» в ДС нет).
+   меню по каталогу ролей, данные сделки (шапка и тайл «КНР»), переключение
+   панелей табов и сворачивание секции (компонента «заголовок-аккордеон» в ДС
+   нет).
    Скрипт синхронный и стоит после ds.js — поэтому его DSTabs.tabs(...) успевает
    раньше автопривязки wireAll (она на DOMContentLoaded), и onChange не теряется. */
 (function () {
@@ -614,6 +1033,37 @@
     document.getElementById('deal-crumb').textContent = num;
     document.title = num + ' — IBP';
     fillChips(deal);
+    applyMode(deal);
+    fillKnr(deal);
+  }
+
+  /* Режим правки страницы. Статус сделки сильнее роли: в статусе, который не
+     допускает правку сущностей (DealsStore.isEditable), вся страница — только
+     просмотр, какой бы ни была роль. Режим — входной атрибут компонента
+     (data-mode): его ставит страница, а свой вид в просмотре каждый компонент
+     держит сам (действия правки не рисуются). Окно КНР — такой же компонент.
+     Статус правку не закрыл — режимы остаются теми, что пришли с фрагментами.
+     Кнопка переименования — разметка самого экрана, её прячет экран. */
+  function applyMode(deal) {
+    if (window.DealsStore.isEditable(deal)) return;
+    document.querySelectorAll('.screen__content .tile[data-mode], .lc-knrm[data-mode]').forEach(function (el) {
+      el.setAttribute('data-mode', 'view');
+    });
+    var rename = document.querySelector('.phead__edit');
+    if (rename) rename.hidden = true;
+  }
+
+  /* Тайл «КНР» — КНР этой сделки из CounterpartiesStore. Пока состав
+     грузится (сервер данных или localStorage, см. data/API.md), тайл стоит в
+     loading. После «Сохранить» в окне КНР тайл перерисовывается сразу —
+     таблица портфеля увидит то же при следующем открытии. */
+  function fillKnr(deal) {
+    var store = window.CounterpartiesStore;
+    var tile = document.getElementById('tile-knr');
+    if (!store || !tile || !window.PostTileKNR) return;
+    function paint() { window.PostTileKNR.render(tile, store.knr()); }
+    store.use(deal.id).then(paint);
+    store.on('commit', paint);
   }
 
   /* Сворачивание блока «Общая информация». Рантайм ds-tile.js сюда не подходит:

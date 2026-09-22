@@ -69,7 +69,7 @@ function placeTip(stage, tip, target, placement, align, gap) {
   controls.appendChild(textInput());
   controls.appendChild(select('Тип', [['main','Main'],['error','Error']], () => state.type, v => state.type = v));
   controls.appendChild(select('Размещение', [['top','Top'],['bottom','Bottom'],['left','Left'],['right','Right']], () => state.placement, v => state.placement = v));
-  controls.appendChild(select('Стрелка (выравнивание)', [['start','Start'],['center','Center'],['end','End']], () => state.align, v => state.align = v));
+  controls.appendChild(select('Стрелка (выравнивание)', [['start','Стрелка в начале'],['center','Стрелка по центру'],['end','Стрелка в конце']], () => state.align, v => state.align = v));
   controls.appendChild(ctlToggle('Стрелка', 'arrow'));
   controls.appendChild(ctlToggle('Богатый контент', 'rich'));
   const multilineCtl = ctlToggle('Перенос (multiline)', 'multiline');

@@ -61,6 +61,7 @@
     'ds-input.js',
     'ds-nav-panel.js',
     'ds-splitter.js',
+    'ds-scroll.js',
     'ds-illustrations.js',
     'ds-include.js'
   ];

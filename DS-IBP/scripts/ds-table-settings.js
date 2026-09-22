@@ -19,8 +19,19 @@
    находится по контексту (closest('.dtable') / соседняя .dtable от
    .dtable-toolbar / первый .tbl в контентной области).
 
-   Экспорт: window.DSTableSettings = { bind(trigger), bindAll(root) }.
-   Автоподключение: bindAll(document) на DOMContentLoaded.
+   Хранение на время сессии (opt-in): data-table-persist="<ключ>" на .tbl.
+   В sessionStorage (ключ ds.table-settings.<ключ>) пишется вид таблицы:
+     колонки — порядок, видимость, закрепление и ширина: после «Применить»,
+       переноса за подпись, булавки в шапке и ручки ширины;
+     сортировка — после каждого события sort;
+     скролл тела — при уходе со страницы (pagehide).
+   На загрузке страницы всё возвращается в этом порядке: колонки →
+   сортировка (событие sort с restored: true) → скролл — последним, когда
+   строки, страница пагинации и ширины уже на месте. Колонки опознаются по
+   data-col на .th. Хранилище живёт, пока открыта вкладка браузера.
+
+   Экспорт: window.DSTableSettings = { bind(trigger), bindAll(root), restore(table) }.
+   Автоподключение: bindAll(document) и восстановление на DOMContentLoaded.
    ========================================================================= */
 (function () {
   'use strict';
@@ -150,6 +161,27 @@
     state.dataLead = nextLead;
     state.dataTrail = nextTrail;
     state.columns.forEach(function (c, ci) { c.rowCells = nextCells[ci]; });
+  }
+
+  /* ---------- модель догоняет шапку ---------- */
+  /* Порядок и закрепление меняют и мимо модалки: перенос за подпись
+     (tbl-reorder.js), булавка в шапке (tbl-pin.js), ширину — ручка
+     (tbl-resize.js). Модель об этом не знала, и следующее «Применить»
+     откатывало такие правки к снимку. Поэтому видимые колонки перед каждым
+     использованием модели берут из шапки порядок, закрепление и ширину;
+     скрытые остаются на своих местах в списке — в шапке их нет. */
+  function syncHeader(state) {
+    var cells = Array.prototype.slice.call(state.headerRow.children);
+    var visible = state.columns.filter(function (c) { return c.visible; });
+    if (visible.some(function (c) { return cells.indexOf(c.headerCell) < 0; })) return;
+    visible.sort(function (a, b) { return cells.indexOf(a.headerCell) - cells.indexOf(b.headerCell); });
+    var vi = 0;
+    state.columns = state.columns.map(function (c) { return c.visible ? visible[vi++] : c; });
+    visible.forEach(function (c) {
+      c.pinned = c.headerCell.classList.contains('th--pinned');
+      var w = Math.round(c.headerCell.getBoundingClientRect().width);
+      if (w > 0) c.width = w;
+    });
   }
 
   /* ---------- применение к таблице ---------- */
@@ -380,16 +412,236 @@
       var state = table.__dsTableSettings || captureState(table);
       if (!state) return;
       if (!table.__dsTableSettings) table.__dsTableSettings = state;
-      else syncRows(state);   /* строки могли добавиться после снимка */
+      else {
+        syncRows(state);     /* строки могли добавиться после снимка */
+        syncHeader(state);   /* порядок и булавки могли поменять в шапке */
+      }
       openSettings(state);
     });
   }
   function bindAll(root) {
     (root || document).querySelectorAll('[data-table-settings]').forEach(bind);
   }
-  function boot() { bindAll(document); }
+
+  /* ---------- хранение на время сессии: data-table-persist ---------- */
+  /* Запись — { v, columns: [{ key, visible, pinned, width }] в порядке колонок,
+     sort: { column, dir }, scroll: { top, left } }. Колонку узнаём по
+     data-col: индекс ненадёжен, порядок как раз и хранится. Части записи
+     пишутся в разное время (колонки — по событию, скролл — на уходе), поэтому
+     запись дополняется, а не перезаписывается. width, sort и scroll
+     необязательны — запись без них (Table 1.017) читается как есть.
+     Хранилище может быть недоступно (приватный режим, запрет сайта) — тогда
+     таблица просто работает без памяти, все обращения в try/catch. */
+  var STORE_PREFIX = 'ds.table-settings.';
+  var warned = [];
+
+  function persistKey(table) {
+    var key = table && table.getAttribute('data-table-persist');
+    return key ? STORE_PREFIX + key : null;
+  }
+  function readStore(key) {
+    try {
+      var raw = window.sessionStorage.getItem(key);
+      var data = raw ? JSON.parse(raw) : null;
+      return data && data.v === 1 && Array.isArray(data.columns) ? data : null;
+    } catch (e) { return null; }
+  }
+  function writeStore(key, patch) {
+    var data = readStore(key) || { v: 1, columns: [] };
+    Object.keys(patch).forEach(function (k) { data[k] = patch[k]; });
+    try { window.sessionStorage.setItem(key, JSON.stringify(data)); } catch (e) { /* без памяти */ }
+  }
+
+  /* Без ключа у настраиваемой колонки хранить нечего: восстановленный порядок
+     не на что было бы сопоставить. Предупреждаем один раз на таблицу. */
+  function keysComplete(table, cols) {
+    if (cols.every(function (c) { return !!c.key; })) return true;
+    if (warned.indexOf(table) < 0) {
+      warned.push(table);
+      if (window.console) console.warn('[ds-table-settings] data-table-persist: у колонки шапки нет data-col — настройки колонок не сохраняются');
+    }
+    return false;
+  }
+
+  /* текущее состояние колонок: из модели, если настройку уже открывали
+     (в ней и скрытые колонки), иначе прямо из шапки — там все видимы */
+  function currentColumns(table) {
+    var state = table.__dsTableSettings;
+    if (state) {
+      syncHeader(state);
+      return state.columns.map(function (c) { return { key: c.key, visible: c.visible, pinned: c.pinned, width: c.width }; });
+    }
+    var headerRow = headerRowOf(table);
+    if (!headerRow) return null;
+    var out = [];
+    Array.prototype.forEach.call(headerRow.children, function (th) {
+      if (th.classList.contains('th--separator')) return;
+      var labelEl = th.querySelector('.th__label');
+      if (!labelEl || !labelEl.textContent.trim()) return;
+      out.push({
+        key: th.dataset.col || '', visible: true, pinned: th.classList.contains('th--pinned'),
+        width: Math.round(th.getBoundingClientRect().width)
+      });
+    });
+    return out;
+  }
+
+  function save(table) {
+    var key = persistKey(table);
+    if (!key) return;
+    var cols = currentColumns(table);
+    if (!cols || !keysComplete(table, cols)) return;
+    writeStore(key, { columns: cols });
+  }
+
+  /* Колонки: снимок колонок → рабочий список в сохранённом порядке с
+     сохранёнными видимостью, закреплением и шириной → то же применение, что
+     у «Применить» (commit строит треки из width). Колонка, которой в записи
+     нет (появилась в разметке позже), встаёт на свой исходный индекс; ключ
+     записи, которого в шапке больше нет, пропускается. Ширина берётся любая
+     положительная: минимум ручки (96px) — ограничение перетаскивания, а в
+     разметке бывают колонки и уже (флаг, признак). */
+  function restoreColumns(table, saved) {
+    var headerRow = headerRowOf(table);
+    if (!headerRow) return false;
+    /* не отрисованная таблица (display:none — например, экран показал вместо
+       неё пустое состояние) даёт нулевые ширины, и применение записало бы
+       нулевые треки. Сейчас её не трогаем, а ждём, пока она появится */
+    if (!headerRow.getBoundingClientRect().width) { whenRendered(table); return false; }
+    var state = table.__dsTableSettings || captureState(table);
+    if (!state || !keysComplete(table, state.columns)) return false;
+    if (table.__dsTableSettings) { syncRows(state); syncHeader(state); }
+
+    var byKey = {};
+    state.columns.forEach(function (c) { byKey[c.key] = c; });
+    var used = {};
+    var working = [];
+    saved.columns.forEach(function (s) {
+      var c = s && byKey[s.key];
+      if (!c || used[s.key]) return;
+      used[s.key] = true;
+      var width = (typeof s.width === 'number' && s.width > 0) ? Math.round(s.width) : c.width;
+      working.push(Object.assign({}, c, { visible: s.visible !== false, pinned: !!s.pinned, width: width }));
+    });
+    state.columns.forEach(function (c, i) {
+      if (used[c.key]) return;
+      working.splice(Math.min(i, working.length), 0, Object.assign({}, c));
+    });
+
+    var same = working.length === state.columns.length && working.every(function (w, i) {
+      var c = state.columns[i];
+      return w.key === c.key && w.visible === c.visible && w.pinned === c.pinned && w.width === c.width;
+    });
+    if (same) return false;
+    table.__dsTableSettings = state;
+    commit(state, working);
+    return true;
+  }
+
+  /* Таблица появится позже (экран уберёт пустое состояние) — колонки
+     применяются тогда. Без этого она показалась бы в исходном виде, а первая
+     же правка колонок затёрла бы запись исходными. Один наблюдатель на
+     таблицу, после применения отключается. */
+  function whenRendered(table) {
+    if (table.__dsPersistWait || !window.ResizeObserver) return;
+    var ro = new ResizeObserver(function () {
+      var headerRow = headerRowOf(table);
+      if (!headerRow || !headerRow.getBoundingClientRect().width) return;
+      ro.disconnect();
+      table.__dsPersistWait = null;
+      var saved = readStore(persistKey(table));
+      if (saved) restoreColumns(table, saved);
+    });
+    table.__dsPersistWait = ro;
+    ro.observe(table);
+  }
+
+  /* Сортировка: текущую читаем с кнопок шапки (стартовую рисует разметка через
+     aria-sort) и при совпадении с записью не трогаем. Применяет рантайм
+     таблицы с флагом restored: событие sort говорит экрану, что это возврат,
+     а не клик, — экран с пагинацией оставляет страницу. dir 'none' — «без
+     сортировки»: снимается той кнопкой, что активна сейчас. Кнопка скрытой
+     колонки в DOM не стоит — такая сортировка молча не применяется. */
+  function restoreSort(table, saved) {
+    var s = saved.sort;
+    if (!s || !s.column || !window.DSTable || !table.hasAttribute('data-table')) return false;
+    var active = null;
+    table.querySelectorAll('[data-sort]').forEach(function (b) {
+      if (b.dataset.sortDir && b.dataset.sortDir !== 'none') active = b;
+    });
+    var want = (s.dir === 'asc' || s.dir === 'desc') ? s.dir : 'none';
+    var api = window.DSTable.wire(table);
+    if (want === 'none') {
+      if (!active) return false;
+      api.sort(active.dataset.sort, 'none', { restored: true });
+      return true;
+    }
+    if (active && active.dataset.sort === String(s.column) && active.dataset.sortDir === want) return false;
+    api.sort(String(s.column), want, { restored: true });
+    return true;
+  }
+
+  /* Скролл тела: контейнер — .dtable__body вокруг таблицы, у таблицы без
+     обёртки (.tbl--scroll) — она сама. Возвращается последним, иначе
+     упрётся в высоту и ширину до пагинации, сортировки и ширин колонок.
+     Скрытую таблицу не прокручиваем — прокручивать нечего. */
+  function scrollerOf(table) { return table.closest('.dtable__body') || table; }
+  function restoreScroll(table, saved) {
+    var s = saved.scroll;
+    if (!s || !table.getBoundingClientRect().width) return false;
+    var box = scrollerOf(table);
+    box.scrollTop = +s.top || 0;
+    box.scrollLeft = +s.left || 0;
+    return true;
+  }
+  function saveScroll(table) {
+    var key = persistKey(table);
+    if (!key) return;
+    var box = scrollerOf(table);
+    writeStore(key, { scroll: { top: Math.round(box.scrollTop), left: Math.round(box.scrollLeft) } });
+  }
+
+  /* Восстановление вида: колонки → сортировка → скролл. Порядок обязателен:
+     сортировка переставляет строки, и экран по её событию пересчитывает окно
+     пагинации, а скролл имеет смысл только на окончательной раскладке. */
+  function restore(table) {
+    var key = persistKey(table);
+    if (!key) return false;
+    var saved = readStore(key);
+    if (!saved) return false;
+    var cols = restoreColumns(table, saved);
+    var sorted = restoreSort(table, saved);
+    var scrolled = restoreScroll(table, saved);
+    return cols || sorted || scrolled;
+  }
+
+  /* запись колонок — на любое их изменение: «Применить» (columnsettings),
+     перенос за подпись (columnreorder), булавка в шапке (columnpin), ручка
+     ширины (columnresize) */
+  ['columnsettings', 'columnreorder', 'columnpin', 'columnresize'].forEach(function (type) {
+    document.addEventListener(type, function (e) {
+      var t = e.target;
+      if (t && t.matches && t.matches('.tbl[data-table-persist]')) save(t);
+    });
+  });
+  /* сортировка — по её событию; восстановленная пишется тем же значением */
+  document.addEventListener('sort', function (e) {
+    var t = e.target;
+    if (!t || !t.matches || !t.matches('.tbl[data-table-persist]')) return;
+    var d = e.detail || {};
+    if (d.column) writeStore(persistKey(t), { sort: { column: String(d.column), dir: d.dir || 'none' } });
+  });
+  /* скролл меняется непрерывно — пишем один раз, при уходе со страницы */
+  window.addEventListener('pagehide', function () {
+    document.querySelectorAll('.tbl[data-table-persist]').forEach(saveScroll);
+  });
+
+  function boot() {
+    bindAll(document);
+    document.querySelectorAll('.tbl[data-table-persist]').forEach(restore);
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  window.DSTableSettings = { bind: bind, bindAll: bindAll };
+  window.DSTableSettings = { bind: bind, bindAll: bindAll, restore: restore };
 })();

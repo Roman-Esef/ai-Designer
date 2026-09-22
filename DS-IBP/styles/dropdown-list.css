@@ -342,16 +342,26 @@
 .ddl.ddl--floating {
   position: absolute;
   opacity: 0;
+  /* закрытый список выключен из раскладки полностью: visibility:hidden
+     оставляет его в потоке прокрутки, и невидимый узел удлиняет страницу
+     или колонку, давая лишний скролл (окно КНР, страницы документации,
+     21.09.2026). display в переходе — с allow-discrete, появление —
+     через @starting-style. Размер списка меряют ПОСЛЕ .is-open. */
+  display: none;
   visibility: hidden;
   transform: scale(.98);
   transform-origin: var(--ddl-origin, top center);
-  transition: opacity .13s ease, transform .13s ease, visibility 0s linear .13s;
+  transition: opacity .13s ease, transform .13s ease, visibility 0s linear .13s, display .13s allow-discrete;
 }
 .ddl.ddl--floating.is-open {
+  display: inline-flex;
   opacity: 1;
   visibility: visible;
   transform: scale(1);
   transition: opacity .13s ease, transform .13s ease;
+}
+@starting-style {
+  .ddl.ddl--floating.is-open { opacity: 0; transform: scale(.98); }
 }
 @media (prefers-reduced-motion: reduce) {
   .ddl.ddl--floating { transition: opacity .01s; transform: none; }
@@ -359,6 +369,7 @@
 }
 /* pinned — всегда открытый список (для демонстраций в документации) */
 .ddl.ddl--floating.ddl--pinned {
+  display: inline-flex;
   opacity: 1;
   visibility: visible;
   transform: none;

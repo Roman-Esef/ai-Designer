@@ -59,7 +59,7 @@
       box.appendChild(sel); wrap.appendChild(box); return wrap;
     }
 
-    controls.appendChild(ctlSelect('Режим выбора', [['single', 'Дата'], ['range', 'Диапазон'], ['month', 'Месяц']], 'mode'));
+    controls.appendChild(ctlSelect('Режим выбора', [['single', 'Одна дата'], ['range', 'Диапазон дат'], ['month', 'Месяц']], 'mode'));
     var quickCtl = ctlToggle('Быстрое «Сегодня»', 'quick');
     controls.appendChild(ctlToggle('Кнопки Отменить / Применить', 'foot'));
     controls.appendChild(quickCtl);
