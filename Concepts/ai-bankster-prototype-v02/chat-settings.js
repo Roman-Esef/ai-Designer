@@ -33,10 +33,8 @@
     'ООО «Каспий-Порт» — расширение терминала': 10
   };
   var CHANNELS = { mail: 'Почта', sberchat: 'Сберчат', ui: 'В интерфейсе' };
-  var NOTIFY_HELP = {
-    local: 'Настройка действует только для этого чата. Можно выбрать несколько каналов.',
-    global: 'Настройка действует для всех чатов. Можно выбрать несколько каналов.'
-  };
+  /* Настройки уведомлений общие для всех чатов — один ключ хранилища. */
+  var NOTIFY_KEY = 'notify';
   var cache = Object.create(null);
   var provider = function () { return null; };
   var menuChat = null, editingChat = null, draft = null;
@@ -54,7 +52,6 @@
     try { value = JSON.parse(localStorage.getItem(key(id))) || value; } catch (_) { /* file:// может ограничить хранилище */ }
     value = value && typeof value === 'object' ? value : {};
     return {
-      scope: value.scope === 'global' ? 'global' : 'local',
       channels: Array.isArray(value.channels) ? value.channels.filter(function (c) { return CHANNELS[c]; }) : ['mail', 'ui'],
       users: Array.isArray(value.users) ? value.users.filter(function (id) { return PEOPLE.some(function (p) { return p.id === id; }); }) : [],
       desks: Array.isArray(value.desks) ? value.desks.filter(function (id) { return DESKS.some(function (d) { return d.id === id; }); }) : []
@@ -71,28 +68,6 @@
   function deskName(id) { return DESKS.filter(function (d) { return d.id === id; })[0].name; }
   function toast(message) {
     if (window.DSToast) window.DSToast.show({ message: message, kind: 'bar', tone: 'success', duration: 3000 });
-  }
-  function syncNotifyUi() {
-    /* Название чата имеет смысл только для локальной настройки: глобальные
-       действуют на все чаты сразу. */
-    el('notify-chat').hidden = notifyScope() !== 'local';
-    updateNotifyHelp();
-  }
-  function applyNotifyScope(scope) {
-    el('notify-scope').querySelectorAll('.segctrl__item').forEach(function (item) {
-      var on = item.getAttribute('data-scope') === scope;
-      item.setAttribute('aria-checked', on ? 'true' : 'false');
-      item.tabIndex = on ? 0 : -1;
-    });
-    syncNotifyUi();
-  }
-  function notifyScope() {
-    var on = el('notify-scope').querySelector('.segctrl__item[aria-checked="true"]');
-    return on && on.getAttribute('data-scope') === 'global' ? 'global' : 'local';
-  }
-  function updateNotifyHelp() {
-    var help = el('notify-help');
-    if (help) help.textContent = NOTIFY_HELP[notifyScope()];
   }
   function modal(id, title, body, action, width) {
     return '<div class="modal-scrim" id="' + id + '-scrim" hidden data-modal-guarded>' +
@@ -186,26 +161,20 @@
   function init() {
     var menu = el('hist-menu') || el('row-menu');
     if (!menu) return;
-    var content = '<div class="segctrl segctrl--fullwidth" role="radiogroup" aria-label="Область действия уведомлений" data-segctrl id="notify-scope">' +
-      '<div class="segctrl__thumb"></div>' +
-      '<button type="button" class="segctrl__item" role="radio" aria-checked="false" tabindex="-1" data-scope="global"><span class="segctrl__label">Глобальные</span></button>' +
-      '<button type="button" class="segctrl__item" role="radio" aria-checked="true" tabindex="0" data-scope="local"><span class="segctrl__label">Локальные</span></button>' +
-      '</div><p class="ds-body-m" id="notify-chat" hidden></p><div class="cb-group" role="group" aria-labelledby="notify-channels-title">' +
+    var content = '<div class="cb-group" role="group" aria-labelledby="notify-channels-title">' +
       '<p class="cb-group__title" id="notify-channels-title">Сообщить о готовности материала</p><div class="cb-group__items">' +
       Object.keys(CHANNELS).map(function (id) {
         return '<label class="cb"><input type="checkbox" class="cb__input" name="notify-channel" value="' + id + '">' +
           '<span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span><span class="cb__content"><span class="cb__label">' + CHANNELS[id] + '</span></span></label>';
-      }).join('') + '</div></div><span class="ds-helper ds-helper--left" id="notify-help">' + NOTIFY_HELP.local + '</span>';
+      }).join('') + '</div></div><span class="ds-helper ds-helper--left">Настройка действует для всех чатов. Можно выбрать несколько каналов.</span>';
     document.body.insertAdjacentHTML('beforeend', modal('notify', 'Настроить уведомление', content, 'Сохранить', 4));
-    window.DSTabs.segment(el('notify-scope'), { onChange: syncNotifyUi });
     menu.insertAdjacentHTML('beforeend', '<button type="button" class="menu__item" role="menuitem" data-chat-settings="notify" data-modal="notify-scrim" data-modal-guarded><span class="menu__item-icon"><i data-icon="settings"></i></span><span class="menu__item-label">Настроить уведомление</span></button>');
     /* Новое действие стоит до разделителя и удаления. */
     menu.insertBefore(menu.lastElementChild, menu.querySelector('.menu__divider') || menu.querySelector('.menu__item--danger'));
     el('notify-save').addEventListener('click', function () {
-      var value = read(editingChat.id);
-      value.scope = notifyScope();
+      var value = read(NOTIFY_KEY);
       value.channels = Array.from(document.querySelectorAll('[name="notify-channel"]:checked')).map(function (n) { return n.value; });
-      save(editingChat.id, value);
+      save(NOTIFY_KEY, value);
       window.DSModal.closeTop();
       toast('Настройки уведомлений сохранены');
     });
@@ -218,7 +187,7 @@
         '<p class="ds-body-m" id="share-chat"></p>' + field('share-people', 'Пользователи', 'Введите имя или фамилию', false) +
         field('share-desks', 'Дески', 'Выберите один или несколько десков', true) +
         '<span class="ds-helper ds-helper--left">Все пользователи выбранных десков увидят этот чат и его владельца в своей истории чатов. Доступ — для просмотра.</span>' +
-        '<p class="ds-body-s" id="share-summary" role="status" aria-live="polite"></p>', 'ОК', 4));
+        '<p class="ds-body-s" id="share-summary" role="status" aria-live="polite"></p>', 'Сохранить', 4));
       peopleApi = window.DSDropdownList.bind(el('share-people-field'), { list: el('share-people-list'), multiple: true, onToggle: function (item) {
         var id = item.getAttribute('data-value');
         draft.users = draft.users.filter(function (value) { return value !== id; });
@@ -278,14 +247,8 @@
     editingChat = action.closest('.menu') ? menuChat : provider();
     if (!editingChat) return;
     if (action.getAttribute('data-chat-settings') === 'notify') {
-      var value = read(editingChat.id);
-      el('notify-chat').textContent = editingChat.title;
+      var value = read(NOTIFY_KEY);
       document.querySelectorAll('[name="notify-channel"]').forEach(function (n) { n.checked = value.channels.indexOf(n.value) !== -1; });
-      applyNotifyScope(value.scope);
-      /* Индикатор сегконтрола измерен, пока модалка скрыта (capture-фаза
-         клика идёт раньше снятия hidden) — пересчитываем в кадре, когда у
-         сегментов уже есть реальные размеры. */
-      requestAnimationFrame(function () { window.DSTabs.positionThumb(el('notify-scope')); });
     } else prepareShare();
   }, true);
   /* Рантайм модалки закрывает окно; его списки освобождаются тем же событием. */
@@ -300,16 +263,26 @@
        следующий Esc отдаётся модальному слою. Сам список закрывает его API. */
     e.preventDefault(); e.stopPropagation(); list.close(true);
   }, true);
+  /* Аватарки-получатели — span с ролью button, а не button: Enter и пробел
+     открывают диалог так же, как клик. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var t = e.target.closest ? e.target.closest('.av-group--link') : null;
+    if (!t) return;
+    e.preventDefault(); t.click();
+  });
 
   window.PitcherChatSettings = {
     configure: function (current) { provider = current; },
-    channels: function (id) { return read(id).channels; },
+    channels: function () { return read(NOTIFY_KEY).channels; },
     recipients: function (id) { return recipients(read(id)); },
     avatars: function (id) {
       var people = recipients(read(id));
       if (!people.length) return '';
       var names = people.map(function (p) { return p.name; }).join(', ');
-      return '<span class="av-group av-group--m" role="group" tabindex="0" aria-label="Чат доступен для просмотра: ' + esc(names) + '" data-tooltip="' + esc(names) + '" data-tooltip-multiline="yes">' +
+      /* Аватарки — тот же триггер «Поделиться», что и пункт меню: клик
+         обслуживают capture-обработчик выше и DSModal (bindAll в rebind). */
+      return '<span class="av-group av-group--m av-group--link" role="button" tabindex="0" aria-label="Поделиться чатом. Получатели доступа: ' + esc(names) + '" data-chat-settings="share" data-modal="share-scrim" data-modal-guarded data-tooltip="' + esc(names) + '" data-tooltip-multiline="yes">' +
         people.slice(0, 4).map(function (p) {
           return '<span class="av av--circular av--m" aria-hidden="true"><span class="av__text">' + initials(p.name) + '</span></span>';
         }).join('') + (people.length > 4 ? '<span class="av-group__more" aria-hidden="true">+' + (people.length - 4) + '</span>' : '') + '</span>';

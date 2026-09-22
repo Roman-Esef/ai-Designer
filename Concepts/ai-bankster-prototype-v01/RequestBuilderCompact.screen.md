@@ -1,7 +1,7 @@
 ---
 screen: RequestBuilderCompact
 title: Новый отчёт — режим конструктора, компактный вариант
-file: Concepts/ai-bankster-prototype/RequestBuilderCompact.html
+file: Concepts/ai-bankster-prototype-v01/RequestBuilderCompact.html
 source: ТЗ (БТ-1, БТ-2, БТ-5, БТ-10); черновой прототип модуля; замечание заказчика от 14.09.2026 — форма конструктора слишком высокая
 version: "1.002"
 created: "14.09.2026"

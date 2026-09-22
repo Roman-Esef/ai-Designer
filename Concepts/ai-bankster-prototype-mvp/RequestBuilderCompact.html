@@ -13,7 +13,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Конструктор отчётов, компактный вариант — Новый отчёт — Аналитические материалы — IBP</title>
+<title>Конструктор отчётов, компактный вариант — Новый отчёт — AI Pitcher — IBP</title>
 <link rel="icon" type="image/svg+xml" href="../../DS-IBP/assets/logo.svg">
 <link rel="stylesheet" href="../../DS-IBP/ds.css">
 <style>
@@ -85,13 +85,6 @@
   .bld-stack > .inp { width: 100%; }
   .bld-row       { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
 
-  /* Строка файла — в одну линию: Entity (иконка, имя, размер), состояние
-     чипом и два действия. Компонента «файл в списке загрузки» в ДС нет:
-     строку собирает локальная обёртка, анатомия Entity не трогается. */
-  .bld-files     { display: flex; flex-direction: column; gap: var(--space-8); }
-  .bld-file      { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-8) var(--space-12); background: var(--bg-page); border-radius: var(--radius-xl); }
-  .bld-file > .entity { flex: 1; min-width: 0; }
-  .bld-file__acts { flex: none; display: flex; gap: var(--space-4); }
   /* Подвал формы: нехватка сведений, разделитель, строка запуска */
   .bld-end       { display: flex; flex-direction: column; gap: var(--space-16); margin-top: var(--space-24); }
   .bld-foot      { display: flex; align-items: center; gap: var(--space-16); }
@@ -140,19 +133,11 @@
       <a class="nav__item" href="index.html"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
       <div class="nav__block">
         <div class="nav__block-label">Origination</div>
+        <a class="nav__item nav__item--selected" href="RequestThread.html" aria-current="page"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="funds"></i></span><span class="nav__label">Фонды</span></a>
-      </div>
-      <div class="nav__block">
-        <div class="nav__block-label">Отчёты</div>
-        <a class="nav__item nav__item--acc" href="#" aria-expanded="true" aria-controls="nav-sub-analytics"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">Аналитические материалы</span><span class="nav__caret"><i data-icon="chevron-down"></i></span></a>
-        <div class="nav__sub" id="nav-sub-analytics"><div class="nav__sub-in">
-          <a class="nav__item nav__item--selected" href="RequestThread.html" aria-current="page"><span class="nav__label">Новый отчёт</span></a>
-          <a class="nav__item" href="RequestHistory.html"><span class="nav__label">История и материалы</span></a>
-          <a class="nav__item" href="ActivityLog.html"><span class="nav__label">Журнал</span></a>
-        </div></div>
       </div>
       <div class="nav__block">
         <div class="nav__block-label">Pipeline</div>
@@ -200,7 +185,7 @@
 
       <nav class="crumbs" aria-label="Хлебные крошки" data-breadcrumbs>
         <li class="crumbs__item"><a class="link link--muted" href="index.html">Главная</a></li>
-        <li class="crumbs__item"><a class="link link--muted" href="RequestHistory.html">Аналитические материалы</a></li>
+        <li class="crumbs__item"><a class="link link--muted" href="RequestThread.html">AI Pitcher</a></li>
         <li class="crumbs__item crumbs__item--current">
           <span class="crumbs__current" aria-current="page">Новый отчёт</span>
         </li>
@@ -397,17 +382,6 @@
                         </div>
                       </div>
 
-                      <!-- Материалы для анализа (БТ-2): файлы в одну строку и кнопка выбора -->
-                      <div class="bld-field tile__grid-full">
-                        <span class="ds-label"><span class="ds-label__text">Материалы для анализа</span></span>
-                        <div class="bld-stack">
-                          <div class="bld-files" id="fileList"></div>
-                          <div class="bld-row">
-                            <button class="btn btn--outline btn--s" id="btnAddFile"><i data-icon="attach"></i><span class="btn__label">Выбрать файлы</span></button>
-                          </div>
-                        </div>
-                      </div>
-
                     </div>
 
                     <!-- Готовность и запуск (БТ-5.9, БТ-5.10) -->
@@ -459,9 +433,6 @@
   <button type="button" class="menu__item" role="menuitem" id="miDuplicate">
     <span class="menu__item-icon"><i data-icon="copy"></i></span><span class="menu__item-label">Дублировать запрос</span>
   </button>
-  <button type="button" class="menu__item" role="menuitem" id="miRestart">
-    <span class="menu__item-icon"><i data-icon="refresh"></i></span><span class="menu__item-label">Перезапустить по прежним вводным</span>
-  </button>
   <hr class="menu__divider">
   <button type="button" class="menu__item" role="menuitem" onclick="location.href='RequestHistory.html'">
     <span class="menu__item-icon"><i data-icon="history"></i></span><span class="menu__item-label">Все запросы</span>
@@ -479,12 +450,12 @@
       <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
     </header>
     <div class="modal__body">
-      <div class="inp inp--m">
+      <div class="inp inp--m inp--fullwidth">
         <label class="ds-label" for="renameField"><span class="ds-label__text">Название запроса</span></label>
         <div class="inp__field">
           <input class="inp__control" id="renameField" value="ГК «Северный агрохолдинг» — выход миноритария" aria-describedby="rename-help">
         </div>
-        <span class="ds-helper ds-helper--left" id="rename-help">Название видно в истории запросов и в уведомлениях</span>
+        <span class="ds-helper ds-helper--left" id="rename-help">Название видно в истории запросов</span>
       </div>
     </div>
     <footer class="modal__foot">
@@ -516,9 +487,9 @@
   </div>
 </div>
 
-<!-- ── Подсказки и ограничения (БТ-5, БТ-2.8, БТ-1.9) ───────────────────────
+<!-- ── Подсказки и ограничения (БТ-5) ────────────────────────────────────────
      В компактном варианте хелперов под полями нет: пояснения к полям собраны
-     здесь, над ограничениями на файлы и правилами выгрузки. -->
+     в этом окне. -->
 <div class="modal-scrim" id="limits-scrim" hidden>
   <div class="modal modal--w6" role="dialog" aria-modal="true" aria-labelledby="limits-title">
     <header class="modal__head">
@@ -545,36 +516,7 @@
         </div>
         <div class="rof">
           <span class="ds-label"><span class="ds-label__text">Подготовка</span></span>
-          <div class="rof__row"><span class="rof__value">До 30 минут. Работа продолжится, даже если закрыть инструмент; запрос появится в «Недавних запросах», ход подготовки — в нити.</span></div>
-        </div>
-      </div>
-
-      <hr class="dvd dvd--h" aria-hidden="true">
-
-      <div class="tile__grid" style="grid-template-columns:1fr 1fr;">
-        <div class="rof">
-          <span class="ds-label"><span class="ds-label__text">Файлов на один запрос</span></span>
-          <div class="rof__row"><span class="rof__value">не более 10</span></div>
-        </div>
-        <div class="rof">
-          <span class="ds-label"><span class="ds-label__text">Размер одного файла</span></span>
-          <div class="rof__row"><span class="rof__value">не более 30 МБ</span></div>
-        </div>
-        <div class="rof">
-          <span class="ds-label"><span class="ds-label__text">Форматы входных файлов</span></span>
-          <div class="rof__row"><span class="rof__value">PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX</span></div>
-        </div>
-        <div class="rof">
-          <span class="ds-label"><span class="ds-label__text">Сканированные документы</span></span>
-          <div class="rof__row"><span class="rof__value">распознаются автоматически</span></div>
-        </div>
-        <div class="rof tile__grid-full">
-          <span class="ds-label"><span class="ds-label__text">Правила выгрузки</span></span>
-          <div class="rof__row"><span class="rof__value">Детальный материал — PDF и Word, краткий — только PDF. Файл получает принятую в Банке маркировку конфиденциальности и доступен только пользователям с правами на запрос, включая обращение по прямой ссылке.</span></div>
-        </div>
-        <div class="rof tile__grid-full">
-          <span class="ds-label"><span class="ds-label__text">Обработка данных</span></span>
-          <div class="rof__row"><span class="rof__value">Загруженные материалы не используются для обучения моделей, обработка и хранение остаются в информационном контуре Банка.</span></div>
+          <div class="rof__row"><span class="rof__value">До 30 минут. Работа продолжится, даже если закрыть окно; запрос появится в «Недавних запросах», ход подготовки — в нити.</span></div>
         </div>
       </div>
     </div>
@@ -689,48 +631,12 @@
   el('miDuplicate').addEventListener('click', function () {
     if (window.DSSnack) window.DSSnack.show({ tone: 'success', title: 'Запрос дублирован', text: 'Создана копия запроса с теми же вводными и файлами.' });
   });
-  el('miRestart').addEventListener('click', function () {
-    /* перезапуск идёт в нити запроса — открываем её */
-    if (menuRow) location.href = 'RequestThread.html?id=' + menuRow;
-  });
   el('btnDelete').addEventListener('click', function () {
     if (window.DSSnack) window.DSSnack.show({
       tone: 'info', title: 'Запрос удалён', text: 'Восстановить можно в течение 30 дней.',
       buttons: [{ label: 'Отменить удаление', variant: 'outline' }]
     });
   });
-
-  /* ── Приложенные файлы (БТ-2.6): строка в одну линию ──────────────────── */
-  var FILES = [
-    { name: 'Отчётность_МСФО_2025.pdf', size: '4,2 МБ', state: 'ok' },
-    { name: 'Teaser_group.pptx', size: '8,1 МБ', state: 'err' },
-    { name: 'Презентация_менеджмента_2026.pptx', size: '15,4 МБ', state: 'ok' }
-  ];
-  var FILE_CHIP = {
-    ok:  { cls: ' chip--success', label: 'Обработан',         icon: 'check-circle' },
-    err: { cls: ' chip--error',   label: 'Защищён паролем',   icon: 'alert-circle' },
-    run: { cls: ' chip--info',    label: 'Извлечение данных', icon: 'clock-timer' }
-  };
-
-  function drawFiles() {
-    el('fileList').innerHTML = FILES.map(function (f, i) {
-      var c = FILE_CHIP[f.state];
-      return '<div class="bld-file">' +
-        '<div class="entity entity--s">' +
-          '<div class="entity__lead"><span class="entity__icon" aria-hidden="true"><i data-icon="' + (f.state === 'err' ? 'file-off-close' : 'file-check') + '"></i></span></div>' +
-          '<div class="entity__main"><div class="entity__titles"><div class="entity__labelrow">' +
-            '<span class="entity__label entity__label--truncate">' + esc(f.name) + '</span>' +
-            '<span class="entity__postfix">' + esc(f.size) + '</span>' +
-          '</div></div></div>' +
-        '</div>' +
-        '<span class="chip chip--s' + c.cls + '"><span class="chip__marker"><i data-icon="' + c.icon + '"></i></span><span class="chip__label">' + c.label + '</span></span>' +
-        '<div class="bld-file__acts">' +
-          '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Заменить файл ' + esc(f.name) + '" data-act="replace" data-i="' + i + '"><i data-icon="syncronyze"></i></button>' +
-          '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Удалить файл ' + esc(f.name) + '" data-act="remove" data-i="' + i + '"><i data-icon="trash"></i></button>' +
-        '</div></div>';
-    }).join('');
-    rebind(el('fileList'));
-  }
 
   /* ── Правило формата и готовность к запуску ───────────────────────────── */
   function sync() {
@@ -791,31 +697,6 @@
     field.focus();
   });
 
-  /* Файлы: заменить и удалить (БТ-2.7) */
-  el('fileList').addEventListener('click', function (e) {
-    var t = e.target.closest('[data-act]');
-    if (!t) return;
-    var i = Number(t.getAttribute('data-i'));
-    if (t.getAttribute('data-act') === 'remove') { FILES.splice(i, 1); drawFiles(); }
-    if (t.getAttribute('data-act') === 'replace') {
-      FILES[i] = { name: 'Тизер_группы_2026_open.pptx', size: '7,4 МБ', state: 'run' };
-      drawFiles();
-      setTimeout(function () {
-        FILES[i] = { name: 'Тизер_группы_2026_open.pptx', size: '7,4 МБ', state: 'ok' };
-        drawFiles();
-      }, 1400);
-    }
-  });
-  el('btnAddFile').addEventListener('click', function () {
-    FILES.push({ name: 'Ковенантный_пакет_2025.pdf', size: '2,1 МБ', state: 'run' });
-    drawFiles();
-    var i = FILES.length - 1;
-    setTimeout(function () {
-      FILES[i].state = 'ok';
-      drawFiles();
-    }, 1500);
-  });
-
   /* ── Вариант формы (костыль прототипа, вне правил ДС) ────────────────────
      Иконка в шапке тайла открывает другой вариант формы — обычный или
      компактный, — чтобы показать заказчику оба. Параметры адреса (например
@@ -859,7 +740,6 @@
   }, { passive: true });
 
   drawHist();
-  drawFiles();
   sync();
 })();
 </script>

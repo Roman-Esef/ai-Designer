@@ -3,7 +3,8 @@
      Раскладка стартовой страницы — по правилу Layout: шапки страницы нет,
      крошка одна, контент — сетка групп .grid12 (.col-3 / .colw-6), внутри
      группы заголовок H5 Strong и тайлы NavTile, фон — background-illustration.
-     Раздел прототипа — «Аналитические материалы» (тайл варианта «со ссылками»).
+     Раздел прототипа — «AI Pitcher» в группе Origination: обычный тайл,
+     ведёт сразу в «Новый отчёт».
      Контекст для правки: DS-IBP/specs/_cheatsheet.md. CSS компонентов не читать. -->
 <html lang="ru">
 <head>
@@ -63,19 +64,11 @@
       <a class="nav__item nav__item--selected" href="index.html" aria-current="page"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
       <div class="nav__block">
         <div class="nav__block-label">Origination</div>
+        <a class="nav__item" href="RequestThread.html"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="funds"></i></span><span class="nav__label">Фонды</span></a>
-      </div>
-      <div class="nav__block">
-        <div class="nav__block-label">Отчёты</div>
-        <a class="nav__item nav__item--acc" href="#" aria-expanded="false" aria-controls="nav-sub-analytics"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">Аналитические материалы</span><span class="nav__caret"><i data-icon="chevron-down"></i></span></a>
-        <div class="nav__sub" id="nav-sub-analytics"><div class="nav__sub-in">
-          <a class="nav__item" href="RequestThread.html"><span class="nav__label">Новый отчёт</span></a>
-          <a class="nav__item" href="RequestHistory.html"><span class="nav__label">История и материалы</span></a>
-          <a class="nav__item" href="ActivityLog.html"><span class="nav__label">Журнал</span></a>
-        </div></div>
       </div>
       <div class="nav__block">
         <div class="nav__block-label">Pipeline</div>
@@ -112,6 +105,12 @@
           <section class="home-group col-3 colw-6">
             <h2 class="home-group__head">Origination</h2>
 
+            <a class="ntile" href="RequestThread.html">
+              <span class="illu ntile__illu" data-illu="rwa" aria-hidden="true"></span>
+              <h3 class="ntile__title">AI Pitcher</h3>
+              <p class="ntile__desc">Подготовка отчетов для встречи с клиентом</p>
+            </a>
+
             <a class="ntile" href="#">
               <span class="illu ntile__illu" data-illu="sales-projects" aria-hidden="true"></span>
               <h3 class="ntile__title">Проекты продаж CIB</h3>
@@ -137,21 +136,6 @@
             </a>
           </section>
 
-          <section class="home-group col-3 colw-6">
-            <h2 class="home-group__head">Отчёты</h2>
-
-            <!-- Вариант NavTile «со ссылками»: контейнер div (не <a> в <a>),
-                 кликается название и до четырёх ссылок подразделов. -->
-            <div class="ntile">
-              <span class="illu ntile__illu" data-illu="rwa" aria-hidden="true"></span>
-              <a class="ntile__title-link" href="RequestHistory.html"><h3 class="ntile__title">Аналитические материалы</h3></a>
-              <nav class="ntile__links" aria-label="Подразделы раздела «Аналитические материалы»">
-                <a class="link link--accent link--m" href="RequestThread.html">Новый отчёт</a>
-                <a class="link link--accent link--m" href="RequestHistory.html">История и материалы</a>
-                <a class="link link--accent link--m" href="ActivityLog.html">Журнал</a>
-              </nav>
-            </div>
-          </section>
 
           <section class="home-group col-3 colw-6">
             <h2 class="home-group__head">Pipeline</h2>
