@@ -60,21 +60,30 @@ window.IBPHub = [
     icon: 'folder'
   },
   {
-    id: 'ai-bankster-prototype',
+    id: 'ai-bankster-prototype-v01',
     group: 'concepts',
-    title: 'Аналитические материалы',
+    title: 'AI Pitcher ver. 01',
     desc: 'Прототип модуля AI Pitcher: новый отчёт, история, журнал',
-    href: 'Concepts/ai-bankster-prototype/index.html',
-    root: 'Concepts/ai-bankster-prototype',
+    href: 'Concepts/ai-bankster-prototype-v01/index.html',
+    root: 'Concepts/ai-bankster-prototype-v01',
     icon: 'folder'
   },
   {
     id: 'ai-bankster-prototype-v02',
     group: 'concepts',
-    title: 'AI Pitcher',
+    title: 'AI Pitcher ver. 02',
     desc: 'Прототип v02: чат с конструктором запроса и просмотром материала',
     href: 'Concepts/ai-bankster-prototype-v02/index.html',
     root: 'Concepts/ai-bankster-prototype-v02',
+    icon: 'ai-stars'
+  },
+  {
+    id: 'ai-bankster-prototype-mvp',
+    group: 'concepts',
+    title: 'AI Pitcher MVP',
+    desc: 'Прототип MVP: чат с конструктором запроса и просмотром материала',
+    href: 'Concepts/ai-bankster-prototype-mvp/index.html',
+    root: 'Concepts/ai-bankster-prototype-mvp',
     icon: 'ai-stars'
   },
   {

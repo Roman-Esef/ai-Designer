@@ -140,7 +140,7 @@
       <a class="nav__item" href="index.html"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
       <div class="nav__block">
         <div class="nav__block-label">Origination</div>
-        <a class="nav__item nav__item--selected" href="RequestThread.html" aria-current="page"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher</span></a>
+        <a class="nav__item nav__item--selected" href="RequestThread.html" aria-current="page"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher ver. 02</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
@@ -481,9 +481,6 @@
   <button type="button" class="menu__item" role="menuitem" id="miDuplicate">
     <span class="menu__item-icon"><i data-icon="copy"></i></span><span class="menu__item-label">Дублировать запрос</span>
   </button>
-  <button type="button" class="menu__item" role="menuitem" id="miRestart">
-    <span class="menu__item-icon"><i data-icon="refresh"></i></span><span class="menu__item-label">Перезапустить по прежним вводным</span>
-  </button>
   <hr class="menu__divider">
   <button type="button" class="menu__item" role="menuitem" onclick="location.href='RequestHistory.html'">
     <span class="menu__item-icon"><i data-icon="history"></i></span><span class="menu__item-label">Все запросы</span>
@@ -501,7 +498,7 @@
       <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
     </header>
     <div class="modal__body">
-      <div class="inp inp--m">
+      <div class="inp inp--m inp--fullwidth">
         <label class="ds-label" for="renameField"><span class="ds-label__text">Название запроса</span></label>
         <div class="inp__field">
           <input class="inp__control" id="renameField" value="ГК «Северный агрохолдинг» — выход миноритария" aria-describedby="rename-help">
@@ -660,13 +657,11 @@
     rebind(el('histList'));
   }
 
-  /* Строка списка открывает запрос в нити; кебаб открывает меню и запоминает,
-     к какому запросу оно относится */
-  var menuRow = null;
+  /* Строка списка открывает запрос в нити; клик по кебабу только открывает меню */
   el('histList').addEventListener('click', function (e) {
     var row = e.target.closest('[data-thread]');
     if (!row) return;
-    if (e.target.closest('.entity__actions')) { menuRow = row.getAttribute('data-thread'); return; }
+    if (e.target.closest('.entity__actions')) return;
     location.href = 'RequestThread.html?id=' + row.getAttribute('data-thread');
   });
   el('histList').addEventListener('keydown', function (e) {
@@ -681,10 +676,6 @@
   });
   el('miDuplicate').addEventListener('click', function () {
     if (window.DSSnack) window.DSSnack.show({ tone: 'success', title: 'Запрос дублирован', text: 'Создана копия запроса с теми же вводными и файлами.' });
-  });
-  el('miRestart').addEventListener('click', function () {
-    /* перезапуск идёт в нити запроса — открываем её */
-    if (menuRow) location.href = 'RequestThread.html?id=' + menuRow;
   });
   el('btnDelete').addEventListener('click', function () {
     if (window.DSSnack) window.DSSnack.show({

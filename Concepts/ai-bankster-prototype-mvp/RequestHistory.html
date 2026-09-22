@@ -63,45 +63,6 @@
      закрепление колонок ничего не теряет. Описано в RequestHistory.screen.md. */
   .dtable__body .tbl__row { min-width: 100%; }
 
-  /* ── Превью материала — локальный компонент направления ──────────────────
-     Отчёт формируется файлом (PDF или Word); в инструменте он показывается
-     превью. Документ — сам файл-пример PDF во встроенном просмотрщике
-     браузера (<object type="application/pdf">): картинки страниц не нужны,
-     другой файл показывается без подготовки. Компонента «документ» в ДС нет:
-     рамка просмотрщика и строки версий собраны здесь, на токенах ДС.
-     Окно всегда на полную высоту (--modal-max-h, 80% экрана): документ
-     прокручивается в своём просмотрщике, а не вместе с телом окна. */
-  .prv        { height: var(--modal-max-h); }
-  .prv__body  { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 320px; grid-template-rows: minmax(0, 1fr); gap: var(--space-24); padding: var(--space-24); }
-  .prv__doc   { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; min-height: 0; }
-  .prv__pdf   { display: block; flex: 1; min-height: 0; width: 100%; background: var(--bg-page); border: 1px solid var(--border-light); border-radius: var(--radius-xs); overflow: hidden; }
-  /* браузер без встроенного просмотрщика PDF показывает содержимое <object> */
-  .prv__pdf > .alert { margin: var(--space-16); }
-  .prv__muted { color: var(--text-secondary); }
-  /* Колонка выгрузки и версий прокручивается сама, если не помещается по
-     высоте. Полоса — рецепт тела модалки ДС (modal.css). */
-  .prv__rail  { display: flex; flex-direction: column; gap: var(--space-24); min-width: 0; min-height: 0; overflow-y: auto; }
-  .prv__rail::-webkit-scrollbar { width: var(--space-8); }
-  .prv__rail::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: var(--radius-m); }
-  @supports not selector(::-webkit-scrollbar) {
-    .prv__rail { scrollbar-width: thin; scrollbar-color: var(--border-light) transparent; }
-  }
-  .prv__block { display: flex; flex-direction: column; gap: var(--space-8); }
-  /* Строки версий повторяют строки истории запросов в нити: те же отступы,
-     скругление и состояния, выбранная версия — фон строки таблицы в фокусе. */
-  .prv__vers  { display: flex; flex-direction: column; gap: var(--space-4); }
-  .prv__ver   { padding: var(--space-8) var(--space-12); border-radius: var(--radius-m); cursor: pointer; transition: background-color .15s ease; }
-  .prv__ver:hover { background: var(--bg-table-default-hover); }
-  .prv__ver:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
-  .prv__ver[aria-checked="true"] { background: var(--bg-table-default-focus); }
-
-  /* узкое окно: одна колонка, выгрузка и версии — над документом;
-     прокручивается тело окна, у просмотрщика своя высота */
-  @media (max-width: 1100px) {
-    .prv__body { flex: none; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
-    .prv__rail { order: -1; overflow: visible; }
-    .prv__pdf  { flex: none; height: 60vh; }
-  }
 </style>
 </head>
 <body>
@@ -117,7 +78,7 @@
       <a class="nav__item" href="index.html"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
       <div class="nav__block">
         <div class="nav__block-label">Origination</div>
-        <a class="nav__item nav__item--selected" href="RequestThread.html"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher ver. 02</span></a>
+        <a class="nav__item nav__item--selected" href="RequestThread.html"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
@@ -511,7 +472,6 @@
                 <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Ограничена</span></span></span></div>
                 <div class="tc"><span class="tc__row"><span class="tc__text">12.09.2026</span></span></div>
                 <div class="tc tc--center"><span class="tc__controls">
-                  <button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть материал" data-modal="preview-scrim"><i data-icon="visibility-on"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Выгрузить материал" data-act="download"><i data-icon="download"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Ещё действия" aria-haspopup="menu" data-menu="row-menu"><i data-icon="more-dots"></i></button>
                 </span></div>
@@ -529,7 +489,6 @@
                 <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Полная</span></span></span></div>
                 <div class="tc"><span class="tc__row"><span class="tc__text">10.09.2026</span></span></div>
                 <div class="tc tc--center"><span class="tc__controls">
-                  <button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть материал" data-modal="preview-scrim"><i data-icon="visibility-on"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Выгрузить материал" data-act="download"><i data-icon="download"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Ещё действия" aria-haspopup="menu" data-menu="row-menu"><i data-icon="more-dots"></i></button>
                 </span></div>
@@ -547,7 +506,6 @@
                 <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Полная</span></span></span></div>
                 <div class="tc"><span class="tc__row"><span class="tc__text">09.09.2026</span></span></div>
                 <div class="tc tc--center"><span class="tc__controls">
-                  <button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть материал" data-modal="preview-scrim"><i data-icon="visibility-on"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Выгрузить материал" data-act="download"><i data-icon="download"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Ещё действия" aria-haspopup="menu" data-menu="row-menu"><i data-icon="more-dots"></i></button>
                 </span></div>
@@ -565,7 +523,6 @@
                 <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Полная</span></span></span></div>
                 <div class="tc"><span class="tc__row"><span class="tc__text">05.09.2026</span></span></div>
                 <div class="tc tc--center"><span class="tc__controls">
-                  <button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть материал" data-modal="preview-scrim"><i data-icon="visibility-on"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Выгрузить материал" data-act="download"><i data-icon="download"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Ещё действия" aria-haspopup="menu" data-menu="row-menu"><i data-icon="more-dots"></i></button>
                 </span></div>
@@ -583,7 +540,6 @@
                 <div class="tc"><span class="tc__row"><span class="chip chip--s chip--warning"><span class="chip__label">Ограничена</span></span></span></div>
                 <div class="tc"><span class="tc__row"><span class="tc__text">28.08.2026</span></span></div>
                 <div class="tc tc--center"><span class="tc__controls">
-                  <button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть материал" data-modal="preview-scrim"><i data-icon="visibility-on"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Выгрузить материал" data-act="download"><i data-icon="download"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Ещё действия" aria-haspopup="menu" data-menu="row-menu"><i data-icon="more-dots"></i></button>
                 </span></div>
@@ -601,7 +557,6 @@
                 <div class="tc"><span class="tc__row"><span class="chip chip--s chip--success"><span class="chip__label">Полная</span></span></span></div>
                 <div class="tc"><span class="tc__row"><span class="tc__text">21.08.2026</span></span></div>
                 <div class="tc tc--center"><span class="tc__controls">
-                  <button class="ibtn ibtn--neutral ibtn--s" aria-label="Открыть материал" data-modal="preview-scrim"><i data-icon="visibility-on"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Выгрузить материал" data-act="download"><i data-icon="download"></i></button>
                   <button class="ibtn ibtn--neutral ibtn--s" aria-label="Ещё действия" aria-haspopup="menu" data-menu="row-menu"><i data-icon="more-dots"></i></button>
                 </span></div>
@@ -641,9 +596,6 @@
   <div id="row-menu" class="menu menu--floating" role="menu" hidden>
     <button type="button" class="menu__item" role="menuitem" onclick="location.href='RequestThread.html'">
       <span class="menu__item-icon"><i data-icon="message-star"></i></span><span class="menu__item-label">Продолжить диалог</span>
-    </button>
-    <button type="button" class="menu__item" role="menuitem" data-modal="preview-scrim">
-      <span class="menu__item-icon"><i data-icon="document-check"></i></span><span class="menu__item-label">Открыть материал и версии</span>
     </button>
     <button type="button" class="menu__item" role="menuitem" data-act="download">
       <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Выгрузить последнюю версию</span>
@@ -918,176 +870,8 @@
 </div>
 
 
-<!-- ── Превью материала (БТ-1, БТ-4.6, БТ-4.7) ──────────────────────────────
-     Отчёт формируется файлом и показывается в инструменте превью. Функционала
-     у документа мало — выгрузка и версии, — поэтому превью живёт модальным
-     окном поверх нити или реестра: уточнения остаются в нити (сценарий, шаг 8),
-     работа по запросу — там, где была. Документ — сам файл-пример
-     report-example-for-test.pdf (краткий материал, 2 страницы A4) во встроенном
-     просмотрщике PDF браузера. Скрипт окна идёт сразу за разметкой. -->
-<div class="modal-scrim" id="preview-scrim" hidden>
-  <div class="modal modal--w9 prv" role="dialog" aria-modal="true" aria-labelledby="prv-title">
-    <header class="modal__head">
-      <h2 class="modal__title" id="prv-title">ООО «Друза» — бриф перед встречей</h2>
-      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть превью" data-modal-close><i data-icon="close"></i></button>
-    </header>
-
-    <div class="modal__alert">
-      <div class="alert alert--warning alert--m alert--flush" role="status" aria-live="polite">
-        <span class="alert__icon" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
-        <div class="alert__body">
-          <p class="alert__title" data-prv="alert-title">Полнота ограничена</p>
-          <p class="alert__text" data-prv="alert-text">Консолидированной отчётности по группе нет, выгрузки из платных систем не было — ограничение отмечено в разделе «Ключевые риски».</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal__body modal__body--flush">
-      <div class="prv__body">
-
-        <div class="prv__doc">
-          <object class="prv__pdf" data="report-example-for-test.pdf#toolbar=0&amp;navpanes=0&amp;view=FitH" type="application/pdf" aria-label="ООО «Друза» — бриф перед встречей, краткий материал, PDF, 2 страницы">
-            <div class="alert alert--info alert--m">
-              <span class="alert__icon" aria-hidden="true"><i data-icon="Info-circle-filled"></i></span>
-              <div class="alert__body">
-                <p class="alert__title">Браузер не показывает PDF внутри окна</p>
-                <p class="alert__text">Откройте файл в новой вкладке или скачайте краткий материал в блоке «Выгрузка».</p>
-                <div class="alert__buttons"><a class="link link--info link--s" href="report-example-for-test.pdf" target="_blank" rel="noopener">Открыть PDF</a></div>
-              </div>
-            </div>
-          </object>
-          <p class="ds-body-s prv__muted">Краткий материал · 2 страницы. Детальный — в выгрузке.</p>
-        </div>
-
-        <aside class="prv__rail" aria-label="Выгрузка и версии материала">
-
-          <div class="prv__block">
-            <span class="ds-label"><span class="ds-label__text" data-prv="dl-label">Выгрузка — версия 2</span></span>
-            <a class="btn btn--outline btn--m btn--fullwidth" href="report-example-for-test.pdf" download data-act="dl" data-fmt-base="Краткий материал, PDF" data-fmt="Краткий материал, PDF, версия 2"><i data-icon="download"></i><span class="btn__label">Краткий материал — PDF</span></a>
-            <button type="button" class="btn btn--outline btn--m btn--fullwidth" data-act="dl" data-fmt-base="Детальный материал, PDF" data-fmt="Детальный материал, PDF, версия 2"><i data-icon="download"></i><span class="btn__label">Детальный материал — PDF</span></button>
-            <button type="button" class="btn btn--outline btn--m btn--fullwidth" data-act="dl" data-fmt-base="Детальный материал, Word" data-fmt="Детальный материал, Word, версия 2"><i data-icon="download"></i><span class="btn__label">Детальный материал — Word</span></button>
-            <span class="ds-helper ds-helper--left">Краткий — только PDF. Файл с маркировкой конфиденциальности, выгрузка — в журнале действий.</span>
-          </div>
-
-          <div class="prv__block">
-            <span class="ds-label"><span class="ds-label__text">Версии материала</span></span>
-            <div class="prv__vers" role="radiogroup" aria-label="Просматриваемая версия">
-            <div class="prv__ver" role="radio" aria-checked="true" tabindex="0" data-prv-ver="2">
-              <div class="entity entity--s">
-                <div class="entity__main">
-                  <div class="entity__titles"><p class="entity__header">12.09.2026, 09:05</p><div class="entity__labelrow"><span class="entity__label">Версия 2</span></div></div>
-                  <div class="entity__subs"><span class="entity__subs-list">Уточнение из нити: добавлены ключевые риски и позиция на встрече</span></div>
-                  <div class="entity__chips"><span class="chip chip--s chip--success"><span class="chip__label">Текущая</span></span></div>
-                </div>
-              </div>
-            </div>
-            <div class="prv__ver" role="radio" aria-checked="false" tabindex="-1" data-prv-ver="1">
-              <div class="entity entity--s">
-                <div class="entity__main">
-                  <div class="entity__titles"><p class="entity__header">11.09.2026, 14:20</p><div class="entity__labelrow"><span class="entity__label">Версия 1</span></div></div>
-                  <div class="entity__subs"><span class="entity__subs-list">Первая версия по параметрам конструктора</span></div>
-                </div>
-              </div>
-            </div>
-            </div>
-            <span class="ds-helper ds-helper--left">Версии хранятся без изменений.</span>
-          </div>
-
-        </aside>
-      </div>
-    </div>
-
-    <footer class="modal__foot">
-      <div class="modal__foot-right">
-        <button type="button" class="btn btn--outline btn--m" data-act="to-thread"><i data-icon="message-star"></i><span class="btn__label">Перейти в нить</span></button>
-        <button type="button" class="btn btn--accent btn--m" data-modal-close><span class="btn__label">Закрыть</span></button>
-      </div>
-    </footer>
-  </div>
-</div>
-<script>
-/* Превью материала: просматриваемая версия (БТ-4.6, БТ-4.7). Каждое
-   открытие окна показывает текущую версию с первой страницы. */
-(function () {
-  var scrim = document.getElementById('preview-scrim');
-  if (!scrim) return;
-  var CURRENT = '2';
-  var V = {
-    '2': {
-      short: 'версия 2',
-      alertTitle: 'Полнота ограничена',
-      alertText: 'Консолидированной отчётности по группе нет, выгрузки из платных систем не было — ограничение отмечено в разделе «Ключевые риски».'
-    },
-    '1': {
-      short: 'версия 1',
-      alertTitle: 'Версия 1 — не текущая',
-      alertText: 'Сохранена без изменений. Полнота ограничена по тем же причинам: консолидированной отчётности по группе нет.'
-    }
-  };
-
-  var body = scrim.querySelector('.modal__body');
-  var opened = false;
-
-  function each(sel, fn) { Array.prototype.forEach.call(scrim.querySelectorAll(sel), fn); }
-  function fill(key, value) { each('[data-prv="' + key + '"]', function (n) { n.textContent = value; }); }
-
-  /* Встроенный просмотрщик PDF помнит, до какой страницы файл прокрутили.
-     Чтобы окно снова открывалось с первой страницы, элемент документа
-     пересоздаётся и файл загружается заново — из кэша браузера. */
-  function reloadDoc() {
-    var doc = scrim.querySelector('.prv__pdf');
-    if (doc) doc.parentNode.replaceChild(doc.cloneNode(true), doc);
-  }
-
-  function show(n) {
-    var v = V[n];
-    if (!v) return;
-    fill('alert-title', v.alertTitle); fill('alert-text', v.alertText);
-    fill('dl-label', 'Выгрузка — ' + v.short);
-    /* выгрузка относится к просматриваемой версии (БТ-1.7) */
-    each('[data-fmt-base]', function (b) { b.setAttribute('data-fmt', b.getAttribute('data-fmt-base') + ', ' + v.short); });
-    each('[data-prv-ver]', function (r) {
-      var on = r.getAttribute('data-prv-ver') === n;
-      r.setAttribute('aria-checked', on ? 'true' : 'false');
-      r.tabIndex = on ? 0 : -1;
-    });
-  }
-
-  scrim.addEventListener('click', function (e) {
-    var row = e.target.closest('[data-prv-ver]');
-    if (row) show(row.getAttribute('data-prv-ver'));
-  });
-
-  /* радиогруппа версий с клавиатуры: стрелки переключают, Enter и пробел выбирают */
-  scrim.addEventListener('keydown', function (e) {
-    var row = e.target.closest && e.target.closest('[data-prv-ver]');
-    if (!row) return;
-    var rows = Array.prototype.slice.call(scrim.querySelectorAll('[data-prv-ver]'));
-    var i = rows.indexOf(row);
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      var next = rows[(i + (e.key === 'ArrowDown' ? 1 : rows.length - 1)) % rows.length];
-      show(next.getAttribute('data-prv-ver'));
-      next.focus();
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      show(row.getAttribute('data-prv-ver'));
-    }
-  });
-
-  /* окно открыто любым входом (карточка в нити, снэк, строка реестра, меню) */
-  new MutationObserver(function () {
-    if (scrim.hasAttribute('hidden')) return;
-    show(CURRENT);
-    if (opened) reloadDoc();
-    opened = true;
-    if (body) body.scrollTop = 0;
-  }).observe(scrim, { attributes: true, attributeFilter: ['hidden'] });
-})();
-</script>
 
 <script src="../../DS-IBP/scripts/ds.js"></script>
-<script src="chat-settings.js"></script>
 <script>
 /* ============================================================================
    Скрипт экрана «История запросов».
@@ -1152,11 +936,6 @@
     if (act === 'download' && window.DSToast) {
       window.DSToast.show({ message: 'Файл сформирован и промаркирован по политике Банка', kind: 'bar', tone: 'success', duration: 3000 });
     }
-    /* действия внутри превью материала */
-    if (act === 'dl' && window.DSToast) {
-      window.DSToast.show({ message: t.getAttribute('data-fmt') + ' — файл сформирован и промаркирован', kind: 'bar', tone: 'success', duration: 3000 });
-    }
-    if (act === 'to-thread') { location.href = 'RequestThread.html?id=1'; }
     if (act === 'rename' && window.DSSnack) {
       window.DSSnack.show({ tone: 'info', title: 'Переименование', text: 'Название меняется в карточке запроса — откройте нить.' });
     }

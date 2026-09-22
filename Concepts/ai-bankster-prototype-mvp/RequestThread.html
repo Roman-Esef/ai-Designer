@@ -2,7 +2,7 @@
 <!-- Экран «Новый отчёт» / нить запроса (RequestThread) раздела «AI Pitcher».
      Собран на компонентах IBP DS по ТЗ: БТ-3 (диалог), БТ-4 (история
      запросов слева), БТ-6 (уточнения и управление выполнением), БТ-7 (шаги
-     подготовки), БТ-8 (уведомления), БТ-2 (файлы к сообщению).
+     подготовки).
      По умолчанию открывается пустой нитью — это точка входа в раздел.
      Конструктор запроса — не отдельный экран, а панель, выезжающая внутри
      поля ввода: выбор в ней дописывает в запрос готовые фрагменты текста.
@@ -106,15 +106,9 @@
      форма скролл-контейнера, чек-лист К3) и закреплённый под ней композер. */
   /* У пустой нити шапки нет: заголовок появляется с первым запросом */
   .phead[hidden] { display: none; }
-
-  /* Аватарки-получателей в шапке открывают диалог «Поделиться» (диалоги —
-     в chat-settings.js, триггер вешает PitcherChatSettings.avatars).
-     Фокус — как у интерактивного аватара ДС (.av--button:focus-visible). */
-  .av-group--link { cursor: pointer; }
-  .av-group--link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
   .thr           { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-16); }
-  /* Пол области сообщений: когда открытый конструктор (с блоком отчётов
-     коллег) перестаёт помещаться в окно, нить уступает место не до нуля,
+  /* Пол области сообщений: когда открытый конструктор перестаёт помещаться
+     в окно, нить уступает место не до нуля,
      а до минимума — дальше скроллит рабочая область (.screen__content ниже),
      а не сама панель конструктора. */
   .thr__scroll   { flex: 1; min-height: var(--space-96); overflow-y: auto; scrollbar-gutter: stable; display: flex; flex-direction: column; }
@@ -166,21 +160,18 @@
   .think__text.is-out { opacity: 0; }
   .think__time   { font: var(--type-body-xs); color: var(--text-inactive); font-variant-numeric: tabular-nums; }
   .think-row    { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-8); }
-  .think-row__notify { margin-left: auto; }
   @keyframes thinkSpin { to { transform: rotate(360deg); } }
   @keyframes thinkShimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
   /* ── Карточка материала в нити ───────────────────────────────────────────
-     Файл как вложение на всю ширину колонки: глиф, название (открывает
-     просмотр), параметры, кнопка «Просмотр» и «Скачать» с меню форматов. */
+     Файл как вложение на всю ширину колонки: глиф, название, параметры
+     и кнопка «Скачать — MD». */
   .doc           { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-12); background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-xl); transition: border-color .15s ease, box-shadow .2s ease; }
   .doc:hover     { border-color: var(--border-primary); box-shadow: 0 4px 16px color-mix(in srgb, var(--text-primary) 6%, transparent); }
   .doc__ico      { flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--radius-m); color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, var(--bg-tile)); }
   .doc__ico > [data-icon] { width: 22px; height: 22px; }
   .doc__main     { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
-  .doc__title    { display: block; max-width: 100%; padding: 0; overflow: hidden; font: var(--type-body-m-strong); color: var(--text-primary); text-align: left; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; background: none; border: 0; }
-  .doc__title:hover { color: var(--primary-dark); text-decoration: underline; text-underline-offset: 3px; }
-  .doc__title:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-2xs); }
+  .doc__title    { display: block; max-width: 100%; overflow: hidden; font: var(--type-body-m-strong); color: var(--text-primary); white-space: nowrap; text-overflow: ellipsis; }
   .doc__meta     { overflow: hidden; font: var(--type-body-xs); color: var(--text-secondary); white-space: nowrap; text-overflow: ellipsis; }
   .doc__acts     { flex: none; display: flex; align-items: center; gap: var(--space-8); }
   .doc__ctx      { display: flex; }
@@ -188,7 +179,7 @@
   /* ── Ошибка подготовки в нити ────────────────────────────────────────────
      Не только сообщает о сбое: говорит, что случилось, что поможет его
      исправить, и даёт выход — вернуть текст запроса в поле для правки.
-     После запуска новой подготовки действия скрываются. */
+     После повторной отправки действия скрываются. */
   .err           { display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-16); background: var(--bg-tile); border: 1px solid color-mix(in srgb, var(--error) 28%, var(--border-light)); border-radius: var(--radius-xl); }
   .err__head     { display: flex; align-items: flex-start; gap: var(--space-12); }
   .err__ico      { flex: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius-full); color: var(--error); background: var(--error-bg); }
@@ -204,7 +195,7 @@
   .err.is-resolved .err__acts { display: none; }
 
   @media (prefers-reduced-motion: reduce) {
-    .msg, .msg *, .think *, .think__loader::before, .pv { animation: none !important; transition: none !important; }
+    .msg, .msg *, .think *, .think__loader::before { animation: none !important; transition: none !important; }
   }
   .thr__text     { display: flex; flex-direction: column; gap: var(--space-8); }
   .thr__row      { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
@@ -269,7 +260,6 @@
   @keyframes cmpFlow { to { background-position: 300% 0; } }
 
   .cmp__main     { display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12) var(--space-12) var(--space-12) var(--space-16); }
-  .cmp__files:empty { display: none; }
 
   .cmp__field    { position: relative; display: grid; max-height: 240px; overflow-y: auto; }
   .cmp__field > .cmp__mirror,
@@ -341,8 +331,8 @@
      Высота анимируется через grid-template-rows 0fr → 1fr: панель выезжает
      вниз на собственную высоту без замера скриптом. Содержимое догоняет
      с небольшой задержкой и лёгким сдвигом, секции появляются лесенкой.
-     Панель растягивается под контент без внутреннего скролла — включая
-     блок отчётов коллег. Если вместе с ней нить перестаёт помещаться
+     Панель растягивается под контент без внутреннего скролла.
+     Если вместе с ней нить перестаёт помещаться
      в окно, область сообщений сжимается до своего минимума, а дальше
      скроллит рабочая область, не сама панель. */
   .cmp__drawer   { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s var(--cmp-ease); }
@@ -404,16 +394,6 @@
   .bopt--custom  { padding-left: var(--space-8); border-style: dashed; color: var(--primary-dark); }
   .bopt--custom > [data-icon] { flex: none; width: 16px; height: 16px; }
 
-  /* Отчёты коллег по выбранному объекту — под вариантами объекта, на всю
-     ширину секции. Поверхность та же, что у поиска объекта; строки — Entity S */
-  .bprior        { grid-column: 1 / -1; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12); background: var(--bg-page); border: 1px solid var(--border-light); border-radius: var(--radius-m); animation: bldIn .4s var(--cmp-ease) both; }
-  .bprior[hidden] { display: none; }
-  .bprior__head  { display: flex; align-items: center; gap: var(--space-8); margin: 0; font: var(--type-body-s-strong); color: var(--text-primary); }
-  .bprior__ico   { flex: none; display: flex; width: 18px; height: 18px; color: var(--primary); }
-  .bprior__ico > [data-icon] { width: 100%; height: 100%; }
-  .bprior__hint  { margin: 0; font: var(--type-body-xs); color: var(--text-secondary); }
-  .bprior__list  { padding-top: var(--space-4); }
-
   /* Дополнительный фокус — переключаемые чипы: «+» превращается в галочку */
   .bchip         { display: inline-flex; align-items: center; gap: var(--space-6); min-height: 32px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8); font: var(--type-body-s); color: var(--text-primary); cursor: pointer; background: transparent; border: 1px dashed var(--border-primary); border-radius: var(--radius-full); transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease; }
   .bchip:hover   { border-style: solid; border-color: var(--primary); background: color-mix(in srgb, var(--primary) 4%, transparent); }
@@ -434,6 +414,10 @@
   /* Приветствие пустой нити: три строки с переносами из макета — у тела
      пустого состояния ДС ширина 420px, строки в неё не помещались */
   .thr__start .es--l .es__body { max-width: 760px; }
+  /* Кнопка «Показать пример запроса» исчезает с первым символом в поле.
+     Место резервируется (visibility вместо display), чтобы центрированный
+     блок «С чего начнём?» не прыгал при исчезновении кнопки. */
+  .es__actions #btnExample[hidden] { display: inline-flex; visibility: hidden; pointer-events: none; }
 
 
   @container screen (max-width: 960px) {
@@ -449,10 +433,6 @@
      работать — то же соглашение, что у компонентов ДС. */
   .thr__start    { flex: 1; min-height: 0; display: flex; align-items: safe center; justify-content: center; }
   .thr__start[hidden] { display: none; }
-  /* Кнопка-пример уходит с первым символом в поле, но место резервирует:
-     блок «С чего начнём?» центрирован по свободной высоте, и display:none
-     пересчитал бы центр — весь стенд прыгает. */
-  #btnExample.is-ghost { visibility: hidden; pointer-events: none; }
 
   /* Полосы прокрутки внутри блоков — тот же рецепт, что у тела модалки ДС
      (modal.css): 8px, бегунок --border-light со скруглением. Общего класса
@@ -490,34 +470,6 @@
     .tile-row > [class*="colw-"] { grid-column: span var(--colw); }
   }
 
-  /* ── Просмотр материала — локальный компонент направления ────────────────
-     Панель справа от нити вместо модального окна: диалог остаётся перед
-     глазами. Ширина — переменная --pv-w, меняется перетаскиванием левого
-     края. Документ — страница материала MaterialReport.html во фрейме. */
-  .pv            { --pv-w: 560px; position: relative; flex: 0 0 var(--pv-w); width: var(--pv-w); min-width: 0; display: flex; flex-direction: column; background: var(--bg-tile); border-left: 1px solid var(--border-light); container: pv / inline-size; animation: pvIn .45s cubic-bezier(.22, 1, .36, 1) both; }
-  .pv[hidden]    { display: none; }
-  @keyframes pvIn { from { opacity: 0; transform: translateX(32px); } }
-  html.is-col-resizing, html.is-col-resizing * { cursor: col-resize !important; user-select: none !important; }
-
-  /* край для перетаскивания: широкая зона захвата, тонкая линия и ручка */
-  .pv__grip      { position: absolute; top: 0; bottom: 0; left: -6px; z-index: 2; width: 12px; cursor: col-resize; touch-action: none; outline: 0; }
-  .pv__grip::before { content: ""; position: absolute; top: 0; bottom: 0; left: 5px; width: 2px; background: transparent; transition: background-color .15s ease; }
-  .pv__grip::after { content: ""; position: absolute; top: 50%; left: 3px; width: 6px; height: 44px; margin-top: -22px; border-radius: var(--radius-full); background: var(--primary); opacity: 0; transform: scaleY(.6); transition: opacity .15s ease, transform .2s ease; }
-  .pv__grip:hover::before, .pv__grip:focus-visible::before, .pv.is-resizing .pv__grip::before { background: var(--primary); }
-  .pv__grip:hover::after, .pv__grip:focus-visible::after, .pv.is-resizing .pv__grip::after { opacity: 1; transform: none; }
-
-  .pv__head      { flex: none; display: flex; align-items: center; gap: var(--space-12); padding: var(--space-12) var(--space-12) var(--space-12) var(--space-20); border-bottom: 1px solid var(--border-light); }
-  .pv__ico       { flex: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius-m); color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, var(--bg-tile)); }
-  .pv__ico > [data-icon] { width: 20px; height: 20px; }
-  .pv__titles    { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .pv__title     { margin: 0; overflow: hidden; font: var(--type-body-m-strong); color: var(--text-primary); white-space: nowrap; text-overflow: ellipsis; }
-  .pv__meta      { margin: 0; overflow: hidden; font: var(--type-body-xs); color: var(--text-secondary); white-space: nowrap; text-overflow: ellipsis; }
-  .pv__acts      { flex: none; display: flex; align-items: center; gap: var(--space-24); }
-  .pv__body      { flex: 1; min-height: 0; display: flex; background: var(--bg-page); }
-  .pv__frame     { display: block; flex: 1; width: 100%; height: 100%; border: 0; background: var(--bg-page); }
-  /* фрейм не перехватывает указатель, пока тянут край панели */
-  .pv.is-resizing .pv__frame { pointer-events: none; }
-
 </style>
 </head>
 <body>
@@ -533,7 +485,7 @@
       <a class="nav__item" href="index.html"><span class="nav__ico"><i data-icon="main-page"></i></span><span class="nav__label">Главная</span></a>
       <div class="nav__block">
         <div class="nav__block-label">Origination</div>
-        <a class="nav__item nav__item--selected" href="RequestThread.html" aria-current="page"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher ver. 02</span></a>
+        <a class="nav__item nav__item--selected" href="RequestThread.html" aria-current="page"><span class="nav__ico"><i data-icon="ai-stars"></i></span><span class="nav__label">AI Pitcher</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="sales-projects"></i></span><span class="nav__label">Проекты продаж CIB</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="dcm-potentials"></i></span><span class="nav__label">Потенциалы DCM</span></a>
         <a class="nav__item" href="#"><span class="nav__ico"><i data-icon="calc"></i></span><span class="nav__label">Калькулятор</span></a>
@@ -608,7 +560,6 @@
                 <div class="phead__title-group">
                   <h1 class="phead__title" id="hdTitle">Новый отчёт</h1>
                 </div>
-                <div class="phead__chips" id="hdChips"></div>
               </div>
               <!-- Параметры запроса: заполняются, когда нить принадлежит
                    существующему запросу; у новой нити их ещё нет. -->
@@ -647,7 +598,6 @@
             <div class="thr__compose">
               <div class="cmp" id="cmp">
                 <div class="cmp__main">
-                  <div class="chiplist cmp__files" id="cmpFiles" role="group" aria-label="Файлы, приложенные к сообщению"></div>
                   <div class="chiplist cmp__ctx" id="cmpCtx" role="group" aria-label="Фрагменты материала в запросе"></div>
                   <div class="cmp-quote" id="cmpQuote" hidden>
                     <div class="cmp-quote__head">
@@ -661,7 +611,6 @@
                     <textarea class="cmp__control" id="cmpInput" rows="2" placeholder="Задайте вопрос или опишите задачу…" aria-label="Текст запроса" aria-describedby="cmpHint"></textarea>
                   </div>
                   <div class="cmp__row">
-                    <button type="button" class="ibtn ibtn--neutral ibtn--m" id="btnAttach" aria-label="Приложить файлы. До 10 файлов на запрос, не более 30 МБ каждый: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX. Сканы распознаются автоматически." data-tooltip="До 10 файлов на запрос, не более 30 МБ каждый. PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX. Сканы распознаются автоматически." data-tooltip-multiline="yes"><i data-icon="attach"></i></button>
                     <button type="button" class="btn btn--outline btn--s cmp__tgl" id="btnBuilder" aria-expanded="false" aria-controls="cmpDrawer">
                       <span class="cmp__tgl-ico" aria-hidden="true"><i data-icon="ai-stars"></i><i data-icon="close"></i></span>
                       <span class="btn__label">Конструктор</span>
@@ -691,10 +640,6 @@
                           </div>
                           <div class="bopts" id="bldObjects" role="radiogroup" aria-labelledby="bsecObject"></div>
                         </div>
-                        <!-- Отчёты коллег по выбранному объекту: блок виден, когда они есть.
-                             Кнопка ставит документ в чат, конструктор остаётся открытым.
-                             Переписку чужого запроса не показываем — только документ. -->
-                        <div class="bprior" id="bldPrior" role="group" aria-label="Отчёты коллег по объекту" hidden></div>
                       </section>
 
                       <section class="bsec" data-sec="focus" style="--i:2" aria-labelledby="bsecFocus">
@@ -706,38 +651,20 @@
 
                       <div class="bld__foot" style="--i:3">
                         <span class="bld__foot-ico" aria-hidden="true"><i data-icon="clock-timer"></i></span>
-                        <span>Подготовка отчета обычно занимает до 30 минут. Работа продолжится, даже если закрыть инструмент.</span>
+                        <span>Подготовка отчета обычно занимает до 30 минут. Работа продолжится, даже если закрыть окно.</span>
                       </div>
 
                     </div>
                   </div>
                 </div>
               </div>
-              <p class="cmp__hint" id="cmpHint"><span><kbd>Enter</kbd> — отправить</span><span><kbd>Shift</kbd> + <kbd>Enter</kbd> — новая строка</span><span>К запросу можно приложить PDF, Word, PowerPoint и Excel</span></p>
+              <p class="cmp__hint" id="cmpHint"><span><kbd>Enter</kbd> — отправить</span><span><kbd>Shift</kbd> + <kbd>Enter</kbd> — новая строка</span></p>
             </div>
 
           </div>
 
       </main>
     </div>
-
-    <!-- ── Просмотр материала (БТ-1, БТ-4.6) ─────────────────────────────── -->
-    <aside class="pv" id="pv" aria-label="Просмотр материала" hidden>
-      <div class="pv__grip" id="pvGrip" role="separator" aria-orientation="vertical" aria-label="Ширина панели просмотра" aria-valuemin="360" tabindex="0"></div>
-      <header class="pv__head">
-        <span class="pv__ico" aria-hidden="true"><i data-icon="document-check"></i></span>
-        <div class="pv__titles">
-          <p class="pv__title" id="pvTitle">ООО «Друза» — бриф перед встречей</p>
-          <p class="pv__meta">Детальный материал · версия 2 · 12.09.2026, 09:05</p>
-        </div>
-        <div class="pv__acts">
-          <button type="button" class="btn btn--outline btn--s" aria-haspopup="menu" aria-expanded="false" data-menu="doc-menu"><i data-icon="download"></i><span class="btn__label">Скачать</span><i data-icon="chevron-down"></i></button>
-          <button type="button" class="ibtn ibtn--neutral ibtn--m" id="pvWide" data-act="pv-wide" aria-label="Развернуть" data-tooltip="Развернуть"><i data-icon="maximize"></i></button>
-          <button type="button" class="ibtn ibtn--neutral ibtn--m" data-act="pv-close" aria-label="Закрыть просмотр" data-tooltip="Закрыть просмотр"><i data-icon="close"></i></button>
-        </div>
-      </header>
-      <div class="pv__body" id="pvBody"><iframe class="pv__frame" id="pvFrame" title="ООО «Друза» — бриф перед встречей"></iframe></div>
-    </aside>
   </div>
 </div>
 
@@ -772,7 +699,7 @@
         <div class="inp__field">
           <input class="inp__control" id="renameField" value="ГК «Северный агрохолдинг» — выход миноритария" aria-describedby="rename-help">
         </div>
-        <span class="ds-helper ds-helper--left" id="rename-help">Название видно в истории запросов и в уведомлениях</span>
+        <span class="ds-helper ds-helper--left" id="rename-help">Название видно в истории запросов</span>
       </div>
     </div>
     <footer class="modal__foot">
@@ -805,23 +732,7 @@
 </div>
 
 
-<!-- ── Меню «Скачать» материала: форматы выгрузки ───────────────────────── -->
-<div id="doc-menu" class="menu menu--floating" role="menu" hidden>
-  <div class="menu__label">Скачать</div>
-  <button type="button" class="menu__item" role="menuitem" data-act="dl" data-fmt="Детальный материал, PDF">
-    <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Детальный — PDF</span>
-  </button>
-  <button type="button" class="menu__item" role="menuitem" data-act="dl" data-fmt="Детальный материал, Word">
-    <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Детальный — Word</span>
-  </button>
-  <button type="button" class="menu__item" role="menuitem" data-act="dl" data-fmt="Краткий материал, PDF" data-href="report-example-for-test.pdf">
-    <span class="menu__item-icon"><i data-icon="download"></i></span><span class="menu__item-label">Краткий — PDF</span>
-  </button>
-</div>
-
-
 <script src="../../DS-IBP/scripts/ds.js"></script>
-<script src="chat-settings.js"></script>
 <script>
 /* ============================================================================
    Скрипт экрана «Новый отчёт» / нить запроса.
@@ -841,7 +752,7 @@
    Состояние экрана задаётся параметром адреса:
      без параметров — новая пустая нить (точка входа в раздел);
      ?id=N          — открыт запрос N из истории;
-     ?run=1         — запуск подготовки по прежним вводным;
+     ?run=1         — запуск подготовки из формы или конструктора;
      ?builder=1     — пустая нить с открытым конструктором.
 
    После каждой перерисовки поддерева рантаймы связываются заново (урок Л93).
@@ -857,26 +768,25 @@
 
   /* ── История запросов: последние 10 (БТ-4.1) ──────────────────────────── */
   var HIST = [
-    { id: 1,  title: 'ГК «Северный агрохолдинг» — выход миноритария',        kind: 'По клиенту · Группа · Детальный',      versions: 2, upd: '12 минут назад',  state: 'ready', files: 3 },
-    { id: 2,  title: 'ПАО «Волга-Агро» — оценка перед встречей',             kind: 'По клиенту · Компания · Детальный',    versions: 1, upd: '40 минут назад',  state: 'running', files: 1 },
-    { id: 4,  title: 'Логистика последней мили, Юг России',                  kind: 'По рынку · Регион',                    versions: 0, upd: 'вчера, 17:40',   state: 'answer', files: 0 },
-    { id: 5,  title: 'Бенефициар Токарев П. А. — активы и структура владения', kind: 'По клиенту · Бенефициар · Детальный', versions: 3, upd: '10.09.2026',     state: 'ready', files: 4 },
-    { id: 6,  title: 'АО «Метизный завод» — рефинансирование выпуска',       kind: 'По клиенту · Компания · Краткий',      versions: 1, upd: '09.09.2026',     state: 'ready', files: 2 },
-    { id: 7,  title: 'Рынок минеральных удобрений, СЗФО',                    kind: 'По рынку · Регион · Детальный',        versions: 0, upd: '08.09.2026',     state: 'error', files: 0 },
-    { id: 8,  title: 'ГК «Северный агрохолдинг» — долговой профиль',         kind: 'По клиенту · Группа · Краткий',        versions: 1, upd: '05.09.2026',     state: 'ready', files: 1 },
-    { id: 9,  title: 'Сравнение peers в агросекторе за 2025 год',            kind: 'По рынку · Отрасль',                   versions: 0, upd: '03.09.2026',     state: 'answer', files: 0 },
-    { id: 10, title: 'ООО «Каспий-Порт» — расширение терминала',             kind: 'По клиенту · Компания · Детальный',    versions: 2, upd: '28.08.2026',     state: 'ready', files: 2 }
+    { id: 1,  title: 'ГК «Северный агрохолдинг» — выход миноритария',        kind: 'ГК «Северный агрохолдинг» · Оценка по мультипликаторам',      versions: 2, upd: '12 минут назад',  state: 'ready' },
+    { id: 2,  title: 'ПАО «Волга-Агро» — оценка перед встречей',             kind: 'ПАО «Волга-Агро» · Структура владения',    versions: 1, upd: '40 минут назад',  state: 'running' },
+    { id: 4,  title: 'Логистика последней мили, Юг России',                  kind: 'Пользовательский промпт',                    versions: 0, upd: 'вчера, 17:40',   state: 'answer' },
+    { id: 5,  title: 'Бенефициар Токарев П. А. — активы и структура владения', kind: 'Бенефициар Токарев П. А. · Структура владения', versions: 3, upd: '10.09.2026',     state: 'ready' },
+    { id: 6,  title: 'АО «Метизный завод» — рефинансирование выпуска',       kind: 'АО «Метизный завод» · Рефинансирование',      versions: 1, upd: '09.09.2026',     state: 'ready' },
+    { id: 7,  title: 'Рынок минеральных удобрений, СЗФО',                    kind: 'Минеральные удобрения, СЗФО · Отраслевые бенчмарки',        versions: 0, upd: '08.09.2026',     state: 'error' },
+    { id: 8,  title: 'ГК «Северный агрохолдинг» — долговой профиль',         kind: 'ГК «Северный агрохолдинг» · Долговая нагрузка и ковенанты',        versions: 1, upd: '05.09.2026',     state: 'ready' },
+    { id: 9,  title: 'Сравнение peers в агросекторе за 2025 год',            kind: 'Пользовательский промпт',                   versions: 0, upd: '03.09.2026',     state: 'answer' },
+    { id: 10, title: 'ООО «Каспий-Порт» — расширение терминала',             kind: 'ООО «Каспий-Порт» · Продуктовые идеи для встречи',    versions: 2, upd: '28.08.2026',     state: 'ready' }
   ];
+  /* В панели истории два статуса: идёт подготовка и готовый материал.
+     Ответы в диалоге и сбои подготовки чипом не помечаются (MVP). */
   var HIST_CHIP = {
     ready:   { cls: ' chip--success', label: 'Материал готов' },
-    running: { cls: ' chip--info',    label: 'Подготовка идёт' },
-    answer:  { cls: ' chip--info',    label: 'Ответ в диалоге' },
-    error:   { cls: ' chip--error',   label: 'Ошибка подготовки' }
+    running: { cls: ' chip--info',    label: 'Идет подготовка...' }
   };
 
   /* ── Состояние нити ───────────────────────────────────────────────────── */
   var S = {
-    settingsId: 'new-' + Date.now(),
     msgs: [],
     versions: [
       { n: 1, date: '11.09.2026, 14:20', note: 'Исходный материал по параметрам конструктора' },
@@ -884,10 +794,8 @@
     ],
     hasMaterial: false,
     running: false,
-    files: [],
     ctx: [],           /* фрагменты материала для следующего запроса */
     ctxOpen: null,     /* раскрытый текстовый фрагмент */
-    priorShown: {},    /* отчёты коллег, уже поставленные в нить: id → true */
     openId: null,
     pristine: false,   /* новая пустая нить — адрес без параметров */
     params: { volume: 'Детальный' },
@@ -907,21 +815,6 @@
     return '12.09.2026, ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
   }
   function el(id) { return document.getElementById(id); }
-
-  function settingsId() { return S.openId && S.openId !== 'new' ? S.openId : S.settingsId; }
-  window.PitcherChatSettings.configure(function () {
-    return { id: settingsId(), title: el('hdTitle').textContent };
-  });
-  function accessText() {
-    var count = window.PitcherChatSettings.recipients(settingsId()).length;
-    return count ? 'Доступ для просмотра: ' + count : 'Доступ: только вы';
-  }
-  document.addEventListener('pitcher:settings', function (e) {
-    if (String(e.detail.id) !== String(settingsId())) return;
-    setActions(true);
-    var access = el('hdAccess');
-    if (access) access.textContent = accessText();
-  });
 
   /* Пересборка поддерева через innerHTML отвязывает рантаймы ДС —
      связываем заново одной функцией из единственного места (урок Л93). */
@@ -956,10 +849,10 @@
     var c = HIST_CHIP[h.state];
     var versions = h.versions ? 'Версий: ' + h.versions : 'Без отчёта';
     var selected = h.id === S.openId;
-    /* Ведущего элемента у строки истории нет: состояние несёт чип, а колонка
-       узкая — каждый лишний слот съедает ширину названия запроса.
-       Наведение и «текущая нить» — на обёртке .hist__item, а не на Entity:
-       состояние компонента задаёт только сам компонент. */
+    /* Ведущего элемента у строки истории нет: колонка узкая — каждый лишний
+       слот съедает ширину названия запроса. Наведение и «текущая нить» — на
+       обёртке .hist__item, а не на Entity: состояние компонента задаёт только
+       сам компонент. */
     return '<div class="hist__item" role="listitem"' +
       (selected ? ' aria-current="true"' : '') + ' tabindex="0" data-thread="' + h.id + '">' +
       '<div class="entity entity--s">' +
@@ -969,7 +862,7 @@
           '<div class="entity__labelrow"><span class="entity__label entity__label--truncate">' + hl(h.title, words) + '</span></div>' +
         '</div>' +
         '<div class="entity__subs"><span class="entity__subs-list">' + versions + ' · обновлён ' + esc(h.upd) + '</span></div>' +
-        '<div class="entity__chips"><span class="chip chip--s' + c.cls + '"><span class="chip__label">' + c.label + '</span></span></div>' +
+        (c ? '<div class="entity__chips"><span class="chip chip--s' + c.cls + '"><span class="chip__label">' + c.label + '</span></span></div>' : '') +
       '</div>' +
       '<div class="entity__actions">' +
         '<button class="ibtn ibtn--neutral ibtn--s" aria-label="Действия с запросом «' + esc(h.title) + '»" aria-haspopup="menu" data-menu="hist-menu"><i data-icon="more-dots"></i></button>' +
@@ -1028,18 +921,15 @@
 
   /* Заголовок экрана: пока нить пуста — «Новый отчёт»; после первого сообщения —
      суть запроса; у открытого запроса и при подготовке — имя запроса. */
-  /* Параметры запроса под заголовком — у открытого запроса и при подготовке;
-     у запроса из первого сообщения и у пустой нити их нет. */
+  /* Параметры запроса под заголовком — то, что задано в конструкторе:
+     объект и выбранные фокусы; у запроса из простого промпта —
+     «Пользовательский промпт». Рядом — дата обновления запроса. */
   function setMeta(h) {
     var meta = el('hdMeta');
     if (!h) { meta.innerHTML = ''; return; }
-    var versions = h.versions ? 'Версий материала: ' + h.versions : 'Отчёт ещё не собран';
     meta.innerHTML =
       '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="target"></i></span>' + esc(h.kind) + '</span>' +
-      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="calendar"></i></span>Обновлён ' + esc(h.upd) + '</span>' +
-      '<span class="phead__meta"><span class="phead__meta-ico phead__meta-ico--ok"><i data-icon="check-circle"></i></span>' + versions + '</span>' +
-      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="attach"></i></span>Файлов: ' + (h.files || 0) + '</span>' +
-      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="lock"></i></span><span id="hdAccess">' + accessText() + '</span></span>';
+      '<span class="phead__meta"><span class="phead__meta-ico"><i data-icon="calendar"></i></span>Обновлён ' + esc(h.upd) + '</span>';
     rebind(meta);
   }
 
@@ -1049,18 +939,18 @@
   function setActions(on) {
     var acts = el('hdActions');
     acts.innerHTML = on
-      ? window.PitcherChatSettings.avatars(settingsId()) + '<button class="btn btn--outline btn--m btn--icon-only" aria-label="Действия с запросом" aria-haspopup="menu" aria-expanded="false" data-menu="hist-menu"><i data-icon="more-dots"></i></button>'
+      ? '<button class="btn btn--outline btn--m btn--icon-only" aria-label="Действия с запросом" aria-haspopup="menu" aria-expanded="false" data-menu="hist-menu"><i data-icon="more-dots"></i></button>'
       : '';
     rebind(acts);
   }
 
-  function setTitle(text, chip) {
+  function setTitle(text) {
     el('hdTitle').closest('.phead').hidden = false;
     el('hdTitle').textContent = text;
     /* Крошки ведёт ds-breadcrumbs.js: он один раз запоминает пункты и на
-       каждое изменение ширины (открытие панели просмотра, ресайз окна)
-       перерисовывает трейл из этой копии. Текст, записанный прямо в
-       .crumbs__current, при этом стирается — меняем пункт в его api. */
+       каждое изменение ширины (ресайз окна) перерисовывает трейл из этой
+       копии. Текст, записанный прямо в .crumbs__current, при этом стирается —
+       меняем пункт в его api. */
     var trail = document.querySelector('[data-breadcrumbs]');
     var api = trail && trail.__dsBreadcrumbs;
     if (api && api.items.length) {
@@ -1070,10 +960,6 @@
       var crumb = document.querySelector('.crumbs__current');
       if (crumb) crumb.textContent = text;
     }
-    el('hdChips').innerHTML = chip
-      ? '<span class="chip chip--rounded chip--s' + chip.cls + '"><span class="chip__label">' + chip.label + '</span></span>'
-      : '';
-    rebind(el('hdChips'));
   }
 
   /* ── Новый запрос из первого сообщения ───────────────────────────────────────────────
@@ -1088,12 +974,12 @@
     return t.charAt(0).toUpperCase() + t.slice(1);
   }
 
-  function createRequest(q) {
-    var h = { id: 'new', title: requestTitle(q), kind: 'Новый запрос', versions: 0, upd: 'только что', state: 'answer', files: 0 };
+  function createRequest(q, kindLine) {
+    var h = { id: 'new', title: requestTitle(q), kind: kindLine || 'Пользовательский промпт', versions: 0, upd: 'только что', state: 'answer' };
     S.openId = h.id;
     HIST.unshift(h);
     if (HIST.length > 10) HIST.pop();
-    setTitle(h.title, { cls: HIST_CHIP[h.state].cls, label: HIST_CHIP[h.state].label });
+    setTitle(h.title);
     setActions(true);
     drawHist();
   }
@@ -1119,12 +1005,11 @@
     return '<div class="doc">' +
       '<span class="doc__ico" aria-hidden="true"><i data-icon="document-check"></i></span>' +
       '<div class="doc__main">' +
-        '<button type="button" class="doc__title" data-act="open">' + esc(OBJECT) + ' — материал с идеями</button>' +
+        '<span class="doc__title">' + esc(OBJECT) + ' — материал с идеями</span>' +
         '<span class="doc__meta">' + esc(S.params.volume) + ' · версия ' + v.n + ' · ' + esc(v.date) + '</span>' +
       '</div>' +
       '<div class="doc__acts">' +
-        '<button type="button" class="btn btn--outline btn--s" data-act="open"><i data-icon="visibility-on"></i><span class="btn__label">Просмотр</span></button>' +
-        '<button type="button" class="btn btn--outline btn--s" aria-haspopup="menu" aria-expanded="false" data-menu="doc-menu"><i data-icon="download"></i><span class="btn__label">Скачать</span><i data-icon="chevron-down"></i></button>' +
+        '<button type="button" class="btn btn--outline btn--s" data-act="dl" data-fmt="Материал, MD"><i data-icon="download"></i><span class="btn__label">Скачать — MD</span></button>' +
       '</div></div>';
   }
 
@@ -1155,8 +1040,7 @@
     return '<div class="think-row"><button type="button" class="think" data-act="finish" title="Прототип: нажмите, чтобы завершить подготовку" aria-label="AI Pitcher готовит материал. Прототип: нажмите, чтобы завершить подготовку">' +
       '<span class="think__loader" aria-hidden="true"></span>' +
       '<span class="think__text" data-think aria-hidden="true">' + THINK[think.i] + '</span>' +
-      '<span class="think__time" aria-hidden="true"><span data-think-time>' + elapsed() + '</span></span></button>' +
-      '<button type="button" class="btn btn--transparent btn--s think-row__notify" data-chat-settings="notify" data-modal="notify-scrim" data-modal-guarded><i data-icon="settings"></i><span class="btn__label">Настроить уведомление</span></button></div>';
+      '<span class="think__time" aria-hidden="true"><span data-think-time>' + elapsed() + '</span></span></button></div>';
   }
   function startThinking() {
     if (think.timer) return;
@@ -1174,28 +1058,27 @@
 
   /* Завершение подготовки. Настоящий сигнал придёт от агентной системы;
      в прототипе — клик по индикатору. Индикатор сменяется сообщением
-     с карточкой материала, приходит уведомление. */
+     с карточкой материала. */
   function finishRun() {
     if (!S.msgs.some(function (m) { return m.think; })) return;
     S.msgs.forEach(function (m) { m.think = false; });
     clearInterval(think.timer); think.timer = null;
     S.running = false; S.hasMaterial = true;
-    setTitle(S.runTitle || el('hdTitle').textContent, { cls: ' chip--success', label: 'Материал готов' });
+    setTitle(S.runTitle || el('hdTitle').textContent);
     var h = HIST.filter(function (x) { return x.id === S.openId; })[0];
     if (h) { h.state = 'ready'; h.versions = Math.max(1, h.versions); drawHist(); }
-    push('agent', text('Готово — материал по ' + esc(OBJECT) + ' собран: ключевые показатели, возможности для продуктов, инсайты, риски и позиция на встречу. Откройте просмотр или скачайте в нужном формате.') + docCard());
-    if (window.DSSnack && window.PitcherChatSettings.channels(settingsId()).indexOf('ui') !== -1) {
+    push('agent', text('Готово — материал по ' + esc(OBJECT) + ' собран: ключевые показатели, возможности для продуктов, инсайты, риски и позиция на встречу.') + docCard());
+    if (window.DSSnack) {
       window.DSSnack.show({
         tone: 'success',
         title: 'Материал готов',
-        text: OBJECT + ' — материал с идеями.',
-        buttons: [{ label: 'Открыть просмотр', variant: 'outline', onClick: function () { openPreview(); } }]
+        text: OBJECT + ' — материал с идеями.'
       });
     }
   }
 
-  /* p — параметры из конструктора: объект и число файлов.
-     Без них (перезапуск, ?run=1) подготовка идёт по прежним вводным. */
+  /* p — параметры из конструктора: объект, фокусы и строка params для шапки.
+     Без них (?run=1, простой промпт) запрос помечается как пользовательский. */
   function startRun(intro, p) {
     p = p || {};
     if (p.object) OBJECT = p.object.name;
@@ -1203,10 +1086,9 @@
     S.runTitle = p.title || (p.object ? OBJECT + ' — материал с идеями' : (S.runTitle || OBJECT + ' — выход миноритария'));
     /* новый запуск разбирает прежний сбой: действия на его карточке не нужны */
     S.msgs.forEach(function (m) { m.html = m.html.replace('class="err"', 'class="err is-resolved"'); });
-    var kind = (p.object && p.object.kind === 'Отрасль' ? 'По рынку' : 'По клиенту') + ' · ' +
-      (p.object ? p.object.kind : 'Группа') + ' · ' + S.params.volume;
-    setTitle(S.runTitle, { cls: ' chip--info', label: 'Подготовка идёт' });
-    setMeta({ kind: kind, upd: 'только что', versions: S.versions.length, files: p.files != null ? p.files : 3 });
+    var kind = p.params || 'Пользовательский промпт';
+    setTitle(S.runTitle);
+    setMeta({ kind: kind, upd: 'только что' });
     setActions(true);
     /* запрос, созданный первым сообщением, получает имя и тип из параметров */
     if (S.openId === 'new' && HIST[0] && HIST[0].id === 'new') {
@@ -1241,12 +1123,17 @@
       return;
     }
     /* параметры снимаются с конструктора до очистки поля */
+    var obj = picked(allObjects(), 'object');
+    var focuses = Object.keys(B.frag).filter(function (k) { return k.indexOf('focus:') === 0; })
+      .map(function (k) { return byId(FOCUS, k.slice(6)).label; });
     var run = {
-      object: picked(allObjects(), 'object'),
-      files: S.files.length
+      object: obj,
+      /* строка параметров для шапки и панели истории: объект и фокусы
+         из конструктора; у запроса из простого промпта — своё значение */
+      params: obj ? obj.name + (focuses.length ? ' · ' + focuses.join(' · ') : '') : 'Пользовательский промпт'
     };
     /* первое сообщение новой нити создаёт запрос */
-    if (S.pristine && S.openId === null) createRequest(q);
+    if (S.pristine && S.openId === null) createRequest(q, run.params);
     field.value = '';
     B.frag = {}; B.fresh = null; B.custom = null;
     el('bldFind').value = '';
@@ -1254,17 +1141,10 @@
     setBuilder(false);
 
     var body = '<p class="ds-body-m">' + esc(q) + '</p>';
-    if (S.files.length) {
-      body += '<div class="chiplist chiplist--s">' + S.files.map(function (f) {
-        return '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">' + esc(f) + '</span></span>';
-      }).join('') + '</div>';
-    }
     if (S.ctx.length) {
       body = '<div class="chiplist chiplist--s">' + S.ctx.map(function (c) { return ctxChip(c, false); }).join('') + '</div>' + body;
     }
     push('user', body);
-    var hadFiles = S.files.length > 0;
-    S.files = []; drawFiles();
     var hadCtx = S.ctx.length > 0;
     S.ctx = []; S.ctxOpen = null; drawCtx();
 
@@ -1273,7 +1153,7 @@
     /* запрос на материал с выбранным объектом — сразу к подготовке */
     if (reportish && run.object) {
       setTimeout(function () {
-        startRun('Принял, готовлю материал по ' + run.object.name + (hadFiles ? ' с учётом приложенных файлов' : '') + '.', run);
+        startRun('Принял, готовлю материал по ' + run.object.name + '.', run);
       }, 500);
       return;
     }
@@ -1287,7 +1167,7 @@
       return;
     }
 
-    if (hadCtx || S.hasMaterial || hadFiles) {
+    if (hadCtx || S.hasMaterial) {
       setTimeout(function () { push('agent', forkCard(hadCtx)); }, 600);
       return;
     }
@@ -1298,21 +1178,10 @@
     }, 700);
   }
 
-  /* ── Файлы композера (БТ-2.7) ─────────────────────────────────────────── */
-  function drawFiles() {
-    el('cmpFiles').innerHTML = S.files.map(function (f, i) {
-      return '<span class="chip chip--edit chip--s" tabindex="0"><span class="chip__icon"><i data-icon="file-basic"></i></span>' +
-        '<span class="chip__label">' + esc(f) + '</span>' +
-        '<span class="chip__remove" role="button" aria-label="Убрать файл ' + esc(f) + '" data-act="rmfile" data-i="' + i + '"><i data-icon="close"></i></span></span>';
-    }).join('');
-    rebind(el('cmpFiles'));
-    syncPriorCtxAll();
-  }
-
   /* ── Контекст из материала («Доработать в чате») ──────────────────────────
-     Материал во фрейме панели просмотра присылает сообщение с фрагментами:
-     текст целиком или график тегом. Сообщение принимается только от своего
-     фрейма. */
+     Фрагменты материала (текст целиком или график тегом) приходили сообщением
+     из фрейма панели просмотра; панель убрана из MVP, точка входа снята,
+     приёмник сообщений удалён вместе с ней. */
   var ctxSeq = 0;
 
   function ctxLabel(c) {
@@ -1375,14 +1244,6 @@
     field.focus();
   }
 
-  window.addEventListener('message', function (e) {
-    var d = e.data;
-    if (!d || d.source !== 'ai-pitcher-material' || d.type !== 'context' || !Array.isArray(d.items)) return;
-    var frame = el('pvFrame');
-    if (!frame || e.source !== frame.contentWindow) return;
-    addCtx(d.items.slice(0, 10));
-  });
-
   /* чип фрагмента с клавиатуры: Enter и пробел раскрывают, Backspace и Delete
      убирают. Перехват на погружении — раньше штатного удаления чипа ДС,
      которое сняло бы узел, не трогая состояние. */
@@ -1418,15 +1279,8 @@
     else if (act === 'fork-version') {
       var n = S.versions.length + 1;
       S.versions.push({ n: n, date: now(), note: 'Уточнение из нити: добавлен сценарий частичного выхода' });
-      startRun('Собираю версию ' + n + ' с учётом уточнения. Параметры и файлы взяты из запроса — предыдущие версии сохранены без изменений.');
+      startRun('Собираю версию ' + n + ' с учётом уточнения. Параметры взяты из запроса — предыдущие версии сохранены без изменений.');
     }
-    else if (act === 'open') { openPreview(); }
-    else if (act === 'open-prior') {
-      var pd = priorById(t.getAttribute('data-id'));
-      if (pd) openPreview({ title: pd.title, meta: priorMeta(pd) });
-    }
-    else if (act === 'pv-close') { closePreview(); }
-    else if (act === 'pv-wide') { toggleWide(); }
     else if (act === 'finish') { finishRun(); }
     else if (act === 'rmctx') { removeCtx(t.getAttribute('data-id')); }
     else if (act === 'ctx-collapse') { S.ctxOpen = null; drawCtx(); field.focus(); }
@@ -1455,21 +1309,6 @@
     }
     else if (act === 'copy') {
       if (window.DSSnack) window.DSSnack.show({ tone: 'success', title: 'Скопировано', text: 'Текст ответа скопирован в буфер обмена.' });
-    }
-    else if (act === 'rmfile') {
-      S.files.splice(Number(t.getAttribute('data-i')), 1); drawFiles();
-    }
-    else if (act === 'prior-ctx') {
-      var dCtx = priorById(t.getAttribute('data-id'));
-      if (!dCtx) return;
-      var fi = S.files.indexOf(dCtx.title);
-      if (fi === -1) {
-        S.files.push(dCtx.title); drawFiles();
-        if (window.DSToast) window.DSToast.show({ message: 'Документ добавлен в контекст запроса', kind: 'bar', tone: 'success', duration: 2500 });
-      } else {
-        S.files.splice(fi, 1); drawFiles();
-      }
-      syncPriorCtx(dCtx.id);
     }
   });
 
@@ -1510,37 +1349,6 @@
     { id: 'ideas', label: 'Продуктовые идеи для встречи',  text: 'Предложи продуктовые идеи и тезисы для встречи с клиентом.' }
   ];
   var OBJ_PHRASE = { 'Группа': 'группе компаний ', 'Компания': 'компании ', 'Бенефициар': 'бенефициару ', 'Отрасль': 'отрасли ', 'Объект': '' };
-
-  /* Отчёты коллег по объектам — документы из чужих запросов (демо-данные).
-     Автор — владелец чата, в котором документ собран. Сам чат виден только
-     автору, поэтому другому пользователю достаётся документ: название, объём,
-     дата создания и автор. */
-  var PRIOR = {
-    sah: [
-      { id: 'p-sah-1',   title: 'ГК «Северный агрохолдинг» — долговой профиль и рефинансирование', author: 'Петров А. В.',   created: '12.09.2026, 14:20', volume: 'Детальный' },
-      { id: 'p-sah-2',   title: 'ГК «Северный агрохолдинг» — идеи к встрече с финансовым директором', author: 'Смирнова Е. К.', created: '03.09.2026, 10:05', volume: 'Краткий' },
-      { id: 'p-sah-3',   title: 'ГК «Северный агрохолдинг» — структура владения и бенефициары', author: 'Ким Д. С.',      created: '21.08.2026, 16:40', volume: 'Детальный' }
-    ],
-    fert: [
-      { id: 'p-fert-1',  title: 'Минеральные удобрения, СЗФО — отраслевой обзор',          author: 'Орлова Н. В.',   created: '15.09.2026, 11:30', volume: 'Детальный' },
-      { id: 'p-fert-2',  title: 'Минеральные удобрения, СЗФО — бенчмарки маржинальности', author: 'Гусев П. И.',    created: '28.08.2026, 09:15', volume: 'Краткий' }
-    ],
-    metiz: [
-      { id: 'p-metiz-1', title: 'АО «Метизный завод» — рефинансирование кредитного портфеля', author: 'Лебедева О. А.', created: '10.09.2026, 17:50', volume: 'Детальный' }
-    ]
-  };
-  function priorById(id) {
-    var found = null;
-    Object.keys(PRIOR).some(function (k) {
-      return PRIOR[k].some(function (d) { if (d.id === id) { found = d; return true; } return false; });
-    });
-    return found;
-  }
-  function priorMeta(d) { return 'Автор — ' + d.author + ' · создан ' + d.created + ' · ' + d.volume; }
-  function initials(name) {
-    var p = name.split(' ');
-    return (p[0].charAt(0) + (p[1] ? p[1].charAt(0) : '')).toUpperCase();
-  }
 
   function objFrag(o) {
     return 'Собери отчёт по ' + OBJ_PHRASE[o.kind] + (o.kind === 'Отрасль' ? '«' + o.name + '»' : o.name) + '.';
@@ -1613,10 +1421,8 @@
     el('cmpMirror').innerHTML = html + esc(v.slice(pos)) + '​';
     el('btnClear').hidden = !v;
     /* пример запроса — только над пустым полем: он заменил бы начатый текст,
-       поэтому уходит с первым символом и возвращается, когда поле стёрто.
-       Прячется через visibility, а не display: место в центрированном
-       стенде должно оставаться зарезервированным. */
-    el('btnExample').classList.toggle('is-ghost', !!v);
+       поэтому уходит с первым символом и возвращается, когда поле стёрто */
+    el('btnExample').hidden = !!v;
   }
 
   /* Найти в тексте известные фрагменты и отметить их контролы */
@@ -1642,121 +1448,40 @@
     document.querySelector('[data-sec="object"]').classList.toggle('is-done', !!B.frag.object);
     document.querySelector('[data-sec="focus"]').classList.toggle('is-done', keys.some(function (k) { return k.indexOf('focus:') === 0; }));
     el('bldReset').hidden = !keys.length || !B.open;
-    drawPrior();
   }
 
-  /* Блок «коллеги уже готовили отчёты» под вариантами объекта. Перерисовка —
-     только когда сменился объект или какой-то документ встал в нить: syncControls
-     зовётся на каждый ввод, а перерисовка сбрасывала бы фокус с кнопок блока. */
-  function drawPrior() {
-    var box = el('bldPrior'), obj = picked(allObjects(), 'object');
-    var list = obj ? (PRIOR[obj.id] || []) : [];
-    var key = obj ? obj.id + ':' + list.map(function (d) { return S.priorShown[d.id] ? 1 : 0; }).join('') : '';
-    if (key === B.priorKey) return;
-    B.priorKey = key;
-    box.hidden = !list.length;
-    if (!list.length) { box.innerHTML = ''; return; }
-    box.innerHTML =
-      '<p class="bprior__head"><span class="bprior__ico" aria-hidden="true"><i data-icon="history"></i></span>' +
-        '<span>' + esc(obj.name) + ': коллеги уже готовили отчёты — ' + list.length + '</span></p>' +
-      '<p class="bprior__hint">Документ откроется в чате, конструктор останется на месте. Переписка запросов видна только их авторам.</p>' +
-      '<div class="entity-list bprior__list">' + list.map(priorRow).join('') + '</div>';
-    rebind(box);
-  }
-
-  function priorRow(d) {
-    var shown = !!S.priorShown[d.id];
-    return '<div class="entity entity--s">' +
-      '<div class="entity__lead"><span class="av av--circular av--m" aria-hidden="true"><span class="av__text">' + esc(initials(d.author)) + '</span></span></div>' +
-      '<div class="entity__main">' +
-        '<div class="entity__titles"><div class="entity__labelrow">' +
-          '<span class="entity__label entity__label--truncate" data-tooltip="' + esc(d.title) + '" data-tooltip-truncated="only">' + esc(d.title) + '</span>' +
-        '</div></div>' +
-        '<div class="entity__subs"><span class="entity__subs-list">' + esc(d.author) + ' · ' + esc(d.created) + ' · ' + esc(d.volume) + '</span></div>' +
-      '</div>' +
-      '<div class="entity__actions">' + (shown
-        ? '<button type="button" class="btn btn--transparent btn--xs" data-prior="' + d.id + '" aria-label="Уже в чате — перейти к документу"><i data-icon="check"></i><span class="btn__label">В чате</span></button>'
-        : '<button type="button" class="btn btn--outline btn--xs" data-prior="' + d.id + '"><i data-icon="message-text"></i><span class="btn__label">Показать в чате</span></button>') +
-      '</div></div>';
-  }
-
-  /* Карточка документа коллеги в нити: та же, что у своего материала, но в
-     подписи — автор и дата создания. Ссылки на чужой чат нет. */
-  function priorCard(d) {
-    return '<div class="doc" data-prior-doc="' + d.id + '">' +
-      '<span class="doc__ico" aria-hidden="true"><i data-icon="document-check"></i></span>' +
-      '<div class="doc__main">' +
-        '<button type="button" class="doc__title" data-act="open-prior" data-id="' + d.id + '">' + esc(d.title) + '</button>' +
-        '<span class="doc__meta">' + esc(priorMeta(d)) + '</span>' +
-      '</div>' +
-      '<div class="doc__acts">' +
-        '<button type="button" class="btn btn--outline btn--s" data-act="open-prior" data-id="' + d.id + '"><i data-icon="visibility-on"></i><span class="btn__label">Просмотр</span></button>' +
-        '<button type="button" class="btn btn--outline btn--s" aria-haspopup="menu" aria-expanded="false" data-menu="doc-menu"><i data-icon="download"></i><span class="btn__label">Скачать</span><i data-icon="chevron-down"></i></button>' +
-      '</div></div>' +
-      '<div class="doc__ctx"><button type="button" class="btn btn--transparent btn--s" data-act="prior-ctx" data-id="' + d.id + '" aria-pressed="false"><i data-icon="add"></i><span class="btn__label">Добавить в контекст</span></button></div>';
-  }
-
-  /* Документ коллеги в контексте запроса живёт как приложенный файл
-     (S.files), поэтому и состояние кнопки, и чип в композере читают его
-     оттуда: чип можно убрать крестиком — кнопка под документом вернётся
-     к исходному виду. Стиль и размер — как у действий ответа («Копировать»):
-     прозрачная S в обоих состояниях, различие несут глиф и подпись. */
-  function syncPriorCtx(id) {
-    var d = priorById(id);
-    var btn = el('thrMsgs').querySelector('[data-act="prior-ctx"][data-id="' + id + '"]');
-    if (!d || !btn) return;
-    var inCtx = S.files.indexOf(d.title) !== -1;
-    btn.setAttribute('aria-pressed', String(inCtx));
-    btn.className = 'btn btn--transparent btn--s';
-    btn.innerHTML = '<i data-icon="' + (inCtx ? 'check' : 'add') + '"></i><span class="btn__label">' +
-      (inCtx ? 'В контексте' : 'Добавить в контекст') + '</span>';
-    window.dsIcons.apply(btn);
-  }
-  function syncPriorCtxAll() {
-    each('[data-act="prior-ctx"]', function (n) { syncPriorCtx(n.getAttribute('data-id')); });
-  }
-
-  /* Документ встаёт в нить один раз; повторное нажатие прокручивает к нему.
-     Конструктор при этом не закрывается — можно прокликать все документы.
-     Если панель просмотра уже открыта, она сразу переключается на этот
-     документ: рядом с панелью и открытым конструктором нить бывает сжата до
-     нуля, и до карточки в ней не дотянуться. */
-  function showPrior(id) {
-    var d = priorById(id);
-    if (!d) return;
-    if (!S.priorShown[id]) {
-      S.priorShown[id] = true;
-      push('agent', text('Отчёт коллеги из другого запроса.') + priorCard(d));
-    }
-    var card = el('thrMsgs').querySelector('[data-prior-doc="' + id + '"]');
-    if (card) card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    if (!el('pv').hidden) openPreview({ title: d.title, meta: priorMeta(d) });
-    drawPrior();
-    var again = el('bldPrior').querySelector('[data-prior="' + id + '"]');
-    if (again) again.focus({ preventScroll: true });
-  }
-
-  /* Варианты объекта появляются по вводу: совпадения по реестру объектов.
-     Выбранный объект виден всегда; точного совпадения нет — пилюля
-     «Использовать как есть». */
+  /* Объект анализа: подсказки реестра в MVP не показываются. Есть только
+     ввод с применением по Enter и пилюля «Использовать», а выбранный объект
+     виден пилюлей с галочкой — повторное нажатие снимает его. */
   function drawObjects() {
     var raw = el('bldFind').value.trim(), q = raw.toLowerCase();
     var sel = picked(allObjects(), 'object');
-    var list = q ? OBJECTS.filter(function (o) { return (o.name + ' ' + o.kind).toLowerCase().indexOf(q) !== -1; }) : [];
-    if (sel && list.indexOf(sel) === -1) list.unshift(sel);
-    var html = list.map(function (o) {
-      return '<button type="button" class="bopt" role="radio" aria-checked="false" data-obj="' + o.id + '">' +
-        '<span class="bopt__tag">' + esc(o.kind) + '</span>' +
-        '<span class="bopt__label">' + esc(o.name) + '</span>' +
+    var html = '';
+    if (sel) {
+      html += '<button type="button" class="bopt" role="radio" aria-checked="false" data-obj="' + sel.id + '">' +
+        '<span class="bopt__tag">' + esc(sel.kind) + '</span>' +
+        '<span class="bopt__label">' + esc(sel.name) + '</span>' +
         '<span class="bopt__check" aria-hidden="true"><i data-icon="check"></i></span></button>';
-    }).join('');
-    if (q && !OBJECTS.some(function (o) { return o.name.toLowerCase() === q; })) {
+    }
+    if (raw && (!sel || sel.name.toLowerCase() !== q)) {
       html += '<button type="button" class="bopt bopt--custom" data-custom><i data-icon="add"></i>' +
         '<span class="bopt__label">Использовать «' + esc(raw) + '»</span></button>';
     }
     el('bldObjects').innerHTML = html;
     rebind(el('bldObjects'));
     syncControls();
+  }
+
+  /* Применить введённый объект: точное совпадение с реестром берёт его вид
+     («Отрасль», «Компания»…), остальное становится свободным объектом. */
+  function applyObject(raw) {
+    if (!raw) return;
+    var q = raw.toLowerCase();
+    var hit = OBJECTS.filter(function (o) { return o.name.toLowerCase() === q; })[0];
+    B.custom = hit ? null : { id: 'custom', kind: 'Объект', name: raw };
+    el('bldFind').value = '';
+    setFrag('object', objFrag(hit || B.custom));
+    drawObjects();
   }
 
   function buildControls() {
@@ -1822,12 +1547,7 @@
       var of = objFrag(byId(allObjects(), n.getAttribute('data-obj')));
       setFrag('object', B.frag.object === of ? null : of);
     } else if ((n = e.target.closest('[data-custom]'))) {
-      B.custom = { id: 'custom', kind: 'Объект', name: el('bldFind').value.trim() };
-      el('bldFind').value = '';
-      setFrag('object', objFrag(B.custom));
-      drawObjects();
-    } else if ((n = e.target.closest('[data-prior]'))) {
-      showPrior(n.getAttribute('data-prior'));
+      applyObject(el('bldFind').value.trim());
     } else if ((n = e.target.closest('[data-focus]'))) {
       var f = byId(FOCUS, n.getAttribute('data-focus'));
       setFrag('focus:' + f.id, B.frag['focus:' + f.id] ? null : f.text);
@@ -1838,8 +1558,7 @@
   el('bldFind').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
       e.preventDefault();
-      var first = el('bldObjects').querySelector('.bopt');
-      if (first) first.click();
+      applyObject(el('bldFind').value.trim());
     } else if (e.key === 'Escape' && el('bldFind').value) {
       e.preventDefault(); e.stopPropagation();
       el('bldFind').value = ''; drawObjects();
@@ -1869,11 +1588,6 @@
   /* ── Кнопки экрана ────────────────────────────────────────────────────── */
   /* Скрепка открывает системный выбор файлов; в прототипе выбор сразу
      считается сделанным — к запросу приложены два файла-примера */
-  function attachFiles() {
-    S.files = ['Презентация_менеджмента_2026.pptx', 'График_погашений_2028.pdf'];
-    drawFiles();
-    if (window.DSTooltip) window.DSTooltip.hideAll();
-  }
   function sendOnEnter(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   }
@@ -1887,106 +1601,12 @@
     field.focus();
   });
   field.addEventListener('keydown', sendOnEnter);
-  el('btnAttach').addEventListener('click', attachFiles);
   el('btnExample').addEventListener('click', function () {
     field.value = 'Какая долговая нагрузка у ГК «Северный агрохолдинг» и когда пик погашений?';
     B.frag = {}; B.fresh = null;
     paint(); syncControls();
     field.focus();
   });
-
-  /* ── Просмотр материала (БТ-1, БТ-4.6) ────────────────────────────────────
-     Материал открывается панелью справа от нити, а не модальным окном.
-     Ширина меняется перетаскиванием левого края или стрелками с клавиатуры;
-     двойной клик по краю и кнопка «Развернуть» переключают обычную и
-     максимальную ширину. Ширина запоминается в браузере (хранилище может
-     быть недоступно — тогда не запоминается). Документ — страница материала MaterialReport.html во фрейме панели. */
-  var PV_KEY = 'ibp.requestThread.previewWidth', PV_DEFAULT = 560, PV_MIN = 360;
-  var pv = el('pv'), pvGrip = el('pvGrip'), pvLoaded = false, pvWide = null;
-  /* Материал грузится во фрейм при первом открытии панели */
-  function loadDoc() {
-    if (pvLoaded) return;
-    el('pvFrame').src = 'MaterialReport.html';
-    pvLoaded = true;
-  }
-
-  /* нити с панелью истории остаётся не меньше 440px */
-  function pvMax() {
-    var shell = document.querySelector('.app-shell').clientWidth;
-    var hist = document.querySelector('.hist');
-    return Math.max(PV_MIN, shell - (hist ? hist.offsetWidth : 0) - 440);
-  }
-
-  function setPvWidth(w, save) {
-    var max = pvMax();
-    w = Math.round(Math.min(max, Math.max(PV_MIN, w)));
-    pv.style.setProperty('--pv-w', w + 'px');
-    pvGrip.setAttribute('aria-valuenow', String(w));
-    pvGrip.setAttribute('aria-valuemax', String(max));
-    var wide = w >= max - 4;
-    if (wide !== pvWide) {
-      pvWide = wide;
-      var label = wide ? 'Обычная ширина' : 'Развернуть';
-      var btn = el('pvWide');
-      btn.setAttribute('aria-label', label);
-      btn.setAttribute('data-tooltip', label);
-      btn.innerHTML = '<i data-icon="' + (wide ? 'minimize' : 'maximize') + '"></i>';
-      rebind(btn);
-    }
-    if (save) { try { localStorage.setItem(PV_KEY, String(w)); } catch (err) { /* ширина не запоминается */ } }
-  }
-
-  /* Шапка панели называет открытый документ: свой материал или отчёт коллеги
-     (с автором и датой создания). Файл-пример в прототипе один. */
-  var PV_OWN = { title: el('pvTitle').textContent, meta: document.querySelector('.pv__meta').textContent };
-  function openPreview(doc) {
-    doc = doc || PV_OWN;
-    el('pvTitle').textContent = doc.title;
-    document.querySelector('.pv__meta').textContent = doc.meta;
-    el('pvFrame').title = doc.title;
-    var saved = PV_DEFAULT;
-    try { saved = Number(localStorage.getItem(PV_KEY)) || PV_DEFAULT; } catch (err) { /* хранилище недоступно */ }
-    var wasHidden = pv.hidden;
-    pv.hidden = false;
-    setPvWidth(wasHidden ? saved : pv.offsetWidth, false);
-    loadDoc();
-    /* каждое открытие показывает материал с начала */
-    if (wasHidden) { try { el('pvFrame').contentWindow.scrollTo(0, 0); } catch (err) { /* фрейм ещё грузится */ } }
-  }
-  function closePreview() {
-    if (window.DSTooltip) window.DSTooltip.hideAll();
-    pv.hidden = true;
-  }
-  function toggleWide() { setPvWidth(pv.offsetWidth >= pvMax() - 4 ? PV_DEFAULT : pvMax(), true); }
-
-  pvGrip.addEventListener('pointerdown', function (e) {
-    if (e.button !== 0) return;
-    e.preventDefault();
-    var startX = e.clientX, startW = pv.offsetWidth;
-    try { pvGrip.setPointerCapture(e.pointerId); } catch (err) { /* захват недоступен — хватит событий на ручке */ }
-    pv.classList.add('is-resizing');
-    document.documentElement.classList.add('is-col-resizing');
-    function move(ev) { setPvWidth(startW + (startX - ev.clientX), false); }
-    function up() {
-      pvGrip.removeEventListener('pointermove', move);
-      pvGrip.removeEventListener('pointerup', up);
-      pvGrip.removeEventListener('pointercancel', up);
-      pv.classList.remove('is-resizing');
-      document.documentElement.classList.remove('is-col-resizing');
-      setPvWidth(pv.offsetWidth, true);
-    }
-    pvGrip.addEventListener('pointermove', move);
-    pvGrip.addEventListener('pointerup', up);
-    pvGrip.addEventListener('pointercancel', up);
-  });
-  pvGrip.addEventListener('keydown', function (e) {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-    e.preventDefault();
-    setPvWidth(pv.offsetWidth + (e.key === 'ArrowLeft' ? 32 : -32), true);
-  });
-  pvGrip.addEventListener('dblclick', toggleWide);
-  pv.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePreview(); });
-  window.addEventListener('resize', function () { if (!pv.hidden) setPvWidth(pv.offsetWidth, false); });
 
   /* ── Поиск по чатам ───────────────────────────────────────────────────── */
   function clearHistSearch() { el('histSearch').value = ''; drawHist(); el('histSearch').focus(); }
@@ -2062,7 +1682,7 @@
   function seedOpened(h) {
     S.openId = h.id;
     S.hasMaterial = h.state === 'ready';
-    setTitle(h.title, { cls: HIST_CHIP[h.state].cls, label: HIST_CHIP[h.state].label });
+    setTitle(h.title);
     setMeta(h);
     setActions(true);
     if (h.state === 'error') { seedError(); return; }
@@ -2077,14 +1697,9 @@
     }
     S.msgs = [
       { role: 'user', time: '11.09.2026, 14:02', html:
-        '<div class="thr__text"><p class="ds-body-m">Запрос из конструктора: ' + esc(OBJECT) + ', детальный материал, направление «Прямые инвестиции». Собственник рассматривает частичный выход. Интересует применимость мезонина, оценка через мультипликаторы peers и график погашений валютного долга до 2028 года.</p></div>' +
-        '<div class="chiplist chiplist--s">' +
-        '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">Отчётность_МСФО_2025.pdf</span></span>' +
-        '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">Teaser_group.pptx</span></span>' +
-        '<span class="chip chip--s"><span class="chip__icon"><i data-icon="file-basic"></i></span><span class="chip__label">Презентация_менеджмента_2026.pptx</span></span>' +
-        '</div>' },
+        '<div class="thr__text"><p class="ds-body-m">Запрос из конструктора: ' + esc(OBJECT) + ', детальный материал, направление «Прямые инвестиции». Собственник рассматривает частичный выход. Интересует применимость мезонина, оценка через мультипликаторы peers и график погашений валютного долга до 2028 года.</p></div>' },
       { role: 'agent', time: '11.09.2026, 14:02', html:
-        text('Принял. Параметры зафиксированы, файлы переданы на извлечение. Ожидаемое время подготовки — до 30 минут, уведомление придёт, даже если вы закроете инструмент.') }
+        text('Принял. Параметры зафиксированы. Ожидаемое время подготовки — до 30 минут.') }
     ];
     if (h.state === 'ready') {
       S.msgs.push({ role: 'agent', time: '12.09.2026, 09:05', html:
@@ -2094,7 +1709,7 @@
       think.start = Date.now() - 7 * 60 * 1000;
       S.running = true;
       S.msgs.push({ role: 'agent', time: '12.09.2026, 11:40', think: true, html:
-        text('Готовлю материал по параметрам запроса. Это займёт до 30 минут. Как будет готово, сообщу в чате и уведомлю по выбранным каналам.') });
+        text('Готовлю материал по параметрам запроса. Это займёт до 30 минут. Как будет готово, сообщу в чате.') });
       startThinking();
     }
     render();
@@ -2118,7 +1733,6 @@
   }, { passive: true });
 
   var params = new URLSearchParams(location.search);
-  drawFiles();
   paint();
   /* ?builder=1 — вход «Открыть черновик в конструкторе» из реестра */
   if (params.get('builder')) setBuilder(true, false);
@@ -2127,7 +1741,7 @@
     S.openId = 1;
     drawHist();
     push('user', '<p class="ds-body-m">Запрос из конструктора: ' + esc(OBJECT) + ' · детальный материал · направление «Прямые инвестиции».</p>');
-    startRun('Принял. Параметры зафиксированы, файлы переданы на извлечение.');
+    startRun('Принял. Параметры зафиксированы. Ожидаемое время подготовки — до 30 минут.', { params: OBJECT });
   } else if (params.get('id')) {
     var opened = HIST.filter(function (h) { return String(h.id) === params.get('id'); })[0];
     if (opened) seedOpened(opened); else render();
