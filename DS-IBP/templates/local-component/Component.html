@@ -2,7 +2,8 @@
      Префикс классов lc-component заменить на lc-<имя>.
      Внешние отступы и место в колонках задаёт экран, здесь их нет.
      data-state — состояние компонента: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:            edit | view | locked -->
+     data-mode  — режим прав:            edit | view (view — и при роли без права,
+                                          и когда статус сущности не допускает правку) -->
 <section class="lc-component" data-state="data" data-mode="view">
   <header class="lc-component__head">
     <h3 class="lc-component__title">Заголовок компонента</h3>

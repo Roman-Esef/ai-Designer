@@ -123,7 +123,7 @@
     controls.appendChild(select('Размер', [['l', 'L · 40'], ['m', 'M · 32'], ['s', 'S · 24'], ['xs', 'XS · 20']], () => state.size, v => state.size = v));
     controls.appendChild(select('Тон', [['system', 'System'], ['success', 'Success'], ['info', 'Info'], ['warning', 'Warning'], ['error', 'Error'], ['green', 'Green'], ['lblue', 'LBlue'], ['orange', 'Orange'], ['red', 'Red'], ['dpurple', 'DPurple'], ['grey', 'Grey'], ['primary', 'Primary']], () => state.tone, v => state.tone = v));
     controls.appendChild(select('Дополнительный элемент', [['none', 'Нет'], ['marker', 'Маркер'], ['icon', 'Иконка'], ['avatar', 'Аватар']], () => state.leading, v => state.leading = v));
-    const avatarCtl = select('Содержимое аватара', [['text', 'Текст'], ['icon', 'Иконка'], ['image', 'Фото']], () => state.avatarContent, v => state.avatarContent = v);
+    const avatarCtl = select('Содержимое аватара', [['text', 'Аватар-инициалы'], ['icon', 'Аватар-иконка'], ['image', 'Аватар-фото']], () => state.avatarContent, v => state.avatarContent = v);
     controls.appendChild(avatarCtl);
     controls.appendChild(select('Состояние', [['default', 'Default'], ['selected', 'Selected'], ['focus', 'Focus'], ['loading', 'Loading'], ['invalid', 'Invalid'], ['disabled', 'Disabled']], () => state.chipState, v => state.chipState = v));
 

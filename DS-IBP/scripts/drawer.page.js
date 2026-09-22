@@ -134,8 +134,8 @@
       ctlSelect('pg-path', 'Путь в шапке', [['no', 'Нет'], ['yes', 'Да']], state.path ? 'yes' : 'no') +
       ctlSelect('pg-alert', 'Alert под шапкой', [['no', 'Нет'], ['yes', 'Да']], state.alert ? 'yes' : 'no') +
       '<div class="pg__grouphead">Содержимое</div>' +
-      ctlSelect('pg-cols', 'Колонок в сетке', [[2, '2'], [1, '1']], state.cols) +
-      ctlSelect('pg-sections', 'Секций', [[1, '1'], [2, '2'], [3, '3']], state.sections);
+      ctlSelect('pg-cols', 'Колонок в сетке', [[2, '2 колонки'], [1, '1 колонка']], state.cols) +
+      ctlSelect('pg-sections', 'Секций', [[1, '1 секция'], [2, '2 секции'], [3, '3 секции']], state.sections);
 
     var map = {
       'pg-w':        function (v) { state.w = v; },

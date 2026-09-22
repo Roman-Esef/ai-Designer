@@ -1,8 +1,8 @@
 ---
 component: Chart
 title: "Chart"
-version: "1.002"
-updated: "05.09.2026"
+version: "1.003"
+updated: "21.09.2026"
 page: pages/organisms/Chart.html
 page_js: scripts/chart.page.js
 runtime: scripts/ds-chart.js

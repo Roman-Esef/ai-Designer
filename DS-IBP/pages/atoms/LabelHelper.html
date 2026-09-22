@@ -153,7 +153,7 @@
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.005</b></span><span>Обновлено: <b>05.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.006</b></span><span>Обновлено: <b>21.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>Label / Helper</h1>
     <p class="lead">Общие вспомогательные текстовые слоты, вынесенные из нескольких родительских компонентов в отдельную группу. <b>Label</b> подписывает поле ввода, <b>Helper</b> поясняет назначение или ограничение контрола. Оба переиспользуются в разных компонентах, но не имеют собственного визуального контейнера.</p>
@@ -578,6 +578,18 @@ function makeHelper(o) {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* --wrap — перенос до двух строк, дальше многоточие. Для лейблов в узких
+   колонках (шапка колонок тайла на 3 из 12), где одна строка режет подпись
+   до пары слов. Идиома клэмпа — как у .tile__title и .th__label.
+   Выравнивание вправо сохраняется и у переносимого текста. */
+.ds-label--wrap .ds-label__text {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.ds-label--wrap.ds-label--right .ds-label__text { text-align: right; }
 /* дополнительные иконки (одна или две, любого назначения) — редкий кейс, справа от текста.
    Каждая иконка — IconButton S neutral (см. IconButton); контейнер задаёт раскладку. */
 .ds-label__icons {

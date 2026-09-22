@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ], () => state.details, v => state.details = v));
 
     controls.appendChild(ctl('Состояние поповера', [
-      ['default', 'Обычное'], ['loading', 'Загрузка'], ['error', 'Ошибка'],
+      ['default', 'Поповер с данными'], ['loading', 'Поповер загружается'], ['error', 'Поповер с ошибкой'],
     ], () => state.popState, v => state.popState = v));
 
     const hint = document.createElement('p');

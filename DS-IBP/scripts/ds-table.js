@@ -13,11 +13,18 @@
                                              колонки); хук — data-col на .th
                                              и .tc. Зовётся сам на вставку
                                              строки, вручную не нужен
+     cell(rowEl, key) → .tc | null         — ячейка колонки по ключу data-col:
+                                             видимая или ячейка скрытой
+                                             колонки со склада строки. Для
+                                             потребителя, который обновляет
+                                             ячейку на месте
      chipOverflow(tblEl)                   — пересчитать свёртку чипов «+N»
                                              (нужен, только если потребитель
                                              перерисовал ячейки мимо api)
    }
-   api: { el, selected(), sort(column, dir), refresh(), rowsChanged() }
+   api: { el, selected(), sort(column, dir, opts), refresh(), rowsChanged() }
+     sort(…, { restored: true }) — сортировку возвращает хранение
+                      (ds-table-settings.js); событие 'sort' несёт тот же флаг
      refresh()      — чекбокс шапки + тултипы усечения + свёртка чипов «+N»
                       (состав строк не менялся)
      rowsChanged()  — то же плюс переустановка исходного порядка строк
@@ -35,7 +42,10 @@
                     глиф, aria-sort и подсветка .th--sorted синхронны, активна
                     одна колонка; стартовое направление читается из aria-sort
                     разметки; событие 'sort' с { column, dir }, где column —
-                    значение data-sort (ключ поля данных)
+                    значение data-sort (ключ поля данных). Сортировка,
+                    возвращённая хранением (data-table-persist), приходит с
+                    restored: true — экран с пагинацией оставляет страницу,
+                    серверный реестр запрашивает отсортированную страницу
      порядок строк — opt-in: data-sort-rows на .tbl. Рантайм сам переставляет
                     строки по значению колонки (тип — data-sort-type на .th:
                     date | number | text, иначе автоопределение), dir = none
@@ -175,6 +185,21 @@
     return true;
   }
 
+  /* ---------- ячейка колонки по ключу ---------- */
+  /* Колонка, скрытая настройкой таблицы, в DOM строки не стоит: её ячейка
+     ждёт на складе row.__dsColCells (кладут adoptRow и ds-table-settings.js).
+     Потребитель, который обновляет ячейку на месте (данные пришли позже
+     рендера), querySelector-ом скрытую ячейку не найдёт, и после показа
+     колонки в ней осталось бы старое значение. */
+  function cellOf(row, key) {
+    if (!row || !key) return null;
+    var k = String(key);
+    for (var i = 0; i < row.children.length; i++) {
+      if (row.children[i].dataset && row.children[i].dataset.col === k) return row.children[i];
+    }
+    return (row.__dsColCells && row.__dsColCells[k]) || null;
+  }
+
   /* глиф кнопки сортировки — переставляем имя в data-icon и просим ds-icons
      перерисовать: инлайн SVG рантайм не пишет (правило ДС «не инлайнить SVG»).
      Кнопки, где глиф вставлен как готовый <svg> (демо-страницы рисуют шапку
@@ -187,7 +212,7 @@
     if (window.dsIcons) window.dsIcons.apply(btn);
   }
 
-  function setSort(tbl, btn, dir) {
+  function setSort(tbl, btn, dir, extra) {
     tbl.querySelectorAll('[data-sort]').forEach(function (b) {
       var head = b.closest('.th') || b;
       var own = b === btn;
@@ -200,7 +225,11 @@
       b.classList.toggle('is-sorted', d !== 'none');
     });
     sortRows(tbl, btn, dir);
-    emit(tbl, 'sort', { column: btn.dataset.sort, dir: dir });
+    /* restored — сортировку вернуло хранение (data-table-persist), а не клик:
+       экран с пагинацией по нему не сбрасывает страницу на первую */
+    var detail = { column: btn.dataset.sort, dir: dir };
+    if (extra && extra.restored) detail.restored = true;
+    emit(tbl, 'sort', detail);
   }
 
   /* ---------- порядок строк (opt-in: data-sort-rows на .tbl) ----------
@@ -466,9 +495,9 @@
     var api = {
       el: tbl,
       selected: function () { return selectedIds(tbl); },
-      sort: function (column, dir) {
+      sort: function (column, dir, opts) {
         var b = tbl.querySelector('[data-sort="' + column + '"]');
-        if (b) setSort(tbl, b, dir || 'asc');
+        if (b) setSort(tbl, b, dir || 'asc', opts);
       },
       refresh: function () { syncHeadCheckbox(tbl); chipOverflow(tbl); },
       /* Строка добавлена/удалена мимо рантайма (реестр дописал новую сделку) —
@@ -668,5 +697,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', registerTrunc);
   else registerTrunc();
 
-  window.DSTable = { bind: bind, bindAll: bindAll, wire: wire, wireAll: wireAll, chipOverflow: chipOverflow, adoptRow: adoptRow };
+  window.DSTable = { bind: bind, bindAll: bindAll, wire: wire, wireAll: wireAll, chipOverflow: chipOverflow, adoptRow: adoptRow, cell: cellOf };
 })();

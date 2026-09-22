@@ -418,7 +418,7 @@ function initPlayground() {
     function () { return state.width; }, function (v) { state.width = v; }));
   controls.appendChild(ctl('Состояние', [['loaded', 'Загружено'], ['loading', 'Загрузка'], ['loading-slow', 'Долгий расчёт'], ['error', 'Ошибка'], ['empty', 'Нет данных']],
     function () { return state.status; }, function (v) { state.status = v; }));
-  controls.appendChild(ctl('Сумма позиций', [['exact', 'Равна итогу'], ['partial', 'Меньше итога'], ['overflow', 'Больше итога']],
+  controls.appendChild(ctl('Сумма позиций', [['exact', 'Сумма равна итогу'], ['partial', 'Сумма меньше итога'], ['overflow', 'Сумма больше итога']],
     function () { return state.sum; }, function (v) { state.sum = v; }));
   controls.appendChild(ctl('Проценты', [['yes', 'Показывать'], ['no', 'Скрыть']],
     function () { return state.pct; }, function (v) { state.pct = v; }));
@@ -426,7 +426,7 @@ function initPlayground() {
     function () { return state.bar; }, function (v) { state.bar = v; }));
   controls.appendChild(ctl('Иконка предупреждения', [['no', 'Нет'], ['yes', 'Есть']],
     function () { return state.warn; }, function (v) { state.warn = v; }));
-  controls.appendChild(ctl('maxVisibleItems', [['3', '3'], ['5', '5'], ['12', '12']],
+  controls.appendChild(ctl('maxVisibleItems', [['3', '3 позиции'], ['5', '5 позиций'], ['12', '12 позиций']],
     function () { return state.maxv; }, function (v) { state.maxv = v; }));
 
   function items() {

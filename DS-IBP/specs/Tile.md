@@ -1,8 +1,8 @@
 ﻿---
 component: Tile
 title: "Tile"
-version: "1.012"
-updated: "10.09.2026"
+version: "1.013"
+updated: "21.09.2026"
 page: pages/organisms/Tile.html
 runtime: scripts/ds-tile.js
 css: styles/tile.css
@@ -42,7 +42,7 @@ Tile — основная плашка рабочей области стран�
 ## Для разработчиков (выжимка)
 
 ### Точные размеры (redline)
-Рендерятся на странице через getComputedStyle. Радиус 8 (`--radius-m`), бордер 1px `--border-light`, паддинг хэдера 20 сверху / 20 по бокам / 10 снизу, зазор Title↔Subtitle↔Chiplist 8, зазор действий в Actions 8, зазор чипов в Chiplist 4, паддинг контента 0/20/24/20 (headless 20/20/32/20), зазор строк 16 (или 24), колонок 16.
+Рендерятся на странице через getComputedStyle. Радиус 8 (`--radius-m`), бордер 1px `--border-light`, паддинг хэдера 20 сверху / 20 по бокам / 10 снизу, зазор Title↔Subtitle↔Chiplist 8 (у Card — 4), зазор действий в Actions 8, зазор чипов в Chiplist 4, паддинг контента 0/20/24/20 (headless 20/20/32/20), зазор строк 16 (или 24), колонок 16.
 
 ### Разметка · HTML (эталонная реализация ДС)
 
@@ -100,7 +100,7 @@ onToggle():                       # AccordionTile
 | `.tile--accordion` | сворачиваемый тайл |
 | `.tile--collapsed` | свёрнуто: `.tile__collapsible` скрыт (display:none) |
 | `.tile__header` | TileHeader M: header-main + actions, padding 20 20 10 |
-| `.tile__header-main` | колонка title-row · subtitle · chiplist, gap 8 |
+| `.tile__header-main` | колонка title-row · subtitle · chiplist, gap 8 (у Card — 4) |
 | `.tile__title-row` | строка Title + Addition |
 | `.tile__title` | заголовок, H5 Strong, усекается |
 | `.tile__title-add` | Addition: link/icon/chip/badge; `--icon` = warning |
@@ -115,4 +115,6 @@ onToggle():                       # AccordionTile
 | `.tile-row` | ряд нескольких тайлов — grid 12 колонок, gap 16. Ширина тайла — `style="grid-column:span N"` (ряд без перестроения) либо пара утилит Spacing `col-N` + `colw-N` (когда нужен адаптив: инлайн-стиль из CSS не переопределить). Своих классов ширины экран не заводит; узкий режим включается порогом `@container screen (max-width: …) { .tile-row > [class*="colw-"] { grid-column: span var(--colw) } }` |
 | `.tile-group` | обёртка нескольких `.tile-row` — flex-колонка, зазор 16px. Обязательна, когда рядов больше одного: `.screen__content` имеет собственный `gap: 24px`, поэтому зазор нельзя задавать `margin`'ом на `.tile-row` (сложится в 40px). Группа — один ребёнок контентной области: 24px между крупными зонами, 16px внутри группы |
 | `.tile__grid-full` | элемент на всю ширину сетки тайла (`grid-column:1/-1`) — длинное «Описание», комментарий, Alert: остаётся внутри `.tile__grid`, не выносится соседним блоком |
+| `.tile--card` | Card — карточка в модалке, списке, на канбане: хэдер 16/16/8, контент 8/16/20/16, Title H6 Strong, зазор Title↔Subtitle↔Chiplist 4; свои состояния `:hover`/`.is-hover` · `:active`/`.is-pressed` · `.is-move` · `.is-disabled`/`[aria-disabled="true"]`; alert-слота нет |
+| `.tile__grip` | грип переноса Card — IconButton M 20×20 (`<button class="ibtn ibtn--neutral ibtn--m tile__grip" aria-label="Перенести"><i data-icon="drag-dots"></i></button>`), последним в `.tile__actions`; своего только курсор grab/grabbing. Жест переноса — у потребителя |
 | `.tile-stack` | колонка/стопка внутри `.tile-row` (канбан) — flex-column, gap 16; вложенные тайлы высоту друг с другом не равняют |

@@ -307,6 +307,26 @@
 .tile--card .tile__title {
   font: var(--type-h6-strong);
 }
+/* Зазор Title↔Subtitle↔Chiplist у Card — 4 (у плашки 8): заголовок на
+   ступень ниже, и 8px отрывали сабхедер от своего заголовка. */
+.tile--card .tile__header-main {
+  gap: 4px;
+}
+/* Грип — точка захвата карточки для переноса. Это IconButton M (20×20,
+   глиф drag-dots), последний элемент в .tile__actions:
+   <button class="ibtn ibtn--neutral ibtn--m tile__grip" aria-label="Перенести">.
+   Размер, тон, hover и фокус — у IconButton; здесь только курсор захвата.
+   Жеста у Card нет: переносом управляет потребитель (Kanban, свой рантайм),
+   грип лишь говорит, за что тащить, — нужен, когда в карточке должно
+   работать выделение текста и тащить за тело нельзя. */
+.tile__grip {
+  cursor: grab;
+  touch-action: none;
+}
+.tile--card.is-move .tile__grip,
+.tile__grip:active {
+  cursor: grabbing;
+}
 
 /* Hover */
 .tile--card:hover,

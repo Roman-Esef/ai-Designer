@@ -1039,6 +1039,36 @@ async function pageChecks(p, P, opts, out) {
       }
     }
 
+    /* R9 — у свитча конструктора нет лейбла сверху (правило Switch,
+       29.08.2026). Дефект — подпись `.lbl`, за которой сразу идёт свитч
+       `pg-toggle`: лейбл называет опцию, свитч пишет «Показывать», и ни
+       одна из двух подписей не читается сама. Свитч, управляющий полем,
+       стоит в `.ctl` ПЕРВЫМ и называет опцию, а у поля под ним — свой
+       `.lbl` («Пример», «Вариант»): этот порядок правило пропускает.
+       Вход — оба контейнера конструктора: `#pg-controls` (динамический)
+       и `#pane-constructor` (статичный). R6/R8 смотрят только в первый,
+       и статичный конструктор TableCell без `#pg-controls` прошёл с пятью
+       свитчами под лейблами (21.09.2026). Конструктор, который page.js
+       собирает скриптом, в разметке не виден — его свитчи строит
+       `docs-split.js` из селектов, и лейбла над ними он не ставит. */
+    {
+      const hosts = ['pg-controls', 'pane-constructor']
+        .map((id) => markup.search(new RegExp('<[a-z]+[^>]*\\bid="' + id + '"')))
+        .filter((at) => at >= 0);
+      scan: for (const at of hosts) {
+        const controls = tagSlice(markup, at);
+        for (const l of controls.matchAll(/<[a-z]+[^>]*class="[^"]*\blbl\b[^"]*"[^>]*>/g)) {
+          const after = controls.slice(l.index + tagSlice(controls, l.index).length)
+            .replace(/^<\/[a-z]+>\s*/, '');
+          if (/^<label\b[^>]*\bclass="[^"]*\bpg-toggle\b/.test(after)) {
+            const name = strip(tagSlice(controls, l.index).replace(/^<[^>]*>/, '')).trim();
+            say('BLOCKER', 'R9', 'лейбл «' + name + '» над свитчем конструктора — подпись свитча самодостаточна (правило Switch): свитч называет опцию сам и стоит в .ctl первым, у поля под ним — свой .lbl');
+            break scan;
+          }
+        }
+      }
+    }
+
     /* R4 (К10) — остатки flex-раскладки конструктора ДО docs-split: в колонке
        `.ctl-col` такие правила растягивают поля по высоте и дают огромные
        отступы (урок Л2, Pagination). Живые page-стили контролов остаются —

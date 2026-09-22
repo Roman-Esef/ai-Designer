@@ -105,7 +105,7 @@
       ['warning', 'Warning'], ['warning-focus', 'WarningFocus'],
       ['disabled', 'Disabled'],
     ], 'state', true));
-    controls.appendChild(ctlSelect('Показ выбора', [['summary', 'Сводка'], ['chips', 'Чипы в поле'], ['chips-ext', 'Чипы внешние']], 'display'));
+    controls.appendChild(ctlSelect('Показ выбора', [['summary', 'Выбор сводкой'], ['chips', 'Чипы в поле'], ['chips-ext', 'Чипы вне поля']], 'display'));
     controls.appendChild(ctlSelect('Тип списка', [['text', 'Текст'], ['checkbox', 'Чекбоксы']], 'list'));
 
     function render() {

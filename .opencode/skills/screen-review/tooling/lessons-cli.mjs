@@ -236,6 +236,16 @@ function sensorIds() {
   return [...new Set([...out.matchAll(/([БЗКK]\d{1,2}(?:\.\d)?)(?![0-9.])/gu)].map((m) => m[1]))];
 }
 
+/* Структурные проверки страницы документации. Свой инструмент, свой ряд
+   идентификаторов — и своё пространство имён: якорь `док-сплит:ДС17` иначе
+   не проверяется ничем. Имя пространства кириллическое намеренно — разбор
+   неизвестных пространств в `check` читает только кириллицу, и латинское имя
+   прошло бы молча (то же, за что написан Л100). */
+function docsSplitIds() {
+  const out = execFileSync(process.execPath, [DOCS_SPLIT, '--rules'], { encoding: 'utf8' });
+  return [...new Set([...out.matchAll(/(ДС\d{1,2})(?!\d)/gu)].map((m) => m[1]))];
+}
+
 function auditIds() {
   const src = rd(path.join(ROOT, 'DS-IBP/scripts/spec-audit.mjs'));
   return [...new Set([...src.matchAll(/section\('Проход (\d)/g)].map((m) => m[1]))];
@@ -262,6 +272,7 @@ function anchorsFromCode() {
       'линтер': { источник: 'DS-IBP/scripts/ds-lint.js', алфавит: 'латиница', ids: lintIds() },
       'сенсор': { источник: '.opencode/skills/screen-review/tooling/layout-check.mjs --rules', алфавит: 'кириллица Б/З/К, латинская K — геометрия', ids: sensorIds() },
       'аудит': { источник: 'DS-IBP/scripts/spec-audit.mjs', алфавит: 'номер прохода', ids: auditIds() },
+      'док-сплит': { источник: '.opencode/skills/docs-split/tooling/docs-split.mjs --rules', алфавит: 'кириллица ДС', ids: docsSplitIds() },
       'чек-лист': { источник: 'SKILL.md screen-review и composition-review', алфавит: 'кириллица Б/З/К, латинская K — композиция', ids: checkIds() },
     },
   };
@@ -579,7 +590,7 @@ function cmdCheck() {
          считается: так велит скилл lessons. До 13.09.2026 соглашение было
          записано, а регулярка ёлочки не исключала — первая же такая цитата
          дала ложный Л-ЯКОРЬ (класс Л42: правило записано, кода нет). */
-      for (const m of text.matchAll(/(?<!«)(линтер|сенсор|чек-лист|аудит):\s*([^\s`,;)]+)/gu)) {
+      for (const m of text.matchAll(/(?<!«)(линтер|сенсор|чек-лист|аудит|док-сплит):\s*([^\s`,;)]+)/gu)) {
         const ns = m[1];
         let id = m[2].replace(/[.,;:)»]+$/u, '');
         if (ns === 'аудит') { const d = id.match(/(\d)\s*$/); id = d ? d[1] : id; }
@@ -1217,9 +1228,19 @@ function gateStepsFor(rel, deleted) {
   }
   if (rel.startsWith(SCREEN_FIXTURES_REL + '/') || rel.startsWith('DS-IBP/fixtures/')) add('verify-lint', 'anchors');
 
-  if (/^DS-IBP\/pages\/.+\.html$/.test(rel)) {
-    add('lint:' + rel);
-    if (isDocsSplit(rel)) add('split:' + rel);
+  if (/^DS-IBP\/pages\/.+\.html$/.test(rel)) add('lint:' + rel);
+  /* Структурная проверка паттерна «сплиттер + табы» — по ПРИЗНАКУ СТРАНИЦЫ, а
+     не по её папке. Пока шаг звался только для `DS-IBP/pages/**`, витрины
+     локальных компонентов не получали его вовсе: сенсор их пропускал, линтер
+     проверяет другое, и три дефекта каркаса дошли до человека при зелёном
+     гейте (20.09.2026). Урок Л115 — сторож, которого никто не вызывает, не
+     сторож; здесь сторож был, а вызывали его не для всех входов.
+     У собранной витрины проверяются оба файла: у источника свой каркас, но
+     открывают и правят результат. */
+  if (html && !inFixtures && isDocsSplit(rel)) {
+    add('split:' + rel);
+    const built = assembledOf(path.resolve(ROOT, rel));
+    if (built) add('split:' + toRel(built));
   }
   if (/^DS-IBP\/scripts\/[^/]+\.page\.js$/.test(rel)) {
     const pages = pageForScript(rel);

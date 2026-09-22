@@ -338,7 +338,10 @@ let catalogBroken = false;
   } else {
     const blk = (rules.split(/^## 6\. Каталог компонентов/m)[1] || '').split(/^## /m)[0];
     const catalog = new Set();
-    for (const line of blk.split('\n')) {
+    /* \r?\n: рабочая копия на Windows — CRLF (core.autocrlf), а `.` в
+       регулярке ниже `\r` не берёт, и `(.+)$` не совпадал ни с одной строкой —
+       каталог разбирался пустым, и проход падал на ровном месте (21.09.2026) */
+    for (const line of blk.split(/\r?\n/)) {
       const g = line.match(/^\*\*[^*]+:\*\*\s*(.+)$/);
       if (!g) continue;
       for (const item of g[1].split('·')) {

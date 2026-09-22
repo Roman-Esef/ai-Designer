@@ -23,11 +23,12 @@
    ========================================================================= */
 
 /* ---------- раскладка: верх — демо, низ — табы ---------- */
-/* scrollbar-gutter: stable — место под скроллбар резервируется всегда,
-   чтобы ширина рабочей области не скакала при переключении табов
-   (у «Конструктора» контент короче — скроллбар документа может
-   появляться/исчезать и сдвигать контент на 15px) */
-html{scrollbar-gutter:stable}
+/* Документ страницы паттерна не прокручивается никогда: прокручиваются
+   только область под табами и демо. main занимает ровно 100vh, но узлы
+   вне его клипа (добавленные в body, спозиционированные от вьюпорта)
+   удлиняли документ, и поверх скролла области появлялся второй — на
+   «Конструкторе» колесо двигало всю страницу. */
+html:has(main.ds-split){overflow:hidden}
 main.ds-split{max-width:none;padding:0;height:100vh;overflow:hidden;display:flex;box-sizing:border-box}
 main.ds-split .splitpane{flex:1;min-height:0;height:100%;border-radius:var(--radius-2xl)}
 /* панели обязаны оставаться flex-контейнерами: не использовать .splitpane--app
@@ -40,7 +41,10 @@ main.ds-split .app-pane-docs{display:flex!important;flex-direction:column!import
    подчёркивания до первого и после последнего таба. Вертикальный отступ —
    можно, горизонтальный задаётся только на обёртке без рейла. */
 main.ds-split .app-pane-docs .tabs{flex:none;padding:10px 0 0;background:var(--bg-tile)}
-main.ds-split .tabs-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+/* scrollbar-gutter: stable — место под скроллбар области резервируется
+   всегда: у «Конструктора» контент короче, и появляющийся/исчезающий
+   скроллбар сдвигал бы контент на 15px при переключении табов */
+main.ds-split .tabs-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
 main.ds-split .tabpane{min-width:0}
 
 /* ---------- вкладка «Документация»: контент ~1200px + локальный TOC ---------- */
@@ -70,6 +74,12 @@ main.ds-split .docs-main > .desc{font:var(--type-body-m);color:var(--text-second
 main.ds-split .docs-main .pg__controls{display:grid;grid-template-columns:1fr 1fr;gap:18px 48px;align-items:start;padding:0;max-height:none;overflow:visible;border:none}
 main.ds-split .docs-main .ctl-col{display:flex;flex-direction:column;gap:18px;min-width:0}
 main.ds-split .docs-main .toggles{display:flex;flex-direction:column;gap:14px;min-width:0}
+/* Пустая колонка не рисуется: иначе конструктор из одних свитчей оставлял
+   слева пустую половину. Оставшаяся колонка встаёт в первый трек — правило
+   «один тип контролов — слева» исполняет CSS, поэтому оно ловит и статические
+   конструкторы, и контролы, которые страница переносит после раскладки.
+   Пустая — без видимых детей: .is-off и [hidden] не в счёт. */
+main.ds-split .docs-main :is(.ctl-col,.toggles):not(:has(> :not(.is-off):not([hidden]))){display:none}
 main.ds-split .docs-main .ctl--span{grid-column:1/-1}
 main.ds-split .docs-main .readout{grid-column:1/-1}
 /* контрол в колонке: подпись (.lbl) + сам контрол; .is-off — неактуальный скрыт.

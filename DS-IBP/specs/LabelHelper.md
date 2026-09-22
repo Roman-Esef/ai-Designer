@@ -1,8 +1,8 @@
 ---
 component: LabelHelper
 title: "Label / Helper"
-version: "1.005"
-updated: "05.09.2026"
+version: "1.006"
+updated: "21.09.2026"
 page: pages/atoms/LabelHelper.html
 page_js: scripts/label-helper.page.js
 css: styles/label-helper.css
@@ -21,6 +21,7 @@ status: auto
 - Выравнивание (left/right) Label и Helper всегда синхронизировано в паре — не задавать им разное направление у одного родителя.
 - Ошибка — только у Helper (`--error`, опц. иконка); у Label собственного состояния ошибки нет.
 - Иконки в Label — редкий кейс, IconButton S сжимается до 16px под высоту строки Body XS.
+- Текст Label по умолчанию в одну строку; перенос — только явным модификатором `.ds-label--wrap` и не больше двух строк (1.006). Лейбл, который растёт на третью строку, раздвигает сетку полей — поэтому клэмп, а не свободный перенос.
 
 ## Диагностика
 - «Label и Helper выровнены в разные стороны» → привести оба к одному направлению (`--left`/`--right`)
@@ -117,7 +118,8 @@ interface InputTextProps {
 | Класс / атрибут | На чём | Назначение |
 |---|---|---|
 | .ds-label | label/span | Подпись; for связывает с полем |
-| .ds-label__text | span | Текст — обрезается многоточием, не переносится |
+| .ds-label__text | span | Текст — по умолчанию одна строка, обрезается многоточием, не переносится |
+| .ds-label--wrap | label/span | Перенос до двух строк, дальше многоточие (клэмп 2, идиома .tile__title). Для узких колонок, где одна строка режет подпись; с --right текст выравнивается вправо |
 | .ds-label--right | label | Выравнивание вправо (left — база, класса нет). Выравнивание — общее с Helper той же пары, задаётся синхронно |
 | .ds-label__icons .is-action | span | Иконка (0–2, любое назначение) — IconButton S neutral (классы .ibtn .ibtn--s .ibtn--neutral), aria-label обязателен |
 | .ds-label--disabled | label | Цвет — --text-inactive |

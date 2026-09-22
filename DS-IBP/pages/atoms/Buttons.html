@@ -176,7 +176,7 @@
             <div class="docs-main">
 
 <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.011</b></span><span>Обновлено: <b>30.08.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.011</b></span><span>Обновлено: <b>21.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Компоненты</p>
     <h1>Button</h1>
     <p class="lead">Кнопка инициирует действие. Три типа, три размера, состояния Default / Hover / Active / Disabled, лоадер и режим Fullwidth. Модификатор Тон (<code class="tok">--error</code> / <code class="tok">--warning</code> / <code class="tok">--success</code> / <code class="tok">--info</code>) комбинируется с любым типом — Error для деструктивных действий (диалог подтверждения удаления), остальные тоны переиспользуются в Alert и SnackBar. Текст кнопок набран токенами Button&nbsp;M&nbsp;/&nbsp;S&nbsp;/&nbsp;XS (SB Sans Screen).</p>
@@ -685,7 +685,7 @@ function attachLoader(btn){
     ()=>state.type, v=>state.type=v));
   controls.appendChild(select('Тон', [['none','Без тона'],['error','Error'],['warning','Warning'],['success','Success'],['info','Info']],
     ()=>state.tone, v=>state.tone=v));
-  controls.appendChild(select('Размер', [['m','M'],['s','S'],['xs','XS']], ()=>state.size, v=>state.size=v));
+  controls.appendChild(select('Размер', [['m','M · 40 px'],['s','S · 32 px'],['xs','XS · 24 px']], ()=>state.size, v=>state.size=v));
   controls.appendChild(select('Состояние', [['default','Default'],['hover','Hover'],['active','Active'],['disabled','Disabled']],
     ()=>state.state, v=>state.state=v));
 

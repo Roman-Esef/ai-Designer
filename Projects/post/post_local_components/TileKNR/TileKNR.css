@@ -1,0 +1,114 @@
+/* Локальный компонент «КНР».
+   Только внутренняя раскладка. Цвета, шрифты, отступы — токены ДС;
+   своих значений здесь нет.
+   Состояния компонентов ДС отсюда не переопределяются: переключается только
+   присутствие собственных блоков .lc-knr__* и слотов тайла. */
+
+/* Компонент перестраивается по СВОЕЙ ширине, а не по ширине окна: он стоит на
+   3 колонках из 12, а на узкой странице — на 6. */
+.lc-knr { container-type: inline-size; }
+
+/* ── Заполненное состояние и загрузка: общая раскладка ──────────────── */
+.lc-knr__list,
+.lc-knr__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* Шапка колонок и строка КНР живут на одной сетке — иначе лейблы разъедутся
+   со значениями. Первая колонка сжимаемая (minmax(0,1fr)): благодаря ей
+   работает усечение длинного наименования; вторая по содержимому, чтобы чип
+   метрики не растягивался. */
+.lc-knr__head,
+.lc-knr__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: var(--space-8) var(--space-16);
+}
+/* Лейблы колонок — обе подписи в две строки с жёстким переносом:
+   «Наименование / контрагента», «Рейтинг и зона / проблемности» (перенос —
+   <br class="lc-knr__br"> в тексте лейбла). В одну строку — только обе сразу,
+   когда обе помещаются; иначе рядом стояли бы подписи в одну и в две строки.
+   Перенос заранее задан по смыслу, а не где придётся: без него узкая колонка
+   рвала «Рейтинг и / зона проблемности». Шапка выровнена к низу — ближе к
+   данным. ds-label--wrap остаётся страховкой клэмпа в две строки. */
+.lc-knr__head { align-items: end; }
+
+/* Порог «обе подписи в одну строку» — 406px ширины тайла. Вывод по метрикам
+   шрифта Body XS (SB Sans Text 12px): «Наименование контрагента» ≈ 168px +
+   зазор колонок 16px + «Рейтинг и зона проблемности» ≈ 182px + поля тела
+   тайла 2×20px = 406px. Ниже порога перенос на месте, и правая колонка шапки
+   сужается до длинной строки (≈91px) — у наименований остаётся больше места. */
+@container (min-width: 406px) {
+  .lc-knr__br { display: none; }
+}
+
+/* Наименование — до двух строк, дальше многоточие. Клэмп держит своя обёртка,
+   а не ссылка: Link из ДС не переопределяется, а длинные слова без пробелов
+   («СамолётИнвестХолдинг») переносятся по буквам, а не распирают колонку.
+   Шрифт обёртки — тот же, что у Link S: иначе строку растянул бы strut
+   обёртки с кеглем родителя. */
+.lc-knr__name {
+  min-width: 0;
+  font: var(--type-body-s);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.lc-knr__more {
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+/* ── Не заполнено, прав на правку нет ───────────────────────────────── */
+.lc-knr__empty {
+  margin: 0;
+  font: var(--type-body-m);
+  color: var(--text-inactive);
+}
+
+/* ── Что видно в каком состоянии ────────────────────────────────────── */
+/* База — «данные есть»; остальные блоки появляются по data-state. */
+.lc-knr__loading,
+.lc-knr__fill,
+.lc-knr__empty,
+.lc-knr__error { display: none; }
+
+.lc-knr[data-state="loading"] .lc-knr__list,
+.lc-knr[data-state="empty"] .lc-knr__list,
+.lc-knr[data-state="error"] .lc-knr__list { display: none; }
+
+.lc-knr[data-state="loading"] .lc-knr__loading { display: flex; }
+.lc-knr[data-state="empty"][data-mode="edit"] .lc-knr__fill { display: block; }
+.lc-knr[data-state="empty"][data-mode="view"] .lc-knr__empty { display: block; }
+.lc-knr[data-state="error"] .lc-knr__error { display: block; }
+
+/* ── Действия шапки ─────────────────────────────────────────────────── */
+/* В просмотре действие не выключается, а не рисуется вовсе (правило прав
+   локальных компонентов). Пока данных нет и пока они грузятся — действий в
+   шапке нет совсем. */
+.lc-knr__act { display: none; }
+.lc-knr[data-mode="edit"] .lc-knr__act--edit,
+.lc-knr[data-mode="view"] .lc-knr__act--view { display: inline-flex; }
+.lc-knr[data-state="loading"] .tile__actions,
+.lc-knr[data-state="empty"] .tile__actions,
+.lc-knr[data-state="error"][data-mode="view"] .tile__actions { display: none; }
+
+/* ── Перестроение по своей ширине ───────────────────────────────────── */
+/* На странице 1440 тайл на 3 колонках — это ≈195px внутренней ширины: пара
+   «наименование + метрика» в строку уже не читается, наименование сжимается
+   до пары слов в строке. Ниже порога строка складывается в две, а правый
+   лейбл шапки убирается — над одной колонкой он ни над чем не стоит. */
+@container (max-width: 240px) {
+  .lc-knr__head,
+  .lc-knr__row { grid-template-columns: minmax(0, 1fr); }
+  .lc-knr__head .ds-label--right { display: none; }
+  .lc-knr__row { gap: var(--space-4); justify-items: start; }
+}

@@ -1,0 +1,28 @@
+<!-- Связанный артефакт тайла «КНР»: подтверждение удаления контрагента из
+     участников сделки. Открывается ПОВЕРХ модального окна КНР,
+     когда убирают контрагента, уже выбранного как КНР.
+
+     Отдельный файл, потому что у фрагмента один корневой элемент, а вложенный
+     скрим должен быть соседом основного, а не его потомком: иначе он
+     наследует hidden родителя и не покажется.
+
+     Вложение держит ds-modal.js: класс --nested на скриме поднимает слой, не
+     закрывая нижний, и снимает блокировку прокрутки только на последнем. -->
+<div class="modal-scrim modal-scrim--nested" id="knr-confirm-scrim" hidden>
+  <div class="modal modal--w3" role="alertdialog" aria-modal="true" aria-labelledby="knr-confirm-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="knr-confirm-title">Подтверждение действия</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+    <div class="modal__body">
+      <!-- один текст в две строки: без зазора между абзацами -->
+      <p class="ds-body-m">Удаление контрагента, который задействован в:<br>1234.1.1.2. Договор займа (НКЛ)</p>
+    </div>
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--transparent btn--m" data-knr-confirm="cancel"><span class="btn__label">Отменить</span></button>
+        <button type="button" class="btn btn--accent btn--error btn--m" data-knr-confirm="ok"><span class="btn__label">Подтвердить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>

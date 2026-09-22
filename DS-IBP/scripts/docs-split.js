@@ -11,10 +11,14 @@
    работает с уже готовыми контролами). Рантаймы ДС не дублирует: ds-tabs.js
    делает roving tabindex и индикатор, ds-splitter.js — перетаскивание;
    здесь только связка «таб ↔ панель», сегмент «Код», подсветка, локальный
-   TOC (замена ds-toc.js) и прогрессивное улучшение контролов конструктора:
-   бинарные селекты → свитчеры pg-toggle (остальные селекты остаются
-   выпадающими списками — конвертация в SegmentControl/сетку иконок
-   сознательно не применяется, решение 29.08.2026).
+   TOC (замена ds-toc.js) и прогрессивное улучшение контролов конструктора
+   (правило ds-rules §11, решение человека 21.09.2026):
+     да/нет           → свитчер pg-toggle;
+     2–3 варианта     → ButtonGroup, сегментированный выбор;
+     4 и больше       → выпадающий список, как есть.
+   Свитчер и ButtonGroup — без лейбла сверху: подпись свитча и тексты кнопок
+   самодостаточны, текст .lbl остаётся только в aria-label группы.
+   SegmentControl и сетка иконок в конструкторе не применяются.
 
    Словарь самодостаточных подписей свитчеров страница может задать до
    подключения этого файла: window.DS_SPLIT_SWITCH_LABELS = { 'Имя': 'Подпись' }
@@ -178,13 +182,29 @@ ready(function () {
   }
 
   /* ---------- 5. Конструктор: две колонки контролов ----------
-     Слева (.ctl-col) — выпадающие списки и инпуты; справа (.toggles) —
-     свитчеры, чекбоксы, радиобаттоны, слайдеры. Бинарные селекты
-     конвертируются в свитчеры pg-toggle (селект остаётся скрытым
-     источником истины — change продолжает работать). Конвертация
-     select → SegmentControl / сетка иконок сознательно не применяется:
-     в конструкторе только свитчеры + выпадающие списки (29.08.2026). */
+     Слева (.ctl-col) — выпадающие списки, ButtonGroup и инпуты; справа
+     (.toggles) — свитчеры, чекбоксы, радиобаттоны, слайдеры. Селекты
+     улучшаются по числу вариантов (правило §11, 21.09.2026): да/нет →
+     свитчер pg-toggle, 2–3 варианта → ButtonGroup (5c), 4 и больше
+     остаются списком. Селект всегда остаётся скрытым источником истины —
+     change страницы продолжает работать. SegmentControl в конструкторе
+     не применяется. Пустая колонка не рисуется — docs-split.css. */
   var SWITCH_LABELS = window.DS_SPLIT_SWITCH_LABELS || {};
+  var OFF_VALUES = ['no', 'off', 'false', 'none', '0', ''];
+
+  function isOffOption(o) {
+    return OFF_VALUES.indexOf(String(o.value).toLowerCase()) !== -1 || /^нет$/i.test(o.textContent.trim());
+  }
+  /* Да/нет — это селект на два варианта, записанный в словаре подписей
+     свитчеров, или селект, у которого один вариант означает «выключено».
+     Два равноправных варианта («Юрлицо / Физлицо», «Найдено / Выбрано») —
+     выбор, а не опция: ему место в ButtonGroup. */
+  function isToggleSelect(sel, labelName) {
+    if (sel.options.length !== 2) return false;
+    if (Object.prototype.hasOwnProperty.call(SWITCH_LABELS, labelName)) return true;
+    return isOffOption(sel.options[0]) || isOffOption(sel.options[1]);
+  }
+
   var controls = main.querySelector('#pg-controls') || main.querySelector('.constructor-panel .pg__controls');
   if (controls) {
     var ctlCol = document.createElement('div'); ctlCol.className = 'ctl-col';
@@ -204,6 +224,7 @@ ready(function () {
       if (!sel || sel.options.length !== 2) return;
       var lblEl = ctl.querySelector('.lbl');
       var labelName = lblEl ? lblEl.textContent.trim() : '';
+      if (!isToggleSelect(sel, labelName)) return; /* два равноправных варианта — в 5c */
       var dict = SWITCH_LABELS[labelName];
       var yesVal = null;
       if (dict && typeof dict === 'object' && dict.on) yesVal = String(dict.on);
@@ -213,6 +234,9 @@ ready(function () {
           if (v === 'yes' || v === 'on') yesVal = v;
         }
       }
+      /* «включено» — вариант, который не означает «выключено» */
+      if (yesVal === null && isOffOption(sel.options[0]) && !isOffOption(sel.options[1])) yesVal = sel.options[1].value;
+      if (yesVal === null && isOffOption(sel.options[1]) && !isOffOption(sel.options[0])) yesVal = sel.options[0].value;
       if (yesVal === null) yesVal = sel.options[1].value;
       var noVal = sel.options[0].value === yesVal ? sel.options[1].value : sel.options[0].value;
       var label = document.createElement('label');
@@ -239,9 +263,110 @@ ready(function () {
        30.08.2026: раньше переносились только :scope > .ctl, заголовки групп
        оставались стопкой вверху #pg-controls без своих контролов). */
     controls.querySelectorAll(':scope > *').forEach(function (node) {
+      /* сами колонки тоже прямые дети: перенос колонки в саму себя бросал
+         HierarchyRequestError и обрывал обработчик (найдено 21.09.2026) */
+      if (node === ctlCol || node === toggles) return;
       if (node.classList.contains('ctl') && node.style.display === 'none') return; /* бинарные уже скрыты */
       ctlCol.appendChild(node);
     });
   }
+
+  /* 5c. селекты на 2–3 варианта → ButtonGroup, сегментированный выбор
+     (правило §11, решение человека 21.09.2026). Работает во всех
+     конструкторах страницы — динамических, статических и сгруппированных —
+     и на месте: контрол остаётся в своей колонке.
+     Лейбла над группой нет (правило ButtonGroup, 21.09.2026): .lbl скрывается,
+     его текст уходит в aria-label группы, а смысл несут тексты кнопок —
+     поэтому варианты селекта пишутся самодостаточными («1 чип / 2 чипа»,
+     а не «1 / 2» под лейблом «Количество чипов»).
+     Разметка — по спеке ButtonGroup: outline, toggle, fullwidth (ширина
+     колонки, как у списка), кнопки M (40px, как селект). Длинная подпись
+     режется многоточием по правилу Button, полный текст — в title.
+     aria-pressed ставится здесь, а не рантаймом ds-buttongroup.js: страницы
+     ДС грузят рантаймы поштучно, и его на них нет. */
+  function ensureButtonCss() {
+    if (ensureButtonCss.done) return;
+    ensureButtonCss.done = true;
+    var barrel = document.querySelector('link[rel="stylesheet"][href$="/ds.css"]');
+    ['button.css', 'button-group.css'].forEach(function (f) {
+      if (barrel || document.querySelector('link[rel="stylesheet"][href$="/' + f + '"]')) return;
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = (window.__DS_ROOT || '') + 'styles/' + f;
+      document.head.appendChild(l);
+    });
+  }
+
+  function segmented(box, sel, lblEl, labelName) {
+    ensureButtonCss();
+    if (lblEl) lblEl.hidden = true;
+    var group = document.createElement('div');
+    group.className = 'btn-group btn-group--outline btn-group--toggle btn-group--fullwidth';
+    group.setAttribute('role', 'radiogroup');
+    if (labelName) group.setAttribute('aria-label', labelName);
+
+    function sync() {
+      Array.prototype.forEach.call(group.children, function (b) {
+        b.setAttribute('aria-pressed', String(b.dataset.value === sel.value));
+      });
+    }
+    function build() {
+      group.textContent = '';
+      Array.prototype.forEach.call(sel.options, function (o) {
+        var text = o.textContent.trim();
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn btn--outline btn--m';
+        b.dataset.value = o.value;
+        b.title = text;
+        b.disabled = o.disabled;
+        var s = document.createElement('span');
+        s.className = 'btn__label';
+        s.textContent = text;
+        b.appendChild(s);
+        group.appendChild(b);
+      });
+      sync();
+    }
+
+    group.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.btn') : null;
+      if (!b || !group.contains(b) || b.disabled) return;
+      if (sel.value !== b.dataset.value) {
+        sel.value = b.dataset.value;
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      sync();
+    });
+    sel.addEventListener('change', sync);
+    /* страница может пересобрать варианты селекта — группа следует за ним */
+    if (window.MutationObserver) new MutationObserver(build).observe(sel, { childList: true });
+
+    box.style.display = 'none';
+    box.parentNode.insertBefore(group, box.nextSibling);
+    build();
+    return sync;
+  }
+
+  main.querySelectorAll('#pane-constructor .pg__controls, .constructor-panel .pg__controls').forEach(function (host) {
+    var syncers = [];
+    host.querySelectorAll('.ctl').forEach(function (ctl) {
+      if (ctl.style.display === 'none') return;                  /* уже свитчер */
+      var box = ctl.querySelector('.pg-select');
+      var sel = box && box.querySelector('select');
+      if (!sel || sel.multiple || box.style.display === 'none') return;
+      if (sel.options.length < 2 || sel.options.length > 3) return;
+      var lblEl = ctl.querySelector('.lbl');
+      var labelName = lblEl ? lblEl.textContent.trim() : '';
+      if (isToggleSelect(sel, labelName)) return;                /* да/нет — не выбор */
+      syncers.push(segmented(box, sel, lblEl, labelName));
+    });
+    if (!syncers.length) return;
+    /* Страница правит зависимые селекты программно, без события (например,
+       сбрасывает значение скрытого контрола). Такие правки случаются в
+       обработчике change — после него группы сверяются со своими селектами. */
+    function syncAll() { syncers.forEach(function (f) { f(); }); }
+    host.addEventListener('change', function () { syncAll(); setTimeout(syncAll, 0); });
+  });
 });
 })();

@@ -259,11 +259,11 @@
     host.innerHTML =
       '<div class="pg__grouphead">Доска</div>' +
       ctlSelect('pg-cols', 'Колонок', [[3, '3'], [4, '4'], [5, '5'], [6, '6']], state.cols) +
-      ctlSelect('pg-view', 'Состояние', [['default', 'Обычное'], ['loading', 'Загрузка'], ['empty', 'Нет колонок']], state.view) +
+      ctlSelect('pg-view', 'Состояние', [['default', 'С данными'], ['loading', 'Загрузка'], ['empty', 'Нет колонок']], state.view) +
       ctlSelect('pg-collapsed', 'Свернуть первую колонку', [['no', 'Нет'], ['yes', 'Да']], state.collapsed ? 'yes' : 'no') +
       '<div class="pg__grouphead">Карточка</div>' +
       ctlSelect('pg-dense', 'Компактные карточки', [['no', 'Нет'], ['yes', 'Да']], state.dense ? 'yes' : 'no') +
-      ctlSelect('pg-fields', 'Полей на карточке', [[0, '0'], [2, '2'], [4, '4']], state.fields) +
+      ctlSelect('pg-fields', 'Полей на карточке', [[0, 'Без полей'], [2, '2 поля'], [4, '4 поля']], state.fields) +
       ctlSelect('pg-keychip', 'Чип «Ключевая сделка»', [['no', 'Нет'], ['yes', 'Да']], state.keychip ? 'yes' : 'no') +
       ctlSelect('pg-avatars', 'Исполнители', [['no', 'Нет'], ['yes', 'Да']], state.avatars ? 'yes' : 'no');
 

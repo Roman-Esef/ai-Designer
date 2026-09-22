@@ -272,10 +272,15 @@
       var run = function () {
         if (current && current !== api) current.hide(true);
         /* anchor — цель тултипа: из модалки слой уезжает в её скрим, иначе
-           тултип рисуется под подложкой (z-index 30 против 1000) */
+           тултип попадает под её inert (скрим — свой контекст наложения).
+           z-index тултипа — максимальный (--tip-z, tooltip.css); zIndex в
+           mount — только явная просьба вызывающего */
         if (window.DSFloat) DSFloat.mount(tip, { anchor: target, zIndex: conf.zIndex });
-        reposition();
+        /* сначала показать, потом мерить: закрытый тултип — display:none
+           (tooltip.css), размера у него нет. Кадр между двумя строками не
+           рисуется, поэтому тултип не мелькает на старом месте */
         tip.classList.add('is-visible');
+        reposition();
         current = api;
       };
       if (immediate) run(); else showT = setTimeout(run, conf.delay);
