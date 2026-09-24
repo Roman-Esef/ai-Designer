@@ -12,11 +12,12 @@
    Options:  каждый слот включается независимо и сочетается в любой
              комбинации (label/helper можно скрыть, иконки/аффиксы —
              показать по одному или все сразу)
-   Value:    default · positive · negative · muted (Empty) ← proposed
+   Value:    default · positive · negative
    Overflow: одна строка (ellipsis) · N строк (line-clamp) — обе с тултипом
              на переполнении
    Align:    left (по умолчанию) · right — для числовых/денежных значений
-   States:   default · empty ← proposed · loading (skeleton) ← proposed
+   States:   default · empty (прочерк «—», СВОЕГО ЦВЕТА НЕТ) ← proposed ·
+             loading (skeleton) ← proposed
    Requires: typography.css, colors.css, radius.css, label-helper.css,
              chip.css (type=chips), link.css (type=link),
              tooltip.css (тултип переполнения / предупреждения / копирования)
@@ -56,6 +57,9 @@
 .rof__row--top .rof__icon { margin-top: 1px; }
 
 /* ---------- icons ---------------------------------------------------------- */
+/* Иконка по умолчанию — secondary, как иконки-действия в полях ввода
+   (input.css, .inp__act): правило ДС «иконки по умолчанию — secondary, если
+   нет иной инструкции» (22.09.2026, было --text-inactive). */
 .rof__icon {
   flex: none;
   width: 18px;
@@ -63,7 +67,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-inactive);
+  color: var(--secondary);
 }
 .rof__icon :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
 
@@ -76,7 +80,7 @@
 .rof__icon--interactive:hover,
 .rof__icon--interactive:focus-visible {
   background: color-mix(in srgb, var(--text-primary) 8%, transparent);
-  color: var(--text-secondary);
+  color: var(--secondary-dark);
 }
 .rof__icon--interactive:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .rof__icon--interactive.is-done { color: var(--success-dark); }
@@ -119,9 +123,9 @@ span.rof__value.rof__value--positive,
 div.rof__value.rof__value--positive { color: var(--success-dark); }
 span.rof__value.rof__value--negative,
 div.rof__value.rof__value--negative { color: var(--error-dark); }
-/* Empty placeholder — PROPOSED */
-span.rof__value.rof__value--muted,
-div.rof__value.rof__value--muted { color: var(--text-inactive); }
+/* Приглушённого тона у значения НЕТ и не заводится: единственным его
+   потребителем был прочерк пустого поля, а прочерк — это значение, а не
+   подсказка (см. «Empty» ниже). */
 
 /* overflow: single line → ellipsis */
 .rof__value--clamp-1 {
@@ -147,7 +151,16 @@ div.rof__value.rof__value--muted { color: var(--text-inactive); }
 .rof .ds-helper--right { text-align: right; }
 
 /* ---------- Empty state — PROPOSED -------------------------------------------- */
-.rof--empty .rof__value { color: var(--text-inactive); }
+/* ПРАВИЛО (23.09.2026): прочерк незаполненного поля — ЗНАЧЕНИЕ, а не подсказка.
+   В дефолтном состоянии он набирается цветом обычного текста и своего правила
+   не имеет: `.rof__value` уже даёт --text-primary. Приглушается прочерк только
+   вместе со всем полем — там, где приглушено поле целиком (Disabled у
+   ReadOnlyField нет, приглушать нечем).
+   До 1.010 здесь стоял --text-inactive, и незаполненное поле читалось как
+   выключенное: серый прочерк говорит «сюда нельзя», хотя значение просто не
+   завели. Правило общее для полей и ячеек таблицы — пара в table-cell.css
+   (.tc__empty). Классы .rof--empty и .rof__value--muted сняты: кроме этого
+   цвета они ничего не делали. */
 
 /* ---------- Loading skeleton — PROPOSED ---------------------------------------- */
 /* Общий компонент Skeleton (.sk-line, styles/skeleton.css), локальной реализации нет. */

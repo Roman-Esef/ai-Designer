@@ -2,7 +2,7 @@
 component: Drawer
 title: "Панель деталей"
 version: "1.000"
-updated: "10.09.2026"
+updated: "22.09.2026"
 page: pages/organisms/Drawer.html
 page_js: scripts/drawer.page.js
 runtime: scripts/ds-drawer.js
@@ -85,7 +85,8 @@ Drawer — панель деталей у правого края экрана �
     scrim.classList += modal-scrim, drawer-scrim   // геометрия обязана быть панельной
     DSModal.open(scrim, { returnFocus: триггер, guarded: data-drawer-guarded })
         → портал в body, снять hidden, lockPage (inert фона + блок прокрутки),
-          wireScroll (тени шапки/подвала), фокус на первый элемент тела
+          wireScroll (тени шапки/подвала), фокус: [autofocus] → первое поле ввода
+          тела → первый элемент тела (порядок рантайма Modal 1.009)
 
 Esc | крестик | [data-modal-close] | клик по скриму (если не guarded):
     DSModal.closeTop() → hidden обратно, unlockPage, фокус на триггер

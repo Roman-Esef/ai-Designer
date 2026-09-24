@@ -139,7 +139,7 @@
             <div class="docs-main">
 
   <header class="masthead">
-    <div class="meta"><span>Версия: <b>1.008</b></span><span>Обновлено: <b>21.09.2026</b></span></div>
+    <div class="meta"><span>Версия: <b>1.009</b></span><span>Обновлено: <b>22.09.2026</b></span></div>
     <p class="eyebrow">Дизайн-система · Организмы</p>
     <h1>Modal</h1>
     <p class="lead">Modal — не отдельный компонент, а свод правил построения модальных форм. Обязательны две части с фиксированной анатомией — шапка (<b>Modal_Top</b>: заголовок + крестик) и подвал (<b>Modal_Bottom</b>: опциональные кнопки слева, кнопки действий справа). Между ними — контентная область, которая может содержать что угодно: форму, таблицу, пустое состояние.</p>
@@ -270,7 +270,7 @@
   <!-- ACCESSIBILITY -->
   <section class="section" data-screen-label="A11y">
     <h2>Доступность</h2>
-    <p class="desc">Контейнер получает <code class="tok">role="dialog"</code> (диалог подтверждения — <code class="tok">role="alertdialog"</code>), <code class="tok">aria-modal="true"</code> и <code class="tok">aria-labelledby</code>, указывающий на заголовок. Фокус при открытии переходит на первый интерактивный элемент тела (или на крестик, если тело пустое) и заперт внутри модалки (focus trap) — <kbd>Tab</kbd> по последнему элементу возвращает на первый. <kbd>Esc</kbd> закрывает и возвращает фокус на элемент, открывший модалку.</p>
+    <p class="desc">Контейнер получает <code class="tok">role="dialog"</code> (диалог подтверждения — <code class="tok">role="alertdialog"</code>), <code class="tok">aria-modal="true"</code> и <code class="tok">aria-labelledby</code>, указывающий на заголовок. Фокус при открытии переходит на элемент с <code class="tok">autofocus</code>, иначе на первое поле ввода тела, иначе на первый интерактивный элемент тела (или на крестик, если тело пустое) — поэтому информер у поля не поднимает подсказку в момент открытия. Фокус заперт внутри модалки (focus trap) — <kbd>Tab</kbd> по последнему элементу возвращает на первый. <kbd>Esc</kbd> закрывает и возвращает фокус на элемент, открывший модалку.</p>
     <div class="row">
       <div class="panel" style="flex:1; min-width:280px;">
         <p class="desc tight" style="margin-bottom:18px;">Клавиатура</p>
@@ -338,8 +338,9 @@
         <button type="button" class="code-panel__copy" data-copy-target="code-js"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span class="copy-label">Копировать</span></button>
       </div>
       <pre><code id="code-js"><span class="tk-cm">// 1. Открытие: смонтировать .modal-scrim в конец body (портал), запомнить activeElement
-//    для возврата фокуса; перевести фокус на первый интерактивный элемент .modal__body
-//    (если тела нет/оно пустое — на крестик); контенту страницы за скримом — aria-hidden/inert</span>
+//    для возврата фокуса; перевести фокус на [autofocus], иначе на первое поле ввода
+//    .modal__body, иначе на первый интерактивный элемент .modal__body (если тела нет/оно
+//    пустое — на крестик); контенту страницы за скримом — aria-hidden/inert</span>
 
 <span class="tk-cm">// 2. Focus trap: перехватывать Tab/Shift+Tab на границах списка фокusируемых
 //    элементов модалки — Tab с последнего уводит на первый, и наоборот</span>

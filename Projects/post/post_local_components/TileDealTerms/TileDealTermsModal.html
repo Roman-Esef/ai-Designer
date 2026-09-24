@@ -1,0 +1,87 @@
+<!-- Связанный артефакт тайла «Сроки сделки»: модальное окно правки дат.
+     Фрагмент вшивается ассемблером отдельной меткой ds-include — скрим должен
+     лежать в конце body, а не внутри тайла.
+
+     Правится одно поле — «Дата первой выдачи». Дата заключения и дата окончания
+     приходят из инструментов сделки и стоят здесь для справки: по ним видно
+     допустимый диапазон. У каждого поля — информер с тултипом: что за поле и
+     откуда данные.
+
+     Значения в разметке — пример. Окно заполняет и проверяет TileDealTermsModal.js
+     (PostDealTermsModal.bind): даты берёт у страницы при открытии, «Сохранить»
+     проверяет дату и отдаёт её странице. Кнопка без data-modal-close: окно
+     закрывает скрипт, когда проверка прошла; с ошибкой окно остаётся открытым.
+     Крестик и Esc закрывают без сохранения, клик мимо окна не закрывает
+     (триггеры стоят с data-modal-guarded).
+
+     Раскладка: две даты для справки — в один ряд, в две колонки штатной сетки
+     ДС (.grid12 + .col-6, зазор 16px); поле ввода под ними во всю ширину. Тело
+     окна ДС само колонка с тем же зазором, своего CSS нет. Порядок полей — как
+     в тайле. Фокус при открытии рантайм ДС ставит на поле ввода, а не на
+     информер первого поля (Modal 1.009), поэтому окно открывается без поднятой
+     подсказки. -->
+
+<div class="modal-scrim" id="deal-terms-scrim" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="deal-terms-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="deal-terms-title">Сроки сделки</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+
+    <div class="modal__body">
+
+      <!-- Даты-границы: один ряд, две колонки. Сетка — штатная .grid12 из ДС,
+           ширина колонки — .col-6; лейбл переносится до двух строк
+           (ds-label--wrap), если колонка уже подписи. -->
+      <div class="grid12">
+        <div class="rof col-6">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Дата заключения</span></span>
+          <div class="rof__row">
+            <span class="rof__value" data-terms-field="signDate">01.01.2021</span>
+            <span class="rof__icon" tabindex="0" aria-label="Подсказка" data-tooltip-multiline="yes"
+                  data-tooltip="Самая ранняя дата заключения договора среди инструментов сделки"><i data-icon="info-circle"></i></span>
+          </div>
+        </div>
+
+        <div class="rof col-6">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Дата окончания</span></span>
+          <div class="rof__row">
+            <span class="rof__value" data-terms-field="endDate">01.01.2023</span>
+            <span class="rof__icon" tabindex="0" aria-label="Подсказка" data-tooltip-multiline="yes"
+                  data-tooltip="Самая поздняя дата среди инструментов сделки — по последнему плановому платежу"><i data-icon="info-circle"></i></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- InputDate: маска ДД.ММ.ГГГГ и календарь — из коробки ДС (ds-datepicker.js
+           по кнопке «Открыть календарь»). Порядок действий: информер → крестик →
+           календарь. Ошибку проверки показывает тултип на фокусе (правило
+           InputText), его вешает скрипт окна на .inp__box.
+           Крестика очистки в разметке нет намеренно: он живёт по значению, и
+           рисует его рантайм ds-input.js — ровно тогда, когда в поле есть что
+           стирать, и ровно между информером и календарём. Нарисованный руками,
+           он висел бы и на пустом поле; значение окно ставит кодом, поэтому
+           после заполнения зовёт DSInput.sync (см. TileDealTermsModal.js). -->
+      <div class="inp inp--m inp--fullwidth">
+        <label class="ds-label" for="deal-terms-first-disb"><span class="ds-label__text">Дата первой выдачи</span></label>
+        <div class="inp__box">
+          <div class="inp__field">
+            <input class="inp__control" id="deal-terms-first-disb" name="firstDisb" placeholder="ДД.ММ.ГГГГ" inputmode="numeric" autocomplete="off" value="21.01.2021">
+            <span class="inp__acts">
+              <button type="button" class="inp__act inp__act--static" aria-label="Подсказка" data-tooltip-multiline="yes"
+                      data-tooltip="Заполняется вручную, если в сделке есть НКЛ с баланса ПАО"><i data-icon="info-circle"></i></button>
+              <button type="button" class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--accent btn--m" data-terms-save><span class="btn__label">Сохранить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>

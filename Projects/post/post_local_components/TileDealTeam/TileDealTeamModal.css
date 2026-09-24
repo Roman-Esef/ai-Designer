@@ -1,0 +1,34 @@
+/* Окно «Команда сделки» — связанный артефакт тайла TileDealTeam.
+   Раскладки здесь нет: поля стоят в штатной сетке ДС (.grid12 + .col-4),
+   зазоры и отступы тела окна даёт Modal. Этот файл переключает режим —
+   правка или просмотр, — и больше ничего.
+
+   Режим ставит TileDealTeamModal.js атрибутом data-mode на .modal: из какого
+   тайла окно открыли, в таком режиме оно и открывается. Разметка держит оба
+   вида сразу, как в тайлах компонента. */
+
+/* ── Правка или просмотр ────────────────────────────────────────────── */
+/* Каждый режим — колонка из двух частей: сетка полей в три колонки и поля во
+   всю ширину рядом с ней («Другие участники», признак). В сетку они не
+   ставятся: последний ряд занят одним полем из трёх, и col-12 следом
+   переполнил бы ряд. Зазор — тот же, что у тела окна. */
+.lc-deal-team-modal__edit,
+.lc-deal-team-modal__view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.lc-deal-team-modal__view { display: none; }
+
+.lc-deal-team-modal[data-mode="view"] .lc-deal-team-modal__edit { display: none; }
+.lc-deal-team-modal[data-mode="view"] .lc-deal-team-modal__view { display: flex; }
+
+/* ── Кнопка подвала ─────────────────────────────────────────────────── */
+/* Подвал модалки обязателен и всегда несёт Primary справа (правило Modal),
+   поэтому он не прячется, а меняет кнопку: в правке — «Сохранить», в
+   просмотре править нечего и окно закрывают. */
+.lc-deal-team-modal__close { display: none; }
+
+.lc-deal-team-modal[data-mode="view"] .lc-deal-team-modal__save { display: none; }
+.lc-deal-team-modal[data-mode="view"] .lc-deal-team-modal__close { display: inline-flex; }

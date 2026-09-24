@@ -1,13 +1,13 @@
 ---
 name: КНР
 version: 0.008
-updated: "21.09.2026"
+updated: "22.09.2026"
 rulesVersion: 1.005
 owner: не решено (20.09.2026)
 designer: Роман Эсэф
 category: Сделка
 purpose: Показать ключевых носителей риска по сделке с рейтингом и зоной проблемности и дать точку входа в их выбор
-ds: [Tile, Alert, Link, RiskMetric, Tooltip, Buttons, IconButton, LabelHelper, Skeleton, Modal, Tab, InputText, InputDate, DropdownList, Checkbox, Divider]
+ds: [Tile, Alert, Link, RiskMetric, Tooltip, Buttons, IconButton, Skeleton, Modal, Tab, InputText, InputDate, DropdownList, Checkbox, Divider]
 usedOn: [Страница сделки — блок «Общая информация», первый ряд, 3 колонки из 12 (узкая ширина — 6)]
 opens: ["Модальное окно КНР → TileKNRModal.md (паспорт артефакта), TileKNRModal.doc.preview.html (страница)", "Подтверждение действия → раздел «Вложенный артефакт» в TileKNRModal.md"]
 uses: [Карточка контрагента (../CardCounterparty/CardCounterparty.md) — в окне выбора]

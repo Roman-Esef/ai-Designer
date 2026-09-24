@@ -1,26 +1,118 @@
 <!-- Локальный компонент «Команда сделки» — фрагмент страницы сделки.
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
-     data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
-                  не допускающий правку, даёт view при любой роли. В view
-                  действия правки не рисуются (TileDealTeam.css)
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section class="tile lc-deal-team" data-state="empty" data-mode="edit">
+
+     data-state      — состояние данных: loading | data | partial | empty
+     data-mode       — режим прав: edit | view. Ставит страница: статус сделки,
+                       не допускающий правку, даёт view при любой роли
+     data-restricted — yes: сделка ограниченного доступа, в шапке строка-признак
+
+     Разметка держит ВСЕ состояния сразу, показывает нужное TileDealTeam.css по
+     этим атрибутам — так же, как тайлы «КНР» и «Сроки сделки».
+
+     Тайл показывает шесть ролей из тринадцати — остальные видны в окне. Поэтому
+     в просмотре действие в шапке есть («Развернуть»): без него роль без права
+     правки не увидела бы остальных участников. Это не действие правки, и
+     правило «в просмотре действия правки не рисуются» им не нарушено.
+
+     ФИО ниже — пример. На странице сделки их заменяет TileDealTeam.js
+     (PostTileDealTeam.render) данными сделки; пока они грузятся, тайл стоит в
+     loading. Окно открывается с data-modal-guarded: в нём ввод, и клик мимо
+     окна не должен его сбросить. В просмотре сбрасывать нечего — там без
+     guarded. -->
+<section class="tile lc-deal-team" data-state="data" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Команда сделки</h3></div>
+      <!-- Признак сделки ограниченного доступа. Тон иконки — модификатор Tile
+           1.014; раньше слот красил иконку зелёным независимо от смысла. -->
+      <p class="tile__subtitle lc-deal-team__restricted">
+        <span class="tile__subtitle-icon tile__subtitle-icon--warning" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
+        Сделка ограниченного доступа
+      </p>
     </div>
+    <!-- Действия шапки — только когда есть что показывать (data, partial).
+         Пустой тайл заполняют кнопкой в теле. -->
     <div class="tile__actions">
-      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-deal-team__act lc-deal-team__act--edit"
+              aria-label="Редактировать" data-modal="deal-team-scrim" data-modal-guarded><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-deal-team__act lc-deal-team__act--view"
+              aria-label="Развернуть" data-modal="deal-team-scrim"><i data-icon="maximize"></i></button>
     </div>
   </header>
+
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
+
+    <!-- Шесть ролей: две колонки, порядок полей постоянный. Незаполненная роль —
+         прочерк, поле с места не уходит: пропавшее поле читалось бы как
+         отсутствие роли, а не значения. Лейбл переносится до двух строк, если
+         колонка уже подписи. -->
+    <div class="tile__grid lc-deal-team__grid">
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Деск</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="desk">Телекоммуникации</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Сотрудник ЦУП</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="tsupEmployee">—</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Директор</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="director">Андреев М.А.</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Клиентский менеджер</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="clientManager">Смирнов А.А.</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Менеджер сделки</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="manager">Андреев М.А.</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Кредитный инспектор</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="creditInspector">Смирнов А.А.</span></div>
       </div>
     </div>
+
+    <!-- Загрузка: каркас в той же сетке — подпись и значение каждого поля в
+         габаритах строк (подпись 16px, значение 20px), чтобы раскладка не
+         прыгнула после ответа. -->
+    <div class="tile__grid lc-deal-team__grid lc-deal-team__loading" aria-busy="true">
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:38%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:136px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:60%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:46%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:76%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:64%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:78%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <!-- Не заполнено, право на правку есть -->
+    <div class="lc-deal-team__fill">
+      <button type="button" class="btn btn--accent btn--m" data-modal="deal-team-scrim" data-modal-guarded>
+        <span class="btn__label">Заполнить</span>
+      </button>
+    </div>
+
+    <!-- Не заполнено, права нет: одна строка причины, действия нет -->
+    <p class="lc-deal-team__empty">Не заполнено</p>
+
   </div>
 </section>

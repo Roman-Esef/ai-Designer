@@ -134,9 +134,16 @@
 .tile__title-add--icon {
   width: 20px;
   height: 20px;
-  color: var(--warning);
+  color: var(--secondary);
 }
 .tile__title-add--icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+/* Тон иконки-приписки. Дефолт — штатный цвет иконки ДС; семантика задаётся
+   модификатором, а не вшита в слот: в слот ставят любую иконку, и её смысл
+   знает только место использования (решение человека 23.09.2026). */
+.tile__title-add--success { color: var(--success); }
+.tile__title-add--warning { color: var(--warning); }
+.tile__title-add--error   { color: var(--error); }
+.tile__title-add--info    { color: var(--info); }
 .tile__title-link {
   flex: none;
 }
@@ -158,8 +165,16 @@
   width: 16px;
   height: 16px;
   flex: none;
-  color: var(--success);
+  color: var(--secondary);
 }
+/* Глиф занимает слот целиком: по умолчанию иконка 24px, и без этого правила
+   она вылезала бы за коробку 16×16 — за высоту строки сабтайтла. */
+.tile__subtitle-icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+/* Тон иконки сабтайтла — тем же правилом, что у иконки-приписки. */
+.tile__subtitle-icon--success { color: var(--success); }
+.tile__subtitle-icon--warning { color: var(--warning); }
+.tile__subtitle-icon--error   { color: var(--error); }
+.tile__subtitle-icon--info    { color: var(--info); }
 
 /* Chiplist в хэдере — ряд чипов XS под тайтлом/сабтайтлом, зазор 4 */
 .tile__chiplist {

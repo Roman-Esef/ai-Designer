@@ -135,8 +135,12 @@
 .tc--numbers .tc__row,
 .tc--numbers .tc__text { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
 
-/* пустое значение «—» */
-.tc__empty { color: var(--text-inactive); font: var(--type-body-s); }
+/* пустое значение «—».
+   ПРАВИЛО (23.09.2026): прочерк — ЗНАЧЕНИЕ, а не подсказка, поэтому цвет у него
+   тот же, что у обычного текста ячейки (.tc__text). До 2.022 стоял
+   --text-inactive, и пустая ячейка читалась как выключенная. Пара правила —
+   в read-only-field.css (состояние Empty). */
+.tc__empty { color: var(--text-primary); font: var(--type-body-s); }
 
 /* вторая строка (subtext) — опциональна для любого типа контента */
 .tc__body {

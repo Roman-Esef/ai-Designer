@@ -184,7 +184,7 @@
     } = o;
 
     const root = document.createElement('div');
-    root.className = 'rof' + (align === 'right' ? ' rof--align-right' : '') + (tone === 'empty' ? ' rof--empty' : '');
+    root.className = 'rof' + (align === 'right' ? ' rof--align-right' : '');
 
     if (state === 'loading') {
       if (showLabel) { const s = document.createElement('span'); s.className = 'sk-line sk-line--caption'; s.style.setProperty('--sk-w', '64px'); root.appendChild(s); }
@@ -204,8 +204,11 @@
     if (prefix) row.appendChild(makeAffix(prefix, row));
 
     let valueEl, fullText = '';
-    if (tone === 'empty') {
-      valueEl = document.createElement('span'); valueEl.className = 'rof__value rof__value--muted'; valueEl.textContent = '—';
+    if (state === 'empty') {
+      /* Empty — это СОСТОЯНИЕ (прочерк вместо значения), а не цвет: прочерк
+         набирается как обычное значение (правило 23.09.2026). До 1.010 он жил
+         тоном `empty` и красился --text-inactive. */
+      valueEl = document.createElement('span'); valueEl.className = 'rof__value'; valueEl.textContent = '—';
     } else if (type === 'chips') {
       valueEl = document.createElement('div'); valueEl.className = 'rof__value rof__value--chips';
       const list = document.createElement('div'); list.className = 'chiplist chiplist--s';
@@ -368,7 +371,7 @@
 
     /* --- Состояние --- */
     controls.appendChild(groupHead('Состояние'));
-    const loadCtl = seg('Состояние', [['default', 'Обычное'], ['loading', 'Загрузка']], () => state.loadState, v => state.loadState = v);
+    const loadCtl = seg('Состояние', [['default', 'Обычное'], ['empty', 'Пусто'], ['loading', 'Загрузка']], () => state.loadState, v => state.loadState = v);
     controls.appendChild(loadCtl);
 
     /* --- Значение --- */
@@ -376,7 +379,7 @@
     const typeCtl = seg('Тип значения', [['text', 'Текст'], ['chips', 'Чипы'], ['link', 'Ссылка']], () => state.type, v => state.type = v);
     controls.appendChild(typeCtl);
     controls.appendChild(seg('Выравнивание', [['left', 'Слева'], ['right', 'Справа']], () => state.align, v => state.align = v));
-    const toneCtl = seg('Цвет значения', [['default', 'Default'], ['positive', 'Positive'], ['negative', 'Negative'], ['empty', 'Empty']], () => state.tone, v => state.tone = v, true);
+    const toneCtl = seg('Цвет значения', [['default', 'Default'], ['positive', 'Positive'], ['negative', 'Negative']], () => state.tone, v => state.tone = v, true);
     controls.appendChild(toneCtl);
     const clampCtl = seg('Обрезание текста (строк)', [['none', 'Нет'], ['1', '1'], ['2', '2'], ['3', '3']], () => state.clamp, v => state.clamp = v);
     controls.appendChild(clampCtl);
@@ -410,16 +413,18 @@
     function render() {
       preview.innerHTML = '';
       const isLoading = state.loadState === 'loading';
+      const isEmpty = state.loadState === 'empty';
       const isChips = state.type === 'chips';
       const isText = state.type === 'text';
-      /* цвет значения — только у текста; аффиксы — не у чипов */
-      const tone = isText ? state.tone : 'default';
+      /* цвет значения — только у текста; аффиксы — не у чипов.
+         У пустого поля цвета тоже нет: прочерк идёт цветом обычного текста. */
+      const tone = isText && !isEmpty ? state.tone : 'default';
       const prefix = isChips ? null : (state.prefixText || null);
       const postfix = isChips ? null : (state.postfixText || null);
       const useClamp = !isChips ? state.clamp : 'none';
       const hasIconRight = state.iconRight !== 'none';
       typeCtl.classList.toggle('is-off', isLoading);
-      toneCtl.classList.toggle('is-off', !isText || isLoading);
+      toneCtl.classList.toggle('is-off', !isText || isLoading || isEmpty);
       prefixCtl.classList.toggle('is-off', isChips || isLoading);
       postfixCtl.classList.toggle('is-off', isChips || isLoading);
       clampCtl.classList.toggle('is-off', isChips || isLoading);
@@ -432,7 +437,7 @@
         value: useClamp !== 'none' ? LONG_TEXT : (state.type === 'link' ? 'ссылка-на-документ.pdf' : 'Значение атрибута'),
         chips: CHIP_SET, chipsMaxRows: isChips && state.chipRows !== 'none' ? Number(state.chipRows) : null,
         showLabel: state.label, label: 'Название поля',
-        helper: state.helper ? (tone === 'empty' ? 'Данные ещё не загружены' : 'Пояснение к значению') : null,
+        helper: state.helper ? (isEmpty ? 'Данные ещё не загружены' : 'Пояснение к значению') : null,
         iconLeft: state.iconLeft === 'none' ? null : state.iconLeft,
         prefix: prefix,
         postfix: postfix,
@@ -440,7 +445,7 @@
         iconRightAction: state.iconRightAction,
         iconRightTone: state.iconRightTone,
         iconRightTip: state.iconRightTipText,
-        tone: tone, clampMode: useClamp, align: state.align, state: isLoading ? 'loading' : 'default',
+        tone: tone, clampMode: useClamp, align: state.align, state: state.loadState,
       };
       preview.appendChild(makeROF(o));
 
@@ -631,7 +636,7 @@
     if (!host) return;
     const tiles = [
       ['Default', 'Значение получено и отображается как есть.', makeROF({ label: 'ИНН контрагента', value: '7719000000' })],
-      ['Empty', 'Данные ещё не заполнены или недоступны — показываем «—» приглушённым цветом вместо пустоты.', makeROF({ label: 'ИНН контрагента', tone: 'empty' })],
+      ['Empty', 'Данные ещё не заполнены или недоступны — показываем «—» вместо пустоты. Прочерк — это значение, а не подсказка: цвет у него тот же, что у обычного текста, иначе незаполненное поле читается как выключенное.', makeROF({ label: 'ИНН контрагента', state: 'empty' })],
       ['Loading', 'Данные запрошены у внешней системы — на месте значения и (опционально) лейбла показываем шиммер-плейсхолдер.', makeROF({ label: 'ИНН контрагента', state: 'loading' })],
     ];
     tiles.forEach(([name, desc, node]) => {
@@ -726,7 +731,7 @@
       let s = '#' + hx(r) + hx(g) + hx(b); if (a < 1) s += ' · ' + Math.round(a * 100) + '%'; return s;
     }
     const groups = [
-      { name: 'Текст', rows: [['Label', '--text-secondary'], ['Значение', '--text-primary'], ['Helper', '--text-inactive'], ['Empty / Disabled', '--text-inactive']] },
+      { name: 'Текст', rows: [['Label', '--text-secondary'], ['Значение', '--text-primary'], ['Helper', '--text-inactive'], ['Empty (прочерк «—»)', '--text-primary']] },
       { name: 'Семантика значения', rows: [['Positive', '--success-dark'], ['Negative', '--error-dark'], ['Warning-иконка', '--warning'], ['Error helper', '--error']] },
       { name: 'Interactive icon', rows: [['Иконка по умолчанию', '--text-inactive'], ['Hover / Focus', '--text-secondary'], ['После копирования', '--success-dark']] },
       { name: 'Loading skeleton', rows: [['База', '--st-disabled-light'], ['Пик волны', '--st-disabled-midlight']] },

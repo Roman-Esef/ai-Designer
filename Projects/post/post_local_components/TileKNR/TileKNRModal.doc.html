@@ -67,7 +67,7 @@
               <div class="docs-main">
 
 <header class="masthead">
-  <div class="meta"><span>Версия: <b>0.005</b></span><span>Обновлено: <b>21.09.2026</b></span><span>Тип: <b>модальное окно</b></span></div>
+  <div class="meta"><span>Версия: <b>0.005</b></span><span>Обновлено: <b>22.09.2026</b></span><span>Тип: <b>модальное окно</b></span></div>
   <p class="eyebrow"><a class="inl" href="../index.html">Локальные компоненты Post</a> · <a class="inl" href="TileKNR.doc.preview.html">КНР</a> · артефакт</p>
   <h1>Модальное окно КНР</h1>
   <p class="lead">Окно поиска и выбора ключевых носителей риска: найти контрагентов, перенести их в участники сделки и отметить среди них КНР. Открывается из тайла «КНР».</p>
@@ -120,14 +120,8 @@
     </div>
     <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
       <div class="tc tc--separator"></div>
-      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/atoms/LabelHelper.html">LabelHelper</a></span></span></div>
-      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Подписи полей поиска</span></span></div>
-      <div class="tc tc--separator"></div>
-    </div>
-    <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
-      <div class="tc tc--separator"></div>
       <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text"><a class="inl" href="../../../../DS-IBP/pages/atoms/Divider.html">Divider</a></span></span></div>
-      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Линия под заголовком колонки и разделители между колонками</span></span></div>
+      <div class="tc tc--wrap"><span class="tc__row"><span class="tc__text">Разделители между колонками</span></span></div>
       <div class="tc tc--separator"></div>
     </div>
     <div class="tbl__row" style="grid-template-columns:8px 0.6fr 1.4fr 8px;">
@@ -173,7 +167,7 @@
 <section class="section" data-screen-label="Раскладка">
   <h2>Раскладка окна</h2>
   <p class="desc">Окно шириной 8 колонок. Высота — 60% экрана и не меняется при переключении вкладок.</p>
-  <p class="desc">Колонки разделены вертикальными линиями. Каждая колонка прокручивается отдельно; заголовок колонки и линия под ним остаются на месте. Полоса прокрутки стоит у разделителя: в покое её не видно, при прокрутке появляется бегунок и после остановки плавно гаснет.</p>
+  <p class="desc">Три колонки равной ширины, разделены вертикальными линиями. Каждая колонка прокручивается отдельно; заголовок колонки остаётся на месте. Полоса прокрутки стоит у разделителя: в покое её не видно, при прокрутке появляется бегунок и после остановки плавно гаснет.</p>
 </section>
 
 <section class="section" data-screen-label="Поиск">
@@ -418,7 +412,6 @@
       <div class="lc-knrm__cols" data-knr-panel>
         <section class="lc-knrm__col">
           <h3 class="ds-h6-strong">Параметры поиска</h3>
-          <hr class="dvd dvd--h">
           <!-- ds-scroll — полоса прокрутки ДС (Layout): только бегунок, гаснет -->
           <!-- форма: Enter в любом поле и «Найти» (type=submit) — одно событие -->
           <form class="lc-knrm__form ds-scroll" data-knr-search="ul" novalidate>…Наименование · ИНН · КПП · ОГРН · КИО, «Найти»…</form>
@@ -426,7 +419,6 @@
         <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
         <section class="lc-knrm__col">
           <h3 class="ds-h6-strong">Найдено</h3>
-          <hr class="dvd dvd--h">
           <div class="lc-knrm__drop ds-scroll" data-knr-drop="ul-found">
             <p class="lc-knrm__hint" data-knr-hint>Поиск осуществляется по любому из параметров</p>
           </div>
@@ -434,7 +426,6 @@
         <div class="dvd dvd--v" role="separator" aria-orientation="vertical"></div>
         <section class="lc-knrm__col">
           <h3 class="ds-h6-strong">Участники сделки</h3>
-          <hr class="dvd dvd--h">
           <div class="lc-knrm__drop ds-scroll" data-knr-drop="ul-members">…</div>
         </section>
       </div>

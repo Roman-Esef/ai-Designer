@@ -23,12 +23,18 @@
 <link rel="stylesheet" href="../post_local_components/TileDealTerms/TileDealTerms.css">
 <link rel="stylesheet" href="../post_local_components/TileDealTeam/TileDealTeam.css">
 <link rel="stylesheet" href="../post_local_components/TileDealDescription/TileDealDescription.css">
+<link rel="stylesheet" href="../post_local_components/TileDealMetrics/TileDealMetrics.css">
 <link rel="stylesheet" href="../post_local_components/TileProjectInfo/TileProjectInfo.css">
 <link rel="stylesheet" href="../post_local_components/TileDealSetup/TileDealSetup.css">
 <link rel="stylesheet" href="../post_local_components/TileDealProducts/TileDealProducts.css">
 <link rel="stylesheet" href="../post_local_components/TileFinInstruments/TileFinInstruments.css">
+<link rel="stylesheet" href="../post_local_components/TileEpsVbsImpact/TileEpsVbsImpact.css">
+<link rel="stylesheet" href="../post_local_components/TileFinMetrics/TileFinMetrics.css">
+<link rel="stylesheet" href="../post_local_components/TableCounterparties/TableCounterparties.css">
+<link rel="stylesheet" href="../post_local_components/TileCollaterals/TileCollaterals.css">
 <link rel="stylesheet" href="../post_local_components/TileKNR/TileKNRModal.css">
-<link rel="stylesheet" href="../post_local_components/CardCounterparty/CardCounterparty.css"><!-- сюда ассемблер вставляет CSS подключённых локальных компонентов -->
+<link rel="stylesheet" href="../post_local_components/CardCounterparty/CardCounterparty.css">
+<link rel="stylesheet" href="../post_local_components/TileDealTeam/TileDealTeamModal.css"><!-- сюда ассемблер вставляет CSS подключённых локальных компонентов -->
 <style>
   /* ---------- только раскладка экрана, на токенах ДС ---------- */
   *, *::before, *::after { box-sizing: border-box; }
@@ -72,9 +78,13 @@
   /* ---------- Минимальная высота тайла ----------
      200px — решение человека 21.09.2026 (закрыт вопрос «H min со схемы
      раскладки» в паспортах тайлов). Задаёт страница: это параметр раскладки,
-     а не компонента. Нужнее всего пустым тайлам — без него пустое состояние
-     «Данные ещё не заведены» сжималось до одной строки. Карточки окна КНР (Card —
-     тоже .tile) стоят вне .screen__content и правило не получают. */
+     а не компонента. Минимум — вид по умолчанию для всех тайлов, в том числе
+     заглушек (решение человека 22.09.2026): ряд выше только тогда, когда
+     содержимое наполненного тайла больше, и соседи по ряду тянутся за ним
+     сами (Tile). Поэтому тайл без состава полей — строка по центру, а не
+     EmptyState: его иллюстрация и отступы давали ≈324px и тянули весь ряд.
+     Карточки окна КНР (Card — тоже .tile) стоят вне .screen__content и правило
+     не получают. */
   .screen__content .tile { min-height: 200px; }
 
   @container screen (max-width: 1560px) {
@@ -257,53 +267,195 @@
               <!-- Локальный компонент «Сроки сделки» — фрагмент страницы сделки.
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
-     data-state — состояние данных: loading | data | partial | empty | error | updating
+     data-state — состояние данных: loading | data | partial | empty.
+                  Состояния «Ошибка» у тайла нет (решение человека 22.09.2026)
      data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
-                  не допускающий правку, даёт view при любой роли. В view
-                  действия правки не рисуются (TileDealTerms.css)
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="edit" class="tile lc-deal-terms col-3 colw-6">
+                  не допускающий правку, даёт view при любой роли
+     Разметка держит ВСЕ состояния сразу, показывает нужное TileDealTerms.css по
+     этим двум атрибутам — так же, как тайл «КНР».
+     Даты ниже — пример. На странице сделки их заменяет TileDealTerms.js
+     (PostTileDealTerms.render) датами сделки; пока они грузятся, тайл стоит в
+     loading. Окно правки открывается с data-modal-guarded: в нём ввод, и клик
+     мимо окна не должен его сбросить. -->
+<section id="tile-deal-terms" data-state="loading" data-mode="edit" class="tile lc-deal-terms col-3 colw-6">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Сроки сделки</h3></div>
     </div>
+    <!-- Действие шапки — только в edit и только когда даты есть (data, partial).
+         В просмотре его нет вовсе, пустой тайл заполняют кнопкой в теле. -->
     <div class="tile__actions">
-      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m"
+              aria-label="Редактировать" data-modal="deal-terms-scrim" data-modal-guarded><i data-icon="edit"></i></button>
     </div>
   </header>
+
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
+
+    <!-- Даты: две колонки, порядок полей постоянный. Пустая дата — прочерк,
+         поле с места не уходит. Лейбл переносится до двух строк, если колонка
+         уже подписи. -->
+    <div class="tile__grid lc-deal-terms__grid">
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Дата заключения</span></span>
+        <div class="rof__row"><span class="rof__value" data-terms-field="signDate">01.01.2021</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Дата окончания</span></span>
+        <div class="rof__row"><span class="rof__value" data-terms-field="endDate">01.01.2023</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Дата первой выдачи</span></span>
+        <div class="rof__row"><span class="rof__value" data-terms-field="firstDisb">21.01.2021</span></div>
       </div>
     </div>
+
+    <!-- Загрузка: каркас в той же сетке — подпись и значение каждого поля в
+         габаритах строк (подпись 16px, значение 20px), чтобы раскладка не прыгнула
+         после ответа. -->
+    <div class="tile__grid lc-deal-terms__grid lc-deal-terms__loading" aria-busy="true">
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:64%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:80px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:64%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:80px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:80%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:80px" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <!-- Не заполнено, право на правку есть -->
+    <div class="lc-deal-terms__fill">
+      <button type="button" class="btn btn--accent btn--m" data-modal="deal-terms-scrim" data-modal-guarded>
+        <span class="btn__label">Заполнить</span>
+      </button>
+    </div>
+
+    <!-- Не заполнено, права нет: одна строка причины, действия нет -->
+    <p class="lc-deal-terms__empty">Не заполнено</p>
+
   </div>
 </section>
               <!-- Локальный компонент «Команда сделки» — фрагмент страницы сделки.
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
-     data-state — состояние данных: loading | data | partial | empty | error | updating
-     data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
-                  не допускающий правку, даёт view при любой роли. В view
-                  действия правки не рисуются (TileDealTeam.css)
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="edit" class="tile lc-deal-team col-6 colw-12">
+
+     data-state      — состояние данных: loading | data | partial | empty
+     data-mode       — режим прав: edit | view. Ставит страница: статус сделки,
+                       не допускающий правку, даёт view при любой роли
+     data-restricted — yes: сделка ограниченного доступа, в шапке строка-признак
+
+     Разметка держит ВСЕ состояния сразу, показывает нужное TileDealTeam.css по
+     этим атрибутам — так же, как тайлы «КНР» и «Сроки сделки».
+
+     Тайл показывает шесть ролей из тринадцати — остальные видны в окне. Поэтому
+     в просмотре действие в шапке есть («Развернуть»): без него роль без права
+     правки не увидела бы остальных участников. Это не действие правки, и
+     правило «в просмотре действия правки не рисуются» им не нарушено.
+
+     ФИО ниже — пример. На странице сделки их заменяет TileDealTeam.js
+     (PostTileDealTeam.render) данными сделки; пока они грузятся, тайл стоит в
+     loading. Окно открывается с data-modal-guarded: в нём ввод, и клик мимо
+     окна не должен его сбросить. В просмотре сбрасывать нечего — там без
+     guarded. -->
+<section id="tile-deal-team" data-state="loading" data-mode="edit" class="tile lc-deal-team col-6 colw-12">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Команда сделки</h3></div>
+      <!-- Признак сделки ограниченного доступа. Тон иконки — модификатор Tile
+           1.014; раньше слот красил иконку зелёным независимо от смысла. -->
+      <p class="tile__subtitle lc-deal-team__restricted">
+        <span class="tile__subtitle-icon tile__subtitle-icon--warning" aria-hidden="true"><i data-icon="alert-triangle-filled"></i></span>
+        Сделка ограниченного доступа
+      </p>
     </div>
+    <!-- Действия шапки — только когда есть что показывать (data, partial).
+         Пустой тайл заполняют кнопкой в теле. -->
     <div class="tile__actions">
-      <button type="button" class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-deal-team__act lc-deal-team__act--edit"
+              aria-label="Редактировать" data-modal="deal-team-scrim" data-modal-guarded><i data-icon="edit"></i></button>
+      <button type="button" class="ibtn ibtn--neutral ibtn--m lc-deal-team__act lc-deal-team__act--view"
+              aria-label="Развернуть" data-modal="deal-team-scrim"><i data-icon="maximize"></i></button>
     </div>
   </header>
+
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
+
+    <!-- Шесть ролей: две колонки, порядок полей постоянный. Незаполненная роль —
+         прочерк, поле с места не уходит: пропавшее поле читалось бы как
+         отсутствие роли, а не значения. Лейбл переносится до двух строк, если
+         колонка уже подписи. -->
+    <div class="tile__grid lc-deal-team__grid">
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Деск</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="desk">Телекоммуникации</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Сотрудник ЦУП</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="tsupEmployee">—</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Директор</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="director">Андреев М.А.</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Клиентский менеджер</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="clientManager">Смирнов А.А.</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Менеджер сделки</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="manager">Андреев М.А.</span></div>
+      </div>
+      <div class="rof">
+        <span class="ds-label ds-label--wrap"><span class="ds-label__text">Кредитный инспектор</span></span>
+        <div class="rof__row"><span class="rof__value" data-team-field="creditInspector">Смирнов А.А.</span></div>
       </div>
     </div>
+
+    <!-- Загрузка: каркас в той же сетке — подпись и значение каждого поля в
+         габаритах строк (подпись 16px, значение 20px), чтобы раскладка не
+         прыгнула после ответа. -->
+    <div class="tile__grid lc-deal-team__grid lc-deal-team__loading" aria-busy="true">
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:38%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:136px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:60%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:46%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:76%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:64%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+      <div class="rof">
+        <span class="sk-line" style="--sk-w:78%" aria-hidden="true"></span>
+        <span class="sk-line sk-line--title" style="--sk-w:104px" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <!-- Не заполнено, право на правку есть -->
+    <div class="lc-deal-team__fill">
+      <button type="button" class="btn btn--accent btn--m" data-modal="deal-team-scrim" data-modal-guarded>
+        <span class="btn__label">Заполнить</span>
+      </button>
+    </div>
+
+    <!-- Не заполнено, права нет: одна строка причины, действия нет -->
+    <p class="lc-deal-team__empty">Не заполнено</p>
+
   </div>
 </section>
             </div>
@@ -316,7 +468,9 @@
      data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
                   не допускающий правку, даёт view при любой роли. В view
                   действия правки не рисуются (TileDealDescription.css)
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileDealDescription.css). -->
 <section data-state="empty" data-mode="edit" class="tile lc-deal-description col-6 colw-12">
   <header class="tile__header">
     <div class="tile__header-main">
@@ -327,12 +481,7 @@
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-deal-description__stub">Данные ещё не заведены</p>
   </div>
 </section>
               <!-- Локальный компонент «Финансовые метрики сделки» — фрагмент страницы сделки.
@@ -340,8 +489,10 @@
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
      data-mode  — режим прав:       edit | view
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileDealMetrics.css). -->
+<section data-state="empty" data-mode="view" class="tile lc-deal-metrics col-6 colw-12">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Финансовые метрики сделки</h3></div>
@@ -351,20 +502,17 @@
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-deal-metrics__stub">Данные ещё не заведены</p>
   </div>
 </section>
             </div>
 
-            <!-- Третий ряд опционален: показывается только у сделок, где есть
-                 сведения о проекте. Условие не согласовано (Deal.screen.md, §6),
-                 в макете ряд показан. -->
-            <div class="tile-row">
+            <!-- Третий ряд опционален: сведения о проекте есть у сделок деска
+                 «Недвижимость» — это проекты недвижимости (заказчик
+                 23.09.2026). Деск лежит в команде сделки, поэтому ряд
+                 показывает или прячет страница (fillTeam), а не сам тайл:
+                 модули друг друга не знают. -->
+            <div class="tile-row" id="row-project-info">
               <!-- Локальный компонент «Сведения о проекте» — фрагмент страницы сделки.
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
@@ -372,7 +520,9 @@
      data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
                   не допускающий правку, даёт view при любой роли. В view
                   действия правки не рисуются (TileProjectInfo.css)
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileProjectInfo.css). -->
 <section data-state="empty" data-mode="edit" class="tile lc-project-info col-12">
   <header class="tile__header">
     <div class="tile__header-main">
@@ -383,12 +533,7 @@
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-project-info__stub">Данные ещё не заведены</p>
   </div>
 </section>
             </div>
@@ -405,7 +550,9 @@
      data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
                   не допускающий правку, даёт view при любой роли. В view
                   действия правки не рисуются (TileDealSetup.css)
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileDealSetup.css). -->
 <section class="tile lc-deal-setup" data-state="empty" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
@@ -416,12 +563,7 @@
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-deal-setup__stub">Данные ещё не заведены</p>
   </div>
 </section>
           </div>
@@ -459,7 +601,9 @@
      data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
                   не допускающий правку, даёт view при любой роли. В view
                   действия правки не рисуются (TileDealProducts.css)
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileDealProducts.css). -->
 <section class="tile lc-deal-products" data-state="empty" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
@@ -470,12 +614,7 @@
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-deal-products__stub">Данные ещё не заведены</p>
   </div>
 </section>
           </div>
@@ -487,7 +626,9 @@
      data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
                   не допускающий правку, даёт view при любой роли. В view
                   действия правки не рисуются (TileFinInstruments.css)
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileFinInstruments.css). -->
 <section class="tile lc-fin-instruments" data-state="empty" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
@@ -499,12 +640,7 @@
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-fin-instruments__stub">Данные ещё не заведены</p>
   </div>
 </section>
           </div>
@@ -516,20 +652,17 @@
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
      data-mode  — режим прав:       edit | view
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileEpsVbsImpact.css). -->
+<section data-state="empty" data-mode="view" class="tile lc-eps-vbs-impact col-6 colw-12">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Влияние на ЭПС/ВБС</h3></div>
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-eps-vbs-impact__stub">Данные ещё не заведены</p>
   </div>
 </section>
           <!-- Локальный компонент «Финансовые метрики» — фрагмент страницы сделки.
@@ -537,20 +670,17 @@
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
      data-mode  — режим прав:       edit | view
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile col-6 colw-12">
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileFinMetrics.css). -->
+<section data-state="empty" data-mode="view" class="tile lc-fin-metrics col-6 colw-12">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Финансовые метрики</h3></div>
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-fin-metrics__stub">Данные ещё не заведены</p>
   </div>
 </section>
         </div>
@@ -563,15 +693,12 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      По снимку текущей системы это таблица на всю ширину панели, без шапки-тайла,
      поэтому корень — TileHeadless: он даёт только подложку и отступы.
-     Сейчас компонент в состоянии empty: состав колонок не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile tile--headless col-12">
+     Сейчас компонент в состоянии empty: состав колонок не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TableCounterparties.css). -->
+<section data-state="empty" data-mode="view" class="tile tile--headless lc-counterparties col-12">
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Контрагенты ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-counterparties__stub">Контрагенты ещё не заведены</p>
   </div>
 </section>
         </div>
@@ -585,20 +712,17 @@
      Здесь только разметка: внешние отступы и место в колонках задаёт экран.
      data-state — состояние данных: loading | data | partial | empty | error | updating
      data-mode  — режим прав:       edit | view
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
-<section data-state="empty" data-mode="view" class="tile col-12">
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileCollaterals.css). -->
+<section data-state="empty" data-mode="view" class="tile lc-collaterals col-12">
   <header class="tile__header">
     <div class="tile__header-main">
       <div class="tile__title-row"><h3 class="tile__title">Связанные обеспечения</h3></div>
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-collaterals__stub">Данные ещё не заведены</p>
   </div>
 </section>
         </div>
@@ -638,7 +762,7 @@
      (60vh — не прыгает при смене вкладки), колонки разделены вертикальными
      Divider. У каждой колонки свой скролл с полосой ДС (.ds-scroll, Layout):
      бегунок стоит вплотную к разделителю, появляется при прокрутке и гаснет.
-     Заголовок H6 Strong и линия под ним стоят на месте. -->
+     Заголовок H6 Strong стоит на месте: он вне прокручиваемой области. -->
 
 <div class="modal-scrim" id="knr-scrim" hidden>
 
@@ -740,7 +864,6 @@
 
         <section class="lc-knrm__col">
           <h3 class="ds-h6-strong">Параметры поиска</h3>
-          <hr class="dvd dvd--h">
           <form class="lc-knrm__form ds-scroll" data-knr-search="ul" novalidate>
             <div class="inp inp--m inp--fullwidth">
               <label class="ds-label" for="knr-ul-name"><span class="ds-label__text">Наименование</span></label>
@@ -770,7 +893,6 @@
 
         <section class="lc-knrm__col">
           <h3 class="ds-h6-strong">Найдено</h3>
-          <hr class="dvd dvd--h">
           <div class="lc-knrm__drop ds-scroll" data-knr-drop="ul-found">
             <p class="lc-knrm__hint" data-knr-hint>Поиск осуществляется по любому из параметров</p>
           </div>
@@ -780,7 +902,6 @@
 
         <section class="lc-knrm__col">
           <h3 class="ds-h6-strong">Участники сделки</h3>
-          <hr class="dvd dvd--h">
           <div class="lc-knrm__drop ds-scroll" data-knr-drop="ul-members">
             <p class="lc-knrm__hint">Перенесите выбранных участников сделки сюда.
               Добавить можно только носителей риска или все группы и контрагентов, участвующих в сделке.</p>
@@ -797,7 +918,6 @@
 
         <section class="lc-knrm__col">
           <h3 class="ds-h6-strong">Параметры поиска</h3>
-          <hr class="dvd dvd--h">
           <form class="lc-knrm__form ds-scroll" data-knr-search="fl" novalidate>
             <div class="inp inp--m inp--fullwidth">
               <label class="ds-label" for="knr-fl-ul"><span class="ds-label__text">Юридическое лицо</span></label>
@@ -838,7 +958,6 @@
 
         <section class="lc-knrm__col">
           <h3 class="ds-h6-strong">Физические лица</h3>
-          <hr class="dvd dvd--h">
           <div class="lc-knrm__drop ds-scroll" data-knr-drop="fl-found">
             <p class="lc-knrm__hint" data-knr-hint>Поиск осуществляется по юридическим лицам, входящим в участники сделки</p>
           </div>
@@ -848,7 +967,6 @@
 
         <section class="lc-knrm__col">
           <h3 class="ds-h6-strong">Участники сделки</h3>
-          <hr class="dvd dvd--h">
           <!-- Юрлица здесь тоже видны, но с этой вкладки их не трогают: они
                рисуются недоступными (Disabled у Card). Зеркально на вкладке
                юрлиц недоступны физлица. Удаление юрлица не тянет за собой
@@ -898,9 +1016,380 @@
     </footer>
   </div>
 </div>
+<!-- Окно правки тайла «Сроки сделки» — тоже в конце body, по той же причине. -->
+<!-- Связанный артефакт тайла «Сроки сделки»: модальное окно правки дат.
+     Фрагмент вшивается ассемблером отдельной меткой ds-include — скрим должен
+     лежать в конце body, а не внутри тайла.
+
+     Правится одно поле — «Дата первой выдачи». Дата заключения и дата окончания
+     приходят из инструментов сделки и стоят здесь для справки: по ним видно
+     допустимый диапазон. У каждого поля — информер с тултипом: что за поле и
+     откуда данные.
+
+     Значения в разметке — пример. Окно заполняет и проверяет TileDealTermsModal.js
+     (PostDealTermsModal.bind): даты берёт у страницы при открытии, «Сохранить»
+     проверяет дату и отдаёт её странице. Кнопка без data-modal-close: окно
+     закрывает скрипт, когда проверка прошла; с ошибкой окно остаётся открытым.
+     Крестик и Esc закрывают без сохранения, клик мимо окна не закрывает
+     (триггеры стоят с data-modal-guarded).
+
+     Раскладка: две даты для справки — в один ряд, в две колонки штатной сетки
+     ДС (.grid12 + .col-6, зазор 16px); поле ввода под ними во всю ширину. Тело
+     окна ДС само колонка с тем же зазором, своего CSS нет. Порядок полей — как
+     в тайле. Фокус при открытии рантайм ДС ставит на поле ввода, а не на
+     информер первого поля (Modal 1.009), поэтому окно открывается без поднятой
+     подсказки. -->
+
+<div class="modal-scrim" id="deal-terms-scrim" hidden>
+  <div class="modal modal--w3" role="dialog" aria-modal="true" aria-labelledby="deal-terms-title">
+    <header class="modal__head">
+      <h2 class="modal__title" id="deal-terms-title">Сроки сделки</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+
+    <div class="modal__body">
+
+      <!-- Даты-границы: один ряд, две колонки. Сетка — штатная .grid12 из ДС,
+           ширина колонки — .col-6; лейбл переносится до двух строк
+           (ds-label--wrap), если колонка уже подписи. -->
+      <div class="grid12">
+        <div class="rof col-6">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Дата заключения</span></span>
+          <div class="rof__row">
+            <span class="rof__value" data-terms-field="signDate">01.01.2021</span>
+            <span class="rof__icon" tabindex="0" aria-label="Подсказка" data-tooltip-multiline="yes"
+                  data-tooltip="Самая ранняя дата заключения договора среди инструментов сделки"><i data-icon="info-circle"></i></span>
+          </div>
+        </div>
+
+        <div class="rof col-6">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Дата окончания</span></span>
+          <div class="rof__row">
+            <span class="rof__value" data-terms-field="endDate">01.01.2023</span>
+            <span class="rof__icon" tabindex="0" aria-label="Подсказка" data-tooltip-multiline="yes"
+                  data-tooltip="Самая поздняя дата среди инструментов сделки — по последнему плановому платежу"><i data-icon="info-circle"></i></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- InputDate: маска ДД.ММ.ГГГГ и календарь — из коробки ДС (ds-datepicker.js
+           по кнопке «Открыть календарь»). Порядок действий: информер → крестик →
+           календарь. Ошибку проверки показывает тултип на фокусе (правило
+           InputText), его вешает скрипт окна на .inp__box.
+           Крестика очистки в разметке нет намеренно: он живёт по значению, и
+           рисует его рантайм ds-input.js — ровно тогда, когда в поле есть что
+           стирать, и ровно между информером и календарём. Нарисованный руками,
+           он висел бы и на пустом поле; значение окно ставит кодом, поэтому
+           после заполнения зовёт DSInput.sync (см. TileDealTermsModal.js). -->
+      <div class="inp inp--m inp--fullwidth">
+        <label class="ds-label" for="deal-terms-first-disb"><span class="ds-label__text">Дата первой выдачи</span></label>
+        <div class="inp__box">
+          <div class="inp__field">
+            <input class="inp__control" id="deal-terms-first-disb" name="firstDisb" placeholder="ДД.ММ.ГГГГ" inputmode="numeric" autocomplete="off" value="21.01.2021">
+            <span class="inp__acts">
+              <button type="button" class="inp__act inp__act--static" aria-label="Подсказка" data-tooltip-multiline="yes"
+                      data-tooltip="Заполняется вручную, если в сделке есть НКЛ с баланса ПАО"><i data-icon="info-circle"></i></button>
+              <button type="button" class="inp__act" aria-label="Открыть календарь" aria-haspopup="dialog"><i data-icon="calendar"></i></button>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--accent btn--m" data-terms-save><span class="btn__label">Сохранить</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
+<!-- Окно тайла «Команда сделки»: правка и просмотр — один скрим, режим ему
+     ставит скрипт окна по режиму тайла, который его открыл. -->
+<!-- Связанный артефакт тайла «Команда сделки»: модальное окно состава команды.
+     Фрагмент вшивается ассемблером отдельной меткой ds-include — скрим должен
+     лежать в конце body, а не внутри тайла.
+
+     Окно работает в двух режимах, атрибут data-mode на самой модалке:
+       edit — правка: деск и двенадцать ролей списками, «Другие участники»
+              строкой, подвал с «Сохранить»;
+       view — просмотр: те же поля как ReadOnlyField, подвал с «Закрыть».
+     Признак ограниченного доступа в обоих режимах остаётся чекбоксом и стоит
+     рядом с блоками режимов, а не внутри: читаемой строкой «Да» / «Нет» его не
+     подменяют, выключенный чекбокс показывает состояние честнее.
+     Режим ставит TileDealTeamModal.js по режиму тайла, который окно открыл:
+     из правки — карандашом, из просмотра — «Развернуть». Второй режим нужен
+     потому, что тайл показывает шесть ролей из тринадцати: без окна роль без
+     права правки остальных не увидела бы. Переключает вид
+     TileDealTeamModal.css, разметка держит оба сразу — как тайлы.
+
+     Раскладка: штатная сетка ДС .grid12, поле — .col-4, три колонки, как на
+     макете. Порядок полей в разметке построчный, он же порядок чтения.
+     Своего CSS раскладки у окна нет.
+
+     Списки сотрудников пусты в разметке намеренно: справочник — 35 человек на
+     каждое из тринадцати полей, это 455 строк разметки на один и тот же
+     список. Опции подставляет TileDealTeamModal.js из mock-team.js —
+     динамический список у DropdownList и полагается собирать кодом
+     (runtime-hooks, «Чего рантаймы не делают»).
+
+     Значения ниже — пример. Их заменяет TileDealTeamModal.js данными сделки.
+     «Сохранить» без data-modal-close: окно закрывает скрипт, когда проверка
+     прошла. Крестик и Esc закрывают без сохранения, клик мимо окна не
+     закрывает (триггеры стоят с data-modal-guarded). -->
+
+<div class="modal-scrim" id="deal-team-scrim" hidden>
+  <div class="modal modal--w7 lc-deal-team-modal" role="dialog" aria-modal="true" aria-labelledby="deal-team-title" data-mode="edit">
+    <header class="modal__head">
+      <h2 class="modal__title" id="deal-team-title">Команда сделки</h2>
+      <button type="button" class="ibtn ibtn--neutral ibtn--l" aria-label="Закрыть" data-modal-close><i data-icon="close"></i></button>
+    </header>
+
+    <div class="modal__body">
+
+      <!-- ── Правка ──────────────────────────────────────────────────── -->
+      <!-- Поля во всю ширину («Другие участники», признак) стоят НЕ в сетке, а
+           рядом с ней — как в окне «Сроки сделки». В сетке они переполнили бы
+           последний ряд: в нём одно поле из трёх, и col-12 следом даёт 16
+           колонок при 12 (линтер L1). -->
+      <div class="lc-deal-team-modal__edit">
+      <div class="grid12">
+
+        <!-- Ряд 1 -->
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-desk"><span class="ds-label__text">Деск</span><span class="ds-label__req">*</span></label>
+          <div class="inp__field" data-ddl="dt-desk-list">
+            <input class="inp__control" id="dt-desk" name="desk" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-desk-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-client-manager"><span class="ds-label__text">Клиентский менеджер</span></label>
+          <div class="inp__field" data-ddl="dt-client-manager-list">
+            <input class="inp__control" id="dt-client-manager" name="clientManager" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-client-manager-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-pmz"><span class="ds-label__text">Сотрудник ПМЗ</span></label>
+          <div class="inp__field" data-ddl="dt-pmz-list">
+            <input class="inp__control" id="dt-pmz" name="pmzEmployee" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-pmz-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+
+        <!-- Ряд 2 -->
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-director"><span class="ds-label__text">Директор</span></label>
+          <div class="inp__field" data-ddl="dt-director-list">
+            <input class="inp__control" id="dt-director" name="director" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-director-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-credit-inspector"><span class="ds-label__text">Кредитный инспектор</span></label>
+          <div class="inp__field" data-ddl="dt-credit-inspector-list">
+            <input class="inp__control" id="dt-credit-inspector" name="creditInspector" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-credit-inspector-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-prpa"><span class="ds-label__text">Сотрудник ПРПА</span></label>
+          <div class="inp__field" data-ddl="dt-prpa-list">
+            <input class="inp__control" id="dt-prpa" name="prpaEmployee" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-prpa-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+
+        <!-- Ряд 3 -->
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-regional-director"><span class="ds-label__text">Региональный директор</span></label>
+          <div class="inp__field" data-ddl="dt-regional-director-list">
+            <input class="inp__control" id="dt-regional-director" name="regionalDirector" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-regional-director-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-risk"><span class="ds-label__text">Сотрудник Рисков</span></label>
+          <div class="inp__field" data-ddl="dt-risk-list">
+            <input class="inp__control" id="dt-risk" name="riskEmployee" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-risk-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-legal"><span class="ds-label__text">Сотрудник Юридической службы</span></label>
+          <div class="inp__field" data-ddl="dt-legal-list">
+            <input class="inp__control" id="dt-legal" name="legalEmployee" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-legal-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+
+        <!-- Ряд 4 -->
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-manager"><span class="ds-label__text">Менеджер сделки</span></label>
+          <div class="inp__field" data-ddl="dt-manager-list">
+            <input class="inp__control" id="dt-manager" name="manager" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-manager-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-monitoring"><span class="ds-label__text">Сотрудник Мониторинга</span></label>
+          <div class="inp__field" data-ddl="dt-monitoring-list">
+            <input class="inp__control" id="dt-monitoring" name="monitoringEmployee" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-monitoring-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-construction"><span class="ds-label__text">Строительный эксперт</span></label>
+          <div class="inp__field" data-ddl="dt-construction-list">
+            <input class="inp__control" id="dt-construction" name="constructionExpert" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-construction-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+
+        <!-- Ряд 5: в правой части ряда полей нет, как на макете -->
+        <div class="inp inp--m inp--fullwidth col-4">
+          <label class="ds-label" for="dt-tsup"><span class="ds-label__text">Сотрудник ЦУП</span></label>
+          <div class="inp__field" data-ddl="dt-tsup-list">
+            <input class="inp__control" id="dt-tsup" name="tsupEmployee" autocomplete="off">
+            <span class="inp__acts"><button type="button" class="inp__act inp__act--chev" aria-label="Показать список"><i data-icon="chevron-down"></i></button></span>
+          </div>
+          <div id="dt-tsup-list" class="ddl ddl--floating ddl--scroll" role="listbox"></div>
+        </div>
+
+      </div>
+
+        <!-- Другие участники — не список: сюда вписывают людей не из банка,
+             несколько через запятую. Справочника для них нет и быть не может. -->
+        <div class="inp inp--m inp--fullwidth">
+          <label class="ds-label" for="dt-others"><span class="ds-label__text">Другие участники</span></label>
+          <div class="inp__field">
+            <input class="inp__control" id="dt-others" name="otherParticipants" autocomplete="off">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Просмотр ────────────────────────────────────────────────── -->
+      <!-- Состав и порядок полей те же, что в правке — правило локальных
+           компонентов для состояния «Только просмотр». -->
+      <div class="lc-deal-team-modal__view">
+      <div class="grid12">
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Деск</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="desk">Телекоммуникации</span></div>
+        </div>
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Клиентский менеджер</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="clientManager">Смирнов А.А. 100127</span></div>
+        </div>
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Сотрудник ПМЗ</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="pmzEmployee">—</span></div>
+        </div>
+
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Директор</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="director">Андреев М.А. 100101</span></div>
+        </div>
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Кредитный инспектор</span></span>
+          <!-- Второй Смирнов А.А. — не опечатка: однофамилец, и различает их
+               только табельный номер -->
+          <div class="rof__row"><span class="rof__value" data-team-view="creditInspector">Смирнов А.А. 100241</span></div>
+        </div>
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Сотрудник ПРПА</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="prpaEmployee">—</span></div>
+        </div>
+
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Региональный директор</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="regionalDirector">—</span></div>
+        </div>
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Сотрудник Рисков</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="riskEmployee">—</span></div>
+        </div>
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Сотрудник Юридической службы</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="legalEmployee">—</span></div>
+        </div>
+
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Менеджер сделки</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="manager">Андреев М.А. 100101</span></div>
+        </div>
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Сотрудник Мониторинга</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="monitoringEmployee">—</span></div>
+        </div>
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Строительный эксперт</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="constructionExpert">—</span></div>
+        </div>
+
+        <div class="rof col-4">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Сотрудник ЦУП</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="tsupEmployee">—</span></div>
+        </div>
+
+      </div>
+
+        <!-- «Другие участники» — во всю ширину рядом с сеткой, как в правке -->
+        <div class="rof">
+          <span class="ds-label ds-label--wrap"><span class="ds-label__text">Другие участники</span></span>
+          <div class="rof__row"><span class="rof__value" data-team-view="otherParticipants">—</span></div>
+        </div>
+
+      </div>
+
+      <!-- Признак ограниченного доступа — общий для обоих режимов, поэтому
+           стоит РЯДОМ с ними, а не внутри. Видимый блок всегда один, и чекбокс
+           встаёт под ним и в правке, и в просмотре.
+           Читаемым полем его не подменяем: чекбокс сам показывает состояние —
+           отмечен или нет, — и выключенный чекбокс честнее строки «Да» / «Нет»
+           (решение человека 23.09.2026). Видят его все роли, меняет только
+           руководитель ЦУП; в просмотре он выключен всегда. Состояние ставит
+           TileDealTeamModal.js. -->
+      <label class="cb">
+        <input type="checkbox" class="cb__input" id="dt-restricted" name="restricted" disabled>
+        <span class="cb__box"><span class="cb__mark"><i data-icon="check"></i></span></span>
+        <span class="cb__content"><span class="cb__label">Сделка ограниченного доступа</span></span>
+      </label>
+
+    </div>
+
+    <!-- Подвал у модалки обязателен, поэтому в просмотре он не прячется, а
+         меняет кнопку: править нечего — окно закрывают. «Закрыть» аутлайновая,
+         как у окна КНР (TileKNRModal): в просмотре подтверждать нечего, и
+         залитая Primary обещала бы действие, которого нет. -->
+    <footer class="modal__foot">
+      <div class="modal__foot-right">
+        <button type="button" class="btn btn--accent btn--m lc-deal-team-modal__save" data-team-save><span class="btn__label">Сохранить</span></button>
+        <button type="button" class="btn btn--outline btn--m lc-deal-team-modal__close" data-modal-close><span class="btn__label">Закрыть</span></button>
+      </div>
+    </footer>
+  </div>
+</div>
 
 <script src="../data/mock-deals.js"></script>
 <script src="../data/deals-store.js"></script>
+<!-- справочник сотрудников для списков окна «Команда сделки»: сами назначения
+     лежат в записи сделки, здесь только кандидаты -->
+<script src="../data/mock-team.js"></script>
 <!-- контрагенты сделки: база, адаптер хранения и стор — до рантаймов, как у
      сделок. Стор подключается после deals-store.js: он переносит сохранённые
      КНР в DealsStore. Хранение — data/API.md -->
@@ -915,9 +1404,13 @@
 <script src="../post_local_components/CardCounterparty/CardCounterparty.js"></script>
 <script src="../post_local_components/TileKNR/TileKNRModal.js"></script>
 <script src="../post_local_components/TileKNR/TileKNR.js"></script>
+<script src="../post_local_components/TileDealTerms/TileDealTermsModal.js"></script>
+<script src="../post_local_components/TileDealTerms/TileDealTerms.js"></script>
+<script src="../post_local_components/TileDealTeam/TileDealTeamModal.js"></script>
+<script src="../post_local_components/TileDealTeam/TileDealTeam.js"></script>
 <script>
 /* Экранный скрипт. Делает только то, чего рантаймы ДС не делают:
-   меню по каталогу ролей, данные сделки (шапка и тайл «КНР»), переключение
+   меню по каталогу ролей, данные сделки (шапка, тайлы «КНР» и «Сроки сделки»), переключение
    панелей табов и сворачивание секции (компонента «заголовок-аккордеон» в ДС
    нет).
    Скрипт синхронный и стоит после ds.js — поэтому его DSTabs.tabs(...) успевает
@@ -1035,6 +1528,8 @@
     fillChips(deal);
     applyMode(deal);
     fillKnr(deal);
+    fillTerms(deal);
+    fillTeam(deal);
   }
 
   /* Режим правки страницы. Статус сделки сильнее роли: в статусе, который не
@@ -1064,6 +1559,72 @@
     function paint() { window.PostTileKNR.render(tile, store.knr()); }
     store.use(deal.id).then(paint);
     store.on('commit', paint);
+  }
+
+  /* Тайл «Сроки сделки» — даты этой сделки из DealsStore (signDate, endDate,
+     firstDisb). Окно правки модули друг друга не знают — связывает их здесь
+     страница: окно берёт даты сделки при открытии и отдаёт проверенную дату
+     первой выдачи, страница пишет её в стор, тайл перерисовывается по событию
+     стора. Хранение — в памяти вкладки, как у всего DealsStore. */
+  function fillTerms(deal) {
+    var tile = document.getElementById('tile-deal-terms');
+    if (!tile || !window.PostTileDealTerms) return;
+    window.PostTileDealTerms.render(tile, deal);
+    if (window.PostDealTermsModal) {
+      window.PostDealTermsModal.bind(document.getElementById('deal-terms-scrim'), {
+        get: function () { return window.DealsStore.byId(deal.id) || deal; },
+        save: function (value) { window.DealsStore.update(deal.id, { firstDisb: value }); }
+      });
+    }
+    window.DealsStore.on('change', function (d) {
+      if (d && d.deal && String(d.deal.id) === String(deal.id)) window.PostTileDealTerms.render(tile, d.deal);
+    });
+  }
+
+  /* Тайл «Команда сделки» — деск и роли этой сделки из DealsStore. Тайл
+     показывает шесть ролей из тринадцати, остальные — в окне; оно же правит
+     состав. Как и со сроками, модули друг друга не знают: окно берёт команду
+     при открытии и отдаёт правку сюда, страница пишет её в стор, тайл
+     перерисовывается по событию стора.
+
+     Признак ограниченного доступа меняет только руководитель ЦУП (заказчик
+     23.09.2026). Такой роли в каталоге ролей пока нет — в IBPHome объявлена
+     одна, «Финансист ДИД», — поэтому право сейчас всегда закрыто и чекбокс в
+     окне выключен. Появится роль — условие ниже заработает само; заводить её
+     в ДС ради этого тайла не стали.
+
+     Деск управляет третьим рядом страницы: сведения о проекте есть у сделок
+     деска «Недвижимость». Решает это страница, а не тайлы — «Команда сделки»
+     про «Сведения о проекте» ничего не знает. */
+  function fillTeam(deal) {
+    var tile = document.getElementById('tile-deal-team');
+    if (!tile || !window.PostTileDealTeam) return;
+
+    function paint(d) {
+      window.PostTileDealTeam.render(tile, d);
+      applyProjectInfo(d);
+    }
+    paint(deal);
+
+    if (window.PostDealTeamModal) {
+      window.PostDealTeamModal.bind(document.getElementById('deal-team-scrim'), {
+        get: function () { return window.DealsStore.byId(deal.id) || deal; },
+        save: function (patch) { window.DealsStore.update(deal.id, patch); },
+        canEditRestricted: role === 'Руководитель ЦУП'
+      });
+    }
+    window.DealsStore.on('change', function (d) {
+      if (d && d.deal && String(d.deal.id) === String(deal.id)) paint(d.deal);
+    });
+  }
+
+  /* Ряд «Сведения о проекте» — только у деска «Недвижимость»: это проекты
+     недвижимости (заказчик 23.09.2026). Ряд прячется целиком, а не пустым
+     тайлом: пустой тайл читался бы как «данных нет». */
+  function applyProjectInfo(deal) {
+    var row = document.getElementById('row-project-info');
+    if (!row) return;
+    row.hidden = String((deal && deal.desk) || '').trim() !== 'Недвижимость';
   }
 
   /* Сворачивание блока «Общая информация». Рантайм ds-tile.js сюда не подходит:
