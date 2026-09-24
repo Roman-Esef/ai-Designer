@@ -28,6 +28,8 @@
    Закрытие: крестик .modal__close button, любой [data-modal-close], Esc,
    клик по скриму. Всё по спеке Modal: портал в body, блокировка прокрутки
    страницы, inert фона, focus trap, возврат фокуса на инициатора.
+   Начальный фокус: [autofocus] → первое поле ввода тела → первый
+   интерактивный элемент тела → крестик.
    ========================================================================= */
 (function () {
   'use strict';
@@ -100,9 +102,22 @@
     return modal;
   }
 
+  /* Начальный фокус (спека Modal, «Доступность»): элемент с autofocus →
+     первое поле ввода тела → первый интерактивный элемент тела → крестик.
+     Поле — раньше прочих: первым интерактивным элементом бывает информер
+     поля, а тултип по фокусу показывается сразу — окно открывалось бы с
+     поднятой подсказкой (урок Л135, 22.09.2026). */
+  var FIELD_SEL = 'input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]), select, textarea';
+
   function firstTarget(modal) {
+    var auto = Array.prototype.filter.call(modal.querySelectorAll('[autofocus]'), function (el) {
+      return el.matches(FOCUSABLE) && visible(el);
+    })[0];
+    if (auto) return auto;
     var body = modal.querySelector(BODY_SEL);
     var inBody = body ? focusables(body) : [];
+    var field = inBody.filter(function (el) { return el.matches(FIELD_SEL); })[0];
+    if (field) return field;
     if (inBody.length) return inBody[0];
     var close = modal.querySelector(CLOSE_SEL);
     if (close) return close;

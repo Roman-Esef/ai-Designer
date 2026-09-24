@@ -244,7 +244,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
               <div class="tile__title-row">
                 <h4 class="tile__title">Проектное финансирование</h4>
               </div>
-              <div class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="check-circle-filled"></i></span>Нерезидент</div>
+              <div class="tile__subtitle"><span class="tile__subtitle-icon tile__subtitle-icon--success"><i data-icon="check-circle-filled"></i></span>Нерезидент</div>
               <div class="tile__chiplist">
                 <span class="chip chip--xs"><span class="chip__label">Погашен</span></span>
               </div>
@@ -295,7 +295,7 @@ a{color:var(--link);} a:hover{color:var(--link-dark);}
         <div class="tile__header">
           <div class="tile__header-main">
             <div class="tile__title-row"><h4 class="tile__title">Сроки сделки</h4></div>
-            <div class="tile__subtitle"><span class="tile__subtitle-icon"><i data-icon="check-circle-filled"></i></span>Нерезидент</div>
+            <div class="tile__subtitle"><span class="tile__subtitle-icon tile__subtitle-icon--success"><i data-icon="check-circle-filled"></i></span>Нерезидент</div>
           </div>
           <div class="tile__actions"><button class="ibtn ibtn--neutral ibtn--m" aria-label="Редактировать"><i data-icon="edit"></i></button></div>
         </div>
@@ -1295,9 +1295,16 @@ DSTile.toggle(tileEl, true);        // свернуть / развернуть �
 .tile__title-add--icon {
   width: 20px;
   height: 20px;
-  color: var(--warning);
+  color: var(--secondary);
 }
 .tile__title-add--icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+/* Тон иконки-приписки. Дефолт — штатный цвет иконки ДС; семантика задаётся
+   модификатором, а не вшита в слот: в слот ставят любую иконку, и её смысл
+   знает только место использования (решение человека 23.09.2026). */
+.tile__title-add--success { color: var(--success); }
+.tile__title-add--warning { color: var(--warning); }
+.tile__title-add--error   { color: var(--error); }
+.tile__title-add--info    { color: var(--info); }
 .tile__title-link {
   flex: none;
 }
@@ -1319,8 +1326,16 @@ DSTile.toggle(tileEl, true);        // свернуть / развернуть �
   width: 16px;
   height: 16px;
   flex: none;
-  color: var(--success);
+  color: var(--secondary);
 }
+/* Глиф занимает слот целиком: по умолчанию иконка 24px, и без этого правила
+   она вылезала бы за коробку 16×16 — за высоту строки сабтайтла. */
+.tile__subtitle-icon > :is(svg,[data-icon]){ width: 100%; height: 100%; display: block; }
+/* Тон иконки сабтайтла — тем же правилом, что у иконки-приписки. */
+.tile__subtitle-icon--success { color: var(--success); }
+.tile__subtitle-icon--warning { color: var(--warning); }
+.tile__subtitle-icon--error   { color: var(--error); }
+.tile__subtitle-icon--info    { color: var(--info); }
 
 /* Chiplist в хэдере — ряд чипов XS под тайтлом/сабтайтлом, зазор 4 */
 .tile__chiplist {
@@ -1595,12 +1610,12 @@ function buildTile(){
   /* ---- title addition ---- */
   var addHtml = '';
   if (add === 'link') addHtml = '<a class="link link--accent link--s tile__title-link" href="#" onclick="return false">Заполнить</a>';
-  else if (add === 'icon') addHtml = '<span class="tile__title-add tile__title-add--icon" aria-hidden="true">' + getIcon('alert-triangle-filled',20) + '</span>';
+  else if (add === 'icon') addHtml = '<span class="tile__title-add tile__title-add--icon tile__title-add--warning" aria-hidden="true">' + getIcon('alert-triangle-filled',20) + '</span>';
   else if (add === 'chip') addHtml = '<span class="chip chip--s"><span class="chip__label">Погашен</span></span>';
   else if (add === 'badge') addHtml = '<span class="badge badge--s badge--neutral badge--text">9</span>';
 
   var titleRow = '<div class="tile__title-row"><h3 class="tile__title">' + esc(title) + '</h3>' + addHtml + '</div>';
-  var subHtml = sub ? '<p class="tile__subtitle"><span class="tile__subtitle-icon">' + getIcon('check-circle-filled',16) + '</span>Нерезидент</p>' : '';
+  var subHtml = sub ? '<p class="tile__subtitle"><span class="tile__subtitle-icon tile__subtitle-icon--success">' + getIcon('check-circle-filled',16) + '</span>Нерезидент</p>' : '';
   var chipsHtml = chips ? '<div class="tile__chiplist"><span class="chip chip--xs"><span class="chip__label">Погашен</span></span><span class="chip chip--xs"><span class="chip__label">Погашен</span></span></div>' : '';
 
   /* ---- actions: 1..3 действия, каждое — IconButton или Button ---- */

@@ -2,14 +2,11 @@
      Вшивается ассемблером (../../assemble.mjs) по метке ds-include на экране.
      По снимку текущей системы это таблица на всю ширину панели, без шапки-тайла,
      поэтому корень — TileHeadless: он даёт только подложку и отступы.
-     Сейчас компонент в состоянии empty: состав колонок не согласован (см. паспорт). -->
-<section class="tile tile--headless" data-state="empty" data-mode="view">
+     Сейчас компонент в состоянии empty: состав колонок не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TableCounterparties.css). -->
+<section class="tile tile--headless lc-counterparties" data-state="empty" data-mode="view">
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Контрагенты ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-counterparties__stub">Контрагенты ещё не заведены</p>
   </div>
 </section>

@@ -17,6 +17,26 @@
    Допущения по форматам (нет однозначного ответа в ТЗ): jointness — строка
    из справочника (см. DEALS_ENUMS.jointness); corpGovernance — список строк;
    boardRep — Да/Нет.
+
+   Команда сделки — плоские поля этой же записи, их правит окно тайла
+   «Команда сделки» (post_local_components/TileDealTeam). Деск + двенадцать
+   ролей, каждая — ФИО одного сотрудника из справочника mock-team.js:
+   desk · director · regionalDirector · manager · tsupEmployee ·
+   clientManager · creditInspector · riskEmployee · monitoringEmployee ·
+   pmzEmployee · prpaEmployee · legalEmployee · constructionExpert.
+   У каждой роли есть пара <роль>Tab — табельный номер назначенного сотрудника
+   (directorTab, managerTab и так далее). Само поле роли остаётся чистым ФИО:
+   его читают реестр портфеля и тайл, и номера там не показывают. Номер нужен
+   там, где сотрудника выбирают, — в окне правки: по нему различают
+   однофамильцев. У деска пары нет, деск не человек.
+
+   Плюс otherParticipants — свободная строка: люди не из банка, несколько
+   через запятую. Отсутствующее поле = роль не назначена, в тайле прочерк;
+   заполнять все роли не нужно, у разных сделок свой обязательный состав
+   (заказчик 23.09.2026). Поля desk / director / manager / tsupEmployee были
+   здесь и раньше — их показывает реестр портфеля; остальные добавлены
+   23.09.2026 и заполнены у сделок 1024 и 1027 как демо, у прочих их нет.
+   Флаг restricted («Да» / «Нет») — сделка ограниченного доступа.
    ========================================================================= */
 
 window.MOCK_DEALS = [
@@ -30,8 +50,30 @@ window.MOCK_DEALS = [
     "restricted": "Нет",
     "desk": "Недвижимость",
     "director": "Иванов И.И.",
+    "directorTab": "100112",
+    "regionalDirector": "Соколов С.С.",
+    "regionalDirectorTab": "100129",
     "manager": "Павлов П.П.",
+    "managerTab": "100124",
     "tsupEmployee": "Комаров К.К.",
+    "tsupEmployeeTab": "100114",
+    "clientManager": "Смирнов А.А.",
+    "clientManagerTab": "100127",
+    "creditInspector": "Морозов М.М.",
+    "creditInspectorTab": "100121",
+    "riskEmployee": "Орлов О.О.",
+    "riskEmployeeTab": "100123",
+    "monitoringEmployee": "Титов Т.Т.",
+    "monitoringEmployeeTab": "100132",
+    "pmzEmployee": "Белов Б.Б.",
+    "pmzEmployeeTab": "100103",
+    "prpaEmployee": "Гусев Г.Г.",
+    "prpaEmployeeTab": "100108",
+    "legalEmployee": "Зайцев З.З.",
+    "legalEmployeeTab": "100110",
+    "constructionExpert": "Крылов К.К.",
+    "constructionExpertTab": "100116",
+    "otherParticipants": "Разумовский А.П. (ООО «Технадзор Плюс»), Федотова М.С. (независимый оценщик)",
     "knr": [
       "ООО «ЮгСтрой»"
     ],
@@ -167,8 +209,15 @@ window.MOCK_DEALS = [
     "restricted": "Да",
     "desk": "Природные ресурсы",
     "director": "Кузнецов К.К.",
+    "directorTab": "100117",
     "manager": "Фролов Ф.Ф.",
+    "managerTab": "100133",
     "tsupEmployee": "Лебедев Л.Л.",
+    "tsupEmployeeTab": "100119",
+    "clientManager": "Щукин Щ.Щ.",
+    "clientManagerTab": "100134",
+    "creditInspector": "Яковлев Я.Я.",
+    "creditInspectorTab": "100135",
     "knr": [
       "ООО «ГорноКапитал»"
     ],
@@ -2397,7 +2446,12 @@ window.DEALS_ENUMS = {
     "Металлургия",
     "Энергетика",
     "Агропромышленный комплекс",
-    "Транспорт и логистика"
+    "Транспорт и логистика",
+    "M&A",
+    "ECM",
+    "DCM",
+    "Менеджмент",
+    "Промышленность"
   ],
   "balances": [
     "ООО «СБИ»",

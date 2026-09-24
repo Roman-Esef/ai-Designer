@@ -1,8 +1,8 @@
 ﻿---
 component: Tile
 title: "Tile"
-version: "1.013"
-updated: "21.09.2026"
+version: "1.014"
+updated: "23.09.2026"
 page: pages/organisms/Tile.html
 runtime: scripts/ds-tile.js
 css: styles/tile.css
@@ -37,7 +37,7 @@ Tile — основная плашка рабочей области стран�
 - **Состояния** — Tile собственных состояний НЕ имеет. Интерактивны только вложенные IconButton (хэдер), Button/Link (контент, алерт). AccordionTile collapsed/expanded — конфигурация, не состояние.
 - **Доступность** — Title = семантический heading; иконка-предупреждение декоративна (aria-hidden); IconButton — aria-label; шеврон — поворот на 180° красится и по `[aria-expanded="false"]` на кнопке напрямую (RulesAudit W1, 12.08.2026); рантайм `ds-tile.js` остаётся class-authoritative — сам синхронизирует атрибут с `.tile--collapsed`, атрибутный CSS — фоллбэк для случаев без класса. aria-expanded + aria-controls; Alert — role по тону; reduced-motion отключает анимацию.
 - **Типографика** — Title Tile: `--type-h5-strong`; Title Card: `--type-h6-strong`; Subtitle и метка поля: `--type-body-xs`; значение поля: `--type-body-m` (Strong — по месту, не дефолт).
-- **Цвета** — фон `--bg-tile`, бордер `--border-light`; текст `--text-primary`/`--text-secondary`/`--text-inactive`; Addition-иконка `--warning`, иконка сабтайтла `--success`, ссылка `--link`; Alert-слот `--warning-bg`/`--info-bg`.
+- **Цвета** — фон `--bg-tile`, бордер `--border-light`; текст `--text-primary`/`--text-secondary`/`--text-inactive`; Addition-иконка и иконка сабтайтла — `--secondary`, тон задаётся модификатором `--success`/`--warning`/`--error`/`--info`; ссылка `--link`; Alert-слот `--warning-bg`/`--info-bg`.
 
 ## Для разработчиков (выжимка)
 
@@ -103,8 +103,8 @@ onToggle():                       # AccordionTile
 | `.tile__header-main` | колонка title-row · subtitle · chiplist, gap 8 (у Card — 4) |
 | `.tile__title-row` | строка Title + Addition |
 | `.tile__title` | заголовок, H5 Strong, усекается |
-| `.tile__title-add` | Addition: link/icon/chip/badge; `--icon` = warning |
-| `.tile__subtitle` | подзаголовок, Body XS, опц. `.tile__subtitle-icon` (success) |
+| `.tile__title-add` | Addition: link/icon/chip/badge; `--icon` — слот 20px, иконка в `--secondary`, тон — `--success`/`--warning`/`--error`/`--info` |
+| `.tile__subtitle` | подзаголовок, Body XS, опц. `.tile__subtitle-icon` — слот 16px (высота строки Body XS), иконка в `--secondary`, тон — `.tile__subtitle-icon--success`/`--warning`/`--error`/`--info` |
 | `.tile__chiplist` | ряд чипов-маркеров (Chip XS, зазор 4) |
 | `.tile__actions` | трейлинг: 1–3 действия — IconButton (размер M, 20×20) и/или Button, зазор 8 |
 | `.tile__toggle` / `.tile__chevron` | кнопка-шеврон аккордеона (aria-expanded) / поворот 180° |

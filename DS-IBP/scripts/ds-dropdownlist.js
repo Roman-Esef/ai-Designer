@@ -272,6 +272,15 @@
       items(list).forEach(function (x) { if (x.hasAttribute('aria-selected')) x.setAttribute('aria-selected', 'false'); });
       it.setAttribute('aria-selected', 'true');
       if (opts.onSelect) opts.onSelect(it);
+      /* Значение в поле поставил потребитель — присваиванием `.value`, а оно
+         событий не шлёт. Рантайм поля считает крестик очистки ПО ЗНАЧЕНИЮ
+         (правило InputText), поэтому о выборе ему сообщает сам список: иначе
+         каждый экран помнил бы этот вызов руками, и забытый крестик не падал
+         бы ничем — поле выглядит заполненным и правильным.
+         Клавиатурный выбор идёт через этот же обработчик (Enter → click), так
+         что вставка одна на мышь и на клавиатуру. У поля-триггера без `.inp`
+         (например `.fld`) closest вернёт null, и sync выйдет сразу. */
+      if (window.DSInput) window.DSInput.sync(field.closest('.inp'));
       if (!conf.keepOpenOnSelect) close(true);
     });
 

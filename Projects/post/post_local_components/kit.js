@@ -59,11 +59,19 @@ window.PostKit = {
       purpose: 'Навигатор заведения сделки: степпер этапов по контурам и переход к следующему шагу',
       doc: null, state: 'stub' },
     { id: 'TileDealTeam', name: 'Команда сделки', category: 'Сделка',
-      purpose: 'Ответственные по сделке: деск, директор, менеджеры, сотрудник ЦУП, кредитный инспектор',
-      doc: null, state: 'stub' },
+      purpose: 'Ответственные по сделке — деск и роли участников, с точкой входа в правку состава',
+      doc: 'TileDealTeam/TileDealTeam.doc.preview.html', state: 'filled',
+      artifacts: [
+        { id: 'TileDealTeamModal', name: 'Модальное окно команды сделки', type: 'модальное окно',
+          doc: 'TileDealTeam/TileDealTeamModal.doc.preview.html' }
+      ] },
     { id: 'TileDealTerms', name: 'Сроки сделки', category: 'Сделка',
-      purpose: 'Ключевые даты сделки: заключение, первая выдача, окончание, вход и выход ДИД',
-      doc: null, state: 'stub' },
+      purpose: 'Ключевые даты сделки — заключение, окончание и первая выдача — и точка входа в ввод даты первой выдачи',
+      doc: 'TileDealTerms/TileDealTerms.doc.preview.html', state: 'filled',
+      artifacts: [
+        { id: 'TileDealTermsModal', name: 'Модальное окно сроков сделки', type: 'модальное окно',
+          doc: 'TileDealTerms/TileDealTermsModal.doc.preview.html' }
+      ] },
     { id: 'TileEpsVbsImpact', name: 'Влияние на ЭПС/ВБС', category: 'Сделка',
       purpose: 'Расчёт влияния модификации на ЭПС и ВБС по сделке',
       doc: null, state: 'stub' },

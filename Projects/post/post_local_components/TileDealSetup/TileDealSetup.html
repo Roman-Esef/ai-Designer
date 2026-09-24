@@ -5,7 +5,9 @@
      data-mode  — режим прав:       edit | view. Ставит страница: статус сделки,
                   не допускающий правку, даёт view при любой роли. В view
                   действия правки не рисуются (TileDealSetup.css)
-     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт). -->
+     Сейчас компонент в состоянии empty: состав полей не согласован (см. паспорт).
+     Пока состав не согласован — строка по центру тела, без EmptyState:
+     помещается в минимальную высоту тайла и не растягивает ряд (TileDealSetup.css). -->
 <section class="tile lc-deal-setup" data-state="empty" data-mode="edit">
   <header class="tile__header">
     <div class="tile__header-main">
@@ -16,11 +18,6 @@
     </div>
   </header>
   <div class="tile__body">
-    <div class="es es--m">
-      <span class="illu es__illu" data-illu="empty-folder" aria-hidden="true"></span>
-      <div class="es__body">
-        <p class="es__title">Данные ещё не заведены</p>
-      </div>
-    </div>
+    <p class="lc-deal-setup__stub">Данные ещё не заведены</p>
   </div>
 </section>
