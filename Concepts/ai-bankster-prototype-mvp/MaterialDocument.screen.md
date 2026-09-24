@@ -1,7 +1,7 @@
 ---
 screen: MaterialDocument
 title: Материал с идеями
-file: Concepts/ai-bankster-prototype-v02/MaterialDocument.html
+file: Concepts/ai-bankster-prototype-mvp/MaterialDocument.html
 source: ТЗ (БТ-1, БТ-3.1, БТ-4.6, БТ-4.7, БТ-9, СТ-2); черновой прототип модуля
 version: "1.000"
 created: "12.09.2026"
@@ -171,8 +171,7 @@ components: [Layout, NavPanel, Breadcrumbs, PageHeader, Tile, Entity, ReadOnlyFi
 
 Модалки, меню, тултипы, сортировка и колонки таблицы живут на рантаймах ДС.
 Собственный скрипт делает две вещи: строит график вызовом `DSChart.make` (Chart
-в ДС строится только из данных) и показывает сообщения о выгрузке, копировании
-и перезапуске.
+в ДС строится только из данных) и показывает сообщения о выгрузке и копировании.
 
 ## 15. Открытые вопросы и допущения
 

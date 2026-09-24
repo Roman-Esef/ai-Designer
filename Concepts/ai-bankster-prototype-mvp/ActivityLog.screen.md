@@ -1,7 +1,7 @@
 ---
 screen: ActivityLog
 title: Журнал действий
-file: Concepts/ai-bankster-prototype/ActivityLog.html
+file: Concepts/ai-bankster-prototype-mvp/ActivityLog.html
 source: ТЗ (БТ-11, БТ-1.10, БТ-9)
 version: "1.002"
 created: "12.09.2026"
@@ -26,11 +26,11 @@ components: [Layout, NavPanel, Breadcrumbs, PageHeader, Table, TableCell, TableF
 | Уровень | Текст | Ссылка |
 |---|---|---|
 | 1 | Главная | `index.html` |
-| 2 | Аналитические материалы | `RequestHistory.html` |
+| 2 | AI Pitcher | `RequestThread.html` |
 | 3 (текущий) | Журнал действий | — |
 
-Пункт бокового меню в состоянии `nav__item--selected`: подраздел «Журнал»
-в развёрнутом разделе «Аналитические материалы» (группа «Отчёты»).
+Пункт бокового меню в состоянии `nav__item--selected`: «AI Pitcher»
+(группа «Origination»). Собственного пункта у журнала в меню нет.
 
 ## 3. Шапка страницы (PageHeader)
 

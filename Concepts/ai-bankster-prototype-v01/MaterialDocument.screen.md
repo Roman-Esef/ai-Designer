@@ -1,7 +1,7 @@
 ---
 screen: MaterialDocument
 title: Материал с идеями
-file: Concepts/ai-bankster-prototype/MaterialDocument.html
+file: Concepts/ai-bankster-prototype-v01/MaterialDocument.html
 source: ТЗ (БТ-1, БТ-3.1, БТ-4.6, БТ-4.7, БТ-9, СТ-2); черновой прототип модуля
 version: "1.000"
 created: "12.09.2026"

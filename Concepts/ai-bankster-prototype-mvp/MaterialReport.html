@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<!-- Материал AI Pitcher «ООО «Друза» — бриф перед встречей» (MaterialReport).
+     Отчёт открывается превью в панели просмотра на экране «Новый отчёт»
+     (RequestThread.html) и живёт отдельной страницей: так его видно целиком,
+     как файл, который получит пользователь. Содержание — из
+     report-example-for-test.pdf; ряды для графиков — демо-данные прототипа.
+     Графики — компонент Chart (DSChart.make), статусы — Chip; обложка, карточки
+     и раскладка — локальные, на токенах ДС. Спека — MaterialReport.screen.md. -->
+<html lang="ru">
+<head>
+<script>window.__DS_ROOT = '../../DS-IBP/';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ООО «Друза» — бриф перед встречей — AI Pitcher</title>
+<link rel="icon" type="image/svg+xml" href="../../DS-IBP/assets/logo.svg">
+<link rel="stylesheet" href="../../DS-IBP/ds.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body { margin: 0; font-family: var(--font-text), system-ui, sans-serif; color: var(--text-primary); background: var(--bg-page); }
+
+  /* ── Лист отчёта ──────────────────────────────────────────────────────────
+     Документ на «бумаге» поверх фона страницы. Ширина листа ограничена,
+     в узкой панели просмотра отступы уменьшаются. */
+  .rep           { max-width: 880px; margin: 0 auto; padding: var(--space-24); }
+  .rep__sheet    { overflow: hidden; background: var(--bg-tile); border: 1px solid var(--border-light); border-radius: var(--radius-xl); box-shadow: 0 2px 12px color-mix(in srgb, var(--text-primary) 5%, transparent); }
+
+  /* Обложка: бренд-градиент и ключевые показатели */
+  .rep__cover    { display: flex; flex-direction: column; gap: var(--space-24); padding: var(--space-40) var(--space-40) var(--space-32); color: var(--text-on-dark); background: linear-gradient(135deg, var(--primary-dark), var(--primary) 70%, var(--primary-light)); }
+  .rep__eyebrow  { margin: 0; font: var(--type-body-xs); letter-spacing: .1em; text-transform: uppercase; opacity: .85; }
+  .rep__title    { margin: var(--space-6) 0 0; font: var(--type-h2); }
+  .rep__lead     { margin: var(--space-12) 0 0; max-width: 720px; font: var(--type-body-m); opacity: .92; }
+  .rep__meta     { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-16); margin: 0; font: var(--type-body-xs); opacity: .8; }
+  .rep__kpis     { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-12); }
+  .rep__kpi      { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-12) var(--space-16); background: color-mix(in srgb, var(--text-on-dark) 12%, transparent); border: 1px solid color-mix(in srgb, var(--text-on-dark) 22%, transparent); border-radius: var(--radius-l); }
+  .rep__kpi-name { font: var(--type-body-xs); letter-spacing: .04em; text-transform: uppercase; opacity: .85; }
+  .rep__kpi-val  { font: var(--type-h4-strong); font-variant-numeric: tabular-nums; }
+  .rep__kpi-note { font: var(--type-body-xs); opacity: .85; }
+
+  /* Разделы листа */
+  .rep__body     { display: flex; flex-direction: column; gap: var(--space-40); padding: var(--space-40); }
+  .rep__sec      { display: flex; flex-direction: column; gap: var(--space-16); }
+  .rep__h        { margin: 0; padding-bottom: var(--space-8); font: var(--type-h5-strong); border-bottom: 1px solid var(--border-light); }
+  .rep__p        { margin: 0; font: var(--type-body-m); color: var(--text-primary); }
+  .rep__note     { margin: 0; font: var(--type-body-xs); color: var(--text-secondary); }
+
+  /* Графики: карточки в две колонки */
+  .rep__charts   { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-16); }
+  .rep__chart    { min-width: 0; padding: var(--space-16); border: 1px solid var(--border-light); border-radius: var(--radius-l); }
+  .rep__chart--wide { grid-column: 1 / -1; }
+
+  /* Возможности ДИД */
+  .rep__opps     { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-12); }
+  .rep__opp      { display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-16); background: var(--bg-page); border: 1px solid var(--border-light); border-radius: var(--radius-l); }
+  .rep__opp--top { background: color-mix(in srgb, var(--primary) 6%, var(--bg-tile)); border-color: var(--primary); }
+  .rep__opp-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6); }
+  .rep__opp-title { margin: 0; font: var(--type-body-m-strong); }
+  .rep__opp-text { margin: 0; font: var(--type-body-s); color: var(--text-secondary); }
+
+  /* Инсайты */
+  .rep__insights { display: flex; flex-direction: column; gap: var(--space-12); margin: 0; padding: 0; list-style: none; counter-reset: ins; }
+  .rep__insight  { display: flex; gap: var(--space-12); counter-increment: ins; }
+  .rep__insight::before { content: counter(ins); flex: none; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; font: var(--type-body-s-strong); color: var(--primary-dark); background: color-mix(in srgb, var(--primary) 12%, var(--bg-tile)); border-radius: var(--radius-full); }
+  .rep__insight p { margin: 0; font: var(--type-body-m); }
+
+  /* Риски */
+  .rep__risks    { display: flex; flex-direction: column; border: 1px solid var(--border-light); border-radius: var(--radius-l); overflow: hidden; }
+  .rep__risk     { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: var(--space-16); padding: var(--space-16); }
+  .rep__risk + .rep__risk { border-top: 1px solid var(--border-light); }
+  .rep__risk-name { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-6); font: var(--type-body-m-strong); }
+  .rep__risk-text { margin: 0; font: var(--type-body-s); color: var(--text-primary); }
+
+  /* Позиция на встрече */
+  .rep__call     { display: flex; flex-direction: column; gap: var(--space-6); padding: var(--space-16) var(--space-20); background: color-mix(in srgb, var(--primary) 6%, var(--bg-tile)); border-left: 3px solid var(--primary); border-radius: 0 var(--radius-m) var(--radius-m) 0; }
+  .rep__call-title { margin: 0; font: var(--type-body-m-strong); color: var(--primary-dark); }
+
+  /* ── «Доработать в чате» ──────────────────────────────────────────────────
+     Работает, когда материал открыт в панели просмотра экрана «Новый отчёт»:
+     над выделенным текстом всплывает кнопка, у графика она появляется при
+     наведении. Фрагмент уходит в поле ввода контекстом следующего запроса. */
+  .rep__chart    { position: relative; }
+  .rep__chart.is-sent { box-shadow: 0 0 0 2px var(--primary); transition: box-shadow .2s ease; }
+  .rep__chart-ask { position: absolute; top: var(--space-12); right: var(--space-12); z-index: 2; opacity: 0; transition: opacity .15s ease; }
+  .rep__chart:hover .rep__chart-ask, .rep__chart:focus-within .rep__chart-ask { opacity: 1; }
+  .quote-fab     { position: absolute; z-index: 20; display: flex; padding: var(--space-4); background: var(--bg-tile); border-radius: var(--radius-l); box-shadow: 0 8px 24px color-mix(in srgb, var(--text-primary) 18%, transparent); transform: translate(-50%, calc(-100% - var(--space-8))); animation: fabIn .18s ease both; }
+  .quote-fab[hidden] { display: none; }
+  /* Появление без прозрачности: браузер приостанавливает анимации во фрейме
+     вне видимой области, и кнопка, начинавшая с opacity 0, оставалась
+     невидимой. Сдвиг и лёгкий масштаб видны и без анимации. */
+  @keyframes fabIn { from { transform: translate(-50%, calc(-100% - var(--space-2))) scale(.96); } }
+  @media (prefers-reduced-motion: reduce) { .quote-fab, .rep__chart-ask { animation: none; transition: none; } }
+
+  .rep__foot     { display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-20) var(--space-40); background: var(--bg-page); border-top: 1px solid var(--border-light); }
+
+  @media (max-width: 720px) {
+    .rep           { padding: var(--space-12); }
+    .rep__cover, .rep__body { padding: var(--space-24) var(--space-20); }
+    .rep__foot     { padding: var(--space-16) var(--space-20); }
+    .rep__charts   { grid-template-columns: minmax(0, 1fr); }
+    .rep__risk     { grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }
+  }
+</style>
+</head>
+<body>
+
+<main class="rep">
+  <article class="rep__sheet" aria-labelledby="repTitle">
+
+    <header class="rep__cover">
+      <div>
+        <p class="rep__eyebrow">Бриф перед встречей · ДИД</p>
+        <h1 class="rep__title" id="repTitle">ООО «Друза»</h1>
+        <p class="rep__lead">Добыча и переработка рудного золота · Невское месторождение и ГОК «Невский», Бодайбинский район Иркутской области · бенефициары — братья Слепневы (51% / 25% / 24%) через ООО «В.Н.В.» · директор Николай Игнатьев</p>
+      </div>
+      <p class="rep__meta"><span>Детальный материал</span><span>Версия 2</span><span>12.09.2026, 09:05</span><span>Для внутреннего использования</span></p>
+      <div class="rep__kpis">
+        <div class="rep__kpi"><span class="rep__kpi-name">Выручка 2025</span><span class="rep__kpi-val">11 102 млн</span><span class="rep__kpi-note">RUB · ▲ +21,8% г/г</span></div>
+        <div class="rep__kpi"><span class="rep__kpi-name">Чистая прибыль 2025</span><span class="rep__kpi-val">1 898 млн</span><span class="rep__kpi-note">RUB · ▲ +69,6% г/г</span></div>
+        <div class="rep__kpi"><span class="rep__kpi-name">Рентабельность продаж</span><span class="rep__kpi-val">35,5%</span><span class="rep__kpi-note">EBIT 3 943 млн RUB</span></div>
+        <div class="rep__kpi"><span class="rep__kpi-name">Долговая нагрузка</span><span class="rep__kpi-val">≈0,09</span><span class="rep__kpi-note">заёмный / собственный капитал</span></div>
+        <div class="rep__kpi"><span class="rep__kpi-name">Добыча золота</span><span class="rep__kpi-val">1,158 т</span><span class="rep__kpi-note">2023, последний раскрытый год</span></div>
+      </div>
+    </header>
+
+    <div class="rep__body">
+
+      <section class="rep__sec" aria-labelledby="secSummary">
+        <h2 class="rep__h" id="secSummary">Executive Summary</h2>
+        <p class="rep__p">Высокорентабельный семейный золотодобытчик Ленского района с почти нулевым долгом, растущий на ценовой конъюнктуре и входящий в капиталоёмкую инвестфазу. Ключевой проект — расширение ГОКа «Невский» с 1,3 до 4,4 млн т руды в год (ЗИФ-3) с выходом добычи до 3,7 т золота. Реальный масштаб бизнеса шире одного юрлица: холдинг Слепневых включает золотые «Ленсиб», «Сибирь», «Даксиб» и флюоритовые ГОКи в Бурятии, но консолидированной отчётности по группе нет.</p>
+      </section>
+
+      <section class="rep__sec" aria-labelledby="secFin">
+        <h2 class="rep__h" id="secFin">Финансы и рынок</h2>
+        <div class="rep__charts">
+          <div class="rep__chart rep__chart--wide" id="chRevenue"></div>
+          <div class="rep__chart" id="chGold"></div>
+          <div class="rep__chart" id="chDebt"></div>
+        </div>
+      </section>
+
+      <section class="rep__sec" aria-labelledby="secOps">
+        <h2 class="rep__h" id="secOps">Производство и владение</h2>
+        <div class="rep__charts">
+          <div class="rep__chart" id="chOutput"></div>
+          <div class="rep__chart" id="chOwners"></div>
+        </div>
+        <p class="rep__note">Прогноз добычи — по плану расширения ГОКа (ЗИФ-3). Ряды графиков — оценка по открытым источникам и данным Банка.</p>
+      </section>
+
+      <section class="rep__sec" aria-labelledby="secOpps">
+        <h2 class="rep__h" id="secOpps">Возможности ДИД</h2>
+        <div class="rep__opps">
+          <div class="rep__opp rep__opp--top">
+            <div class="rep__opp-head">
+              <span class="chip chip--s chip--rounded chip--success"><span class="chip__label">Да</span></span>
+              <span class="chip chip--s chip--rounded chip--info"><span class="chip__label">Приоритет</span></span>
+            </div>
+            <p class="rep__opp-title">Проектный мезонин под ЗИФ-3</p>
+            <p class="rep__opp-text">Капиталоёмкое расширение ГОКа при нулевом долге: от 1 млрд RUB на 5–7 лет, обеспечение на уровне проекта, контроль семьи сохраняется.</p>
+          </div>
+          <div class="rep__opp">
+            <div class="rep__opp-head"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__label">Условно</span></span></div>
+            <p class="rep__opp-title">Кредитный мезонин / предпроектное</p>
+            <p class="rep__opp-text">0,5–2 млрд RUB под проектирование и закупку оборудования ЗИФ-3; варрант 2–7% семья воспримет настороженно.</p>
+          </div>
+          <div class="rep__opp">
+            <div class="rep__opp-head"><span class="chip chip--s chip--rounded chip--warning"><span class="chip__label">Условно</span></span></div>
+            <p class="rep__opp-title">M&amp;A — покупка (buy-side)</p>
+            <p class="rep__opp-text">Группа — активный консолидатор; рекультивационные фонды выдавливают мелких россыпников, создавая поток дешёвых лицензий района.</p>
+          </div>
+          <div class="rep__opp">
+            <div class="rep__opp-head"><span class="chip chip--s chip--rounded chip--error"><span class="chip__label">Нет</span></span></div>
+            <p class="rep__opp-title">M&amp;A — продажа (sell-side)</p>
+            <p class="rep__opp-text">Контроль сконцентрирован у семьи, Невское — ядро бизнеса; мотивации к выходу нет в горизонте 2–3 лет.</p>
+          </div>
+          <div class="rep__opp">
+            <div class="rep__opp-head"><span class="chip chip--s chip--rounded chip--error"><span class="chip__label">Нет</span></span></div>
+            <p class="rep__opp-title">Рынки капитала (DCM/ECM)</p>
+            <p class="rep__opp-text">Нет рейтингов, МСФО и публичной истории; возможна дорожная карта на 2–3 года под ЗИФ-3 после консолидации группы.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="rep__sec" aria-labelledby="secInsights">
+        <h2 class="rep__h" id="secInsights">Инсайты</h2>
+        <ol class="rep__insights">
+          <li class="rep__insight"><p><strong>Прибыльный актив с незадействованным долговым плечом.</strong> При выручке 11,1 млрд RUB и рентабельности продаж 35,5% компания финансирует развитие из собственного потока при соотношении заёмного и собственного капитала около 0,09 — редкий для отрасли профиль заёмщика с огромным запасом долговой ёмкости.</p></li>
+          <li class="rep__insight"><p><strong>Стоимость создаёт не объём, а цена и передел.</strong> Физическая добыча стагнирует на уровне 1,1–1,2 т, но учётная цена ЦБ достигла 12 088,55 RUB за грамм 27.01.2026 — впервые за историю наблюдений с 1997 года. Дальнейший рост возможен только через ЗИФ-3, то есть через CAPEX.</p></li>
+          <li class="rep__insight"><p><strong>За юрлицом стоит скрытая группа.</strong> Холдинг Слепневых объединяет золотые и флюоритовые активы в двух регионах с совокупной выручкой, кратно превышающей выручку «Друзы». Клиентское покрытие имеет смысл строить на уровне группы, а не одной компании.</p></li>
+        </ol>
+      </section>
+
+      <section class="rep__sec" aria-labelledby="secRisks">
+        <h2 class="rep__h" id="secRisks">Ключевые риски</h2>
+        <div class="rep__risks">
+          <div class="rep__risk">
+            <div class="rep__risk-name">Непрозрачность группы<span class="chip chip--s chip--rounded chip--error"><span class="chip__label">Высокий</span></span></div>
+            <p class="rep__risk-text">Консолидированной МСФО нет, операции переплетены с сестринскими компаниями под общим управлением. Оценить реальное кредитное качество без выгрузки из платных систем и прямого запроса отчётности невозможно.</p>
+          </div>
+          <div class="rep__risk">
+            <div class="rep__risk-name">Ценовой и ресурсный<span class="chip chip--s chip--rounded chip--warning"><span class="chip__label">Средний</span></span></div>
+            <p class="rep__risk-text">Прибыль полностью зависит от рублёвой цены золота при стагнации физической добычи. Укрепление рубля или коррекция цены на фоне надбавки к НДПИ 10,0% и налога на прибыль 25,0% быстро сжимает маржу.</p>
+          </div>
+          <div class="rep__risk">
+            <div class="rep__risk-name">Экологический и регуляторный<span class="chip chip--s chip--rounded chip--warning"><span class="chip__label">Средний</span></span></div>
+            <p class="rep__risk-text">Платёж за негативное воздействие 20,6 млн RUB за 2024 год, 119 проверок с 2015 года, арбитражные споры. Готовящиеся рекультивационные фонды добавят отрасли 8–12 млрд RUB нагрузки в год.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="rep__sec" aria-labelledby="secPosition">
+        <h2 class="rep__h" id="secPosition">Позиция на встрече</h2>
+        <div class="rep__call">
+          <p class="rep__call-title">Не предлагать вход в капитал — семья контроль не размывает</p>
+          <p class="rep__p">Заходить с проектным финансированием конкретного этапа ЗИФ-3 под обеспечение активами рудника и с сохранением 100% контроля собственников. Параллельно ставить задачу клиентского покрытия всей группы Слепневых, включая флюоритовый дивизион в Бурятии.</p>
+        </div>
+      </section>
+
+    </div>
+
+    <footer class="rep__foot">
+      <div class="chiplist chiplist--s" role="list" aria-label="Источники">
+        <span class="chip chip--s" role="listitem"><span class="chip__label">Отчётность РСБУ 2021–2025</span></span>
+        <span class="chip chip--s" role="listitem"><span class="chip__label">Данные ЦБ о цене золота</span></span>
+        <span class="chip chip--s" role="listitem"><span class="chip__label">Данные Банка</span></span>
+        <span class="chip chip--s" role="listitem"><span class="chip__label">Отраслевой обзор 2026</span></span>
+      </div>
+      <p class="rep__note">Материал подготовлен AI Pitcher · версия 2 · 12.09.2026. Цифры и выводы требуют проверки перед передачей клиенту.</p>
+    </footer>
+
+  </article>
+</main>
+
+<!-- Всплывающая кнопка над выделенным текстом -->
+<div class="quote-fab" id="quoteFab" hidden>
+  <button type="button" class="btn btn--accent btn--s" id="quoteAsk"><i data-icon="ai-stars"></i><span class="btn__label">Доработать в чате</span></button>
+</div>
+
+<script src="../../DS-IBP/scripts/ds.js"></script>
+<script>
+/* Графики материала — компонент Chart ДС. Ряды — демо-данные прототипа,
+   согласованные с цифрами материала: выручка и прибыль 2025, рентабельность,
+   долговая нагрузка, добыча 2023 и цена золота на 27.01.2026. */
+(function () {
+  'use strict';
+  if (!window.DSChart) return;
+  function put(id, cfg) { document.getElementById(id).appendChild(window.DSChart.make(cfg)); }
+
+  put('chRevenue', {
+    type: 'grouped', size: 'l',
+    title: 'Выручка и чистая прибыль', subtitle: 'RUB, 2021–2025',
+    categories: ['2021', '2022', '2023', '2024', '2025'],
+    series: [
+      { id: 'rev', name: 'Выручка', data: [5340e6, 6210e6, 7480e6, 9115e6, 11102e6] },
+      { id: 'np', name: 'Чистая прибыль', data: [870e6, 1020e6, 890e6, 1119e6, 1898e6] }
+    ],
+    valueLabels: true
+  });
+
+  put('chGold', {
+    type: 'area', size: 'm',
+    title: 'Учётная цена золота ЦБ', subtitle: 'RUB за грамм, среднее за год',
+    categories: ['2021', '2022', '2023', '2024', '2025', 'Янв 2026'],
+    series: [{ id: 'gold', name: 'Цена', data: [4250, 3880, 5180, 7520, 9870, 12089] }]
+  });
+
+  put('chDebt', {
+    type: 'hbar', size: 'm',
+    title: 'Долговая нагрузка', subtitle: 'Заёмный / собственный капитал · Друза, медиана и лидеры отрасли',
+    categories: ['Друза', 'Медиана', 'Лидеры'],
+    series: [{ id: 'debt', name: 'Коэффициент', data: [0.09, 0.65, 1.1] }],
+    valueLabels: true
+  });
+
+  put('chOutput', {
+    type: 'bar', size: 'm',
+    title: 'Добыча золота', subtitle: 'Тонн · 2027–2029 — прогноз под ЗИФ-3',
+    categories: ['2019', '2020', '2021', '2022', '2023', '2027П', '2029П'],
+    series: [{ id: 'out', name: 'Добыча', data: [1.12, 1.18, 1.21, 1.14, 1.158, 2.4, 3.7], forecastFrom: 5 }],
+    valueLabels: true
+  });
+
+  put('chOwners', {
+    type: 'donut', size: 'm',
+    title: 'Структура владения', subtitle: 'Доли бенефициаров через ООО «В.Н.В.»',
+    categories: ['Бенефициар 1', 'Бенефициар 2', 'Бенефициар 3'],
+    series: [{ id: 'own', name: 'Доля, %', data: [51, 25, 24] }],
+    centerLabel: '100%', centerSub: '3 бенефициара'
+  });
+})();
+
+/* «Доработать в чате»: фрагмент материала — в контекст следующего запроса.
+   Материал живёт во фрейме панели просмотра; экран «Новый отчёт» получает
+   фрагмент сообщением (postMessage) — так работает и при открытии файла
+   двойным кликом, где доступ к документу фрейма закрыт. Текст уходит целиком,
+   график — тегом с названием: агенту это указание, что смотреть в материале. */
+(function () {
+  'use strict';
+  if (!window.parent || window.parent === window) return;
+
+  var fab = document.getElementById('quoteFab');
+  var sheet = document.querySelector('.rep__sheet');
+  var pending = null;
+
+  function elOf(node) { return node && (node.nodeType === 1 ? node : node.parentElement); }
+  function sectionOf(node) {
+    var el = elOf(node);
+    var sec = el && el.closest('.rep__sec');
+    if (sec) { var h = sec.querySelector('.rep__h'); return h ? h.textContent.trim() : ''; }
+    return el && el.closest('.rep__cover') ? 'Обложка' : '';
+  }
+  function chartTitle(box) { var t = box.querySelector('.chart__title'); return t ? t.textContent.trim() : 'График'; }
+  function send(items) { window.parent.postMessage({ source: 'ai-pitcher-material', type: 'context', items: items }, '*'); }
+  function hide() { fab.hidden = true; pending = null; }
+  function clean(s) { return s.replace(/\s+/g, ' ').trim(); }
+
+  /* текст выделения без подписей графиков, между блоками — пробел */
+  function selectedText(range) {
+    var frag = range.cloneContents();
+    Array.prototype.forEach.call(frag.querySelectorAll('.rep__chart, .quote-fab, button'), function (n) { n.remove(); });
+    Array.prototype.forEach.call(frag.querySelectorAll('p, li, h1, h2, span, div'), function (n) { n.appendChild(document.createTextNode(' ')); });
+    return clean(frag.textContent);
+  }
+
+  function onSelection() {
+    var sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) { hide(); return; }
+    var range = sel.getRangeAt(0);
+    if (!sheet.contains(range.commonAncestorContainer)) { hide(); return; }
+    var charts = Array.prototype.filter.call(document.querySelectorAll('.rep__chart'), function (c) { return range.intersectsNode(c); });
+    var insideChart = charts.length === 1 && charts[0].contains(range.commonAncestorContainer);
+    var items = [];
+    var txt = insideChart ? '' : (charts.length ? selectedText(range) : clean(sel.toString()));
+    if (txt.length >= 3) items.push({ kind: 'text', text: txt, section: sectionOf(range.startContainer) });
+    charts.forEach(function (c) { items.push({ kind: 'chart', title: chartTitle(c), section: sectionOf(c) }); });
+    if (!items.length) { hide(); return; }
+    pending = items;
+    var rect = range.getBoundingClientRect();
+    var x = Math.min(Math.max(rect.left + rect.width / 2, 110), document.documentElement.clientWidth - 110);
+    fab.style.left = (x + window.scrollX) + 'px';
+    fab.style.top = (Math.max(rect.top, 56) + window.scrollY) + 'px';
+    fab.hidden = false;
+  }
+
+  document.addEventListener('mouseup', function (e) { if (!fab.contains(e.target)) setTimeout(onSelection, 0); });
+  document.addEventListener('keyup', function (e) { if (e.shiftKey || e.key === 'Shift') onSelection(); });
+  document.addEventListener('selectionchange', function () { var s = window.getSelection(); if (!s || s.isCollapsed) hide(); });
+  window.addEventListener('resize', hide);
+  /* клик по кнопке не должен снимать выделение до отправки */
+  fab.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  document.getElementById('quoteAsk').addEventListener('click', function () {
+    if (!pending) return;
+    send(pending);
+    window.getSelection().removeAllRanges();
+    hide();
+  });
+
+  /* у каждого графика — своя кнопка: график не выделяется как текст */
+  Array.prototype.forEach.call(document.querySelectorAll('.rep__chart'), function (box) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn--outline btn--xs rep__chart-ask';
+    btn.innerHTML = '<i data-icon="ai-stars"></i><span class="btn__label">Доработать в чате</span>';
+    btn.setAttribute('aria-label', 'Доработать в чате: график «' + chartTitle(box) + '»');
+    box.appendChild(btn);
+    if (window.dsIcons) window.dsIcons.apply(btn);
+    btn.addEventListener('click', function () {
+      send([{ kind: 'chart', title: chartTitle(box), section: sectionOf(box) }]);
+      box.classList.add('is-sent');
+      setTimeout(function () { box.classList.remove('is-sent'); }, 900);
+    });
+  });
+})();
+</script>
+</body>
+</html>
